@@ -1,2 +1,4 @@
-export const menuIcon = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/VisualEditor_-_Icon_-_Menu.svg/1200px-VisualEditor_-_Icon_-_Menu.svg.png'
+export const menuIcon = 'https://i.imgur.com/iWKMqyx.png'
+export const menuIcon_black = 'https://i.imgur.com/bfeEda2.png'
 export const whatsappIcon = 'https://www.hostalcentralbarcelona.com/wp-content/uploads/2017/03/WhatsApp-icon-300x300.png'
+export const profile = "https://www.pionet.co.il/SVTemplate/img/client_story.svg"

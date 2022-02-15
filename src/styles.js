@@ -1,8 +1,8 @@
-import { orangePrimary } from "./colors"
+import { colorPrimary } from "./colors"
 
 export const bgColor = (color, size) => {
     return {
-        backgroundColor: color,
+        backgroundImage: color,
         width: size.width,
         height: size.height
     }
@@ -19,7 +19,8 @@ export const flex = (direction, align, justify) => {
 export const toolbar = () => {
     return {
         ...flex('row', 'center', 'space-between'),
-        ...bgColor(orangePrimary, { width: '100%', height: '50px' })
+        ...{ zIndex: '100' },
+        ...bgColor(colorPrimary, { width: '100%', height: '50px' })
     }
 }
 export const boxShadow = () => {

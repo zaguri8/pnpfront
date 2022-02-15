@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@material-ui/core": "^4.12.3",
+    "@mui/lab": "^5.0.0-alpha.68",
+    "@mui/material": "^5.4.1",
+    "@mui/styles": "^5.4.1",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
@@ -13,12 +19,15 @@
     "fs": "0.0.1-security",
     "jquery": "^3.6.0",
     "react": "^17.0.2",
+    "react-datepicker": "^4.6.0",
     "react-dom": "^17.0.2",
     "react-scripts": "5.0.0",
+    "simple-react-calendar": "^2.2.8",
     "typescript": "^4.5.5",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4"
   },
+  "homepage": "https://nadavsolutions.com/pnp",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -45,6 +54,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.5.13",
+    "@types/react-datepicker": "^4.3.4",
     "@types/uuid": "^8.3.4"
   }
 }

@@ -1,133 +1,183 @@
 import './App.css';
 import { ToolBar, ToolbarProps } from './components/Toolbar';
-import { useEffect, useState } from 'react';
-import { boxShadow, flex } from './styles';
-import { menuItem_1, menuItem_2, menuItem_3, menuItem_4, menuItem_5 } from './strings';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { flex } from './styles';
 import $ from 'jquery'
+import logo_white from './assets/images/logo_white.png'
 import { ToolbarItem } from './components/ToolbarItem';
-import logo from './assets/images/logo_white.png'
+import AppMenu from './components/AppMenu';
 import { RideForm } from './components/RideForm';
 import { Gallery } from './components/Gallery';
-import { orangePrimary } from './colors';
-import { CopyRights } from './components/CopyRights';
-import { whatsappIcon } from './assets/images';
-function AppMenu(props: ToolbarProps) {
+import { CSSProperties } from 'react';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePicker from '@mui/lab/DatePicker';
+import { colorPrimary } from './colors';
+import { menuIcon_black, whatsappIcon } from './assets/images';
+import { FormElementType, RideFormItem } from './components/RideFormItem';
+import { TextField } from '@mui/material';
 
 
-  return <div id='menu' style={{
-    ...{
-      direction: 'rtl',
-      'overflow': 'scroll',
-      width: '30%',
-      padding: '16px',
-      position: 'absolute',
-      right: '0',
-      zIndex: '9999',
-      height: '100%'
-    },
-    ...flex('column', 'center'),
-    ...{ background: orangePrimary }
-  }}>
-    <ToolbarItem image={logo} />
-
-    <ToolbarItem text={menuItem_2('heb')} action={props.menuToggle} style={{ width: '80%' }} />
-
-    <ToolbarItem text={menuItem_3('heb')} action={props.menuToggle} style={{ width: '80%' }} />
-
-    <ToolbarItem text={menuItem_4('heb')} action={props.menuToggle} style={{ width: '80%' }} />
-    <ToolbarItem text={menuItem_1('heb')} action={props.menuToggle} style={{ width: '80%' }} />
-    <ToolbarItem text={menuItem_5('heb')} action={props.menuToggle} style={{ width: '80%' }} />
-    <CopyRights style={{ fontWeight: '100', position: 'absolute', bottom: '0', color: 'white' }} />
-  </div>
-}
-function App() {
-  const toggleMenu = () => {
-    $('#menu').stop().animate({ height: 'toggle' }, 250);
-    $('#logo').stop().animate({ height: 'toggle' }, 250);
-    $('#options').stop().animate({ height: 'toggle' }, 250);
+function SmallMenu(props: ToolbarProps) {
+  const dFlex: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    columnGap: '24px',
+    alignItems: 'center',
+    width: '100%'
   }
 
 
-  useEffect(() => {
-    $(window).scroll(() => {
-      if (window.scrollY < 400) {
-        $('#toolbar').css('position', 'sticky')
-      }
-      $("#menu").css("height", ($('body').height()! - $('.App-header').height()! - 32) + 'px');
-    })
+  const handleDateChange = (newDate: Date) => {
+    const day = newDate.getDate()
+    const month = newDate.getMonth()
+    const year = newDate.getFullYear()
+    setValue(`${day}/${month}/${year}`)
+  }
+  const [value, setValue] = useState('')
+  return <div id='small_menu' style={{
+    ...{
+      borderTopLeftRadius: '42px',
+      borderTopRightRadius: '42px',
+      overflow: 'hidden',
+      marginTop: '16px',
+      height: '50%'
+    },
+    ...flex('column', 'center'),
+    ...{ background: 'linear-gradient(brown,orangered,orange)' }
+  }}>
+    {<h1 style={{ textAlign: 'end', color: 'white' }}>היי חפש יציאה מעניינת</h1>}
 
-    $('#options_2').on('click', () => toggleMenu())
+    <div style={dFlex}>
+      <RideFormItem style={{ width: '100%', fontSize: '24px' }} text='הכל' type='text' options={["תל אביב", "רמת השרון"]} elem={FormElementType.selector} />
+    </div>
+    <div style={dFlex}>
+      <RideFormItem style={{ width: '50%', fontSize: '24px' }} options={["הכל"]} text='הכל' type='text' elem={FormElementType.selector} />
 
-    $(window).resize(() => {
-      $("#menu").css("height", ($('body').height()! - $('.App-header').height()! - 32) + 'px');
-      const windowWidth = window.outerWidth
-      if (windowWidth && windowWidth < 900) {
-        if (windowWidth < 600) {
-          $('.gallery').css('grid-template-columns', '1fr')
-          $('.gallery').css('grid-template-rows', '1fr 1fr 1fr 1fr')
-        } else {
-          $('.gallery').css('grid-template-columns', '1fr 1fr')
-          $('.gallery').css('grid-template-rows', '1fr 1fr')
-        }
-      } else {
-        $('.gallery').css('grid-template-columns', '1fr 1fr 1fr 1fr')
-        $('.gallery').css('grid-template-rows', '1fr')
-      }
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <DatePicker
+          openTo="day"
+          value={'value'}
 
-      if (windowWidth && windowWidth < 600) {
-        $('#options_2').css('display', 'block')
-        $('#options').css('display', 'none')
-        $('#create_event').css('display', 'none')
-        $('#login').css('display', 'none')
-        $('#language').css('display', 'none')
+          shouldDisableDate={(day: Date) => { return false }}
+          onChange={(newValue) => {
+            handleDateChange(newValue ? newValue : new Date())
+          }}
+          renderInput={(params) => <TextField onChange={(e) => setValue(e.target.value)} id='date' {...params} {...{ value: value }} />}
+        />
+      </LocalizationProvider>
 
-        $('#menu').css({ 'width': '100%' })
-      } else if ($('#options_2').css('display') === 'block') {
+    </div>
+    <div style={dFlex}>
 
-        $('#options_2').css('display', 'none')
-        $('#options').css('display', 'block')
-        $('#create_event').css('display', 'block')
-        $('#login').css('display', 'block')
-        $('#language').css('display', 'block')
-      }
-    })
-    var canTog = false
-    $('.side_icon').hover(() => {
-      if (!canTog)
-        return
-      canTog = false;
-      $('.side_icon').stop().animate({ 'height': '75px', width: '75px' }, 'fast')
-    }, () => {
-      $('.side_icon').stop().animate({ 'height': '50px', width: '50px' }, 'fast', () => {
-        canTog = true
-      })
+      <RideFormItem style={{ width: '100%', fontSize: '24px' }} text='מצא לי מקומות בילוי !' type='text' elem={FormElementType.button} />
+    </div>
 
-    })
+  </div>
+}
+function App() {
+
+  const toggleMenu = () => {
+    if ($('.dim').css('display') === 'none') {
+
+      $('#menu').stop().animate({ width: 'toggle' }, 100, () => dim(true))
+    } else {
+      $('#menu').stop().animate({ width: 'toggle' }, 100, () => dim(false))
+    }
+  }
+
+  const dim = (enable: boolean) => {
+    if (enable) {
+      $('.dim').css('display', 'block')
+    } else {
+      $('.dim').css('display', 'none')
+    }
+  }
+
+  useLayoutEffect(() => {
+    const d = document.createElement('div')
+    d.classList.add('dim')
+    $('.App').append(d)
     $('#menu').hide()
+    d.style.display = 'none'
+    $('.App').on('click', (event) => {
+      if (event.target.tagName == 'span') {
+        return
+      }
+    })
+
+    function onResize() {
+      const windowWidth = window.outerWidth
+      if (windowWidth && windowWidth > 700) {
+        $('.gallery_header').css('alignSelf', 'flex-end').css('text-align', 'right')
+      } else if (windowWidth && windowWidth < 600) {
+        $('.gallery_header').css('alignSelf', 'center').css('text-align', 'center')
+      }
+    }
+    function onScroll() {
+      if (window.scrollY >= 222) {
+        $('#toolbar').css('padding', '4')
+        $('#toolbar').css({ 'position': 'sticky', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
+        $('#toolbar').css('top', '0')
+
+      } else {
+        $('#toolbar').css('padding', '0')
+        $('#toolbar').css({ 'position': 'relative', 'background': colorPrimary, 'transition': 'all .2s' })
+      }
+    }
+
+    onResize()
+    onScroll()
+
+    $(window).on('resize', onResize)
+    $(window).on('scroll', onScroll)
   }, [null])
 
-  const dummy = ['https://media.istockphoto.com/photos/we-are-going-to-party-as-if-theres-no-tomorrow-picture-id1279483477?b=1&k=20&m=1279483477&s=170667a&w=0&h=cWwEBw0uErqkzeCHcJnoih7dU_Gr_DnKdYitDgSvhqw=',
-    "https://media.istockphoto.com/photos/we-are-going-to-party-as-if-theres-no-tomorrow-picture-id1279483477?b=1&k=20&m=1279483477&s=170667a&w=0&h=cWwEBw0uErqkzeCHcJnoih7dU_Gr_DnKdYitDgSvhqw=", "https://media.istockphoto.com/photos/we-are-going-to-party-as-if-theres-no-tomorrow-picture-id1279483477?b=1&k=20&m=1279483477&s=170667a&w=0&h=cWwEBw0uErqkzeCHcJnoih7dU_Gr_DnKdYitDgSvhqw=", "https://media.istockphoto.com/photos/we-are-going-to-party-as-if-theres-no-tomorrow-picture-id1279483477?b=1&k=20&m=1279483477&s=170667a&w=0&h=cWwEBw0uErqkzeCHcJnoih7dU_Gr_DnKdYitDgSvhqw="]
+  const headerStyle: CSSProperties = {
+    textAlign: 'right',
+    background: 'white',
+    fontWeight: 'bold',
+
+    fontFamily: 'Open Sans Hebrew ',
+    position: 'relative',
+    alignSelf: 'flex-end',
+    padding: '32px',
+    margin: '0px',
+    color: 'black'
+  }
+
+  const dummy = ['https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg',
+    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg",
+    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg",
+    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg",
+    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg"]
 
   return (
-    <div className="App">
-
-      <div className='App-header' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
-        <img src={logo} style={{ height: '100px', padding: '8px' }} />
-      </div>
-
+    <div>
       {<AppMenu menuToggle={toggleMenu} />}
-      <ToolBar menuToggle={() => toggleMenu()} />
-
-      <RideForm />
-
-      <h1 style={{ fontFamily: 'georgia', color: 'white' }}>{'אירועים קרובים'}</h1>
-      <Gallery header='תרבות ופנאי' images={dummy} />
-      <Gallery header='מועדונים' images={dummy} />
+      <div className="App">
+        <div className='App-header' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
+          <img src={logo_white} style={{ height: '100px', padding: '8px' }} />
+        </div>
 
 
-      <div className={'side_icon'} style={{ padding: '0px', margin: '24px', zIndex: '9999', bottom: '0', right: '0', position: 'fixed', width: '50px', height: '50px' }}>
-        <img className={'side_icon'} style={{ width: '50px', height: '50px', cursor: 'pointer' }} src={whatsappIcon} />
+        <ToolBar menuToggle={() => toggleMenu()} />
+
+        <RideForm />
+
+        <h1 style={{ fontFamily: 'Open Sans He', color: 'black' }}>{'אירועים קרובים'}</h1>
+        <hr />
+        {<h2 className='gallery_header' style={headerStyle}>{'תרבות ופנאי'}</h2>}
+        <Gallery header='תרבות ופנאי' images={dummy} />
+
+        {<h2 className='gallery_header' style={headerStyle}>{'מועדונים'}</h2>}
+        <Gallery header='' images={dummy} />
+
+
+        <div className={'side_icon'} style={{ padding: '0px', margin: '24px', zIndex: '9999', bottom: '0', right: '0', position: 'fixed', width: '50px', height: '50px' }}>
+          <img className={'side_icon'} style={{ width: '50px', height: '50px', cursor: 'pointer' }} src={whatsappIcon} />
+        </div>
       </div>
     </div>
   );

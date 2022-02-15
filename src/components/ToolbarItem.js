@@ -1,16 +1,18 @@
-export function ToolbarItem({ text = '', action = () => { }, image = '', align = '', style = {}, id = '' }) {
-    return <span id={id} onClick={action} style={{
+export function ToolbarItem({ text = '', action = () => { }, image = '', line = false, bold = false, style = {}, id = '' }) {
+    return <span className={bold ? '' : 'toolbar_item'} onClick={action} style={{
         ...{
-            padding: '8px',
-            fontWeight:'100',
+            padding: '16px',
+            fontWeight: '400',
+            fontSize: '18px',
             cursor: 'pointer',
+            textAlign: 'center',
             borderRadius: '8px',
-            background: image ? 'none' : 'rgba(0,0,0,0.2)',
-            color: 'white',
-            margin: '8px',
+            background: image ? 'none' : 'rgba(0,0,0,0.0)',
+            color: 'black',
             maxHeight: 'inherit'
         }, ...style
     }}>
-        {text ? text : image ? <img style={{ height: '25px' }} src={image} /> : ''}
+        {text ? text : image ? <img id={id} style={{ height: '18px' }} src={image} /> : ''}
+        {line && <hr style={{ borderWidth: '.1px' }} />}
     </span>
 }

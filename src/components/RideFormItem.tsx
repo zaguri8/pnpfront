@@ -1,36 +1,44 @@
 import { CSSProperties, HTMLInputTypeAttribute } from "react"
-
+import $ from 'jquery'
 export enum FormElementType {
     button, input, selector
 }
 export type RideFormProps = {
     text: string,
     elem: FormElementType,
-    type: HTMLInputTypeAttribute
+    id?: string,
+    type: HTMLInputTypeAttribute,
+    style: CSSProperties,
+    options?: string[]
 }
 export function RideFormItem(props: RideFormProps) {
     const elemStyle: CSSProperties = {
         direction: 'rtl',
+        padding: '16px',
         fontSize: '18px',
-        padding: '8px',
-        width: 'fit-content',
-        color: 'whitesmoke',
-        background: 'rgba(0,0,0,0.2',
-        border: '1px solid white',
-        borderRadius: '8px'
+        fontWeight: 'bold',
+        marginLeft: '16px',
+        marginRight: '16px',
+        borderRadius:'16px',
+        background: 'white',
+        color: 'black',
+        textAlign: 'center',
+        border: 'none'
     }
     const getElem = () => {
         switch (props.elem) {
             case FormElementType.button:
-                return <button style={{ ...elemStyle, ...{ cursor: 'pointer' } }}>{props.text}</button>
+                return <button id={props.id} className='ride_form_item' style={{ ...elemStyle, ...props.style, ...{ cursor: 'pointer' } }}>{props.text}</button>
             case FormElementType.input:
-                return <input style={elemStyle} type={props.type} placeholder={props.text} />
+                return <input id={props.id} className='ride_form_item' style={{ ...elemStyle, ...props.style }} type={props.type} placeholder={props.text} />
             case FormElementType.selector:
-                break;
+                return <select id={props.id} className='ride_form_item' style={{ ...elemStyle, ...props.style }}>
+                    {props.options && props.options.map(option => <option id={props.id} value={option} key={option}>
+                        {option}
+                    </option>)}
+                </select>
         }
-        return null
+
     }
-    return <div style={{ padding: '8px', display: 'inline-block' }}>
-        {getElem()}
-    </div>
+    return getElem()
 }

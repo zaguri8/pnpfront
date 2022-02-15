@@ -6,55 +6,62 @@ export type GalleryProps = {
 }
 export function Gallery(props: GalleryProps) {
     const containerStyle: CSSProperties = {
-        padding: '24px',
-        borderRadius: '4px',
         display: 'flex',
+        overflow: 'scroll',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'start',
+        direction:'rtl',
+        background: 'white',
         flexDirection: 'column'
     }
-    const headerStyle: CSSProperties = {
-        fontFamily: 'Open Sans',
-        textAlign: 'right',
-        fontWeight: '100',
-        alignSelf: 'flex-end',
-        padding: '16px',
-        margin: '0px',
-        color: 'white'
-    }
-    const cardStyle: CSSProperties = {
-        width: '200px',
-        height: '100px',
-        borderRadius: '8px',
-        padding: '16px',
 
-        margin: '8px'
+    const cardStyle: CSSProperties = {
+
+        maxWidth: '200px',
+        marginLeft: '32px',
+        marginRight: '32px',
+        minWidth: '150px',
+        boxShadow: '0px 0px 6px 0px',
+        minHeight: '150px',
+        borderRadius: '8px'
     }
     const imageContainer: CSSProperties = {
-        display: 'grid',
+        display: 'flex',
         alignItems: 'center',
-        borderRadius: '8px',
-        gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: '1fr ',
+        background: 'white',
+        overflow: 'auto',
+        padding: '8px',
         justifyContent: 'center',
-        padding: '16px',
-        boxShadow: 'rgba(0, 0, 0, 0.1) 0px 10px 50px',
         textAlign: 'center'
 
     }
-    return <div style={containerStyle}>
-        {<h2 style={headerStyle}>{props.header}</h2>}
-        <hr style={{
-            width: '100%',
-            marginBottom: '32px',
-            marginTop: '16px',
-            borderBlockWidth: '.1px', borderColor: 'white', background: 'white'
-        }} />
+    return <div id='gallery_container' style={containerStyle}>
+
         <div className='gallery' style={imageContainer}>
             {props.images.map(image => {
 
-                return (<div ><img key={image} style={cardStyle} src={image} />
-                    <h4 style={{ margin: '0px', padding: '0px' }}>Hel</h4></div>)
+                return (<div className="gallery_img" style={{
+                    ...cardStyle, ...{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: `url('${image}') `,
+                        backgroundSize: '100% 100%',             /* <------ */
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center center'
+                    }
+                }}>
+
+                    <h4 style={{
+                        background: 'rgba(0,0,0,0.5)',
+                        margin: '0px',
+                        marginTop: 'auto',
+                        padding: '8px',
+                        color: 'white',
+                        borderBottomLeftRadius: '8px',
+                        borderBottomRightRadius: '8px'
+                    }}>שם האירוע</h4>
+
+                </div>)
             })}
         </div>
     </div>

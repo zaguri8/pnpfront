@@ -1,2 +1,3 @@
-export const orangePrimary = "rgb(245,110,0)"
-export const orangeSecondary = "rgb(244 ,191, 54)"
+export const colorPrimary = "white"
+export const colorSecondary = "linear-gradient(orange,orangered,rgb(220,61,45))"
+export const orangeGradient = "linear-gradient(orange,orangered,rgb(161,61,45))"
