@@ -20,7 +20,7 @@ export function Gallery(props: GalleryProps) {
         maxWidth: '200px',
         marginLeft: '32px',
         marginRight: '32px',
-        minWidth: '150px',
+        minWidth: '200px',
         boxShadow: '0px 0px 6px 0px',
         minHeight: '150px',
         borderRadius: '8px'

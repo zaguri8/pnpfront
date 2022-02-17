@@ -20,7 +20,7 @@ export const toolbar = () => {
     return {
         ...flex('row', 'center', 'space-between'),
         ...{ zIndex: '100' },
-        ...bgColor(colorPrimary, { width: '100%', height: '50px' })
+        ...bgColor(colorPrimary, { height: '50px' })
     }
 }
 export const boxShadow = () => {

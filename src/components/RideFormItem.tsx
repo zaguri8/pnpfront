@@ -3,6 +3,7 @@ import $ from 'jquery'
 export enum FormElementType {
     button, input, selector
 }
+
 export type RideFormProps = {
     text: string,
     elem: FormElementType,
@@ -11,6 +12,7 @@ export type RideFormProps = {
     style: CSSProperties,
     options?: string[]
 }
+
 export function RideFormItem(props: RideFormProps) {
     const elemStyle: CSSProperties = {
         direction: 'rtl',

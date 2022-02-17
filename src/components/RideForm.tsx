@@ -57,7 +57,7 @@ export function RideForm() {
                 $('#form_header').css('display', 'none')
             }
 
-            if (windowWidth < 560 || windowWidth >= 1000) {
+            if (windowWidth < 726 || windowWidth >= 1000) {
                 $('#form_item_1').css('display', 'block')
                 $('#form_item_2').css('display', 'block')
                 $('#form_item_3').css('display', 'block')
@@ -72,7 +72,7 @@ export function RideForm() {
     return <div dir="rtl" style={formstyle}>
         <div id='ride_form' style={{
             display: 'flex',
-            background: colorSecondary,
+            background: '#282c34',
             flexDirection: 'column',
             justifyContent: 'center',
             columnGap: '8px',
@@ -82,7 +82,7 @@ export function RideForm() {
             rowGap: '16px',
         }}>
 
-            <h4 id='form_header' style={{ margin: '0px', color: 'whitesmoke' }}>היי, חפש הסעה ל</h4>
+            <h4 id='form_header' style={{ margin: '0px', padding: '8px', color: 'whitesmoke' }}>היי, צור הסעה</h4>
             <RideFormItem id='form_item_1' style={{}} elem={FormElementType.selector} options={["Tel Aviv", "Rosh pina"]} text={'בחר יעד'} type={'text'} />
             <RideFormItem id='form_item_2' style={{}} elem={FormElementType.selector} text={'נקודת יציאה'} options={["Tel Aviv", "Rosh pina"]} type={'text'} />
             <div style={{ columnGap: '8px', display: 'flex', justifyContent: 'center' }}>

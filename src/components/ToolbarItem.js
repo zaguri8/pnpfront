@@ -1,9 +1,11 @@
 export function ToolbarItem({ text = '', action = () => { }, image = '', line = false, bold = false, style = {}, id = '' }) {
     return <span className={bold ? '' : 'toolbar_item'} onClick={action} style={{
         ...{
-            padding: '16px',
+            paddingLeft: '16px',
+            paddingRight: '16px',
             fontWeight: '400',
             fontSize: '18px',
+            paddingTop:image ? '8px' : '0px',
             cursor: 'pointer',
             textAlign: 'center',
             borderRadius: '8px',

@@ -16,6 +16,7 @@ import { colorPrimary } from './colors';
 import { menuIcon_black, whatsappIcon } from './assets/images';
 import { FormElementType, RideFormItem } from './components/RideFormItem';
 import { TextField } from '@mui/material';
+import SayNoMoreContainer from './components/saynomore/SayNoMoreContainer';
 
 
 function SmallMenu(props: ToolbarProps) {
@@ -147,11 +148,11 @@ function App() {
     color: 'black'
   }
 
-  const dummy = ['https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg',
-    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg",
-    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg",
-    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg",
-    "https://t3.ftcdn.net/jpg/00/61/34/66/360_F_61346603_Ex7BpSZiF0SgA7Ok30SoMQVUuBbSBR9G.jpg"]
+  const dummy = ['https://www.foundry.com/sites/default/files/styles/teaser_image/public/content-type/events/Thumbnail%20-%20560x314.jpg?itok=Ut22aZzn',
+    "https://img1.10bestmedia.com/Images/Photos/232356/p-Final-Hakkasan-LV-Crowd-Image_55_660x440_201404241405.jpg",
+    "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/clubbing-party-night-event-video-template-design-ab368aade7af4fb78cf1451b2e8330ad_screen.jpg?ts=1577518856",
+    "https://www.foundry.com/sites/default/files/styles/teaser_image/public/content-type/events/Thumbnail%20-%20560x314.jpg?itok=Ut22aZzn",
+    "https://www.foundry.com/sites/default/files/styles/teaser_image/public/content-type/events/Thumbnail%20-%20560x314.jpg?itok=Ut22aZzn"]
 
   return (
     <div>
@@ -166,8 +167,9 @@ function App() {
 
         <RideForm />
 
+        <SayNoMoreContainer/>
         <h1 style={{ fontFamily: 'Open Sans He', color: 'black' }}>{'אירועים קרובים'}</h1>
-        <hr />
+   
         {<h2 className='gallery_header' style={headerStyle}>{'תרבות ופנאי'}</h2>}
         <Gallery header='תרבות ופנאי' images={dummy} />
 
