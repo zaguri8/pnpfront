@@ -1,4 +1,4 @@
-import { colorPrimary } from "./colors"
+import { ORANGE_GRADIENT_PRIMARY } from "./colors"
 
 export const bgColor = (color, size) => {
     return {
@@ -20,7 +20,7 @@ export const toolbar = () => {
     return {
         ...flex('row', 'center', 'space-between'),
         ...{ zIndex: '100' },
-        ...bgColor(colorPrimary, { height: '50px' })
+        ...bgColor(ORANGE_GRADIENT_PRIMARY, { height: '50px' })
     }
 }
 export const boxShadow = () => {

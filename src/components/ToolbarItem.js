@@ -5,7 +5,7 @@ export function ToolbarItem({ text = '', action = () => { }, image = '', line = 
             paddingRight: '16px',
             fontWeight: '400',
             fontSize: '18px',
-            paddingTop:image ? '8px' : '0px',
+            paddingTop:bold ? '24px' : image ? '8px' : '0px',
             cursor: 'pointer',
             textAlign: 'center',
             borderRadius: '8px',
@@ -14,7 +14,7 @@ export function ToolbarItem({ text = '', action = () => { }, image = '', line = 
             maxHeight: 'inherit'
         }, ...style
     }}>
-        {text ? text : image ? <img id={id} style={{ height: '18px' }} src={image} /> : ''}
+        {text ? text : image ? <img id={id} style={{ height: bold ? '32px' : '18px' }} src={image} /> : ''}
         {line && <hr style={{ borderWidth: '.1px' }} />}
     </span>
 }

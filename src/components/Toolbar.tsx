@@ -1,12 +1,10 @@
 import { toolbar } from "../styles"
 import { ToolbarItem } from "./ToolbarItem"
-import { createEvent, login, language, toolbarItem_1 } from "../strings"
+import { CREATE_EVENT, TOOLBAR_LOGIN, TOOLBAR_LANGUAGE } from "../strings"
 import { flex } from "../styles"
 import search from '../assets/images/search.png'
-import $ from 'jquery'
-
 import { menuIcon_black } from "../assets/images"
-import { orangeGradient } from "../colors"
+import { ORANGE_GRADIENT_PRIMARY } from "../colors"
 export type ToolbarProps = {
     menuToggle: () => void
 }
@@ -14,9 +12,9 @@ export function ToolBar(props: ToolbarProps) {
 
     return <div id='toolbar' style={{ ...toolbar() }}>
         <div style={{ ...flex('row', 'center', 'center'), ...{ zIndex: '9' } }}>
-            <ToolbarItem style={{ 'backgroundImage': orangeGradient, color: 'white', padding: '6px', marginLeft: '4px', marginRight: '4px' }} id='create_event' text={createEvent('heb')} action={() => { }} />
-            <ToolbarItem id='login' text={login('heb')} action={() => { }} />
-            <ToolbarItem id='language' text={language('heb')} action={() => { }} />
+            <ToolbarItem style={{ 'backgroundImage': ORANGE_GRADIENT_PRIMARY, color: 'white', padding: '6px', marginLeft: '4px', marginRight: '4px' }} id='create_event' text={CREATE_EVENT('heb')} action={() => { }} />
+            <ToolbarItem id='login' text={TOOLBAR_LOGIN('heb')} action={() => { }} />
+            <ToolbarItem id='language' text={TOOLBAR_LANGUAGE('heb')} action={() => { }} />
             <ToolbarItem id='search' image={search} />
         </div>
         <div style={{ ...flex('row', 'center', 'center') }}>

@@ -1,4 +1,4 @@
-import { colorSecondary, orangeGradient } from "../../colors"
+import { v4 } from "uuid"
 
 export type SayNoMoreItemProps = {
     icon: string,
@@ -7,28 +7,27 @@ export type SayNoMoreItemProps = {
 export default function SayNoMoreItem(props: SayNoMoreItemProps) {
 
     const nMore = "No more"
-    return <div key={props.content} style={{
-        boxShadow:'rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px',
-        minWidth: '120px',
-        color: 'white',
-        width: '16.6%',
-        marginBottom:'16px',
-        margin:'8px',
-        borderRadius: '12px',
-        background: '#282c34'
-    }}>
-        <img src={props.icon} style={{
-            padding: '8px',
-            width: '40px',
-            height: '40px'
-        }} alt='no image found' />
-        <p style={{
+    return <div key={v4()} style={{
 
-            textAlign: 'center',
-            maxWidth: '120px',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-        }}><b>{nMore + " "}</b><br /> {props.content}</p>
+        minWidth: '120px',
+        background: 'rgb(232,232,232)',
+        color: 'black',
+        padding: '32px',
+        width: '16.6%'
+    }}>
+
+        <p style={{
+            marginTop: '0px',
+            fontSize: '18px',
+            marginBottom: '0px',
+            fontWeight: '100',
+            textAlign: 'center'
+        }}><b style={{
+
+            fontStyle: 'italic',
+            color: 'orangered',
+            fontSize: '26px'
+        }}>{nMore + " "}</b><br /> {props.content}</p>
 
     </div>
 }

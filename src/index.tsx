@@ -8,16 +8,19 @@ import App from './App';
 import Wedding from './components/invitation/InvitationPage';
 import { init } from '@emailjs/browser';
 import { getFirestore } from 'firebase/firestore';
+import { getDatabase } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
 import { Routes } from 'react-router';
 import { HashRouter } from 'react-router-dom';
 import { Route } from 'react-router';
+import { CreateAuthService, CreateRealTimeDatabase } from './store';
 
 
 // Configure Firebase.
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
   authDomain: process.env.REACT_APP_authDomain,
+  databaseURL:process.env.REACT_APP_databaseURL,
   projectId: process.env.REACT_APP_projectId,
   storageBucket: process.env.REACT_APP_storageBucket,
   messagingSenderId: process.env.REACT_APP_messagingSenderId,
@@ -42,17 +45,19 @@ export const uiConfig = (path: string) => ({
 });
 
 firebase.initializeApp(firebaseConfig);
-const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
-export const auth = getAuth(app)
 
+const app = initializeApp(firebaseConfig)
+export const auth = getAuth(app)
+export const db = getFirestore(app)
+export const realTimeFunctions = CreateRealTimeDatabase(auth, getDatabase(app))
+export const authFunctions = CreateAuthService(auth)
 ReactDOM.render(
   <React.StrictMode>
     <HashRouter>
       <Routes>
         <Route path='/hodash' element={<Wedding eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='דרך רמתיים, הוד השרון' />} />
         <Route path='/tlv' element={<Wedding eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='כיכר רבין,תל אביב' />} />
-        <Route path = '/' element = {<App/>}/>
+        <Route path='/' element={<App />} />
       </Routes>
     </HashRouter>
   </React.StrictMode>,

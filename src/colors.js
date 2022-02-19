@@ -1,3 +1,4 @@
-export const colorPrimary = "white"
-export const colorSecondary = "linear-gradient(orange,orangered,rgb(220,61,45))"
-export const orangeGradient = "linear-gradient(orange,orangered,rgb(161,61,45))"
+export const COLOR_PRIMARY = "white"
+export const ORANGE_GRADIENT_PRIMARY = "linear-gradient(orange,orange,orangered,#bd3333)"
+export const TOOLBAR_COLOR = "white"
+export const PRIMARY_WHITE = "rgb(232,232,232)"

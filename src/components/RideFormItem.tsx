@@ -17,11 +17,12 @@ export function RideFormItem(props: RideFormProps) {
     const elemStyle: CSSProperties = {
         direction: 'rtl',
         padding: '16px',
-        fontSize: '18px',
-        fontWeight: 'bold',
+        fontSize: '16px',
+        fontWeight: '500',
         marginLeft: '16px',
+        fontFamily:'Open Sans Hebrew',
         marginRight: '16px',
-        borderRadius:'16px',
+        borderRadius: '16px',
         background: 'white',
         color: 'black',
         textAlign: 'center',
@@ -30,7 +31,7 @@ export function RideFormItem(props: RideFormProps) {
     const getElem = () => {
         switch (props.elem) {
             case FormElementType.button:
-                return <button id={props.id} className='ride_form_item' style={{ ...elemStyle, ...props.style, ...{ cursor: 'pointer' } }}>{props.text}</button>
+                return <button id={props.id} className={props.id === 'form_item_5' ? '' : 'ride_form_item'} style={{ ...elemStyle, ...props.style, ...{ cursor: 'pointer' } }}>{props.text}</button>
             case FormElementType.input:
                 return <input id={props.id} className='ride_form_item' style={{ ...elemStyle, ...props.style }} type={props.type} placeholder={props.text} />
             case FormElementType.selector:
