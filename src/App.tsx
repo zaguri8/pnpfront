@@ -78,9 +78,6 @@ function App() {
     }
   }
 
-  useEffect(() => {
-  }, [])
-
   useLayoutEffect(() => {
     const d = document.createElement('div')
     d.classList.add('dim')

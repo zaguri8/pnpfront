@@ -1,5 +1,7 @@
 import { Auth, } from 'firebase/auth'
-import { child, Database, DataSnapshot, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
+import { PNPEvent, PNPUser, PNPRide } from './types'
+import { rideFromDict, userFromDict, eventFromDict } from './converters'
+import { child, Database, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
 import {
     collection,
     getDoc,
@@ -12,46 +14,7 @@ import {
 } from 'firebase/firestore'
 
 
-export type PNPEventGraphics = {
-    varArg1: string
-}
-export type PNPEventHours = {
-    startHour: number
-    endHour: number
-}
-export type PNPEventAgeRange = {
-    minAge: number
-    maxAge: number
-}
-
-export type PNPRide = {
-    rideId: string
-    rideDestination: string
-    rideStartingPoint: string
-    passengers: number
-    date: number
-    comments: string
-}
-
-export type PNPUser = {
-    email: string
-    phone: string
-    name: string
-    producer: boolean
-}
-
-export type PNPEvent = {
-    eventId: string
-    eventProducerId: string
-    eventGraphics: PNPEventGraphics
-    eventHours: PNPEventHours
-    eventAgeRange: PNPEventAgeRange
-    eventPrice: number
-    expectedNumberOfPeople: number
-    eventImageURL: string
-}
-
-export function CreateExternalStore(app: Firestore) {
+function CreateExternalStore(app: Firestore) {
     /*  get   */
     const events = () => collection(app, '/events')
     const rides = () => collection(app, "rides")
@@ -84,39 +47,7 @@ export function CreateExternalStore(app: Firestore) {
     }
 }
 
-const eventfromDict = (snap: DataSnapshot) => {
-    return {
-        eventId: snap.child('eventId').val(),
-        eventProducerId: snap.child('eventProducerId').val(),
-        eventGraphics: snap.child('eventGraphics').val(),
-        eventHours: snap.child('eventHours').val(),
-        eventAgeRange: snap.child('eventAgeRange').val(),
-        eventPrice: snap.child('eventPrice').val(),
-        expectedNumberOfPeople: snap.child('expectedNumberOfPeople').val(),
-        eventImageURL: snap.child('eventImageURL').val(),
-    }
-}
-
-const rideFromDict = (snap: DataSnapshot) => {
-    return {
-        rideId: snap.child('rideId').val(),
-        rideDestination: snap.child('rideDestination').val(),
-        rideStartingPoint: snap.child('rideStartingPoint').val(),
-        passengers: snap.child('passengers').val(),
-        date: snap.child('date').val(),
-        comments: snap.child('comments').val()
-    }
-}
-const userFromDict = (snap: DataSnapshot) => {
-    return {
-        email: snap.child('email').val(),
-        phone: snap.child('phone').val(),
-        name: snap.child('name').val(),
-        producer: snap.child('producer').val(),
-    }
-}
-
-export function CreateRealTimeDatabase(auth: Auth, app: Database) {
+function CreateRealTimeDatabase(auth: Auth, app: Database) {
     const clubs = () => ref(app, '/events/clubs')
     const culture = () => ref(app, '/events/culture')
     const rides = () => ref(app, "/rides")
@@ -130,7 +61,7 @@ export function CreateRealTimeDatabase(auth: Auth, app: Database) {
                         consume(ret)
                         return
                     }
-                    ret.push(eventfromDict(ev))
+                    ret.push(eventFromDict(ev))
                 })
             })
         },
@@ -142,7 +73,7 @@ export function CreateRealTimeDatabase(auth: Auth, app: Database) {
                         consume(ret)
                         return
                     }
-                    ret.push(eventfromDict(ev))
+                    ret.push(eventFromDict(ev))
                 })
             })
         },
@@ -195,10 +126,15 @@ export function CreateRealTimeDatabase(auth: Auth, app: Database) {
     }
 }
 
-export function CreateAuthService(auth: Auth) {
-
+function CreateAuthService(auth: Auth) {
     return {
         signOut: async () => await auth.signOut()
     }
 }
 
+export default function Store(auth: Auth, db: Database) {
+    return {
+        auth: CreateAuthService(auth),
+        realTime: CreateRealTimeDatabase(auth, db)
+    }
+}

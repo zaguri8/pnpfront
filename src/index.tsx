@@ -13,14 +13,14 @@ import { getAuth } from 'firebase/auth'
 import { Routes } from 'react-router';
 import { HashRouter } from 'react-router-dom';
 import { Route } from 'react-router';
-import { CreateAuthService, CreateRealTimeDatabase } from './store';
+import Store from './store';
 
 
 // Configure Firebase.
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_apiKey,
   authDomain: process.env.REACT_APP_authDomain,
-  databaseURL:process.env.REACT_APP_databaseURL,
+  databaseURL: process.env.REACT_APP_databaseURL,
   projectId: process.env.REACT_APP_projectId,
   storageBucket: process.env.REACT_APP_storageBucket,
   messagingSenderId: process.env.REACT_APP_messagingSenderId,
@@ -49,8 +49,7 @@ firebase.initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
-export const realTimeFunctions = CreateRealTimeDatabase(auth, getDatabase(app))
-export const authFunctions = CreateAuthService(auth)
+export const store = Store(auth, getDatabase(app))
 ReactDOM.render(
   <React.StrictMode>
     <HashRouter>
