@@ -1,10 +1,10 @@
 import './App.css';
-import { ToolBar } from './components/Toolbar';
+import { ToolBar } from './components/toolbar/Toolbar';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import logo_white from './assets/images/logo_white.png'
 import AppMenu from './components/AppMenu';
-import { RideForm } from './components/RideForm';
+import { RideForm } from './components/ride/RideForm';
 import { Gallery } from './components/Gallery';
 import { TOOLBAR_COLOR } from './colors';
 import { whatsappIcon } from './assets/images';

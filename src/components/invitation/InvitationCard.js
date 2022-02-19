@@ -1,35 +1,27 @@
 import 'firebaseui/dist/firebaseui.css'
-import { useEffect, useRef, useState } from 'react';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import { useEffect, useState } from 'react';
+import Login from '../auth/Login';
 import 'firebase/compat/auth';
 import $ from 'jquery'
-import { auth, uiConfig } from '../..';
+import { auth } from '../..';
 import { alreadyHasInvitation, insertInvitation } from '../../auth/db';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { ThreeDots } from 'react-loader-spinner';
-import { useLocation } from 'react-router';
 
 function InvitationCard(props) {
 
     const [logged, setLogged] = useState(null)
     const [loading, setLoading] = useState(false)
     const [hasInvitation, setHasInvitation] = useState(false)
-    const location = useLocation()
-    function Login() {
-        return (<div><p style={{ color: 'white' }}>התחבר על מנת לאשר הגעה</p>
-            <StyledFirebaseAuth uiConfig={uiConfig("#" + location.pathname)} firebaseAuth={auth} /></div>)
-    }
 
-    useEffect(async () => {
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                setLogged(user)
-                await alreadyHasInvitation(props.eventName, (state) => setHasInvitation(state))
-            } else {
-                setLogged(null)
-            }
-        })
-    }, [])
+    const onAuth = async (user) => {
+        if (user) {
+            setLogged(user)
+            await alreadyHasInvitation(props.eventName, (state) => setHasInvitation(state))
+        } else {
+            setLogged(null)
+        }
+    }
 
     function validateForm(direction, phone) {
         if (direction.length < 1) {
@@ -165,7 +157,7 @@ function InvitationCard(props) {
     return (
         <div dir='rtl' style={{ background: 'orange', display: 'flex', flexDirection: 'column' }}>
             <p style={{ color: 'white', fontSize: '22px' }}><b style={{ fontWeight: 'bold', margin: '0px' }}>אישור הגעה להסעה לאירוע:</b><br /> החתונה של הגר וגבריאל </p>
-            {logged ? <InvitationPage /> : <Login />}
+            {logged ? <InvitationPage /> : <Login onAuth={onAuth} title='התחבר על מנת לאשר הגעה' />}
         </div>
     );
 }

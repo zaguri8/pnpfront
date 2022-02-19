@@ -1,8 +1,8 @@
-import { ToolbarItem } from './ToolbarItem'
-import { profile } from '../assets/images.js'
+import { profile } from '../assets/images.js';
+import logo from '../assets/images/logo_black.png';
+import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4 } from '../strings';
 import { flex } from '../styles';
-import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, MENU_ITEM_5 } from '../strings';
-import logo from '../assets/images/logo_black.png'
+import ToolbarItem from './toolbar/ToolbarItem.js';
 
 function MenuProfile() {
     return (<div style={{
@@ -34,7 +34,7 @@ function MenuProfile() {
 }
 
 
-function AppMenu(props) {
+function AppMenu(props: { menuToggle: () => void }) {
 
 
     return <div id='menu' style={{
@@ -52,9 +52,7 @@ function AppMenu(props) {
         ...{ background: 'white' }
     }}>
         <ToolbarItem bold image={logo} />
-
-
-        <MenuProfile/>
+        <MenuProfile />
         <ToolbarItem text={MENU_ITEM_1('heb')} bold={true} action={props.menuToggle} line={true} style={{ width: '80%' }} />
         <ToolbarItem text={MENU_ITEM_2('heb')} bold={true} action={props.menuToggle} line={true} style={{ width: '80%' }} />
         <ToolbarItem text={MENU_ITEM_3('heb')} bold={true} action={props.menuToggle} line={true} style={{ width: '80%' }} />

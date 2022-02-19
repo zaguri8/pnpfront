@@ -3,7 +3,7 @@ import '../App.css'
 import $ from 'jquery'
 import { CSSProperties, useLayoutEffect } from "react";
 import { FormElementType } from "./RideFormItem";
-import { ORANGE_GRADIENT_PRIMARY } from "../colors";
+import { ORANGE_GRADIENT_PRIMARY } from "../../colors";
 
 function FormHeader() {
     return (<h4 id='form_header' style={{
