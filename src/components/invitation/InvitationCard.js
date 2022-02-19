@@ -7,12 +7,13 @@ import { auth } from '../..';
 import { alreadyHasInvitation, insertInvitation } from '../../auth/db';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { ThreeDots } from 'react-loader-spinner';
+import { useNavigate } from 'react-router';
 
 function InvitationCard(props) {
 
     const [logged, setLogged] = useState(null)
     const [loading, setLoading] = useState(false)
-    const [hasInvitation, setHasInvitation] = useState(false)
+    const [hasInvitation, setHasInvitation] = useState(null)
 
     const onAuth = async (user) => {
         if (user) {
@@ -23,6 +24,11 @@ function InvitationCard(props) {
         }
     }
 
+    useEffect(async () => {
+        if (hasInvitation == null) {
+            await alreadyHasInvitation(props.eventName, (state) => setHasInvitation(state))
+        }
+    })
     function validateForm(direction, phone) {
         if (direction.length < 1) {
             stopLoading()
@@ -57,11 +63,13 @@ function InvitationCard(props) {
             await alreadyHasInvitation(props.eventName, (hasInvitation) => {
                 if (hasInvitation) {
                     alert(`תודה ${auth.currentUser.displayName}, קיבלנו את אישורך `)
+                    setHasInvitation(true)
                     stopLoading()
                 } else {
                     insertInvitation(direction, numOfPeople, props.startPoint, phone, props.eventName)
                         .then(() => {
                             alert(`תודה ${auth.currentUser.displayName}, קיבלנו את אישורך `)
+                            setHasInvitation(true)
                             stopLoading()
                         })
                         .catch(() => {
@@ -95,6 +103,23 @@ function InvitationCard(props) {
         setLoading(false)
     }
 
+
+    function LoadingIndicator(props) {
+        return (<div style={{
+            display: props.loading ? 'inherit' : 'none',
+            background: 'white',
+            padding: '8px',
+            borderRadius: '8px',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
+        }}>
+            <ThreeDots ariaLabel='loading-indicator' color={'orangered'} />
+        </div>);
+    }
+
+
     const InvitationForm = () => {
         return (
             <form onSubmit={(e) => sendInvitation(e)} >
@@ -105,19 +130,7 @@ function InvitationCard(props) {
                 <input readOnly value={'18:00'} name="event_time" style={{ display: 'none' }} />
                 <input style={{ padding: '8px' }} id='phone' type='tel' placeholder='מס נייד'></input>
 
-                <div style={{
-                    display: loading ? 'inherit' : 'none',
-                    background: 'white',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    position: 'fixed',
-                    top: '0',
-                    left: '0',
-                    transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
-                }}>
-                    <ThreeDots ariaLabel='loading-indicator' color={'orangered'} />
-                </div>
-
+                <LoadingIndicator loading={loading} />
                 <div>
 
                     <label style={{ fontWeight: 'bold', color: 'white', marginTop: '8px', padding: '8px', display: 'inline-block' }}>כמה אורחים תהיו ?</label><br />
@@ -154,10 +167,19 @@ function InvitationCard(props) {
             </div>)
     }
 
+    const renderElements = () => {
+        if (!logged) {
+            return <Login onAuth={onAuth} title='התחבר על מנת לאשר הגעה' />
+        } else if (hasInvitation === null) {
+            return <LoadingIndicator loading />
+        } else {
+            return <InvitationPage />
+        }
+    }
     return (
         <div dir='rtl' style={{ background: 'orange', display: 'flex', flexDirection: 'column' }}>
             <p style={{ color: 'white', fontSize: '22px' }}><b style={{ fontWeight: 'bold', margin: '0px' }}>אישור הגעה להסעה לאירוע:</b><br /> החתונה של הגר וגבריאל </p>
-            {logged ? <InvitationPage /> : <Login onAuth={onAuth} title='התחבר על מנת לאשר הגעה' />}
+            {renderElements()}
         </div>
     );
 }
