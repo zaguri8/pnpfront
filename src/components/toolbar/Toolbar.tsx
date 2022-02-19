@@ -1,10 +1,10 @@
-import { toolbar } from "../../styles"
+import { toolbar } from "../../settings/styles"
 import ToolbarItem from "./ToolbarItem"
-import { CREATE_EVENT, TOOLBAR_LOGIN, TOOLBAR_LANGUAGE } from "../../strings"
-import { flex } from "../../styles"
-import search from '../assets/images/search.png'
+import { CREATE_EVENT, TOOLBAR_LOGIN, TOOLBAR_LANGUAGE } from "../../settings/strings"
+import { flex } from "../../settings/styles"
+import search from '../../assets/images/search.png'
 import { menuIcon_black } from "../../assets/images"
-import { ORANGE_GRADIENT_PRIMARY } from "../../colors"
+import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
 export type ToolbarProps = {
     menuToggle: () => void
 }

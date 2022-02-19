@@ -1,4 +1,4 @@
-import { ORANGE_GRADIENT_PRIMARY } from "../../colors"
+import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 
 export type WhyUsItemProps = {
     title: string,
@@ -17,11 +17,11 @@ function ContainerTitle(props: { title: string }) {
 
 
 function ContainerImage(props: { icon: string }) {
-    return (<img src={props.icon} style={{
+    return (<img alt='' src={props.icon} style={{
         padding: '8px',
         width: '40px',
         height: '40px'
-    }} alt='no image found' />);
+    }} />);
 }
 
 
@@ -42,7 +42,7 @@ export default function WhyUsItem(props: WhyUsItemProps) {
         padding: '1rem',
         alignSelf: 'center',
         width: '50%',
-        maxWidth:'600px',
+        maxWidth: '600px',
         marginBottom: '16px',
         margin: '8px',
         borderRadius: '12px',

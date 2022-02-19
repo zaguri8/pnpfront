@@ -5,7 +5,7 @@ import alcohol from '../../assets/images/whyus/alcohol.png'
 import handshake from '../../assets/images/whyus/handshake.png'
 import spoil from '../../assets/images/whyus/spoil.png' 
 import time from '../../assets/images/whyus/time.png'
-import { PRIMARY_WHITE } from "../../colors"
+import { PRIMARY_WHITE } from "../../settings/colors"
 import { v4 } from "uuid"
 export default function WhyUsContainer() {
 

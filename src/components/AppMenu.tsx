@@ -1,8 +1,8 @@
 import { profile } from '../assets/images.js';
 import logo from '../assets/images/logo_black.png';
-import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4 } from '../strings';
-import { flex } from '../styles';
-import ToolbarItem from './toolbar/ToolbarItem.js';
+import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4  } from '../settings/strings.js';
+import { flex } from '../settings/styles.js';
+import ToolbarItem from './toolbar/ToolbarItem';
 
 function MenuProfile() {
     return (<div style={{
@@ -11,7 +11,7 @@ function MenuProfile() {
         padding: '16px'
     }}>
 
-        <img src={profile} style={{
+        <img alt='' src={profile} style={{
             width: '75px',
             height: '75px'
         }} />

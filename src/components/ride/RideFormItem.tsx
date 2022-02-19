@@ -1,5 +1,4 @@
 import { CSSProperties, HTMLInputTypeAttribute } from "react"
-import $ from 'jquery'
 export enum FormElementType {
     button, input, selector
 }

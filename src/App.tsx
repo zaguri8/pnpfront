@@ -6,7 +6,7 @@ import logo_white from './assets/images/logo_white.png'
 import AppMenu from './components/AppMenu';
 import { RideForm } from './components/ride/RideForm';
 import { Gallery } from './components/Gallery';
-import { TOOLBAR_COLOR } from './colors';
+import { TOOLBAR_COLOR } from './settings/colors';
 import { whatsappIcon } from './assets/images';
 import SayNoMoreContainer from './components/saynomore/SayNoMoreContainer';
 import WhyUsContainer from './components/whyus/WhyUsContainer';
@@ -25,7 +25,7 @@ function WhatsApp() {
     width: '50px',
     height: '50px'
   }}>
-    <img className={'side_icon'} style={{
+    <img alt='' className={'side_icon'} style={{
       width: '50px',
       height: '50px',
       cursor: 'pointer'
@@ -41,7 +41,7 @@ function ImageHeader() {
     alignItems: 'center',
     justifyContent: 'center'
   }}>
-    <img src={logo_white} style={{
+    <img  alt = '' src={logo_white} style={{
       height: '100px',
       padding: '8px'
     }} />
@@ -88,7 +88,7 @@ function App() {
     $('#menu').hide()
     d.style.display = 'none'
     $('.App').on('click', (event) => {
-      if (event.target.tagName == 'span') {
+      if (event.target.tagName === 'span') {
         return
       }
     })
@@ -118,7 +118,7 @@ function App() {
 
     $(window).on('resize', onResize)
     $(window).on('scroll', onScroll)
-  }, [null])
+  }, [])
 
 
 

@@ -1,4 +1,4 @@
-import { PRIMARY_WHITE } from "../colors";
+import { PRIMARY_WHITE } from "../settings/colors";
 import { CSSProperties } from "react";
 
 export default function SectionTitle(props: { title: string, style: CSSProperties }) {

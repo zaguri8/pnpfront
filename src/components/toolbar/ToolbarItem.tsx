@@ -24,7 +24,7 @@ export default function ToolbarItem(props: {
             maxHeight: 'inherit'
         }, ...props.style
     }}>
-        {props.text ? props.text : props.image ? <img id={props.id} style={{ height: props.bold ? '32px' : '18px' }} src={props.image} /> : ''}
+        {props.text ? props.text : props.image ? <img alt="" id={props.id} style={{ height: props.bold ? '32px' : '18px' }} src={props.image} /> : ''}
         {props.line && <hr style={{ borderWidth: '.1px' }} />}
     </span>
 }

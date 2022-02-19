@@ -1,6 +1,6 @@
 import { CSSProperties } from "react"
 import { v4 } from "uuid"
-import { PRIMARY_WHITE } from "../colors"
+import { PRIMARY_WHITE } from "../settings/colors";
 
 export type GalleryProps = {
     header: string
