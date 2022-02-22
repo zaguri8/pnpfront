@@ -1,13 +1,16 @@
 import { CSSProperties } from "react"
 import { v4 } from "uuid"
 import { PRIMARY_WHITE } from "../settings/colors";
+import { useLoading } from "../context/Loading";
+import { Dialog, DialogTitle, List, ListItem, Button } from "@mui/material";
+import { PNPEvent } from "../store/types";
 
 export type GalleryProps = {
     header: string
-    images: string[],
+    events: PNPEvent[]
 }
 
-function GalleryItemTitle() {
+function GalleryItemTitle(props: { eventName: string }) {
     return (<h4 style={{
         background: 'rgba(0,0,0,0.5)',
         margin: '0px',
@@ -16,7 +19,7 @@ function GalleryItemTitle() {
         color: 'white',
         borderBottomLeftRadius: '8px',
         borderBottomRightRadius: '8px'
-    }}>שם האירוע</h4>);
+    }}>{props.eventName}</h4>);
 }
 
 
@@ -63,31 +66,35 @@ export function Gallery(props: GalleryProps) {
         margin: '0px',
         color: 'black'
     }
+    const dialogContext = useLoading()
 
-
+    const handleOpen = (pnpEvent: PNPEvent) => {
+        dialogContext.openDialog({
+            content: <ListItem>
+                <img src={pnpEvent.eventImageURL} />
+            </ListItem>, title: pnpEvent.eventName
+        })
+    }
 
     return <div>
-        <div>
-
-        </div>
         {<h2 className='gallery_header' style={headerStyle}>{props.header}</h2>}
         <div id='gallery_container' style={containerStyle}>
             <div className='gallery' style={imageContainer}>
-                {props.images.map(image => {
+                {props.events.map(pnpEvent => {
 
                     return (<div key={v4()} className="gallery_img" style={{
                         ...cardStyle, ...{
                             display: 'flex',
                             flexDirection: 'column',
                             cursor: 'pointer',
-                            background: `url('${image}') `,
+                            background: `url('${pnpEvent.eventImageURL}') `,
                             backgroundSize: '100% 100%',
                             backgroundRepeat: 'no-repeat',
                             backgroundPosition: 'center center'
                         }
-                    }} >
+                    }} onClick={() => handleOpen(pnpEvent)}>
 
-                        <GalleryItemTitle />
+                        <GalleryItemTitle eventName={pnpEvent.eventName} />
 
                     </div>)
                 })}

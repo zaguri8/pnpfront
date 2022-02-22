@@ -1,32 +1,35 @@
 import 'firebaseui/dist/firebaseui.css'
 import { useEffect, useState } from 'react';
-import Login from '../auth/Login';
+import Auth from '../auth/Auth';
 import 'firebase/compat/auth';
 import $ from 'jquery'
-import { auth } from '../..';
-import { alreadyHasInvitation, insertInvitation } from '../../auth/db';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import { alreadyHasInvitation, insertInvitation } from '../../auth/db';
 import { ThreeDots } from 'react-loader-spinner';
-import { useNavigate } from 'react-router';
+import { useAuthState } from '../../context/Firebase';
 
+export function LoadingIndicator(props) {
+    return (<div style={{
+        display: props.loading ? 'inherit' : 'none',
+        background: 'white',
+        zIndex:'9999',
+        padding: '8px',
+        borderRadius: '8px',
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
+    }}>
+        <ThreeDots ariaLabel='loading-indicator' color={'orangered'} />
+    </div>);
+}
 function InvitationCard(props) {
-
-    const [logged, setLogged] = useState(null)
     const [loading, setLoading] = useState(false)
     const [hasInvitation, setHasInvitation] = useState(null)
-
-    const onAuth = async (user) => {
-        if (user) {
-            setLogged(user)
-            await alreadyHasInvitation(props.eventName, (state) => setHasInvitation(state))
-        } else {
-            setLogged(null)
-        }
-    }
-
-    useEffect(async () => {
+    const { isAuthenticated, firebase } = useAuthState()
+    useEffect(() => {
         if (hasInvitation == null) {
-            await alreadyHasInvitation(props.eventName, (state) => setHasInvitation(state))
+            alreadyHasInvitation(firebase.auth, firebase.temp, props.eventName, (state) => setHasInvitation(state))
         }
     })
     function validateForm(direction, phone) {
@@ -60,15 +63,15 @@ function InvitationCard(props) {
         const phone = $('#phone').val()
 
         if (validateForm(direction, phone)) {
-            await alreadyHasInvitation(props.eventName, (hasInvitation) => {
+            await alreadyHasInvitation(firebase.auth, firebase.temp, props.eventName, (hasInvitation) => {
                 if (hasInvitation) {
-                    alert(`תודה ${auth.currentUser.displayName}, קיבלנו את אישורך `)
+                    alert(`תודה ${firebase.auth.currentUser.displayName}, קיבלנו את אישורך `)
                     setHasInvitation(true)
                     stopLoading()
                 } else {
-                    insertInvitation(direction, numOfPeople, props.startPoint, phone, props.eventName)
+                    insertInvitation(firebase.auth, firebase.temp, direction, numOfPeople, props.startPoint, phone, props.eventName)
                         .then(() => {
-                            alert(`תודה ${auth.currentUser.displayName}, קיבלנו את אישורך `)
+                            alert(`תודה ${firebase.auth.currentUser.displayName}, קיבלנו את אישורך `)
                             setHasInvitation(true)
                             stopLoading()
                         })
@@ -85,7 +88,7 @@ function InvitationCard(props) {
 
     const InvitationConfirmation = () => {
         return <p style={{ color: 'white' }}>
-            היי {<b>{logged.displayName + " ,"}</b>}<br />
+            היי {<b>{firebase.auth.currentUser.displayName + " ,"}</b>}<br />
             תודה על אישור הגעתך להסעה לאירוע<br />
             <b>{props.eventName}</b><br />
             בשעה {props.eventTime + " "}
@@ -104,28 +107,14 @@ function InvitationCard(props) {
     }
 
 
-    function LoadingIndicator(props) {
-        return (<div style={{
-            display: props.loading ? 'inherit' : 'none',
-            background: 'white',
-            padding: '8px',
-            borderRadius: '8px',
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
-        }}>
-            <ThreeDots ariaLabel='loading-indicator' color={'orangered'} />
-        </div>);
-    }
 
 
     const InvitationForm = () => {
         return (
             <form onSubmit={(e) => sendInvitation(e)} >
-                <p style={{ color: 'white', fontSize: '22px' }}>{`היי, ${logged.displayName}`}</p>
+                <p style={{ color: 'white', fontSize: '22px' }}>{`היי, ${firebase.auth.currentUser.displayName}`}</p>
                 <p style={{ color: 'white', fontSize: '22px' }}> <b>זהו טופס אישור הגעה להסעה:<br /></b> {props.eventTime} מ {props.startPoint}<br /> לאירוע: {props.eventName}</p>
-                <input readOnly value={logged.email} name="to_mail" style={{ display: 'none' }} />
+                <input readOnly value={firebase.auth.currentUser.email} name="to_mail" style={{ display: 'none' }} />
                 <input readOnly value={props.eventName} name="event_name" style={{ display: 'none' }} />
                 <input readOnly value={'18:00'} name="event_time" style={{ display: 'none' }} />
                 <input style={{ padding: '8px' }} id='phone' type='tel' placeholder='מס נייד'></input>
@@ -163,13 +152,13 @@ function InvitationCard(props) {
         return (
             <div >
                 {hasInvitation ? <InvitationConfirmation /> : <InvitationForm />}
-                <button onClick={() => auth.signOut()} type='button' style={{ margin: '16px', padding: '16px', background: 'white', fontSize: '12px', border: 'none', borderRadius: '16px' }}>{'התנתק'}</button>
+                <button onClick={() => firebase.auth.signOut()} type='button' style={{ margin: '16px', padding: '16px', background: 'white', fontSize: '12px', border: 'none', borderRadius: '16px' }}>{'התנתק'}</button>
             </div>)
     }
 
     const renderElements = () => {
-        if (!logged) {
-            return <Login onAuth={onAuth} title='התחבר על מנת לאשר הגעה' />
+        if (!isAuthenticated) {
+            return <Auth title='התחבר על מנת לאשר הגעה' />
         } else if (hasInvitation === null) {
             return <LoadingIndicator loading />
         } else {

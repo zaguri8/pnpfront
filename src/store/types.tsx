@@ -22,16 +22,20 @@ export type PNPRide = {
 }
 
 export type PNPUser = {
+    name: string
     email: string
     phone: string
-    name: string
+    favoriteEvents:string[],
+    birthDate: string
     producer: boolean
 }
 
 export type PNPEvent = {
+    eventName:string
     eventId: string
     eventProducerId: string
-    eventGraphics: PNPEventGraphics
+    eventDate:string
+    eventDetails:string
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange
     eventPrice: number

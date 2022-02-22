@@ -4,7 +4,8 @@ import $ from 'jquery'
 import { CSSProperties, useLayoutEffect } from "react";
 import { FormElementType } from "./RideFormItem";
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
-
+import { useLoading } from "../../context/Loading";
+import { ListItem, TextField } from "@mui/material";
 function FormHeader() {
     return (<h4 id='form_header' style={{
         margin: '0px',
@@ -72,7 +73,7 @@ export function RideForm() {
         $(window).on('resize', resize)
         resize()
     }, [])
-
+    const dialogContext = useLoading()
     return <div dir="rtl" style={formstyle}>
         <div id='ride_form' style={{
             display: 'flex',
@@ -94,10 +95,16 @@ export function RideForm() {
                 <RideFormItem id='form_item_3' style={{ width: '50%' }} elem={FormElementType.input} text={'מספר נוסעים'} type={'text'} />
                 <RideFormItem id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={'שם'} type='text' />
             </div>
-            
+
             <div>
 
-                <RideFormItem id='form_item_5' style={{ borderRadius: '24px' }} elem={FormElementType.button} text={'המשך'} type={'text'} />
+                <RideFormItem action={() => {
+                    dialogContext.openDialog({
+                        content: <ListItem>
+                            <TextField>Hello</TextField>
+                        </ListItem>, title: 'Hello'
+                    })
+                }} id='form_item_5' style={{ borderRadius: '24px' }} elem={FormElementType.button} text={'המשך'} type={'text'} />
             </div>
         </div>
     </div>

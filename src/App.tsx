@@ -3,36 +3,20 @@ import { ToolBar } from './components/toolbar/Toolbar';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import logo_white from './assets/images/logo_white.png'
+import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
+import { useLoading } from './context/Loading';
+import { CLOSE } from './settings/strings'
 import AppMenu from './components/AppMenu';
-import { RideForm } from './components/ride/RideForm';
-import { Gallery } from './components/Gallery';
+import { Routes, Route } from 'react-router';
+import { Navigate } from 'react-router-dom'
+import InvitationPage from './components/invitation/InvitationPage';
+
 import { TOOLBAR_COLOR } from './settings/colors';
-import { whatsappIcon } from './assets/images';
-import SayNoMoreContainer from './components/saynomore/SayNoMoreContainer';
-import WhyUsContainer from './components/whyus/WhyUsContainer';
-import SectionTitle from './components/SectionTitle';
-
-
-
-function WhatsApp() {
-  return (<div className={'side_icon'} style={{
-    padding: '0px',
-    margin: '24px',
-    zIndex: '9999',
-    bottom: '0',
-    right: '0',
-    position: 'fixed',
-    width: '50px',
-    height: '50px'
-  }}>
-    <img alt='' className={'side_icon'} style={{
-      width: '50px',
-      height: '50px',
-      cursor: 'pointer'
-    }} src={whatsappIcon} />
-  </div>);
-}
-
+import Home from './components/home/Home';
+import Auth from './components/auth/Auth';
+import { useAuthState } from './context/Firebase';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
 
 
 function ImageHeader() {
@@ -41,7 +25,7 @@ function ImageHeader() {
     alignItems: 'center',
     justifyContent: 'center'
   }}>
-    <img  alt = '' src={logo_white} style={{
+    <img alt='' src={logo_white} style={{
       height: '100px',
       padding: '8px'
     }} />
@@ -50,8 +34,8 @@ function ImageHeader() {
 
 
 function App() {
-
   const [canToggle, setCanToggle] = useState(true)
+  const dialogContext = useLoading()
   const toggleMenu = () => {
     if (!canToggle)
       return
@@ -109,46 +93,56 @@ function App() {
         $('#toolbar').css({ 'position': 'relative', 'boxShadow': 'none', 'background': TOOLBAR_COLOR, 'transition': 'all .2s' })
       }
     }
-
     onResize()
     onScroll()
-
     $(window).on('resize', onResize)
     $(window).on('scroll', onScroll)
   }, [])
 
+  const { isAuthenticated } = useAuthState()
 
-
-  const dummy = ['https://www.foundry.com/sites/default/files/styles/teaser_image/public/content-type/events/Thumbnail%20-%20560x314.jpg?itok=Ut22aZzn',
-    "https://img1.10bestmedia.com/Images/Photos/232356/p-Final-Hakkasan-LV-Crowd-Image_55_660x440_201404241405.jpg",
-    "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/clubbing-party-night-event-video-template-design-ab368aade7af4fb78cf1451b2e8330ad_screen.jpg?ts=1577518856",
-    "https://www.foundry.com/sites/default/files/styles/teaser_image/public/content-type/events/Thumbnail%20-%20560x314.jpg?itok=Ut22aZzn",
-    "https://www.foundry.com/sites/default/files/styles/teaser_image/public/content-type/events/Thumbnail%20-%20560x314.jpg?itok=Ut22aZzn"]
 
   return (
     <div>
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
+        {dialogContext.content ? <Dialog dir='rtl' sx={{ textAlign: 'center' }} open={dialogContext.isDialogOpened}>
+          <DialogTitle style={{ fontFamily: 'Open Sans Hebrew' }}>{dialogContext.content.title}</DialogTitle>
+          <List sx={{
+            overflowY:'auto',
+            maxHeight:'600px',
+            maxWidth:'400px',
+            pt: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+
+            {dialogContext.content.content}
+            <ListItem>
+            
+              <Button
+                style={{ fontFamily: 'Open Sans Hebrew' ,fontSize:'18px'}}
+                onClick={() => {
+                  dialogContext.closeDialog()
+                }}
+                sx={{ width: '100%', color: 'white' }} >{CLOSE('heb')}</Button>
+            </ListItem>
+
+          </List>
+        </Dialog>
+          : null}
         <ImageHeader />
-
-
         <ToolBar menuToggle={() => toggleMenu()} />
+        <Routes>
+          <Route path='/hodash' element={<InvitationPage eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='דרך רמתיים, הוד השרון' />} />
+          <Route path='/tlv' element={<InvitationPage eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='כיכר רבין,תל אביב' />} />
+          <Route path='/pnp' element={isAuthenticated ? <Home /> : <Navigate to={'/login'} />} />
+          <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
 
-        <RideForm />
-        <SectionTitle style={{
-          padding: '32px',
-          fontStyle: 'italic',
-          fontWeight: '100',
-          fontSize: '42px',
-          borderRadius: '2px'
-        }} title={'We Say No more !'} />
-        <SayNoMoreContainer />
-        <SectionTitle style={{ paddingBottom: '0px' }} title={'אירועים קרובים'} />
-        <Gallery header='תרבות ופנאי' images={dummy} />
-        <Gallery header='מועדונים' images={dummy} />
-        <SectionTitle style={{ padding: '42px', margin: '0px' }} title={'? למה לבחור בנו'} />
-        <WhyUsContainer />
-        <WhatsApp />
+          <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />
+        </Routes>
       </div>
     </div>
   );

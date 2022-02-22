@@ -1,9 +1,6 @@
-import { auth, db } from "..";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-
-import firebase from "firebase/compat/app";
 import 'firebase/firestore'
-export async function insertInvitation(direction, numOfPeople, startPoint, phone, name) {
+export async function insertInvitation(auth, db, direction, numOfPeople, startPoint, phone, name) {
     if (auth.currentUser != null) {
         return await setDoc(doc(collection(db, 'users'), auth.currentUser.uid),
             {
@@ -20,8 +17,7 @@ export async function insertInvitation(direction, numOfPeople, startPoint, phone
     }
 }
 
-export async function alreadyHasInvitation(name, completion) {
-    const auth = firebase.auth()
+export async function alreadyHasInvitation(auth, db, name, completion) {
     if (auth.currentUser != null) {
         return getDoc(doc(collection(db, 'users'), auth.currentUser.uid))
             .then(querySnapShot => {
