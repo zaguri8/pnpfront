@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react"
-import Store from "../store";
+import Store from "../store/external";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";

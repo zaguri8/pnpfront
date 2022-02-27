@@ -13,32 +13,40 @@ export type PNPEventAgeRange = {
 }
 
 export type PNPRide = {
+    rideName?: string
     rideId: string
     rideDestination: string
     rideStartingPoint: string
+    extraStopPoints: string[]
+    rideTime:string
+    ridePrice: number
+    backTime:string
     passengers: number
-    date: number
+    date: string
     comments: string
 }
+
+
 
 export type PNPUser = {
     name: string
     email: string
     phone: string
-    favoriteEvents:string[],
+    favoriteEvents: string[],
     birthDate: string
     producer: boolean
 }
 
 export type PNPEvent = {
-    eventName:string
+    eventName: string
+    eventLocation:string
     eventId: string
     eventProducerId: string
-    eventDate:string
-    eventDetails:string
+    eventDate: string
+    eventDetails: string
+    eventPrice:number
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange
-    eventPrice: number
     expectedNumberOfPeople: number
     eventImageURL: string
 }

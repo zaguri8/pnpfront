@@ -1,14 +1,14 @@
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
 import SectionTitle from "../SectionTitle"
-import { RideForm } from "../ride/RideForm"
+import { RideFormPreview } from "../ride/RideFormPreview"
 import { Gallery } from "../Gallery"
 import WhyUsContainer from "../whyus/WhyUsContainer"
 import WhatsApp from "../WhatsApp"
 import { useAuthState } from "../../context/Firebase"
 import { useEffect } from "react"
-import { Realtime } from "../../store"
+import { Realtime } from "../../store/external"
 import { useState } from "react"
-import { PNPEvent } from "../../store/types"
+import { PNPEvent } from "../../store/external/types"
 export default function Home() {
 
 
@@ -16,6 +16,7 @@ export default function Home() {
     const [pnpCultureEvents, setPNPCultureEvents] = useState<PNPEvent[]>([])
     const [pnpClubEvents, setPNPClubEvents] = useState<PNPEvent[]>([])
     const realTime = firebase.realTime as Realtime
+
     useEffect(() => {
         const unsubscribeCulture = realTime.addListenerToCultureEvents(events => {
             setPNPCultureEvents(events)
@@ -30,7 +31,7 @@ export default function Home() {
     }, [])
 
     return <div>
-        <RideForm />
+        <RideFormPreview />
         <SectionTitle style={{
             padding: '32px',
             fontStyle: 'italic',

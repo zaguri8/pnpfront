@@ -1,11 +1,14 @@
 
 import { DataSnapshot } from "firebase/database"
+
+
 export const eventFromDict = (snap: DataSnapshot) => {
     return {
         eventId: snap.child('eventId').val(),
-        eventName:snap.child('eventName').val(),
+        eventName: snap.child('eventName').val(),
         eventProducerId: snap.child('eventProducerId').val(),
         eventDate: snap.child('eventDate').val(),
+        eventLocation: snap.child('eventLocation').val(),
         eventDetails: snap.child('eventDetails').val(),
         eventHours: snap.child('eventHours').val(),
         eventAgeRange: snap.child('eventAgeRange').val(),
@@ -17,9 +20,14 @@ export const eventFromDict = (snap: DataSnapshot) => {
 
 export const rideFromDict = (snap: DataSnapshot) => {
     return {
+        rideName: snap.child('rideName').val(),
         rideId: snap.child('rideId').val(),
         rideDestination: snap.child('rideDestination').val(),
         rideStartingPoint: snap.child('rideStartingPoint').val(),
+        ridePrice:snap.child('ridePrice').val(),
+        extraStopPoints: snap.child('extraStopPoints').val(),
+        rideTime: snap.child('rideTime').val(),
+        backTime: snap.child('backTime').val(),
         passengers: snap.child('passengers').val(),
         date: snap.child('date').val(),
         comments: snap.child('comments').val()

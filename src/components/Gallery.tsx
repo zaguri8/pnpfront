@@ -1,9 +1,10 @@
 import { CSSProperties } from "react"
 import { v4 } from "uuid"
 import { PRIMARY_WHITE } from "../settings/colors";
+import { useNavigate } from 'react-router'
 import { useLoading } from "../context/Loading";
 import { Dialog, DialogTitle, List, ListItem, Button } from "@mui/material";
-import { PNPEvent } from "../store/types";
+import { PNPEvent } from "../store/external/types";
 
 export type GalleryProps = {
     header: string
@@ -66,14 +67,18 @@ export function Gallery(props: GalleryProps) {
         margin: '0px',
         color: 'black'
     }
-    const dialogContext = useLoading()
-
+    // POPUP VERSION //const dialogContext = useLoading()
+    // PAGE VERSION
+    const nav = useNavigate()
     const handleOpen = (pnpEvent: PNPEvent) => {
-        dialogContext.openDialog({
-            content: <ListItem>
-                <img src={pnpEvent.eventImageURL} />
-            </ListItem>, title: pnpEvent.eventName
-        })
+        // POPUP VERSION:   // dialogContext.openDialog({
+        //     content: <ListItem>
+        //         <img src={pnpEvent.eventImageURL} />
+        //     </ListItem>, title: pnpEvent.eventName
+        // })
+        // PAGE VERSION
+        nav(`/event/${pnpEvent.eventId}`)
+
     }
 
     return <div>

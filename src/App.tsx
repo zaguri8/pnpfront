@@ -7,9 +7,10 @@ import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
 import { CLOSE } from './settings/strings'
 import AppMenu from './components/AppMenu';
-import { Routes, Route } from 'react-router';
+import { Routes, Route, useNavigate } from 'react-router';
 import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
+
 
 import { TOOLBAR_COLOR } from './settings/colors';
 import Home from './components/home/Home';
@@ -17,15 +18,19 @@ import Auth from './components/auth/Auth';
 import { useAuthState } from './context/Firebase';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
+import EventPage from './components/event/EventPage';
+
 
 
 function ImageHeader() {
+  const nav = useNavigate()
   return (<div className='App-header' style={{
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
   }}>
-    <img alt='' src={logo_white} style={{
+    <img onClick={() => nav('/pnp')} alt='' src={logo_white} style={{
+      cursor: 'pointer',
       height: '100px',
       padding: '8px'
     }} />
@@ -107,11 +112,11 @@ function App() {
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
         {dialogContext.content ? <Dialog dir='rtl' sx={{ textAlign: 'center' }} open={dialogContext.isDialogOpened}>
-          <DialogTitle style={{ fontFamily: 'Open Sans Hebrew' }}>{dialogContext.content.title}</DialogTitle>
+          <DialogTitle style={{ fontFamily: 'Open Sans Hebrew', background: 'white' }}>{dialogContext.content.title}</DialogTitle>
           <List sx={{
-            overflowY:'auto',
-            maxHeight:'600px',
-            maxWidth:'400px',
+            background: 'white',
+            overflowY: 'auto',
+            maxHeight: '600px',
             pt: 0,
             display: 'flex',
             flexDirection: 'column',
@@ -121,9 +126,9 @@ function App() {
 
             {dialogContext.content.content}
             <ListItem>
-            
+
               <Button
-                style={{ fontFamily: 'Open Sans Hebrew' ,fontSize:'18px'}}
+                style={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }}
                 onClick={() => {
                   dialogContext.closeDialog()
                 }}
@@ -140,7 +145,7 @@ function App() {
           <Route path='/tlv' element={<InvitationPage eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='כיכר רבין,תל אביב' />} />
           <Route path='/pnp' element={isAuthenticated ? <Home /> : <Navigate to={'/login'} />} />
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
-
+          <Route path='/event/:id' element={<EventPage />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />
         </Routes>
       </div>

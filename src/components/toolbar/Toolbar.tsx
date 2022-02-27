@@ -34,7 +34,7 @@ export function ToolBar(props: ToolbarProps) {
             <ToolbarItem id='search' image={search} />
         </div>
         <div style={{ ...flex('row', 'center', 'center') }}>
-            <ToolbarItem id='options' image={menuIcon_black} style={{ 'marginRight': '32px' }} action={props.menuToggle} />
+           <ToolbarItem id='options' image={menuIcon_black} style={{ 'marginRight': '24px' }} action={props.menuToggle} />
 
         </div>
 

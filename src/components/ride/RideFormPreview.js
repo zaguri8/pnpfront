@@ -1,11 +1,19 @@
 import { RideFormItem } from "./RideFormItem";
 import '../../App.css'
 import $ from 'jquery'
-import { CSSProperties, useLayoutEffect } from "react";
+import React, { CSSProperties, LegacyRef, useLayoutEffect, useEffect, useState } from "react";
 import { FormElementType } from "./RideFormItem";
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 import { useLoading } from "../../context/Loading";
-import { ListItem, TextField } from "@mui/material";
+import { v4 } from 'uuid'
+import { ListItem, TextField, FormControl, InputLabel, Input } from "@mui/material";
+import { makeStyles } from "@material-ui/styles";
+import Places from "../utilities/Places";
+
+import { CREATE_RIDE, DESTINATION_POINT, FULL_NAME, PASSENGERS, STARTING_POINT } from "../../settings/strings";
+import { fontSize } from "@mui/material/node_modules/@mui/system";
+
+
 function FormHeader() {
     return (<h4 id='form_header' style={{
         margin: '0px',
@@ -13,14 +21,34 @@ function FormHeader() {
         fontWeight: '500',
         padding: '8px',
         color: 'whitesmoke'
-    }}>צור הסעה</h4>);
+    }}>{CREATE_RIDE('heb')}</h4>);
+}
+
+export function RideForm(props) {
+    const useStyles = makeStyles(theme => ({
+        labelRoot: {
+            right: '-64px'
+
+        },
+        shrink: {
+            transformOrigin: "top right"
+        }
+    }));
+
+    function fields() {
+        let fields = []
+        fields.push(<Places key={v4()} placeHolder={DESTINATION_POINT('heb')} />)
+        fields.push(<Places key={v4()} placeHolder={STARTING_POINT('heb')} />)
+        return fields
+    }
+    return <span>{fields()}</span>
 }
 
 
-export function RideForm() {
+export function RideFormPreview() {
 
 
-    const formstyle: CSSProperties = {
+    const formstyle = {
         overflow: 'hidden',
         justifyContent: 'center',
 
@@ -88,21 +116,19 @@ export function RideForm() {
         }}>
 
             <FormHeader />
-            <RideFormItem id='form_item_1' style={{}} elem={FormElementType.selector} options={["Tel Aviv", "Rosh pina"]} text={'בחר יעד'} type={'text'} />
-            <RideFormItem id='form_item_2' style={{}} elem={FormElementType.selector} text={'נקודת יציאה'} options={["Tel Aviv", "Rosh pina"]} type={'text'} />
+            <RideFormItem id='form_item_1' style={{}} elem={FormElementType.selector} options={["Tel Aviv", "Rosh pina"]} text={DESTINATION_POINT('heb')} type={'text'} />
+            <RideFormItem id='form_item_2' style={{}} elem={FormElementType.selector} text={STARTING_POINT('heb')} options={["Tel Aviv", "Rosh pina"]} type={'text'} />
             <div style={{ columnGap: '8px', display: 'flex', justifyContent: 'center' }}>
 
-                <RideFormItem id='form_item_3' style={{ width: '50%' }} elem={FormElementType.input} text={'מספר נוסעים'} type={'text'} />
-                <RideFormItem id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={'שם'} type='text' />
+                <RideFormItem id='form_item_3' style={{ width: '50%' }} elem={FormElementType.input} text={PASSENGERS('heb')} type={'text'} />
+                <RideFormItem id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={FULL_NAME('heb')} type='text' />
             </div>
 
             <div>
 
                 <RideFormItem action={() => {
                     dialogContext.openDialog({
-                        content: <ListItem>
-                            <TextField>Hello</TextField>
-                        </ListItem>, title: 'Hello'
+                        content: <RideForm />, title: CREATE_RIDE('heb')
                     })
                 }} id='form_item_5' style={{ borderRadius: '24px' }} elem={FormElementType.button} text={'המשך'} type={'text'} />
             </div>

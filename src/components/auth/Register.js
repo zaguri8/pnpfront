@@ -16,6 +16,40 @@ import { DatePicker } from "@mui/lab"
 import { LoadingIndicator } from "../invitation/InvitationCard"
 import { useLoading } from "../../context/Loading"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
+
+export const PageHolder = ({ children, style = {} }) => {
+    return <div style={{
+        ...{
+            width: '100%',
+            marginBottom: '120px',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center'
+        }, ...style
+    }}>{children}</div>
+}
+export const InnerPageHolder = ({ children, style = {} }) => {
+    return <div style={{
+        ...{
+            background: 'whitesmoke',
+            width: '50%',
+            maxWidth: '500px',
+            marginTop: '32px',
+            minWidth: '200px',
+            borderRadius: '12px',
+            padding: '32px',
+            paddingLeft: '64px',
+            paddingRight: '64px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            border: '.5px solid white',
+        }, ...style
+    }}>{children}</div>
+}
 export default function Register() {
 
 
@@ -98,35 +132,13 @@ export default function Register() {
             })
 
     }
+
+
     const [date, setDate] = useState()
     const classes = useStyles()
-    return (<div style={{
-        width: '100%',
-        marginBottom: '120px',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        alignItems: 'center'
-    }}>
-
+    return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT('heb')} style={{}} />
-        <div style={{
-            background: 'whitesmoke',
-            width: '50%',
-            maxWidth: '500px',
-            marginTop: '32px',
-            minWidth: '200px',
-            borderRadius: '12px',
-            padding: '32px',
-            paddingLeft: '64px',
-            paddingRight: '64px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            border: '.5px solid white',
-        }}>
+        <InnerPageHolder>
             <LoadingIndicator loading={isLoading} />
             <form onSubmit={register} style={{
                 display: 'flex',
@@ -202,7 +214,6 @@ export default function Register() {
 
                 </Stack>
             </form>
-
-        </div>
-    </div >)
+        </InnerPageHolder>
+    </PageHolder >)
 }

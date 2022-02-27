@@ -1,7 +1,7 @@
 import { Auth } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPRide } from './types'
 import { rideFromDict, userFromDict, eventFromDict } from './converters'
-import { child, Database, DatabaseReference, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
+import { child, Database, DatabaseReference, get, onChildAdded, onValue, push, query, ref, remove, set, update } from 'firebase/database'
 import {
     collection,
     getDoc,
@@ -61,23 +61,29 @@ function CreateExternalStore(app: Firestore) {
 }
 
 function CreateRealTimeDatabase(auth: Auth, app: Database) {
+    const events = () => ref(app, '/events')
     const clubs = () => ref(app, '/events/clubs')
     const culture = () => ref(app, '/events/culture')
-    const rides = () => ref(app, "/rides")
+    const rides = () => ref(app, "/rides/public")
     const users = () => ref(app, "/users")
-    return new Realtime(clubs(), culture(), rides(), users(), auth)
+    return new Realtime(events(), clubs(), culture(), rides(), users(), auth)
 }
 export class Realtime {
+    rides: DatabaseReference
+
+    allEvents: DatabaseReference
     clubs: DatabaseReference
     culture: DatabaseReference
-    rides: DatabaseReference
+
     users: DatabaseReference
     auth: Auth
-    constructor(clubs: DatabaseReference,
+    constructor(allEvents: DatabaseReference,
+        clubs: DatabaseReference,
         culture: DatabaseReference,
         rides: DatabaseReference,
         users: DatabaseReference,
         auth: Auth) {
+        this.allEvents = allEvents
         this.clubs = clubs
         this.culture = culture
         this.rides = rides
@@ -129,6 +135,13 @@ export class Realtime {
     removeCultureEvent = async (eventId: string) => {
         return await remove(child(this.culture, eventId))
     }
+
+    addEventRide = async (eventId: string, ride: PNPRide) => {
+        const newRef = get(child(this.rides, 'public'))
+        await newRef.then(d => d.size)
+            .then(async size => await set(child(child(this.rides, size + ""), eventId), ride))
+    }
+
     addRide = async (ride: PNPRide) => {
         const newRef = push(this.rides)
         ride.rideId = newRef.key!
@@ -145,9 +158,28 @@ export class Realtime {
         return await set(newRef, event)
     }
 
-    addUse = async (user: PNPUser) => {
+    addUser = async (user: PNPUser) => {
         if (this.auth.currentUser == null) return
         return await set(child(this.users, this.auth.currentUser!.uid), user)
+    }
+
+    getEventById = async (id: string) => {
+        return await get(this.allEvents)
+            .then(data => {
+                const c1 = data.child('clubs').child(id)
+                const c2 = data.child('culture').child(id)
+                return c1.exists() ? eventFromDict(c1) : c2.exists() ? eventFromDict(c2) : null
+            })
+    }
+    getAllEventRidesById = async (eventId: string) => {
+        return await get(child(this.rides, eventId))
+            .then(snap => {
+                const ret: PNPRide[] = []
+                snap.forEach(ride => {
+                    ret.push(rideFromDict(ride))
+                })
+                return ret
+            })
     }
 
 }
