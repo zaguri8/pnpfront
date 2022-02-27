@@ -1,3 +1,4 @@
+
 export const CREATE_EVENT = (lang) => lang === 'heb' ? 'יצירת אירוע' : 'Create event'
 export const TOOLBAR_LOGIN = (lang) => lang === 'heb' ? 'התחברות ' : 'Sign in'
 export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language'
@@ -5,16 +6,20 @@ export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
 export const CREATE_RIDE = (lang) => lang === 'heb' ? 'צור הסעה' : 'Create a ride'
 export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על הכפתור ופתח ביקוש' : 'Your city is missing? lets open a request for a ride'
 export const RIDE_DATE = (lang) => lang === 'heb' ? 'תאריך הסעה' : 'Ride Date'
-export const STARTING_POINT = (lang) => lang === 'heb' ? 'נקודת יציאה' : 'Create a ride'
+export const STARTING_POINT = (lang) => lang === 'heb' ? 'נקודת יציאה' : 'Create starting point'
 export const ATTENTION = (lang) => lang === 'heb' ? 'שימו לב !' : 'Attention !'
-export const NO_DELAYS = (lang) => lang === 'heb' ? 'ההסעות יוצאות בדיוק בשעה שנקבעה, לכן אין איחורים' : 'The rides leave exactly at the scheduled moment, therefore there are no delays'
-export const DESTINATION_POINT = (lang) => lang === 'heb' ? 'בחר יעד ' : 'Create a ride'
+export const NO_DELAYS = (lang) => lang === 'heb' ? 'ההסעות יוצאות בדיוק בשעה שנקבעה, לכן אין איחורים' : 'The rides leave exactly at the scheduled moment'
+export const DESTINATION_POINT = (lang) => lang === 'heb' ? 'בחר יעד ' : 'Choose Destination'
 export const EXTRA_STOP_POINTS = (lang) => lang === 'heb' ? 'נקודות אסיפה נוספות' : 'Extra stop points'
 export const PASSENGERS = (lang) => lang === 'heb' ? 'מספר נוסעים' : 'Number of passengers'
 export const NAME_OF_RIDE = (lang) => lang === 'heb' ? 'שם ההסעה' : 'Name of ride'
 export const SHARE_PAYMENT = (lang) => lang === 'heb' ? 'אני רוצה לחלק את התשלום בין הנוסעים' : 'Shared payment'
 export const I_PAY = (lang) => lang === 'heb' ? 'הכל עלי !' : 'I Pay it all !'
 
+export const CONTINUE = (lang) => lang === 'heb' ? 'המשך' : 'Continue'
+export const CULTURE = (lang) => lang === 'heb' ? 'תרבות ופנאי' : 'Culture & Leisure'
+export const CLUBS = (lang) => lang === 'heb' ? 'מועדונים' : 'Clubs'
+export const SCHEDULED_EVENTS = (lang) => lang === 'heb' ? 'אירועים קרובים' : 'Upcomming Events'
 export const MENU_ITEM_1 = (lang) => lang === 'heb' ? "אודות" : "About us"
 export const MENU_ITEM_2 = (lang) => lang === 'heb' ? "המשתמש שלי" : 'My Account'
 export const MENU_ITEM_3 = (lang) => lang === 'heb' ? "היסטוריית הסעות" : 'Ride history'
@@ -64,4 +69,32 @@ export const ORDER = (lang) => lang === 'heb' ? 'הזמן כרטיסים' : 'Ord
 export const CURRENCY = (lang) => lang === 'heb' ? `ש"ח` : 'NIS'
 export const AGES = (lang) => lang === 'heb' ? 'גילאים' : 'Ages'
 export const CLOSE = (lang) => lang === 'heb' ? 'סגור' : 'Close'
-export const BOTH_DIRECTIONS = (lang) => lang === 'heb' ? 'סוג הסעה זו הינה דו כיוונית - הלוך וחזור' : 'Two way ticket'
+export const BOTH_DIRECTIONS = (lang) => lang === 'heb' ? 'סוג הסעה זו הינה דו כיוונית הלוך וחזור' : 'The ticket is a two way ticket'
+export const TOTAL_COST = (lang) => lang === 'heb' ? 'סה"כ לתשלום' : 'Total'
+export const SIDE = (lang) => lang === 'heb' ? 'rtl' : 'ltr'
+
+export const WHY_US_TITLE = (lang) => lang === 'heb' ? '? למה לבחור בנו' : 'Why choose us ?'
+export const WHY_US_ITEM_1_TITLE = (lang) => lang === 'heb' ? 'חוסכים לך כסף' : 'Saving you money'
+export const WHY_US_ITEM_1_CONTENT = (lang) => lang === 'heb' ? 'השירות שאנו מספקים הוא זול ומתאים לכל כיס.' : 'Our service is crafted to be affordable for any one'
+
+export const WHY_US_ITEM_2_TITLE = (lang) => lang === 'heb' ? 'חוסכים לך כאב ראש' : 'Sparing you the headache'
+export const WHY_US_ITEM_2_CONTENT = (lang) => lang === 'heb' ? 'לא עוד חיפוש חנייה, לא דוחות ולא נהג תורן.' : 'No more looking for parking spot, no tickets and no duty driver'
+
+export const WHY_US_ITEM_3_TITLE = (lang) => lang === 'heb' ? 'חוסכים לך זמן' : 'Saving you time'
+export const WHY_US_ITEM_3_CONTENT = (lang) => lang === 'heb' ? 'לא תצטרכו להמתין בעשרות נקודות עצירה.' : 'You wont have to go through to many stop points'
+
+export const WHY_US_ITEM_4_TITLE = (lang) => lang === 'heb' ? 'מפנקים אותך' : 'Spoiling you'
+export const WHY_US_ITEM_4_CONTENT = (lang) => lang === 'heb' ? 'Pick N Pull מעניקה לך שלל הטבות, מבצעים וקופונים.' : 'Pick N Pull offers you a wide range of discounts and special offers'
+
+export const WHY_US_ITEM_5_TITLE = (lang) => lang === 'heb' ? '!don’t drink and drive' : '!don’t drink and drive'
+export const WHY_US_ITEM_5_CONTENT = (lang) => lang === 'heb' ? 'אנחנו מאמינים שצריך להנות מבלי לקחת סיכונים מיותרים, החיים יקרים!' : 'We believe in having fun without taking stupid risks, life is too precious!'
+
+export const WHY_US_ITEM_6_TITLE = (lang) => lang === 'heb' ? 'מערכת יחסים ארוכה' : 'Long term relationshop'
+export const WHY_US_ITEM_6_CONTENT = (lang) => lang === 'heb' ? 'בכל נסיעה תצברו נקודה, ולאחר 5 נקודות תוכלו לממש אותן ולקבל נסיעה חינם!' : 'Each ride you take, you gain points too use in your next rides!'
+
+
+export const NO_MORE_ITEM_1 = (lang) => lang === 'heb' ? 'נהג תורן' : 'Duty Driver'
+export const NO_MORE_ITEM_2 = (lang) => lang === 'heb' ? 'חניונים במחירים מטורפים' : 'Expensive parking lots'
+export const NO_MORE_ITEM_3 = (lang) => lang === 'heb' ? 'drink & drive' : 'drink & drive'
+export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'מוניות יקרות' : 'Expensive cabs'
+export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'מחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'

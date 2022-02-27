@@ -3,19 +3,38 @@ import money from '../../assets/images/whyus/money.png'
 import headache from '../../assets/images/whyus/headache.png'
 import alcohol from '../../assets/images/whyus/alcohol.png'
 import handshake from '../../assets/images/whyus/handshake.png'
-import spoil from '../../assets/images/whyus/spoil.png' 
+import spoil from '../../assets/images/whyus/spoil.png'
 import time from '../../assets/images/whyus/time.png'
 import { PRIMARY_WHITE } from "../../settings/colors"
+import {
+    WHY_US_ITEM_1_TITLE,
+    WHY_US_ITEM_1_CONTENT,
+    WHY_US_ITEM_2_TITLE,
+    WHY_US_ITEM_2_CONTENT,
+
+    WHY_US_ITEM_3_TITLE,
+    WHY_US_ITEM_3_CONTENT,
+    WHY_US_ITEM_4_TITLE,
+    WHY_US_ITEM_4_CONTENT,
+
+    WHY_US_ITEM_5_TITLE,
+    WHY_US_ITEM_5_CONTENT,
+    WHY_US_ITEM_6_TITLE,
+    WHY_US_ITEM_6_CONTENT
+} from '../../settings/strings'
 import { v4 } from "uuid"
+import { useLanguage } from "../../context/Language"
 export default function WhyUsContainer() {
 
+    const { lang } = useLanguage()
+
     const sayNoMoreItems: WhyUsItemProps[] = [
-        { icon: money, title: 'חוסכים לך כסף', content: 'השירות שאנו מספקים הוא זול ומתאים לכל כיס.' },
-        { icon: headache, title: 'חוסכים לך כאב ראש', content: 'לא עוד חיפוש חנייה, לא דוחות ולא נהג תורן.' },
-        { icon: time, title: 'חוסכים לך זמן', content: 'לא תצטרכו להמתין בעשרות נקודות עצירה.' },
-        { icon: spoil, title: 'מפנקים אותך', content: 'Pick N Pull מעניקה לך שלל הטבות, מבצעים וקופונים.' },
-        { icon: alcohol, title: '!don’t drink and drive', content: 'אנחנו מאמינים שצריך להנות מבלי לקחת סיכונים מיותרים, החיים יקרים!' },
-        { icon: handshake, title: 'מערכת יחסים ארוכה', content: 'בכל נסיעה תצברו נקודה, ולאחר 5 נקודות תוכלו לממש אותן ולקבל נסיעה חינם!' }
+        { icon: money, title: WHY_US_ITEM_1_TITLE(lang), content: WHY_US_ITEM_1_CONTENT(lang) },
+        { icon: headache, title: WHY_US_ITEM_2_TITLE(lang), content: WHY_US_ITEM_2_CONTENT(lang) },
+        { icon: time, title: WHY_US_ITEM_3_TITLE(lang), content: WHY_US_ITEM_3_CONTENT(lang) },
+        { icon: spoil, title: WHY_US_ITEM_4_TITLE(lang), content: WHY_US_ITEM_4_CONTENT(lang) },
+        { icon: alcohol, title: WHY_US_ITEM_5_TITLE(lang), content: WHY_US_ITEM_5_CONTENT(lang) },
+        { icon: handshake, title: WHY_US_ITEM_6_TITLE(lang), content: WHY_US_ITEM_6_CONTENT(lang) }
     ]
 
     function makeItem(props: WhyUsItemProps) {
@@ -34,7 +53,7 @@ export default function WhyUsContainer() {
             flexDirection: 'column',
             overflow: 'scroll',
             columnGap: '16px',
-            background:PRIMARY_WHITE,
+            background: PRIMARY_WHITE,
             justifyContent: 'center'
         }}>
 

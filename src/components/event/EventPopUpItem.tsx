@@ -6,17 +6,19 @@ import ListItem from '@mui/material/ListItem';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import Typography from '@mui/material/Typography';
+import { useLanguage } from '../../context/Language';
+import { SIDE } from '../../settings/strings';
 
 
 function EventDialog(props: { open: any }) {
     const { open } = props;
-
+    const { lang } = useLanguage()
     const handleListItemClick = () => {
 
     };
 
     return (
-        <Dialog dir='rtl' open={open}>
+        <Dialog dir={SIDE(lang)} open={open}>
             <DialogTitle>{'NOT SET'}</DialogTitle>
             <List sx={{ pt: 0 }}>
                 <ListItem>
@@ -46,10 +48,11 @@ export default function FavoriteEventsDialog() {
         setOpen(false);
     };
 
+    const { lang } = useLanguage()
     return (
-        <div dir='rtl'>
+        <div dir={SIDE(lang)}>
             <Button sx={{ color: 'white' }} variant="outlined" onClick={handleClickOpen}>
-              
+
             </Button>
             <br /><br />
             <Typography id='selected_favorite_events' variant="subtitle1" component="div">

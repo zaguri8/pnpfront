@@ -9,6 +9,8 @@ import { useEffect } from "react"
 import { Realtime } from "../../store/external"
 import { useState } from "react"
 import { PNPEvent } from "../../store/external/types"
+import { CLUBS, CULTURE, SCHEDULED_EVENTS, WHY_US_TITLE } from "../../settings/strings"
+import { useLanguage } from "../../context/Language"
 export default function Home() {
 
 
@@ -29,6 +31,7 @@ export default function Home() {
             unsubscribeClubs()
         }
     }, [])
+    const {lang} = useLanguage()
 
     return <div>
         <RideFormPreview />
@@ -40,10 +43,10 @@ export default function Home() {
             borderRadius: '2px'
         }} title={'We Say No more !'} />
         <SayNoMoreContainer />
-        <SectionTitle style={{ paddingBottom: '0px' }} title={'אירועים קרובים'} />
-        <Gallery header='תרבות ופנאי' events={pnpCultureEvents} />
-        <Gallery header='מועדונים' events={pnpClubEvents} />
-        <SectionTitle style={{ padding: '42px', margin: '0px' }} title={'? למה לבחור בנו'} />
+        <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
+        <Gallery header={CULTURE(lang)} events={pnpCultureEvents} />
+        <Gallery header={CLUBS(lang)} events={pnpClubEvents} />
+        <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} />
         <WhyUsContainer />
         <WhatsApp />
     </div>

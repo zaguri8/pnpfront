@@ -1,7 +1,7 @@
 import { Auth } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPRide } from './types'
 import { rideFromDict, userFromDict, eventFromDict } from './converters'
-import { child, Database, DatabaseReference, get, onChildAdded, onValue, push, query, ref, remove, set, update } from 'firebase/database'
+import { child, Database, DatabaseReference, get, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
 import {
     collection,
     getDoc,
@@ -25,12 +25,10 @@ function CreateExternalStore(app: Firestore) {
     return {
         /*  events */
         getErrors: async () => {
-            return await getDocs(errors()).
-                then(ful => ful.docs.map(doc => doc.data))
+            return await getDocs(errors()).then(ful => ful.docs.map(doc => doc.data))
         },
         getEvents: async () => {
-            return await getDocs(events()).
-                then(ful => ful.docs.map(doc => doc.data))
+            return await getDocs(events()).then(ful => ful.docs.map(doc => doc.data))
         },
         getRides: async (userId: String) => {
             return await getDoc(doc(app, `/rides/${userId}`))

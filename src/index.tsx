@@ -7,18 +7,21 @@ import { HashRouter } from 'react-router-dom';
 import { AuthContextProvider } from './context/Firebase';
 import { LoadingContextProvider } from './context/Loading';
 import { GoogleMapsContextProvider } from './context/GoogleMaps';
+import { LanguageContextProvider } from './context/Language';
 
 
 ReactDOM.render(
   <React.StrictMode>
     <HashRouter>
-      <GoogleMapsContextProvider>
-        <LoadingContextProvider>
-          <AuthContextProvider>
-            <App />
-          </AuthContextProvider>
-        </LoadingContextProvider>
-      </GoogleMapsContextProvider>
+      <LanguageContextProvider>
+        <GoogleMapsContextProvider>
+          <LoadingContextProvider>
+            <AuthContextProvider>
+              <App />
+            </AuthContextProvider>
+          </LoadingContextProvider>
+        </GoogleMapsContextProvider>
+      </LanguageContextProvider>
     </HashRouter>
   </React.StrictMode>,
   document.getElementById('root')

@@ -1,10 +1,10 @@
-import { ListItem, FormControl, List, InputLabel,Input, TextField } from "@mui/material";
+import { ListItem, FormControl, List, TextField } from "@mui/material";
 import { useState } from "react";
 import PlacesAutocomplete from 'react-places-autocomplete'
-import { v4 } from "uuid";
 import { useGoogleState } from "../../context/GoogleMaps";
 import { makeStyles } from "@mui/styles";
-import { DESTINATION_POINT } from "../../settings/strings";
+import { SIDE } from "../../settings/strings";
+import { useLanguage } from "../../context/Language";
 export default function Places({ placeHolder }) {
     const [address, setAddress] = useState('')
     const handleChange = (value) => {
@@ -25,7 +25,7 @@ export default function Places({ placeHolder }) {
         }
     }));
     const classes = useStyles()
-
+    const {lang} = useLanguage()
     return (<ListItem>
 
         <FormControl style={{ dislay: 'flex', }}>
@@ -45,7 +45,7 @@ export default function Places({ placeHolder }) {
                     suggestions,
                     getSuggestionItemProps
                 }) => (
-                    <div dir='rtl' style={{
+                    <div dir={SIDE(lang)} style={{
                         display: 'flex',
                         flexDirection: 'column'
                     }}>
@@ -54,13 +54,13 @@ export default function Places({ placeHolder }) {
                         classes = {{
                             shrink:classes.shrink
                         }}
-                        sx={{ direction: 'rtl' }}
+                        sx={{ direction:SIDE(lang)}}
                             {...getInputProps({
                                 placeholder: placeHolder,
                             })}
                         />
                         
-                        <List dir='rtl' style={{ position: 'relative', zIndex: '9999', overflow: 'scroll', width: '300px' }}>
+                        <List dir={SIDE(lang)} style={{ position: 'relative', zIndex: '9999', overflow: 'scroll', width: '300px' }}>
 
                             {suggestions.map((suggestion, index) => {
                                 const style = suggestion.active

@@ -2,9 +2,9 @@ import { CSSProperties } from "react"
 import { v4 } from "uuid"
 import { PRIMARY_WHITE } from "../settings/colors";
 import { useNavigate } from 'react-router'
-import { useLoading } from "../context/Loading";
-import { Dialog, DialogTitle, List, ListItem, Button } from "@mui/material";
 import { PNPEvent } from "../store/external/types";
+import { useLanguage } from "../context/Language";
+import { SIDE } from "../settings/strings";
 
 export type GalleryProps = {
     header: string
@@ -25,13 +25,13 @@ function GalleryItemTitle(props: { eventName: string }) {
 
 
 export function Gallery(props: GalleryProps) {
+    const {lang} = useLanguage()
     const containerStyle: CSSProperties = {
         display: 'flex',
         overflow: 'scroll',
         justifyContent: 'center',
         paddingBottom: '32px',
-        alignItems: 'start',
-        direction: 'rtl',
+        alignItems: lang === 'heb' ? 'end' : 'start',
         background: PRIMARY_WHITE,
         flexDirection: 'column'
     }
@@ -57,11 +57,10 @@ export function Gallery(props: GalleryProps) {
 
     }
     const headerStyle: CSSProperties = {
-        textAlign: 'right',
+        textAlign: lang === 'heb' ? 'right' : 'left',
         fontWeight: '300',
         fontFamily: 'Open Sans Hebrew ',
         position: 'relative',
-        alignSelf: 'flex-start',
         padding: '32px',
         fontSize: '28px',
         margin: '0px',

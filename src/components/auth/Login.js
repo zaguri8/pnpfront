@@ -1,6 +1,5 @@
 import {  Input, FormControl, InputLabel } from "@mui/material"
-import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, LOGIN_TITLE, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD } from '../../settings/strings'
-import $ from 'jquery'
+import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, LOGIN_TITLE, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE } from '../../settings/strings'
 import Auth from "./Auth"
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
@@ -10,6 +9,7 @@ import { useAuthState } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
+import { useLanguage } from "../../context/Language"
 export default function Login() {
 
     const nav = useNavigate()
@@ -33,6 +33,7 @@ export default function Login() {
 
     }
     const classes = useStyles()
+    const {lang} = useLanguage()
 
     return (<div style={{
         width: '100%',
@@ -43,7 +44,7 @@ export default function Login() {
         flexDirection: 'column',
         alignItems: 'center'
     }}>
-        <SectionTitle title={MY_ACCOUNT('heb')} style={{}} />
+        <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <div style={{
             background: 'whitesmoke',
             width: '50%',
@@ -68,7 +69,7 @@ export default function Login() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <SectionTitle title={LOGIN_TITLE('heb')} style={{
+                <SectionTitle title={LOGIN_TITLE(lang)} style={{
                     background: 'whitesmoke',
                     marginTop: '0px',
                     marginBottom: '32px'
@@ -80,20 +81,20 @@ export default function Login() {
                             root: classes.labelRoot,
                             shrink: classes.shrink
 
-                        }} htmlFor="email_input">{EMAIL('heb')}</InputLabel>
-                        <Input type='email' sx={{ direction: 'rtl' }} id="email_input" aria-describedby="email_helper_text" />
+                        }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
+                        <Input type='email' sx={{ direction:SIDE(lang) }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
                     <FormControl >
                         <InputLabel classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
-                        }} htmlFor="password_input">{PASSWORD('heb')}</InputLabel>
-                        <Input type="password" dir="rtl" id="password_input" aria-describedby="password_helper_text" />
+                        }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
+                        <Input type="password" dir={SIDE(lang)} id="password_input" aria-describedby="password_helper_text" />
 
                     </FormControl>
                     <br />
-                    <Button title={LOGIN_OK('heb')} onClick={() => { }} type='submit' />
+                    <Button title={LOGIN_OK(lang)} onClick={() => { }} type='submit' />
 
 
 
@@ -106,7 +107,7 @@ export default function Login() {
                     }}>
 
                         <hr style={{ width: '42%', height: '.1px' }} />
-                        <p style={{ width: '20%' }}>{OR('heb')}</p>
+                        <p style={{ width: '20%' }}>{OR(lang)}</p>
                         <hr style={{ width: '42%', height: '.1px' }} />
                     </div>
 
@@ -117,11 +118,11 @@ export default function Login() {
             <Auth style={{ margin: '0px' }} title='' redirect="/pnp" />
 
             <div>
-                <Link to={'/register'}>{NO_ACCOUNT('heb')}</Link>
+                <Link to={'/register'}>{NO_ACCOUNT(lang)}</Link>
             </div>
 
             <div>
-                <Link style={{ fontSize: '12px', textDecoration: 'none red' }} to={'/register'}>{FORGOT_PASSWORD('heb')}</Link>
+                <Link style={{ fontSize: '12px', textDecoration: 'none red' }} to={'/register'}>{FORGOT_PASSWORD(lang)}</Link>
             </div>
         </div>
     </div >)

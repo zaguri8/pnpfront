@@ -1,5 +1,5 @@
 import { Input, FormControl, InputLabel, Stack } from "@mui/material"
-import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE } from '../../settings/strings'
+import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE } from '../../settings/strings'
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
@@ -16,6 +16,7 @@ import { DatePicker } from "@mui/lab"
 import { LoadingIndicator } from "../invitation/InvitationCard"
 import { useLoading } from "../../context/Loading"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
+import { useLanguage } from "../../context/Language"
 
 export const PageHolder = ({ children, style = {} }) => {
     return <div style={{
@@ -65,6 +66,7 @@ export default function Register() {
             transformOrigin: "top right"
         }
     }));
+    const { lang } = useLanguage()
     function register(e) {
 
         function validate(phone, firstname, lastname, selectedFavoriteEvents) {
@@ -82,8 +84,8 @@ export default function Register() {
                 || phone.length !== 10) {
                 errors.push(`Invalid phone number ${phone}`)
             }
-            if (selectedFavoriteEvents.length < 1
-                || selectedFavoriteEvents.length === 1 && selectedFavoriteEvents[0].length === 0) {
+            if ((selectedFavoriteEvents.length < 1
+                || selectedFavoriteEvents.length === 1) && selectedFavoriteEvents[0].length === 0) {
                 errors.push('Invalid favorite events, please pick atleast 1')
             }
             if (firstname.length < 2) {
@@ -101,7 +103,7 @@ export default function Register() {
         const email = e.target[3].value
         const password = e.target[4].value
         const birthDate = e.target[5].value
-        const selectedFavoriteEvents = $('#selected_favorite_events').text().replace(`${PICKED('heb')}`, "").replaceAll(' 🎉 ', ',').split(',')
+        const selectedFavoriteEvents = $('#selected_favorite_events').text().replace(`${PICKED(lang)}`, "").replaceAll(' 🎉 ', ',').split(',')
         const validationErrors = validate(phone, firstName, lastName, selectedFavoriteEvents)
         if (validationErrors.length > 0) {
             alert(validationErrors.join('\n'))
@@ -137,7 +139,7 @@ export default function Register() {
     const [date, setDate] = useState()
     const classes = useStyles()
     return (<PageHolder>
-        <SectionTitle title={MY_ACCOUNT('heb')} style={{}} />
+        <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder>
             <LoadingIndicator loading={isLoading} />
             <form onSubmit={register} style={{
@@ -148,7 +150,7 @@ export default function Register() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <SectionTitle title={REGISTER_TITLE('heb')} style={{
+                <SectionTitle title={REGISTER_TITLE(lang)} style={{
                     background: 'whitesmoke',
                     marginTop: '0px',
                     marginBottom: '32px'
@@ -158,32 +160,32 @@ export default function Register() {
                         <InputLabel required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
-                        }} htmlFor="first_name_input">{FIRST_NAME('heb')}</InputLabel>
-                        <Input sx={{ direction: 'rtl' }} id="first_name_input" aria-describedby="first_name_helper_text" />
+                        }} htmlFor="first_name_input">{FIRST_NAME(lang)}</InputLabel>
+                        <Input sx={{ direction: SIDE(lang) }} id="first_name_input" aria-describedby="first_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
                         <InputLabel required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
-                        }} htmlFor="last_name_input">{LAST_NAME('heb')}</InputLabel>
-                        <Input sx={{ direction: 'rtl' }} id="last_name_input" aria-describedby="last_name_helper_text" />
+                        }} htmlFor="last_name_input">{LAST_NAME(lang)}</InputLabel>
+                        <Input sx={{ direction: SIDE(lang) }} id="last_name_input" aria-describedby="last_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
                         <InputLabel required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
-                        }} htmlFor="phone_number_input">{PHONE_NUMBER('heb')}</InputLabel>
-                        <Input sx={{ direction: 'rtl' }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
+                        }} htmlFor="phone_number_input">{PHONE_NUMBER(lang)}</InputLabel>
+                        <Input sx={{ direction: SIDE(lang) }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
 
                     </FormControl>
                     <FormControl>
                         <InputLabel required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
-                        }} htmlFor="email_input">{EMAIL('heb')}</InputLabel>
-                        <Input sx={{ direction: 'rtl' }} type='email' id="email_input" aria-describedby="email_helper_text" />
+                        }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
+                        <Input sx={{ direction: SIDE(lang) }} type='email' id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
 
@@ -191,13 +193,13 @@ export default function Register() {
                         <InputLabel variant="outlined" required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
-                        }} htmlFor="password_input">{PASSWORD('heb')}</InputLabel>
-                        <Input sx={{ direction: 'rtl' }} type='password' id="password_input" aria-describedby="password_helper_text" />
+                        }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
+                        <Input sx={{ direction: SIDE(lang) }} type='password' id="password_input" aria-describedby="password_helper_text" />
                     </FormControl>
 
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                            label={<p >{BIRTH_DATE('heb')}</p>}
+                            label={<p >{BIRTH_DATE(lang)}</p>}
                             value={date}
                             onChange={(newValue) => setDate(newValue)}
                             renderInput={(params) => <TextField {...params} />}
@@ -205,10 +207,10 @@ export default function Register() {
                     </LocalizationProvider>
                     <FavoriteEventsDialog />
 
-                    <Button title={REGISTER_OK('heb')} onClick={() => { }} type='submit' />
+                    <Button title={REGISTER_OK(lang)} onClick={() => { }} type='submit' />
 
                     <div>
-                        <Link to={'/login'}>{ALREADY_REGISTERED('heb')}</Link>
+                        <Link to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
                     </div>
 
 

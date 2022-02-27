@@ -1,44 +1,33 @@
 import { RideFormItem } from "./RideFormItem";
 import '../../App.css'
 import $ from 'jquery'
-import React, { CSSProperties, LegacyRef, useLayoutEffect, useEffect, useState } from "react";
+import {  useLayoutEffect } from "react";
 import { FormElementType } from "./RideFormItem";
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 import { useLoading } from "../../context/Loading";
 import { v4 } from 'uuid'
-import { ListItem, TextField, FormControl, InputLabel, Input } from "@mui/material";
-import { makeStyles } from "@material-ui/styles";
 import Places from "../utilities/Places";
 
-import { CREATE_RIDE, DESTINATION_POINT, FULL_NAME, PASSENGERS, STARTING_POINT } from "../../settings/strings";
-import { fontSize } from "@mui/material/node_modules/@mui/system";
-
+import { CONTINUE, CREATE_RIDE, DESTINATION_POINT, FULL_NAME, PASSENGERS, SIDE, STARTING_POINT } from "../../settings/strings";
+import { useLanguage } from "../../context/Language";
 
 function FormHeader() {
+    const {lang} = useLanguage()
     return (<h4 id='form_header' style={{
         margin: '0px',
         fontSize: '22px',
         fontWeight: '500',
         padding: '8px',
         color: 'whitesmoke'
-    }}>{CREATE_RIDE('heb')}</h4>);
+    }}>{CREATE_RIDE(lang)}</h4>);
 }
 
 export function RideForm(props) {
-    const useStyles = makeStyles(theme => ({
-        labelRoot: {
-            right: '-64px'
-
-        },
-        shrink: {
-            transformOrigin: "top right"
-        }
-    }));
-
+    const {lang} = useLanguage()
     function fields() {
         let fields = []
-        fields.push(<Places key={v4()} placeHolder={DESTINATION_POINT('heb')} />)
-        fields.push(<Places key={v4()} placeHolder={STARTING_POINT('heb')} />)
+        fields.push(<Places key={v4()} placeHolder={DESTINATION_POINT(lang)} />)
+        fields.push(<Places key={v4()} placeHolder={STARTING_POINT(lang)} />)
         return fields
     }
     return <span>{fields()}</span>
@@ -101,8 +90,9 @@ export function RideFormPreview() {
         $(window).on('resize', resize)
         resize()
     }, [])
+    const {lang} = useLanguage()
     const dialogContext = useLoading()
-    return <div dir="rtl" style={formstyle}>
+    return <div dir={SIDE(lang)} style={formstyle}>
         <div id='ride_form' style={{
             display: 'flex',
             backgroundImage: ORANGE_GRADIENT_PRIMARY,
@@ -116,21 +106,21 @@ export function RideFormPreview() {
         }}>
 
             <FormHeader />
-            <RideFormItem id='form_item_1' style={{}} elem={FormElementType.selector} options={["Tel Aviv", "Rosh pina"]} text={DESTINATION_POINT('heb')} type={'text'} />
-            <RideFormItem id='form_item_2' style={{}} elem={FormElementType.selector} text={STARTING_POINT('heb')} options={["Tel Aviv", "Rosh pina"]} type={'text'} />
+            <RideFormItem id='form_item_1' style={{}} elem={FormElementType.selector} options={["Tel Aviv", "Rosh pina"]} text={DESTINATION_POINT(lang)} type={'text'} />
+            <RideFormItem id='form_item_2' style={{}} elem={FormElementType.selector} text={STARTING_POINT(lang)} options={["Tel Aviv", "Rosh pina"]} type={'text'} />
             <div style={{ columnGap: '8px', display: 'flex', justifyContent: 'center' }}>
 
-                <RideFormItem id='form_item_3' style={{ width: '50%' }} elem={FormElementType.input} text={PASSENGERS('heb')} type={'text'} />
-                <RideFormItem id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={FULL_NAME('heb')} type='text' />
+                <RideFormItem id='form_item_3' style={{ width: '50%' }} elem={FormElementType.input} text={PASSENGERS(lang)} type={'text'} />
+                <RideFormItem id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={FULL_NAME(lang)} type='text' />
             </div>
 
             <div>
 
                 <RideFormItem action={() => {
                     dialogContext.openDialog({
-                        content: <RideForm />, title: CREATE_RIDE('heb')
+                        content: <RideForm />, title: CREATE_RIDE(lang)
                     })
-                }} id='form_item_5' style={{ borderRadius: '24px' }} elem={FormElementType.button} text={'המשך'} type={'text'} />
+                }} id='form_item_5' style={{ borderRadius: '24px' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
             </div>
         </div>
     </div>

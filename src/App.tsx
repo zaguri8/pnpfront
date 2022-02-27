@@ -1,24 +1,23 @@
 import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
-import { CLOSE } from './settings/strings'
+import { CLOSE, SIDE } from './settings/strings'
 import AppMenu from './components/AppMenu';
 import { Routes, Route, useNavigate } from 'react-router';
 import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
 
-
 import { TOOLBAR_COLOR } from './settings/colors';
 import Home from './components/home/Home';
-import Auth from './components/auth/Auth';
 import { useAuthState } from './context/Firebase';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import EventPage from './components/event/EventPage';
+import { useLanguage } from './context/Language';
 
 
 
@@ -41,6 +40,7 @@ function ImageHeader() {
 function App() {
   const [canToggle, setCanToggle] = useState(true)
   const dialogContext = useLoading()
+  const { lang } = useLanguage()
   const toggleMenu = () => {
     if (!canToggle)
       return
@@ -111,7 +111,7 @@ function App() {
     <div>
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
-        {dialogContext.content ? <Dialog dir='rtl' sx={{ textAlign: 'center' }} open={dialogContext.isDialogOpened}>
+        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center' }} open={dialogContext.isDialogOpened}>
           <DialogTitle style={{ fontFamily: 'Open Sans Hebrew', background: 'white' }}>{dialogContext.content.title}</DialogTitle>
           <List sx={{
             background: 'white',
@@ -126,13 +126,12 @@ function App() {
 
             {dialogContext.content.content}
             <ListItem>
-
               <Button
                 style={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }}
                 onClick={() => {
                   dialogContext.closeDialog()
                 }}
-                sx={{ width: '100%', color: 'white' }} >{CLOSE('heb')}</Button>
+                sx={{ width: '100%', color: 'white' }} >{CLOSE(lang)}</Button>
             </ListItem>
 
           </List>
