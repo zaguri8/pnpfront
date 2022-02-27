@@ -43,8 +43,8 @@ export function ToolBar(props: ToolbarProps) {
                 justifyContent: 'center',
                 alignItems: 'center'
             }} onClick={() => setLang(lang === 'heb' ? 'en' : 'heb')}>
-                <ToolbarItem id='language' text={lang === 'heb' ? 'EN' : 'HE'} style={{fontFamily:'Open Sans Hebrew', fontSize: '14px', margin: '0px', padding: '2px' }} action={() => { }} />
-                <img style={{padding:'4px', width: '25px', height: '25px' }} src={lang === 'heb' ? america : israel} />
+                <ToolbarItem id='language' text={lang === 'heb' ? 'HE' : 'EN'} style={{fontFamily:'Open Sans Hebrew', fontSize: '14px', margin: '0px', padding: '2px' }} action={() => { }} />
+                <img style={{padding:'4px', width: '25px', height: '25px' }} src={lang === 'heb' ? israel : america} />
             
             </div>
             <ToolbarItem id='options' image={menuIcon_black} style={{ 'marginRight': '24px' }} action={props.menuToggle} />

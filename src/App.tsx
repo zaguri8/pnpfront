@@ -140,9 +140,9 @@ function App() {
         <ImageHeader />
         <ToolBar menuToggle={() => toggleMenu()} />
         <Routes>
-          <Route path='/hodash' element={<InvitationPage eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='דרך רמתיים, הוד השרון' />} />
-          <Route path='/tlv' element={<InvitationPage eventName='החתונה של הגר וגבריאל' eventTime='18:00 בערב' startPoint='כיכר רבין,תל אביב' />} />
-          <Route path='/pnp' element={isAuthenticated ? <Home /> : <Navigate to={'/login'} />} />
+          <Route path='/' element={<Home />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='/pnp' element={<Home />} />
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
           <Route path='/event/:id' element={<EventPage />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />

@@ -5,13 +5,15 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import $ from 'jquery'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import { useAuthState } from "../../context/Firebase"
-import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE } from "../../settings/strings"
+import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE, NO_RIDES } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
 
 import { PageHolder } from "../auth/Register"
 import { PNPRide } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useLanguage } from "../../context/Language";
+import { useLoading } from "../../context/Loading";
+import { LoadingIndicator } from "../invitation/InvitationCard";
 
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
@@ -23,9 +25,11 @@ export default function EventPage() {
     const { id } = useParams()
 
     useEffect(() => {
+        doLoad()
         firebase.realTime.getEventById(id)
             .then((event: PNPEvent) => {
                 setEvent(event)
+                cancelLoad()
             }).catch((err: any) => {
                 setError(err)
             })
@@ -41,7 +45,7 @@ export default function EventPage() {
 
 
     const [expanded, setExpanded] = useState<boolean>(false)
-    const [expandedRides, setExpandedRides] = useState<boolean>(false)
+    const [expandedRides, setExpandedRides] = useState<boolean>(true)
     const [selectedEventRide, setSelectedEventRide] = useState<PNPRide | null>(null)
 
     const handleSelectEventRide = (eventRide: PNPRide) => {
@@ -72,7 +76,8 @@ export default function EventPage() {
         }
         $(window).resize(() => { resize() })
         resize()
-    }, [window])
+    }, [$('#ride_start_point_list')])
+    const { isLoading, doLoad, cancelLoad } = useLoading()
 
     return (error || event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <PageHolder >
@@ -100,11 +105,12 @@ export default function EventPage() {
                         }}>
                             {`${TOTAL_COST(lang)}: ${selectedEventRide?.ridePrice ? selectedEventRide?.ridePrice : '0.00'} ${CURRENCY(lang)}`}
                         </p>
-                        <Accordion style={{ background: 'whitesmoke', margin: '0px', borderTopLeftRadius: '0px', borderTopRightRadius: '0px' }} expanded={expandedRides === true} onChange={() => handleSeeRidesToggle()}>
+                        <Accordion style={{ background: 'whitesmoke', margin: '0px', borderTopLeftRadius: '0px', borderTopRightRadius: '0px' }} expanded={true}>
                             <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
                                 <p style={{
-                                    textAlign: 'right',
-                                    color: 'rgb(0, 122, 255)',
+                                    textAlign: 'center',
+                                    width: '100%',
+                                    color: 'black',
                                     margin: '0px'
                                 }}>
                                     {SHOW_RIDE_SELECT(lang)}</p>
@@ -122,7 +128,7 @@ export default function EventPage() {
                                     </div>
                                 </div>
                                 <div style={{ color: 'black', padding: '8px' }}>{STARTING_POINT(lang)}</div>
-                                {eventRides && <Stack
+                                {!isLoading && eventRides.length > 0 ? <Stack
                                     style={{ width: '100%', rowGap: '8px' }}>
                                     {eventRides.map(ride => {
                                         return <MenuItem onClick={() => {
@@ -148,11 +154,12 @@ export default function EventPage() {
                                             </div>
                                         </MenuItem>
                                     })}
+                                    <div style={{ display: 'flex', rowGap: '8px', flexDirection: 'column' }}> <AddCircleOutlineIcon color="inherit" style={{ cursor: 'pointer', width: '50px', height: '50px', alignSelf: 'center' }} />
+                                        <span style={{ color: 'black' }}>{CANT_SEE_YOUR_CITY(lang)}</span></div>
 
-                                    <AddCircleOutlineIcon color="inherit" style={{ cursor: 'pointer', width: '50px', height: '50px', alignSelf: 'center' }} />
-                                    <span style={{ color: 'black' }}>{CANT_SEE_YOUR_CITY(lang)}</span>
+                                </Stack> : <MenuItem style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>{<b>{NO_RIDES(lang)}</b>}</MenuItem>}
 
-                                </Stack>}
+
                             </AccordionDetails>
                         </Accordion>
                     </div>
@@ -209,5 +216,5 @@ export default function EventPage() {
                 </div>
             </List>
         </PageHolder>
-    ) : <h1 dir={SIDE(lang)}>{LOADING(lang)}</h1>)
+    ) : <LoadingIndicator loading = {isLoading}/>)
 }
