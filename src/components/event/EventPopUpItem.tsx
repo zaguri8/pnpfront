@@ -10,7 +10,7 @@ import { useLanguage } from '../../context/Language';
 import { SIDE } from '../../settings/strings';
 
 
-function EventDialog(props: { open: any }) {
+export function EventDialog(props: { open: any }) {
     const { open } = props;
     const { lang } = useLanguage()
     const handleListItemClick = () => {

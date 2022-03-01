@@ -1,14 +1,13 @@
-import { Typography, AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion } from "@mui/material"
+import { Typography, AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion, Button } from "@mui/material"
 import { useEffect, useLayoutEffect, useState } from "react"
 import { useParams } from "react-router"
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import $ from 'jquery'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import { InnerPageHolder,PageHolder } from "../utilities/Holders";
 import { useAuthState } from "../../context/Firebase"
 import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE, NO_RIDES } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
-
-import { PageHolder } from "../auth/Register"
 import { PNPRide } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useLanguage } from "../../context/Language";
@@ -30,6 +29,18 @@ export default function EventPage() {
             .then((event: PNPEvent) => {
                 setEvent(event)
                 cancelLoad()
+                const resize = () => {
+                    const width = window.outerWidth
+                    if (width < 720) {
+                        $('#ride_start_point_list').css({ width: '95%' })
+                    } else if (width < 1020) {
+                        $('#ride_start_point_list').css({ width: '80%' })
+                    }
+                    else if (width > 1000) {
+                        $('#ride_start_point_list').css({ width: '70%' })
+                    }
+                }
+                resize()
             }).catch((err: any) => {
                 setError(err)
             })
@@ -62,7 +73,6 @@ export default function EventPage() {
     const { lang } = useLanguage()
 
     useLayoutEffect(() => {
-        console.log('again')
         const resize = () => {
             const width = window.outerWidth
             if (width < 720) {
@@ -76,7 +86,7 @@ export default function EventPage() {
         }
         $(window).resize(() => { resize() })
         resize()
-    }, [$('#ride_start_point_list')])
+    }, [])
     const { isLoading, doLoad, cancelLoad } = useLoading()
 
     return (error || event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
@@ -127,7 +137,7 @@ export default function EventPage() {
                                         <span style={{ maxWidth: '200px', fontSize: '16px', padding: '8px', width: '50%', color: 'black', float: 'right' }}>{NO_DELAYS(lang)}</span>
                                     </div>
                                 </div>
-                                <div style={{ color: 'black', padding: '8px' }}>{STARTING_POINT(lang)}</div>
+                                <div style={{ color: 'black', padding: '8px', width: '100%' }}>{STARTING_POINT(lang)}</div>
                                 {!isLoading && eventRides.length > 0 ? <Stack
                                     style={{ width: '100%', rowGap: '8px' }}>
                                     {eventRides.map(ride => {
@@ -154,10 +164,26 @@ export default function EventPage() {
                                             </div>
                                         </MenuItem>
                                     })}
-                                    <div style={{ display: 'flex', rowGap: '8px', flexDirection: 'column' }}> <AddCircleOutlineIcon color="inherit" style={{ cursor: 'pointer', width: '50px', height: '50px', alignSelf: 'center' }} />
+                                    <div style={{
+                                        display: 'flex',
+                                        rowGap: '8px',
+                                        flexDirection: 'column'
+                                    }}> <AddCircleOutlineIcon color="inherit" style={{
+                                        cursor: 'pointer',
+                                        width: '50px',
+                                        height: '50px',
+                                        alignSelf: 'center'
+                                    }} />
                                         <span style={{ color: 'black' }}>{CANT_SEE_YOUR_CITY(lang)}</span></div>
 
-                                </Stack> : <MenuItem style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>{<b>{NO_RIDES(lang)}</b>}</MenuItem>}
+                                </Stack> : <Button style={{
+                                    cursor:'pointer',
+                                    background:'none',
+                                    textAlign: 'center',
+                                    fontFamily:'Open Sans Hebrew',
+                                    width: '100%',
+                                    alignSelf: 'center'
+                                }}>{NO_RIDES(lang)}</Button>}
 
 
                             </AccordionDetails>
@@ -216,5 +242,5 @@ export default function EventPage() {
                 </div>
             </List>
         </PageHolder>
-    ) : <LoadingIndicator loading = {isLoading}/>)
+    ) : <LoadingIndicator loading={isLoading} />)
 }

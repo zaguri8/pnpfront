@@ -2,10 +2,11 @@ import { ListItem, FormControl, List, TextField } from "@mui/material";
 import { useState } from "react";
 import PlacesAutocomplete from 'react-places-autocomplete'
 import { useGoogleState } from "../../context/GoogleMaps";
-import { makeStyles } from "@mui/styles";
 import { SIDE } from "../../settings/strings";
 import { useLanguage } from "../../context/Language";
-export default function Places({ placeHolder }) {
+
+import { makeStyles } from "@mui/styles";
+export default function Places({ placeHolder, style, fixed, id, className }) {
     const [address, setAddress] = useState('')
     const handleChange = (value) => {
         setAddress(value)
@@ -14,21 +15,19 @@ export default function Places({ placeHolder }) {
     const handleSelect = (value) => {
         setAddress(value)
     }
-
-    const useStyles = makeStyles(theme => ({
-        labelRoot: {
-            right: '-64px'
-
-        },
-        shrink: {
-            transformOrigin: "top right"
+    const useStyles = makeStyles(() => ({
+        root: {
+            "& .MuiOutlinedInput-root": {
+                background: "white"
+            }
         }
     }));
-    const classes = useStyles()
-    const {lang} = useLanguage()
-    return (<ListItem>
 
-        <FormControl style={{ dislay: 'flex', }}>
+    const classes = useStyles()
+
+    const { lang } = useLanguage()
+    return (<ListItem style={style} id={id} className={className}>
+        <FormControl style={style}>
             {google && <PlacesAutocomplete
                 onError={(err) => { }}
                 searchOptions={{
@@ -46,25 +45,26 @@ export default function Places({ placeHolder }) {
                     getSuggestionItemProps
                 }) => (
                     <div dir={SIDE(lang)} style={{
-                        display: 'flex',
-                        flexDirection: 'column'
+                        ...{
+                            display: 'flex',
+                            margin: '0px',
+                            flexDirection: 'column'
+                        }, ...style
                     }}>
                         <TextField
-                        label = {placeHolder}
-                        classes = {{
-                            shrink:classes.shrink
-                        }}
-                        sx={{ direction:SIDE(lang)}}
+                            variant='outlined'
+                            className={classes.root}
+                            sx={{ ...{ direction: SIDE(lang), maxHeight: '50px' }, ...style }}
                             {...getInputProps({
-                                placeholder: placeHolder,
+                                placeholder: placeHolder
                             })}
                         />
-                        
-                        <List dir={SIDE(lang)} style={{ position: 'relative', zIndex: '9999', overflow: 'scroll', width: '300px' }}>
+
+                        <List dir={SIDE(lang)} style={{ position: 'relative', zIndex: '9999', overflow: 'scroll', width: '100%', minWidth: fixed ? '300px' : 'fit-content' }}>
 
                             {suggestions.map((suggestion, index) => {
                                 const style = suggestion.active
-                                    ? { backgroundColor: "whitesmoke", textAlign: 'right', cursor: "pointer", fontSize: '14px' }
+                                    ? { backgroundColor: "gray", textAlign: 'right', cursor: "pointer", color: 'white', fontSize: '14px' }
                                     : { backgroundColor: "white", cursor: "pointer", textAlign: 'right', fontSize: '14px' };
 
                                 return (

@@ -27,13 +27,10 @@ function GalleryItemTitle(props: { eventName: string }) {
 export function Gallery(props: GalleryProps) {
     const {lang} = useLanguage()
     const containerStyle: CSSProperties = {
-        display: 'flex',
         overflow: 'scroll',
-        justifyContent: 'center',
+        display:'flex',
+        direction: SIDE(lang),
         paddingBottom: '32px',
-        alignItems: lang === 'heb' ? 'end' : 'start',
-        background: PRIMARY_WHITE,
-        flexDirection: 'column'
     }
 
     const cardStyle: CSSProperties = {
@@ -48,11 +45,8 @@ export function Gallery(props: GalleryProps) {
     }
     const imageContainer: CSSProperties = {
         display: 'flex',
-        alignItems: 'center',
-        background: ' rgb(232,232,232)',
-        overflow: 'auto',
+        width:'fit-content',
         padding: '8px',
-        justifyContent: 'center',
         textAlign: 'center'
 
     }

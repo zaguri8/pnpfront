@@ -8,6 +8,7 @@ export const NO_RIDES = (lang) => lang === 'heb' ? 'לאירוע זה תרם ק�
 export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על הכפתור ופתח ביקוש' : 'Your city is missing? lets open a request for a ride'
 export const RIDE_DATE = (lang) => lang === 'heb' ? 'תאריך הסעה' : 'Ride Date'
 export const STARTING_POINT = (lang) => lang === 'heb' ? 'כל נקודות היציאה' : 'All starting points'
+export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת היציאה' : 'Starting point'
 export const ATTENTION = (lang) => lang === 'heb' ? 'שימו לב !' : 'Attention !'
 export const NO_DELAYS = (lang) => lang === 'heb' ? 'ההסעות יוצאות בדיוק בשעה שנקבעה, לכן אין איחורים' : 'The rides leave exactly at the scheduled moment'
 export const DESTINATION_POINT = (lang) => lang === 'heb' ? 'בחר יעד ' : 'Choose Destination'
@@ -17,22 +18,28 @@ export const NAME_OF_RIDE = (lang) => lang === 'heb' ? 'שם ההסעה' : 'Name
 export const SHARE_PAYMENT = (lang) => lang === 'heb' ? 'אני רוצה לחלק את התשלום בין הנוסעים' : 'Shared payment'
 export const I_PAY = (lang) => lang === 'heb' ? 'הכל עלי !' : 'I Pay it all !'
 
+
+export const PICK_IMAGE = (lang,create) => lang === 'heb' ?  (create? 'שנה גרפיקה' : 'בחר תמונה') : 'Select image'
 export const CONTINUE = (lang) => lang === 'heb' ? 'המשך' : 'Continue'
 export const CULTURE = (lang) => lang === 'heb' ? 'תרבות ופנאי' : 'Culture & Leisure'
 export const CLUBS = (lang) => lang === 'heb' ? 'מועדונים' : 'Clubs'
 export const SCHEDULED_EVENTS = (lang) => lang === 'heb' ? 'אירועים קרובים' : 'Upcomming Events'
+
+export const MY_ACCOUNT = (lang) => lang === 'heb' ? 'האזור שלי' : 'My Account'
+export const REGISTER_TITLE = (lang) => lang === 'heb' ? 'הרשמה' : 'Register'
+export const REGISTER_OK = (lang) => lang === 'heb' ? 'הירשם/י' : 'Register'
+export const LOGIN_OK = lang => lang === 'heb' ? 'התחבר/י' : 'Sign in'
+export const LOGOUT = (lang) => lang === 'heb' ? 'התנתק' : 'Sign out'
 export const MENU_ITEM_1 = (lang) => lang === 'heb' ? "אודות" : "About us"
-export const MENU_ITEM_2 = (lang) => lang === 'heb' ? "המשתמש שלי" : 'My Account'
+export const MENU_ITEM_2 = (lang) => MY_ACCOUNT(lang)
 export const MENU_ITEM_3 = (lang) => lang === 'heb' ? "היסטוריית הסעות" : 'Ride history'
 export const MENU_ITEM_4 = (lang) => lang === 'heb' ? "חדש ב Pick n Pull" : 'New at Pick n Pull'
 export const MENU_ITEM_5 = (lang) => lang === 'heb' ? "סגור" : 'Close'
 
-export const MY_ACCOUNT = (lang) => lang === 'heb' ? 'המשתמש שלי' : 'My Account'
-export const LOGIN_TITLE = (lang) => lang === 'heb' ? 'התחברות' : 'Login'
-export const REGISTER_TITLE = (lang) => lang === 'heb' ? 'הרשמה' : 'Register'
-export const REGISTER_OK = (lang) => lang === 'heb' ? 'הירשם/י' : 'Register'
-export const LOGIN_OK = lang => lang === 'heb' ? 'התחבר/י' : 'Login'
-
+export const MY_ACCOUNT_ITEM_1 = (lang) => lang === 'heb' ? 'מטבעות שצברתי' : 'Coins ive earned'
+export const MY_ACCOUNT_ITEM_2 = (lang) => lang === 'heb' ? 'קופונים והטבות' : 'Coupons and discounts'
+export const MY_ACCOUNT_ITEM_3 = (lang) => lang === 'heb' ? 'היסטוריית נסיעות' : 'Rides history'
+export const MY_ACCOUNT_ITEM_4 = (lang) => lang === 'heb' ? 'הגדרות' : 'Settings'
 export const EMAIL = (lang) => lang === 'heb' ? 'כתובת אימייל' : 'Email address'
 export const PASSWORD = (lang) => lang === 'heb' ? 'סיסמא' : 'Password'
 export const OR = (lang) => lang === 'heb' ? 'או' : 'or'
@@ -99,3 +106,11 @@ export const NO_MORE_ITEM_2 = (lang) => lang === 'heb' ? 'חניונים במח�
 export const NO_MORE_ITEM_3 = (lang) => lang === 'heb' ? 'drink & drive' : 'drink & drive'
 export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'מוניות יקרות' : 'Expensive cabs'
 export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'מחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'
+
+export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'יצירת אירוע'  : 'Create event'
+export const EVENT_TITLE = (lang) => lang === 'heb' ? 'כותרת האירוע'  : 'Event title'
+export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע'  : 'Event address'
+export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע'  : 'Event start date'
+export const EVENT_END = (lang) => lang === 'heb' ? 'סיום האירוע'  : 'Event end date'
+export const EVENT_TYPE = (lang) => lang === 'heb' ? 'סוג האירוע'  : 'Event type'
+export const EVENT_DESC = (lang) => lang === 'heb' ? 'תיאור האירוע'  : 'Event description'

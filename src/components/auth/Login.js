@@ -1,8 +1,9 @@
-import {  Input, FormControl, InputLabel } from "@mui/material"
-import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, LOGIN_TITLE, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE } from '../../settings/strings'
+import { Input, FormControl, InputLabel } from "@mui/material"
+import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE, TOOLBAR_LOGIN } from '../../settings/strings'
 import Auth from "./Auth"
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
+import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import Button from "../Button"
 import { Stack } from "@mui/material"
 import { useAuthState } from "../../context/Firebase"
@@ -33,7 +34,7 @@ export default function Login() {
 
     }
     const classes = useStyles()
-    const {lang} = useLanguage()
+    const { lang } = useLanguage()
 
     return (<div style={{
         width: '100%',
@@ -69,7 +70,7 @@ export default function Login() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <SectionTitle title={LOGIN_TITLE(lang)} style={{
+                <SectionTitle title={TOOLBAR_LOGIN(lang)} style={{
                     background: 'whitesmoke',
                     marginTop: '0px',
                     marginBottom: '32px'
@@ -82,7 +83,7 @@ export default function Login() {
                             shrink: classes.shrink
 
                         }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
-                        <Input type='email' sx={{ direction:SIDE(lang) }} id="email_input" aria-describedby="email_helper_text" />
+                        <Input type='email' sx={{ direction: SIDE(lang) }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
                     <FormControl >

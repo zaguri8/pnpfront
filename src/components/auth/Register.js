@@ -5,8 +5,10 @@ import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
+import { InnerPageHolder,PageHolder } from "../utilities/Holders"
 import $ from 'jquery'
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+
 import { useAuthState } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -18,39 +20,7 @@ import { useLoading } from "../../context/Loading"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
 import { useLanguage } from "../../context/Language"
 
-export const PageHolder = ({ children, style = {} }) => {
-    return <div style={{
-        ...{
-            width: '100%',
-            marginBottom: '120px',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            alignItems: 'center'
-        }, ...style
-    }}>{children}</div>
-}
-export const InnerPageHolder = ({ children, style = {} }) => {
-    return <div style={{
-        ...{
-            background: 'whitesmoke',
-            width: '50%',
-            maxWidth: '500px',
-            marginTop: '32px',
-            minWidth: '200px',
-            borderRadius: '12px',
-            padding: '32px',
-            paddingLeft: '64px',
-            paddingRight: '64px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            border: '.5px solid white',
-        }, ...style
-    }}>{children}</div>
-}
+
 export default function Register() {
 
 

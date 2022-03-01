@@ -18,17 +18,20 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import EventPage from './components/event/EventPage';
 import { useLanguage } from './context/Language';
+import CreateEvent from './components/event/CreateEvent';
+import MyAccount from './components/auth/MyAccount';
 
 
 
 function ImageHeader() {
   const nav = useNavigate()
+
   return (<div className='App-header' style={{
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
   }}>
-    <img onClick={() => nav('/pnp')} alt='' src={logo_white} style={{
+    <img onClick={() => nav('/pnp')} id='image-header' alt='' src={logo_white} style={{
       cursor: 'pointer',
       height: '100px',
       padding: '8px'
@@ -41,29 +44,40 @@ function App() {
   const [canToggle, setCanToggle] = useState(true)
   const dialogContext = useLoading()
   const { lang } = useLanguage()
-  const toggleMenu = () => {
+  const toggleMenu = (completion?: () => void) => {
     if (!canToggle)
       return
     if ($('.dim').css('display') === 'none') {
 
       setCanToggle(false)
       dim(true)
-      $('#menu').stop().animate({ width: 'toggle', opacity: 'toggle' }, 325, () => {
+      $('#menu').stop().animate({ width: 'toggle', opacity: 'toggle' }, 225, () => {
         setCanToggle(true)
+        if (completion !== undefined) {
+          completion()
+        }
       })
     } else {
-      $('#menu').stop().animate({ width: 'toggle', opacity: 'toggle' }, 325, () => {
+      $('#menu').stop().animate({ width: 'toggle', opacity: 'toggle' }, 225, () => {
         dim(false)
         setCanToggle(true)
+        if (completion !== undefined) {
+          completion()
+        }
       })
     }
   }
 
   const dim = (enable: boolean) => {
+
     if (enable) {
       $('.dim').css({ 'display': 'block' })
+      $('.dim').one('click', () => {
+        toggleMenu()
+      })
     } else {
       $('.dim').css({ 'display': 'none' })
+      $('.dim').off()
     }
   }
 
@@ -85,6 +99,11 @@ function App() {
         $('.gallery_header').css('alignSelf', 'flex-end').css('text-align', 'right')
       } else if (windowWidth && windowWidth < 600) {
         $('.gallery_header').css('alignSelf', 'center').css('text-align', 'center')
+      }
+      if (windowWidth && windowWidth < 320) {
+        $('#lang').css('display', 'none')
+      } else {
+        $('#lang').css('display', 'flex')
       }
     }
     function onScroll() {
@@ -111,6 +130,7 @@ function App() {
     <div>
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
+
         {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center' }} open={dialogContext.isDialogOpened}>
           <DialogTitle style={{ fontFamily: 'Open Sans Hebrew', background: 'white' }}>{dialogContext.content.title}</DialogTitle>
           <List sx={{
@@ -143,6 +163,8 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/home' element={<Home />} />
           <Route path='/pnp' element={<Home />} />
+          <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
+          <Route path='/createevent' element={<CreateEvent />} />
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
           <Route path='/event/:id' element={<EventPage />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />

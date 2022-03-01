@@ -1,4 +1,5 @@
 import { useLanguage } from "../../context/Language"
+import { PRIMARY_WHITE } from "../../settings/colors"
 import { NO_MORE_ITEM_1, NO_MORE_ITEM_2, NO_MORE_ITEM_3, NO_MORE_ITEM_4, NO_MORE_ITEM_5 } from "../../settings/strings"
 import SayNoMoreItem, { SayNoMoreItemProps } from "./SayNoMoreItem"
 export default function SayNoMoreContainer() {
@@ -16,21 +17,15 @@ export default function SayNoMoreContainer() {
         return <SayNoMoreItem key={props.content} icon={props.icon} content={props.content} />
     }
 
-    return (<div style={{
-        background: 'white',
-        display: 'flex',
-        flexDirection: 'column'
-    }}>
-
+    return (
         <div style={{
             display: 'flex',
+            overflow:'scroll',
+            position: 'relative',
             flexDirection: 'row',
-            overflow: 'scroll',
-            justifyContent: 'center'
         }}>
 
             {sayNoMoreItems.map(makeItem)}
 
-        </div>
-    </div>)
+        </div>)
 }

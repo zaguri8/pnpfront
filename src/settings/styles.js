@@ -19,7 +19,8 @@ export const flex = (direction, align, justify) => {
 export const toolbar = () => {
     return {
         ...flex('row', 'center', 'space-between'),
-        ...{ zIndex: '100' },
+        
+        ...{ zIndex: '100',width:'100%' },
         ...bgColor(ORANGE_GRADIENT_PRIMARY, { height: '50px' })
     }
 }

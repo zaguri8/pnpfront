@@ -7,12 +7,15 @@ code {
 }
 body {
   margin: 0;
-  background-color: rgb(232,232,232);
   scroll-behavior: smooth;
   font-family: 'Open Sans Hebrew', serif;
   -webkit-font-smoothing: antialiased;
+  background-color: rgb(232,232,232);
+  min-height: 100vh;
   -moz-osx-font-smoothing: grayscale;
-
+}
+html {
+overflow-x: hidden;
 }
 
 button {
@@ -20,9 +23,10 @@ button {
   overflow: hidden;
   transition: background 400ms;
   color: #fff;
+  
   background-image: linear-gradient(orange,orange,orange);
   padding: 14px 24px;
-  font-family: 'Opens Sans Hebrew';
+  font-family: 'Open Sans Hebrew';
   font-size: 18px;
   outline: 0;
   border: 0;

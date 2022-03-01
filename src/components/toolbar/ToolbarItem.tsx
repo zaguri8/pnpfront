@@ -11,10 +11,10 @@ export default function ToolbarItem(props: {
 }) {
     return <span className={props.bold ? '' : 'toolbar_item'} onClick={props.action} style={{
         ...{
-            paddingLeft: '16px',
-            paddingRight: '16px',
+            paddingLeft: '8px',
+            paddingRight: '8px',
             fontWeight: '400',
-            fontSize: '18px',
+            fontSize: '14px',
             paddingTop: props.bold ? '24px' : props.image ? '8px' : '0px',
             cursor: 'pointer',
             textAlign: 'center',
