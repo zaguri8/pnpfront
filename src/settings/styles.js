@@ -7,6 +7,20 @@ export const bgColor = (color, size) => {
         height: size.height
     }
 }
+
+export const submitButton = (margin) => {
+    return {
+        fontFamily: 'Open Sans Hebrew',
+        color: 'white',
+        fontSize: '22px',
+        margin: margin ? '16px' : 'inherit',
+        padding: margin ? '12px' : 'inherit',
+        width: '50%',
+        alignSelf: 'center',
+        borderRadius: '4px',
+        backgroundImage: ORANGE_GRADIENT_PRIMARY
+    }
+}
 export const flex = (direction, align, justify) => {
     return {
         display: 'flex',
@@ -19,8 +33,8 @@ export const flex = (direction, align, justify) => {
 export const toolbar = () => {
     return {
         ...flex('row', 'center', 'space-between'),
-        
-        ...{ zIndex: '100',width:'100%' },
+
+        ...{ zIndex: '100', width: '100%' },
         ...bgColor(ORANGE_GRADIENT_PRIMARY, { height: '50px' })
     }
 }

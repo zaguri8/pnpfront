@@ -6,7 +6,7 @@ import SectionTitle from "../SectionTitle"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import Button from "../Button"
 import { Stack } from "@mui/material"
-import { useAuthState } from "../../context/Firebase"
+import { useFirebase } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
@@ -14,7 +14,7 @@ import { useLanguage } from "../../context/Language"
 export default function Login() {
 
     const nav = useNavigate()
-    const { firebase } = useAuthState()
+    const { firebase } = useFirebase()
     const useStyles = makeStyles(theme => ({
         labelRoot: {
             right: '-64px'

@@ -1,8 +1,9 @@
 
 import { DataSnapshot } from "firebase/database"
+import { PNPUser, PNPEvent, PNPRide } from "./types"
 
 
-export const eventFromDict = (snap: DataSnapshot) => {
+export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
     return {
         eventId: snap.child('eventId').val(),
         eventName: snap.child('eventName').val(),
@@ -18,13 +19,13 @@ export const eventFromDict = (snap: DataSnapshot) => {
     }
 }
 
-export const rideFromDict = (snap: DataSnapshot) => {
+export const rideFromDict: (snap: DataSnapshot) => PNPRide = (snap) => {
     return {
         rideName: snap.child('rideName').val(),
         rideId: snap.child('rideId').val(),
         rideDestination: snap.child('rideDestination').val(),
         rideStartingPoint: snap.child('rideStartingPoint').val(),
-        ridePrice:snap.child('ridePrice').val(),
+        ridePrice: snap.child('ridePrice').val(),
         extraStopPoints: snap.child('extraStopPoints').val(),
         rideTime: snap.child('rideTime').val(),
         backTime: snap.child('backTime').val(),
@@ -33,13 +34,15 @@ export const rideFromDict = (snap: DataSnapshot) => {
         comments: snap.child('comments').val()
     }
 }
-export const userFromDict = (snap: DataSnapshot) => {
-    return {
+export const userFromDict: (snap: DataSnapshot) => PNPUser = (snap) => {
+    let user: PNPUser = {
         email: snap.child('email').val(),
+        image: snap.child('image').val(),
         birthDate: snap.child('birthDate').val(),
         phone: snap.child('phone').val(),
         name: snap.child('name').val(),
         favoriteEvents: snap.child('favoriteEvents').val(),
         producer: snap.child('producer').val(),
     }
+    return user
 }

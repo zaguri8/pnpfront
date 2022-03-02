@@ -9,13 +9,12 @@ import { InnerPageHolder,PageHolder } from "../utilities/Holders"
 import $ from 'jquery'
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
-import { useAuthState } from "../../context/Firebase"
+import { useFirebase } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { TextField } from "@mui/material"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { DatePicker } from "@mui/lab"
-import { LoadingIndicator } from "../invitation/InvitationCard"
 import { useLoading } from "../../context/Loading"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
 import { useLanguage } from "../../context/Language"
@@ -25,8 +24,8 @@ export default function Register() {
 
 
     const nav = useNavigate()
-    const { firebase } = useAuthState()
-    const { doLoad, cancelLoad, isLoading } = useLoading()
+    const { firebase } = useFirebase()
+    const { doLoad, cancelLoad } = useLoading()
     const useStyles = makeStyles(theme => ({
         labelRoot: {
             right: '-64px'
@@ -111,7 +110,6 @@ export default function Register() {
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder>
-            <LoadingIndicator loading={isLoading} />
             <form onSubmit={register} style={{
                 display: 'flex',
                 justifyContent: 'center',

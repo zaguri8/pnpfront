@@ -13,13 +13,14 @@ import InvitationPage from './components/invitation/InvitationPage';
 
 import { TOOLBAR_COLOR } from './settings/colors';
 import Home from './components/home/Home';
-import { useAuthState } from './context/Firebase';
+import { useFirebase } from './context/Firebase';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import EventPage from './components/event/EventPage';
 import { useLanguage } from './context/Language';
 import CreateEvent from './components/event/CreateEvent';
 import MyAccount from './components/auth/MyAccount';
+import { LoadingIndicator } from './components/invitation/InvitationCard';
 
 
 
@@ -95,11 +96,7 @@ function App() {
 
     function onResize() {
       const windowWidth = window.outerWidth
-      if (windowWidth && windowWidth > 700) {
-        $('.gallery_header').css('alignSelf', 'flex-end').css('text-align', 'right')
-      } else if (windowWidth && windowWidth < 600) {
-        $('.gallery_header').css('alignSelf', 'center').css('text-align', 'center')
-      }
+
       if (windowWidth && windowWidth < 320) {
         $('#lang').css('display', 'none')
       } else {
@@ -123,7 +120,7 @@ function App() {
     $(window).on('scroll', onScroll)
   }, [])
 
-  const { isAuthenticated } = useAuthState()
+  const { isAuthenticated } = useFirebase()
 
 
   return (
@@ -159,6 +156,7 @@ function App() {
           : null}
         <ImageHeader />
         <ToolBar menuToggle={() => toggleMenu()} />
+        <LoadingIndicator loading={dialogContext.isLoading} />
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/home' element={<Home />} />

@@ -1,18 +1,20 @@
-import { Typography, AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion, Button } from "@mui/material"
+import { Typography, AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion, Button, Tooltip } from "@mui/material"
 import { useEffect, useLayoutEffect, useState } from "react"
 import { useParams } from "react-router"
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import $ from 'jquery'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
-import { InnerPageHolder,PageHolder } from "../utilities/Holders";
-import { useAuthState } from "../../context/Firebase"
-import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE, NO_RIDES } from "../../settings/strings"
+import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import { useFirebase } from "../../context/Firebase"
+import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
 import { PNPRide } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
-import { LoadingIndicator } from "../invitation/InvitationCard";
+import { submitButton } from '../../settings/styles'
+import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
+import { HtmlTooltip } from "../utilities/HtmlTooltip";
 
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
@@ -20,37 +22,41 @@ export default function EventPage() {
 
 
     const [eventRides, setEventRides] = useState<PNPRide[]>([])
-    const { firebase } = useAuthState()
+    const { firebase } = useFirebase()
     const { id } = useParams()
 
     useEffect(() => {
         doLoad()
-        firebase.realTime.getEventById(id)
-            .then((event: PNPEvent) => {
-                setEvent(event)
-                cancelLoad()
-                const resize = () => {
-                    const width = window.outerWidth
-                    if (width < 720) {
-                        $('#ride_start_point_list').css({ width: '95%' })
-                    } else if (width < 1020) {
-                        $('#ride_start_point_list').css({ width: '80%' })
-                    }
-                    else if (width > 1000) {
-                        $('#ride_start_point_list').css({ width: '70%' })
-                    }
-                }
-                resize()
-            }).catch((err: any) => {
-                setError(err)
-            })
+        if (id) {
 
-        firebase.realTime.getAllEventRidesById(id)
-            .then((rides: PNPRide[]) => {
-                if (rides === null || rides.length === 0)
-                    return
-                setEventRides(rides)
-            })
+
+            firebase.realTime.getEventById(id)
+                .then((event: PNPEvent | null) => {
+                    setEvent(event)
+                    cancelLoad()
+                    const resize = () => {
+                        const width = window.outerWidth
+                        if (width < 720) {
+                            $('#ride_start_point_list').css({ width: '95%' })
+                        } else if (width < 1020) {
+                            $('#ride_start_point_list').css({ width: '80%' })
+                        }
+                        else if (width > 1000) {
+                            $('#ride_start_point_list').css({ width: '70%' })
+                        }
+                    }
+                    resize()
+                }).catch((err: any) => {
+                    setError(err)
+                })
+
+            firebase.realTime.getAllEventRidesById(id)
+                .then((rides: PNPRide[]) => {
+                    if (rides === null || rides.length === 0)
+                        return
+                    setEventRides(rides)
+                })
+        }
     }, [])
 
 
@@ -177,15 +183,18 @@ export default function EventPage() {
                                         <span style={{ color: 'black' }}>{CANT_SEE_YOUR_CITY(lang)}</span></div>
 
                                 </Stack> : <Button style={{
-                                    cursor:'pointer',
-                                    background:'none',
+                                    cursor: 'pointer',
+                                    background: 'none',
                                     textAlign: 'center',
-                                    fontFamily:'Open Sans Hebrew',
+                                    fontFamily: 'Open Sans Hebrew',
                                     width: '100%',
                                     alignSelf: 'center'
                                 }}>{NO_RIDES(lang)}</Button>}
-
-
+                                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
+                                    <span>
+                                        <Button id="request_event_order" aria-haspopup disabled={selectedEventRide === null} sx={{ ...submitButton(true), ...{ maxWidth: '250px' } }}> {ORDER(lang)}</Button>
+                                    </span>
+                                </HtmlTooltip>
                             </AccordionDetails>
                         </Accordion>
                     </div>
@@ -241,6 +250,6 @@ export default function EventPage() {
                     </div>
                 </div>
             </List>
-        </PageHolder>
-    ) : <LoadingIndicator loading={isLoading} />)
+        </PageHolder >
+    ) : null)
 }

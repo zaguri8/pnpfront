@@ -2,8 +2,17 @@ import { createContext } from "react"
 import { useContext } from "react"
 import { useState } from "react"
 import $ from 'jquery'
-const LoadingContext = createContext(null)
-export const LoadingContextProvider = props => {
+const LoadingContext = createContext<ILoadingContext | null>(null)
+
+export type ILoadingContext = {
+    loading: boolean;
+    setLoading: (loading: boolean) => void;
+    openDialog: boolean;
+    setOpenDialog: (open: boolean) => void;
+    dialogContent: any;
+    setDialogContent: (content: any) => void
+}
+export const LoadingContextProvider = (props: object) => {
     const [loading, setLoading] = useState(false)
     const [openDialog, setOpenDialog] = useState(false)
     const [dialogContent, setDialogContent] = useState(false)
@@ -21,28 +30,27 @@ export const useLoading = () => {
 
     const doLoad = () => {
         $('.dim').css('display', 'block')
-        loadingContext.setLoading(true)
+        loadingContext!.setLoading(true)
     }
     const cancelLoad = () => {
         $('.dim').css('display', 'none')
-        loadingContext.setLoading(false)
+        loadingContext!.setLoading(false)
     }
-    const openDialog = (content) => {
-        loadingContext.setDialogContent(content)
-        loadingContext.setOpenDialog(true)
-
+    const openDialog = (content: any) => {
+        loadingContext!.setDialogContent(content)
+        loadingContext!.setOpenDialog(true)
     }
     const closeDialog = () => {
-        loadingContext.setDialogContent(null)
-        loadingContext.setOpenDialog(false)
+        loadingContext!.setDialogContent(null)
+        loadingContext!.setOpenDialog(false)
     }
     return {
-        isLoading: loadingContext.loading,
+        isLoading: loadingContext!.loading,
         doLoad: doLoad,
         cancelLoad: cancelLoad,
-        openDialog: (content) => openDialog(content),
-        isDialogOpened: loadingContext.openDialog,
-        content:loadingContext.dialogContent,
+        openDialog: (content:any) => openDialog(content),
+        isDialogOpened: loadingContext!.openDialog,
+        content: loadingContext!.dialogContent,
         closeDialog: closeDialog
     }
 }

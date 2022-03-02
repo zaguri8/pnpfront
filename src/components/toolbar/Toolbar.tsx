@@ -7,7 +7,7 @@ import israel from '../../assets/images/israel.png'
 import america from '../../assets/images/america.png'
 import { menuIcon_black } from "../../assets/images"
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
-import { useAuthState } from "../../context/Firebase"
+import { useFirebase } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
 import { useNavigate } from "react-router"
 export type ToolbarProps = {
@@ -15,7 +15,7 @@ export type ToolbarProps = {
 }
 export function ToolBar(props: ToolbarProps) {
 
-    const { user } = useAuthState()
+    const { user } = useFirebase()
 
     const nav = useNavigate()
     const { lang, setLang } = useLanguage()

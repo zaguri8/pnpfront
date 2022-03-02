@@ -4,15 +4,18 @@ import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, PICK_IMAGE, REGISTE
 import { flex } from '../settings/styles.js';
 import $ from 'jquery'
 import ToolbarItem from './toolbar/ToolbarItem';
-import { useAuthState } from '../context/Firebase.js';
+import { useFirebase } from '../context/Firebase';
 import { useLanguage } from '../context/Language.js';
-import { List, ListItem, ListItemText } from '@mui/material';
+import { List, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router';
-
+import { useLoading } from '../context/Loading';
+import { getDownloadURL } from 'firebase/storage';
 function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
 
-    const { user } = useAuthState()
+    const { user, appUser, firebase, uploadUserImage } = useFirebase()
+    const { doLoad, cancelLoad } = useLoading()
     const { lang } = useLanguage()
+
     const nav = useNavigate()
     return (<div style={{
         display: 'flex',
@@ -32,12 +35,26 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
         }}>
             {<div >
 
-                {user != null && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {user && appUser  && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
                     <input onChange={(event) => {
                         if (event.target.files) {
-                            $('#menu_profile_image').attr('src', URL.createObjectURL(event.target.files[0]))
-                            $('#menu_profile_image').css('borderRadius', '42.5px')
+                            doLoad()
+                            const image = event.target.files[0]
+                            image.arrayBuffer()
+                                .then(buffer => uploadUserImage(buffer))
+                                .then((res) => {
+                                    if (res) {
+                                        getDownloadURL(res.ref)
+                                            .then(url => {
+                                                firebase.realTime.updateUserImage(url).then(() => {
+                                                    $('#menu_profile_image').css('borderRadius', '42.5px')
+                                                    $('#menu_profile_image').attr('src', url)
+                                                    cancelLoad()
+                                                })
+                                            }).catch(error => { console.log(error) })
+                                    }
+                                }).catch(error => { console.log(error) })
                         }
 
                     }} type="file" id="files" style={{ display: 'none' }} />
@@ -49,7 +66,7 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                     justifyContent: 'center',
                     flexDirection: 'column'
                 }}>
-                    <img id='menu_profile_image' alt='' src={profile} style={{
+                    <img id='menu_profile_image' alt='' src={appUser != null ? appUser.image : profile} style={{
                         width: '75px',
                         borderRadius: '42.5px',
                         border: '1px solid white',
@@ -75,9 +92,9 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                 }}>{TOOLBAR_LOGIN(lang)}</span>
             </div> : <List style={{ paddingLeft: '16px', paddingRight: '16px' }} >
                 <span style={{ fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>שם</span>
-                <ListItemText style={{ color: 'white' }}>{user.email.split('@')[0]}</ListItemText>
+                <ListItemText style={{ color: 'white' }}>{user?.email?.split('@')[0]}</ListItemText>
                 <span style={{ fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>אסימונים</span>
-                <ListItemText style={{ color: 'white' }}>{user.email.split('@')[0]}</ListItemText>
+                <ListItemText style={{ color: 'white' }}>{user?.email?.split('@')[0]}</ListItemText>
 
             </List>}
         </div>

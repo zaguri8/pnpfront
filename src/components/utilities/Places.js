@@ -6,7 +6,7 @@ import { SIDE } from "../../settings/strings";
 import { useLanguage } from "../../context/Language";
 
 import { makeStyles } from "@mui/styles";
-export default function Places({ placeHolder, style, fixed, id, className }) {
+export default function Places({ placeHolder, style, fixed, id, className,types }) {
     const [address, setAddress] = useState('')
     const handleChange = (value) => {
         setAddress(value)
@@ -34,7 +34,7 @@ export default function Places({ placeHolder, style, fixed, id, className }) {
                     location: new google.maps.LatLng(31.046051, 34.851612),
                     radius: 526,
                     componentRestrictions: { country: 'il' },
-                    types: ['address']
+                    types: types
                 }}
                 value={address}
                 onChange={handleChange}

@@ -1,6 +1,8 @@
 import { Auth } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPRide } from './types'
 import { rideFromDict, userFromDict, eventFromDict } from './converters'
+import { SnapshotOptions } from 'firebase/firestore'
+import { DocumentData } from 'firebase/firestore'
 import { child, Database, DatabaseReference, get, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
 import {
     collection,
@@ -10,11 +12,25 @@ import {
     addDoc,
     deleteDoc,
     updateDoc,
-    Firestore
+    Firestore,
+    QuerySnapshot,
+    DocumentReference
 } from 'firebase/firestore'
 
+export type ExternalStoreActions = {
+    /*  events */
+    getErrors: () => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[]>;
+    getEvents: () => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[]>;
+    getRides: (userId: String) => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[] | ((options?: SnapshotOptions | undefined) => DocumentData | undefined)>;
+    addError: (error: string) => Promise<DocumentReference<DocumentData>>;
+    addEvent: (event: PNPEvent) => Promise<DocumentReference<DocumentData>>;
+    removeEvent: (eventId: String) => Promise<void>;
+    updateEvent: (event: PNPEvent) => Promise<void>;
+    /* rides */
+    addRide: (ride: PNPRide) => Promise<DocumentReference<DocumentData>>;
 
-function CreateExternalStore(app: Firestore) {
+}
+function CreateExternalStore(app: Firestore): ExternalStoreActions {
     /*  get   */
     const events = () => collection(app, '/events')
     const rides = () => collection(app, "/rides")
@@ -156,8 +172,13 @@ export class Realtime {
         return await set(newRef, event)
     }
 
+    updateUserImage = async (image: string) => {
+        if (this.auth.currentUser === null) return
+        return await update(child(this.users, this.auth.currentUser!.uid), { image: image })
+    }
+
     addUser = async (user: PNPUser) => {
-        if (this.auth.currentUser == null) return
+        if (this.auth.currentUser === null) return
         return await set(child(this.users, this.auth.currentUser!.uid), user)
     }
 
@@ -182,7 +203,13 @@ export class Realtime {
 
 }
 
-export default function Store(auth: Auth, db: Database, firestore: Firestore) {
+export type FirebaseTools = {
+    auth: Auth,
+    store: ExternalStoreActions,
+    realTime: Realtime,
+    temp: Firestore
+}
+export default function Store(auth: Auth, db: Database, firestore: Firestore) : FirebaseTools {
     return {
         auth: auth,
         store: CreateExternalStore(firestore),

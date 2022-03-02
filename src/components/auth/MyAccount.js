@@ -2,20 +2,21 @@ import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_ACCOUNT_IT
 import SectionTitle from "../SectionTitle"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import { useLanguage } from "../../context/Language"
-import { Button } from "@mui/material"
+import { Box, Button } from "@mui/material"
 import $ from 'jquery'
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
 
 import { useEffect } from "react"
-import { useAuthState } from "../../context/Firebase"
+import { useFirebase } from "../../context/Firebase"
 
 
 function MyAccountItem({ title }) {
-    return (<Button className='my_account_item' sx={
+    return (<Box sx={{ boxShadow: 2  ,borderRadius: '12.5px'}}><Button className='my_account_item' sx={
         {
             backgroundImage: ORANGE_GRADIENT_PRIMARY,
             borderRadius: '12.5px',
             height: '100px',
+            boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
             fontFamily: 'Open Sans Hebrew',
             lineHeight: 'normal',
             width: '100px',
@@ -26,13 +27,13 @@ function MyAccountItem({ title }) {
             fontSize: '16px'
         }
 
-    }>{title}</Button>)
+    }>{title}</Button></Box>)
 }
 
 
 export default function MyAccount() {
     const { lang } = useLanguage()
-    const { firebase } = useAuthState()
+    const { firebase } = useFirebase()
     useEffect(() => {
         function resize() {
             const currentWidth = window.innerWidth

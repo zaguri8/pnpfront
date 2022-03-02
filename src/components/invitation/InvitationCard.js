@@ -6,7 +6,7 @@ import $ from 'jquery'
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { alreadyHasInvitation, insertInvitation } from '../../auth/db';
 import { ThreeDots } from 'react-loader-spinner';
-import { useAuthState } from '../../context/Firebase';
+import { useFirebase } from '../../context/Firebase';
 
 export function LoadingIndicator(props) {
     return (<div style={{
@@ -26,7 +26,7 @@ export function LoadingIndicator(props) {
 function InvitationCard(props) {
     const [loading, setLoading] = useState(false)
     const [hasInvitation, setHasInvitation] = useState(null)
-    const { isAuthenticated, firebase } = useAuthState()
+    const { isAuthenticated, firebase } = useFirebase()
     useEffect(() => {
         if (hasInvitation == null) {
             alreadyHasInvitation(firebase.auth, firebase.temp, props.eventName, (state) => setHasInvitation(state))

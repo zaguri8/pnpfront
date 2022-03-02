@@ -29,7 +29,7 @@ export function RideFormItem(props: RideFormProps) {
     const getElem = () => {
         switch (props.elem) {
             case FormElementType.place:
-                return <Places className='ride_form_item' id={props.id} fixed={false} placeHolder={props.text} style={{ ...{ padding: '0px', margin: '0px', width: '100%' }, ...{ cursor: 'pointer' } }} />
+                return <Places types = {['address']} className='ride_form_item' id={props.id} fixed={false} placeHolder={props.text} style={{ ...{ padding: '0px', margin: '0px', width: '100%' }, ...{ cursor: 'pointer' } }} />
             case FormElementType.button:
                 return <Button id={props.id} onClick={props.action} className={props.id === 'form_item_5' ? '' : 'ride_form_item'} style={{
                     ...props.style, ...{

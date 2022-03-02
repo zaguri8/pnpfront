@@ -27,8 +27,8 @@ export function RideForm(props) {
     const { lang } = useLanguage()
     function fields() {
         let fields = []
-        fields.push(<Places fixed key={v4()} placeHolder={DESTINATION_POINT(lang)} />)
-        fields.push(<Places fixed key={v4()} placeHolder={STARTING_POINT(lang)} />)
+        fields.push(<Places types = {['address']} fixed key={v4()} placeHolder={DESTINATION_POINT(lang)} />)
+        fields.push(<Places types = {['address']} fixed key={v4()} placeHolder={STARTING_POINT(lang)} />)
         return fields
     }
     return <span>{fields()}</span>
@@ -100,8 +100,8 @@ export function RideFormPreview() {
                 flexDirection: 'column',
                 justifyContent: 'center'
             }}>
-                <RideFormItem id='form_item_1' style={{}} elem={FormElementType.place} options={["Tel Aviv", "Rosh pina"]} text={DESTINATION_POINT(lang)} type={'text'} />
-                <RideFormItem id='form_item_2' style={{}} elem={FormElementType.place} text={STARTING_POINT_SINGLE(lang)} options={["Tel Aviv", "Rosh pina"]} type={'text'} />
+                <RideFormItem id='form_item_1' style={{}} elem={FormElementType.place} text={DESTINATION_POINT(lang)} type={'text'} />
+                <RideFormItem id='form_item_2' style={{}} elem={FormElementType.place} text={STARTING_POINT_SINGLE(lang)}  type={'text'} />
 
             </div>
             <div style={{
