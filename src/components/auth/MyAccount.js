@@ -16,7 +16,7 @@ function MyAccountItem({ title }) {
             backgroundImage: ORANGE_GRADIENT_PRIMARY,
             borderRadius: '12.5px',
             height: '100px',
-            boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
+            boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 5px 0px',
             fontFamily: 'Open Sans Hebrew',
             lineHeight: 'normal',
             width: '100px',

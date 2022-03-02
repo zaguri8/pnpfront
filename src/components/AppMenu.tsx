@@ -1,6 +1,6 @@
 import { profile } from '../assets/images.js';
 import logo from '../assets/images/logo_black.png';
-import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, PICK_IMAGE, REGISTER_TITLE, TOOLBAR_LOGIN } from '../settings/strings.js';
+import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, MY_COINS, MY_NAME, PICK_IMAGE, REGISTER_TITLE, TOOLBAR_LOGIN } from '../settings/strings.js';
 import { flex } from '../settings/styles.js';
 import $ from 'jquery'
 import ToolbarItem from './toolbar/ToolbarItem';
@@ -10,6 +10,8 @@ import { List, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useLoading } from '../context/Loading';
 import { getDownloadURL } from 'firebase/storage';
+import coins from '../assets/images/coins.png'
+import { ORANGE_GRADIENT_PRIMARY } from '../settings/colors.js';
 function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
 
     const { user, appUser, firebase, uploadUserImage } = useFirebase()
@@ -19,9 +21,10 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
     const nav = useNavigate()
     return (<div style={{
         display: 'flex',
-        background: user ? 'orange' : 'inherit',
+        backgroundImage: user != null ? ORANGE_GRADIENT_PRIMARY : 'inherit',
         borderRadius: user ? '8px' : 'inherit',
-        border: user ? '1px solid gray' : 'inherit',
+        boxShadow: user ? 'rgba(0, 0, 0, 0.35) 0px -50px 36px -28px inset' : 'inherit',
+        border: user ? '1px solid white' : 'inherit',
         width: user ? '80%' : 'auto',
         margin: user ? '16px' : 'inherit',
         flexDirection: 'column',
@@ -35,7 +38,7 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
         }}>
             {<div >
 
-                {user && appUser  && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {user!=null&&user!=undefined && appUser!=null&&appUser!=undefined  && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
                     <input onChange={(event) => {
                         if (event.target.files) {
@@ -60,7 +63,7 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                     }} type="file" id="files" style={{ display: 'none' }} />
 
                 </div>}
-                <div style={{
+                {user ? <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -75,7 +78,7 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                         fontSize: '10px',
                         color: 'white',
                         padding: '4px'
-                    }} onChange={(e) => alert(e)} htmlFor='files'>{PICK_IMAGE(lang, false)}</label></div></div>}
+                    }} onChange={(e) => alert(e)} htmlFor='files'>{PICK_IMAGE(lang, false)}</label></div> : null} </div>}
             {user === null ? <div style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -91,10 +94,12 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                     cursor: 'pointer'
                 }}>{TOOLBAR_LOGIN(lang)}</span>
             </div> : <List style={{ paddingLeft: '16px', paddingRight: '16px' }} >
-                <span style={{ fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>שם</span>
+                <span style={{ fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>{MY_NAME(lang)}</span>
                 <ListItemText style={{ color: 'white' }}>{user?.email?.split('@')[0]}</ListItemText>
-                <span style={{ fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>אסימונים</span>
-                <ListItemText style={{ color: 'white' }}>{user?.email?.split('@')[0]}</ListItemText>
+                
+                <span style={{display:'flex', fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>{MY_COINS(lang)}<img style = {{paddingRight:'4px',width:'25px',height:'25px',alignSelf:'baseline'}} src = {coins} /></span>
+                
+                <ListItemText style={{ color: 'white' }}>{appUser?.coins}</ListItemText>
 
             </List>}
         </div>

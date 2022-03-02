@@ -26,11 +26,13 @@ export type PNPRide = {
     comments: string
 }
 
+/**TODO: Coin Type, Add 'Coins as a path at databsase for each user' */
 
 
 export type PNPUser = {
     image?: string
     name: string
+    coins:number
     email: string
     phone: string
     favoriteEvents: string[],

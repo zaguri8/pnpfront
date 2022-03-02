@@ -120,3 +120,7 @@ export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע' 
 export const EVENT_END = (lang) => lang === 'heb' ? 'סיום האירוע' : 'Event end date'
 export const EVENT_TYPE = (lang) => lang === 'heb' ? 'סוג האירוע' : 'Event type'
 export const EVENT_DESC = (lang) => lang === 'heb' ? 'תיאור האירוע' : 'Event description'
+
+
+export const MY_NAME = (lang) => lang === 'heb' ? 'שם' : 'Name'
+export const MY_COINS = (lang) => lang === 'heb' ? 'מטבעות PNP' : 'Coins'
