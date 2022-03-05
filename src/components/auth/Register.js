@@ -87,6 +87,7 @@ export default function Register() {
                     phone: phone,
                     birthDate: birthDate,
                     favoriteEvents: selectedFavoriteEvents,
+                    coins:0,
                     producer: false
                 }).then(result => {
                     cancelLoad()

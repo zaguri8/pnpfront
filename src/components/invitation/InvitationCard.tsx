@@ -1,38 +1,49 @@
 import 'firebaseui/dist/firebaseui.css'
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Auth from '../auth/Auth';
 import 'firebase/compat/auth';
+
 import $ from 'jquery'
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
-import { alreadyHasInvitation, insertInvitation } from '../../auth/db';
-import { ThreeDots } from 'react-loader-spinner';
 import { useFirebase } from '../../context/Firebase';
+import { PNPPrivateEvent, PNPEvent, PNPRideConfirmation } from '../../store/external/types';
+import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../utilities/validators';
+import LoadingIndicator from '../utilities/LoadingIndicator';
+import { PNPPublicRide } from '../../store/external/types';
+function InvitationCard(props: { eventId: string }) {
+    const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
 
-export function LoadingIndicator(props) {
-    return (<div style={{
-        display: props.loading ? 'inherit' : 'none',
-        background: 'white',
-        zIndex:'9999',
-        padding: '8px',
-        borderRadius: '8px',
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
-    }}>
-        <ThreeDots ariaLabel='loading-indicator' color={'orangered'} />
-    </div>);
-}
-function InvitationCard(props) {
     const [loading, setLoading] = useState(false)
-    const [hasInvitation, setHasInvitation] = useState(null)
+    const [event, setEvent] = useState<PNPPrivateEvent | null>(null)
+    const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
     const { isAuthenticated, firebase } = useFirebase()
+
     useEffect(() => {
-        if (hasInvitation == null) {
-            alreadyHasInvitation(firebase.auth, firebase.temp, props.eventName, (state) => setHasInvitation(state))
-        }
-    })
-    function validateForm(direction, phone) {
+        firebase.realTime.getPrivateEventById(props.eventId).then((event) => {
+            if (isValidPrivateEvent(event as PNPPrivateEvent)) {
+                setEvent(event as PNPPrivateEvent)
+            } else {
+                setEvent(null)
+            }
+        })
+
+        firebase.realTime.getPrivateEventRidesById(props.eventId).then(rides => {
+            if (rides as PNPPublicRide[]) {
+                setRides(rides as PNPPublicRide[])
+            }
+        })
+
+        firebase.realTime.getRideConfirmationByEventId(props.eventId)
+            .then((confirmation) => {
+                if (confirmation as PNPRideConfirmation)
+                    if (isValidRideConfirmation(confirmation as PNPRideConfirmation)) {
+                        setConfirmation(confirmation as PNPRideConfirmation)
+                    }
+            })
+
+    }, [])
+
+    function validateForm(direction: string, phone: string) {
         if (direction.length < 1) {
             stopLoading()
             alert('יש לבחור כיוון נסיעה')
@@ -47,12 +58,12 @@ function InvitationCard(props) {
         return true
     }
 
-    async function sendInvitation(e) {
+    async function sendInvitation(e: FormEvent) {
         e.preventDefault()
 
-        var direction;
+        var direction: any;
         for (var i = 5; i < 8; i++) {
-            var checkBox = e.target[i]
+            var checkBox: any = e.target
             if (checkBox.checked) {
                 direction = checkBox.value
                 break
@@ -62,37 +73,29 @@ function InvitationCard(props) {
         startLoading()
         const phone = $('#phone').val()
 
-        if (validateForm(direction, phone)) {
-            await alreadyHasInvitation(firebase.auth, firebase.temp, props.eventName, (hasInvitation) => {
-                if (hasInvitation) {
-                    alert(`תודה ${firebase.auth.currentUser.displayName}, קיבלנו את אישורך `)
-                    setHasInvitation(true)
+        if (validateForm(direction, phone as string)) {
+            const confirmation: PNPRideConfirmation = {
+                confirmationId: '',
+                eventId: props.eventId,
+                directions: direction,
+                date: event!.eventDate,
+                passengers: numOfPeople as string
+            }
+            await firebase.realTime.addRideConfirmation(confirmation)
+                .then(() => {
+                    alert(`תודה ${firebase.auth.currentUser?.displayName}, קיבלנו את אישורך `)
+                    setConfirmation(confirmation)
                     stopLoading()
-                } else {
-                    insertInvitation(firebase.auth, firebase.temp, direction, numOfPeople, props.startPoint, phone, props.eventName)
-                        .then(() => {
-                            alert(`תודה ${firebase.auth.currentUser.displayName}, קיבלנו את אישורך `)
-                            setHasInvitation(true)
-                            stopLoading()
-                        })
-                        .catch(() => {
-                            alert('אירעתה שגיאה באישור ההזמנה אנא נסה שוב מאוחר יותר')
-                            stopLoading()
-                        })
-                }
-            })
+                })
         }
     }
-
-    function handleCheck(e) { }
-
     const InvitationConfirmation = () => {
         return <p style={{ color: 'white' }}>
-            היי {<b>{firebase.auth.currentUser.displayName + " ,"}</b>}<br />
+            היי {<b>{firebase.auth.currentUser?.displayName + " ,"}</b>}<br />
             תודה על אישור הגעתך להסעה לאירוע<br />
-            <b>{props.eventName}</b><br />
-            בשעה {props.eventTime + " "}
-            מ{props.startPoint}
+            <b>{event!.eventTitle}</b><br />
+            בשעה {event!.eventHours.startHour + " "}
+            מ{event}
         </p>
     }
 
@@ -112,10 +115,10 @@ function InvitationCard(props) {
     const InvitationForm = () => {
         return (
             <form onSubmit={(e) => sendInvitation(e)} >
-                <p style={{ color: 'white', fontSize: '22px' }}>{`היי, ${firebase.auth.currentUser.displayName}`}</p>
-                <p style={{ color: 'white', fontSize: '22px' }}> <b>זהו טופס אישור הגעה להסעה:<br /></b> {props.eventTime} מ {props.startPoint}<br /> לאירוע: {props.eventName}</p>
-                <input readOnly value={firebase.auth.currentUser.email} name="to_mail" style={{ display: 'none' }} />
-                <input readOnly value={props.eventName} name="event_name" style={{ display: 'none' }} />
+                <p style={{ color: 'white', fontSize: '22px' }}>{`היי, ${firebase.auth.currentUser?.displayName}`}</p>
+                <p style={{ color: 'white', fontSize: '22px' }}> <b>זהו טופס אישור הגעה להסעה:<br /></b> { } מ { }<br /> לאירוע: {event!.eventTitle}</p>
+                <input readOnly value={firebase.auth.currentUser?.email ? firebase.auth.currentUser!.email : ''} name="to_mail" style={{ display: 'none' }} />
+                <input readOnly value={event!.eventTitle} name="event_name" style={{ display: 'none' }} />
                 <input readOnly value={'18:00'} name="event_time" style={{ display: 'none' }} />
                 <input style={{ padding: '8px' }} id='phone' type='tel' placeholder='מס נייד'></input>
 
@@ -134,8 +137,7 @@ function InvitationCard(props) {
 
                 <RadioGroup
 
-                    style={{ alignItems: 'center', padding: '16px', color: 'white' }}
-                    onChange={handleCheck}>
+                    style={{ alignItems: 'center', padding: '16px', color: 'white' }}>
                     <label style={{ fontWeight: 'bold', padding: '4px', margin: '4px' }}>בחר כיווני הסעה</label>
 
                     <FormControlLabel style={{ marginLeft: '26px' }} value={'הסעה הלוך'} control={<Radio style={{ color: 'white' }} />} label='הסעה הלוך'></FormControlLabel>
@@ -151,7 +153,7 @@ function InvitationCard(props) {
     const InvitationPage = () => {
         return (
             <div >
-                {hasInvitation ? <InvitationConfirmation /> : <InvitationForm />}
+                {confirmation ? <InvitationConfirmation /> : event ?  <InvitationForm /> : <LoadingIndicator loading />}
                 <button onClick={() => firebase.auth.signOut()} type='button' style={{ margin: '16px', padding: '16px', background: 'white', fontSize: '12px', border: 'none', borderRadius: '16px' }}>{'התנתק'}</button>
             </div>)
     }
@@ -159,12 +161,13 @@ function InvitationCard(props) {
     const renderElements = () => {
         if (!isAuthenticated) {
             return <Auth title='התחבר על מנת לאשר הגעה' />
-        } else if (hasInvitation === null) {
-            return <LoadingIndicator loading />
+        } else if (confirmation === null) {
+            return <LoadingIndicator loading={loading} />
         } else {
             return <InvitationPage />
         }
     }
+
     return (
         <div dir='rtl' style={{ background: 'orange', display: 'flex', flexDirection: 'column' }}>
             <p style={{ color: 'white', fontSize: '22px' }}><b style={{ fontWeight: 'bold', margin: '0px' }}>אישור הגעה להסעה לאירוע:</b><br /> החתונה של הגר וגבריאל </p>

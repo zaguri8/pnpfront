@@ -5,7 +5,7 @@ import $ from 'jquery'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
-import { CLOSE, SIDE } from './settings/strings'
+import { CLOSE, SIDE,NOTFOUND } from './settings/strings'
 import AppMenu from './components/AppMenu';
 import { Routes, Route, useNavigate } from 'react-router';
 import { Navigate } from 'react-router-dom'
@@ -20,7 +20,7 @@ import EventPage from './components/event/EventPage';
 import { useLanguage } from './context/Language';
 import CreateEvent from './components/event/CreateEvent';
 import MyAccount from './components/auth/MyAccount';
-import { LoadingIndicator } from './components/invitation/InvitationCard';
+import LoadingIndicator from './components/utilities/LoadingIndicator';
 
 
 
@@ -166,6 +166,7 @@ function App() {
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
           <Route path='/event/:id' element={<EventPage />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />
+          <Route path='/*' element={<h1>{NOTFOUND(lang)}</h1>}></Route>
         </Routes>
       </div>
     </div>

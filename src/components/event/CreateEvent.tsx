@@ -1,14 +1,16 @@
-import { FormControl, TextField, Stack, TextFieldProps, Select, MenuItem, Button } from "@mui/material";
+import { FormControl, InputLabel, TextField, Stack, TextFieldProps, Select, MenuItem, Button, Checkbox } from "@mui/material";
 import { useLanguage } from "../../context/Language";
-import { CONTINUE_TO_CREATE, CREATE_EVENT, CREATE_EVENT_TITLE, EVENT_ADDRESS, EVENT_END, EVENT_START, EVENT_TITLE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
+import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_CREATE, CREATE_EVENT, CREATE_EVENT_TITLE, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_NUMBER_PPL, EVENT_START, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE, TERMS_OF_USE } from "../../settings/strings";
 import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw } from "draft-js";
 import SectionTitle from "../SectionTitle";
 import { useEffect, useState } from "react";
 import Places from "../utilities/Places";
 import { PNPEvent } from '../../store/external/types'
 import { makeStyles } from "@mui/styles";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import { DateTimePicker } from "@mui/lab"
+import { DatePicker, DateTimePicker, TimePicker } from "@mui/lab"
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -38,12 +40,57 @@ export default function CreateEvent() {
         expectedNumberOfPeople: 'null',
         eventImageURL: 'null'
     })
-    const [startDate, setStartDate] = useState()
-    const [endDate, setEndDate] = useState()
+    const [startDate, setStartDate] = useState<string>()
+    const [endDate, setEndDate] = useState<string>()
     const onEditorStateChanged = (state: EditorState) => {
         setEditorState(state)
+        if (editorState) {
+            const eventDetailsHTML = draftToHtml(convertToRaw(editorState.getCurrentContent()))
+            setPnpEvent({ ...pnpEvent, ...{ eventDetails: eventDetailsHTML } })
+        }
     }
 
+    const eventTypes = [
+        "מסיבות ומועדונים",
+        "משחקי כדורגל",
+        "הופעות",
+        "פסטיבלים",
+        "ברים",
+        "ספורט כללי",
+        "אירועי ילדים"
+    ]
+
+
+
+    const updateEventHours = (type: 'end' | 'start', event: string | undefined | null) => {
+        const formatted = formatDateHours(new Date(event as string))
+        const dict = type === 'end' ? { startHour: formatted } : { endHour: formatted }
+        type === 'end' ? setEndDate(event as string) : setStartDate(event as string)
+        event && setPnpEvent({
+            ...pnpEvent, ...{
+                eventHours: {
+                    ...pnpEvent.eventHours, ...dict
+                }
+            }
+        })
+    }
+    const updateEventDate = (event: string | undefined | null) => {
+        event && setPnpEvent({ ...pnpEvent, ...{ eventDate: event as string } })
+    }
+
+    const formatDateHours = (date: Date) => {
+        let hours = date.getHours() + ":" + date.getMinutes()
+        return hours
+    }
+
+    const handleTermsOfUseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTermsOfUse(e.target.checked)
+    }
+
+    const [termsOfUser, setTermsOfUse] = useState<boolean>(false)
+
+
+    const [selectedEventType, setSelectedEventType] = useState<string>(eventTypes[0])
 
     const [image, setImage] = useState<string>('')
     return (<PageHolder>
@@ -84,39 +131,67 @@ export default function CreateEvent() {
                             background: 'white',
                             direction: SIDE(lang)
                         }} />
-
                 </FormControl>
+
+                <FormControl>
+                    <TextField
+                        placeholder={EVENT_NUMBER_PPL(lang)}
+                        onChange={(event) => { setPnpEvent({ ...pnpEvent, ...{ eventName: event.target.value } }) }}
+                        dir='rtl'
+                        type='number'
+                        sx={{
+                            background: 'white',
+                            direction: SIDE(lang)
+                        }} />
+                </FormControl>
+
                 <FormControl>
                     <Places types={['address']} className={''} id={''} fixed style={{ width: '100%' }} placeHolder={EVENT_ADDRESS(lang)} />
 
                 </FormControl>
-
                 <FormControl sx={{ background: 'white' }}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DateTimePicker
+                        <DatePicker
+                            onChange={(e) => updateEventDate(e)}
+                            value={pnpEvent.eventDate}
+                            label={EVENT_DATE(lang)}
+                            renderInput={(params: TextFieldProps) => <TextField required disabled {...params} />}
+                        />
+                    </LocalizationProvider>
+                </FormControl>
+                <FormControl sx={{ background: 'white' }}>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <TimePicker
                             label={EVENT_START(lang)}
-                            value={startDate}
-                            onChange={(val: any) => setStartDate(val)}
-                            renderInput={(params: TextFieldProps) => <TextField {...params} />}
+                            value={pnpEvent.eventHours.startHour}
+                            onChange={(e) => updateEventHours('start', e)}
+                            renderInput={(params: TextFieldProps) => <TextField required disabled {...params} />}
                         />
                     </LocalizationProvider>
                 </FormControl>
                 <FormControl sx={{ background: 'white' }}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DateTimePicker
-
+                        <TimePicker
                             label={EVENT_END(lang)}
-                            value={endDate}
-                            onChange={(val: any) => setEndDate(val)}
-                            renderInput={(params: TextFieldProps) => <TextField {...params} />}
+                            value={pnpEvent.eventHours.endHour}
+                            onChange={(e) => updateEventHours('end', e)}
+                            renderInput={(params: TextFieldProps) => <TextField required disabled {...params} />}
                         />
                     </LocalizationProvider>
                 </FormControl>
-                <FormControl>
-                    <Select >
-                        <MenuItem>Hello</MenuItem>
-                    </Select>
 
+                <FormControl fullWidth>
+                    <InputLabel required id="create_event_type_select">{EVENT_TYPE(lang)}</InputLabel>
+                    <Select
+                        labelId="create_event_type_select"
+                        id="create_event_type_select"
+                        value={selectedEventType}
+                        label={EVENT_TYPE(lang)}
+                        onChange={(e) => setSelectedEventType(e.target.value)}
+                    >
+
+                        {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} value={type}>{type}</MenuItem>)}
+                    </Select>
                 </FormControl>
                 <FormControl>
                     <Editor
@@ -128,12 +203,16 @@ export default function CreateEvent() {
                         onEditorStateChange={onEditorStateChanged}
                     />
                 </FormControl>
-                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
+                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : !termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_CREATE(lang)} arrow>
                     <span>
-                        <Button sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px' } }} disabled={!isValidEvent(pnpEvent)} >{CREATE_EVENT(lang)}</Button>
+                        <Button sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px' } }} disabled={!isValidEvent(pnpEvent) || !termsOfUser} >{CREATE_EVENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
-            </Stack>
+                <span><InputLabel>{TERMS_OF_USE(lang)}</InputLabel>
+                    <Checkbox
+                        onChange={handleTermsOfUseChange}
+                        name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
+                </span></Stack>
         </InnerPageHolder>
     </PageHolder>)
 

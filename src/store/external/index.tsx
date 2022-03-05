@@ -1,6 +1,6 @@
 import { Auth } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPRide } from './types'
-import { rideFromDict, userFromDict, eventFromDict } from './converters'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide } from './types'
+import { privateRideFromDict, privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { DocumentData } from 'firebase/firestore'
 import { child, Database, DatabaseReference, get, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
@@ -8,14 +8,12 @@ import {
     collection,
     getDoc,
     doc,
-    getDocs,
-    addDoc,
-    deleteDoc,
-    updateDoc,
     Firestore,
     QuerySnapshot,
     DocumentReference
 } from 'firebase/firestore'
+import { isValidPrivateEvent } from '../../components/utilities/validators'
+import { FirebaseApp } from 'firebase/app'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -27,193 +25,323 @@ export type ExternalStoreActions = {
     removeEvent: (eventId: String) => Promise<void>;
     updateEvent: (event: PNPEvent) => Promise<void>;
     /* rides */
-    addRide: (ride: PNPRide) => Promise<DocumentReference<DocumentData>>;
+    addRide: (ride: PNPPublicRide) => Promise<DocumentReference<DocumentData>>;
 
 }
-function CreateExternalStore(app: Firestore): ExternalStoreActions {
-    /*  get   */
-    const events = () => collection(app, '/events')
-    const rides = () => collection(app, "/rides")
-    const users = () => collection(app, "/users")
-    const errors = () => collection(app, '/errors')
 
-
-    return {
-        /*  events */
-        getErrors: async () => {
-            return await getDocs(errors()).then(ful => ful.docs.map(doc => doc.data))
-        },
-        getEvents: async () => {
-            return await getDocs(events()).then(ful => ful.docs.map(doc => doc.data))
-        },
-        getRides: async (userId: String) => {
-            return await getDoc(doc(app, `/rides/${userId}`))
-                .then(d => d.data)
-        },
-        addError: async (error: string) => {
-            return await addDoc(errors(), {
-                error: error,
-                date: new Date().toDateString()
-            })
-        },
-        addEvent: async (event: PNPEvent) => {
-            return await addDoc(events(), event)
-        },
-        removeEvent: async (eventId: String) => {
-            return await deleteDoc(doc(app, `/events/${eventId}`))
-        },
-        updateEvent: async (event: PNPEvent) => {
-            return await updateDoc(doc(app, `/events/${event.eventId}`), event)
-        },
-
-        /* rides */
-        addRide: async (ride: PNPRide) => {
-            return await addDoc(collection(app, "rides"), ride)
-        }
-
-    }
-}
-
-function CreateRealTimeDatabase(auth: Auth, app: Database) {
-    const events = () => ref(app, '/events')
-    const clubs = () => ref(app, '/events/clubs')
-    const culture = () => ref(app, '/events/culture')
-    const rides = () => ref(app, "/rides/public")
-    const users = () => ref(app, "/users")
-    return new Realtime(events(), clubs(), culture(), rides(), users(), auth)
+function CreateRealTimeDatabase(auth: Auth, db: Database) {
+    return new Realtime(auth, db)
 }
 export class Realtime {
-    rides: DatabaseReference
-
-    allEvents: DatabaseReference
-    clubs: DatabaseReference
-    culture: DatabaseReference
-
-    users: DatabaseReference
-    auth: Auth
-    constructor(allEvents: DatabaseReference,
-        clubs: DatabaseReference,
-        culture: DatabaseReference,
-        rides: DatabaseReference,
-        users: DatabaseReference,
-        auth: Auth) {
-        this.allEvents = allEvents
-        this.clubs = clubs
-        this.culture = culture
-        this.rides = rides
-        this.users = users
+    private rides: DatabaseReference
+    private allEvents: DatabaseReference
+    private errs: DatabaseReference
+    private users: DatabaseReference
+    private auth: Auth
+    constructor(auth: Auth, db: Database) {
+        this.allEvents = ref(db, '/events')
+        this.rides = ref(db, "/rides")
+        this.users = ref(db, '/users')
+        this.errs = ref(db, '/errors')
         this.auth = auth
     }
-    addListenerToClubEvents = (consume: (o: PNPEvent[]) => void) => {
-        return onValue(this.clubs, snap => {
-            const ret: PNPEvent[] = []
-            snap.forEach(ev => {
-                ret.push(eventFromDict(ev))
-            })
-            consume(ret)
-        })
-    }
-    addListenerToCultureEvents = (consume: (o: PNPEvent[]) => void) => {
-        return onValue(this.culture, snap => {
-            const ret: PNPEvent[] = []
-            snap.forEach(ev => {
-                ret.push(eventFromDict(ev))
-            })
-            consume(ret)
-        })
-    }
-    addListenerToRides = async (userId: string, consume: (o: PNPRide[] | null) => void) => {
-        return onChildAdded(child(this.rides, userId), (snap) => {
-            const ret: PNPRide[] = []
-            snap.forEach(ev => {
-                if (ret.length === 10) {
-                    consume(ret)
-                    return
-                }
-                ret.push(rideFromDict(ev))
-            })
-        })
-    }
-    addListenerToCurrentUser = async (userId: string, consume: (o: PNPUser) => void) => {
-        return onValue(child(this.users, userId), (snap) => consume(userFromDict(snap)))
-    }
-    updateClubEvent = async (eventId: string, event: PNPEvent) => {
-        return await update(child(this.clubs, eventId), event)
-    }
-    removeClubEvent = async (eventId: string) => {
-        return await remove(child(this.clubs, eventId))
-    }
-    updateCultureEvent = async (eventId: string, event: PNPEvent) => {
-        return await update(child(this.culture, eventId), event)
-    }
-    removeCultureEvent = async (eventId: string) => {
-        return await remove(child(this.culture, eventId))
+    /**
+     * addError
+     * @param error error to be added to db
+     * @returns new reference callback
+     */
+    async addError(error: PNPError) {
+        const newPath = push(child(this.errs, error.type))
+        error.errorId = newPath.key!
+        return await set(newPath, error)
     }
 
-    addEventRide = async (eventId: string, ride: PNPRide) => {
-        const newRef = get(child(this.rides, 'public'))
+    /**
+     * createError
+     * @param type error type
+     * @param e error to be created
+     * @returns new refernce callback
+     */
+    async createError(type: string, e: any) {
+        const date = new Date().toDateString()
+        let err: PNPError = {
+            type: type,
+            date: date,
+            errorId: '',
+            error: e
+        }
+        return this.addError(err)
+    }
+
+    /**
+     * getRideConfirmationByEventId
+     * @param eventId to get confirmation for
+     * @returns confirmation of event attendance for current user if exists
+     */
+    async getRideConfirmationByEventId(eventId: string): Promise<PNPRideConfirmation | void | null> {
+        if (this.auth.currentUser != null) {
+            return await get(child(child(child(this.rides, 'confirmations'), this.auth.currentUser.uid), eventId))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        return rideConfirmationFromDict(snapshot)
+                    } else return null;
+                })
+                .catch((e) => this.createError('getRideConfirmationByEventId', e))
+        }
+    }
+
+    /**
+     * addRideConfirmation
+     * @param confirmation confirmation to be added for current user
+     * @returns new reference callback
+     */
+    async addRideConfirmation(confirmation: PNPRideConfirmation): Promise<object | void> {
+        if (this.auth.currentUser != null) {
+            return await set(child(child(child(this.rides, 'confirmations'),
+                this.auth.currentUser.uid),
+                confirmation.eventId),
+                confirmation)
+                .catch((e) => this.createError('addRideConfirmation', e))
+        }
+    }
+    /**
+       * addPublicRide
+       * @param ride a public ride to be added
+       * @returns a new reference or error reference
+       */
+    addPublicRide = async (eventId: string, ride: PNPPublicRide): Promise<object | void> => {
+        const newRef = get(child(child(this.rides, 'public'), eventId))
         await newRef.then(d => d.size)
-            .then(async size => await set(child(child(this.rides, size + ""), eventId), ride))
+            .then(async size => {
+                if (size === null || size === undefined || size === 0) {
+                    return await set(child(child(child(this.rides, 'public'), eventId), '0'), ride)
+                } else {
+                    return await set(child(child(child(this.rides, 'public'), eventId), size + ""), ride)
+                }
+
+            })
+            .catch((e) => this.createError('addPublicRide', e))
     }
 
-    addRide = async (ride: PNPRide) => {
-        const newRef = push(this.rides)
-        ride.rideId = newRef.key!
-        return await set(newRef, ride)
-    }
-    addClubEvent = async (event: PNPEvent) => {
-        const newRef = push(this.clubs)
-        event.eventId = newRef.key!
-        return await set(newRef, event)
-    }
-    addCultureEvent = async (event: PNPEvent) => {
-        const newRef = push(this.culture)
-        event.eventId = newRef.key!
-        return await set(newRef, event)
+    /**
+     * addPrivateRide
+     * @param ride a private ride to be added
+     * @returns a new reference or error reference
+     */
+    addPrivateRide = async (ride: PNPPrivateRide): Promise<object | void> => {
+        if (this.auth.currentUser) {
+            const p = push(child(child(child(this.rides, 'private'), 'ridesForPeople'), this.auth.currentUser!.uid))
+            ride.rideId = p.key!
+            return await set(p, ride)
+                .catch((e) => this.createError('addPublicRide', e))
+        }
     }
 
-    updateUserImage = async (image: string) => {
+    /**
+     * addListenerToClubEvents
+     * @param consume a callback to consume the events array
+     * @returns onValue change listener for club events
+     */
+    addListenerToClubEvents = (consume: (o: PNPEvent[]) => void) => {
+        return onValue(child(child(this.allEvents, 'public'), 'clubs'), snap => {
+            const ret: PNPEvent[] = []
+            snap.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            consume(ret)
+        })
+    }
+    /**
+   * addListenerToCultureEvents
+   * @param consume a callback to consume the events array
+   * @returns onValue change listener for culture events
+   */
+    addListenerToCultureEvents = (consume: (o: PNPEvent[]) => void) => {
+        return onValue(child(child(this.allEvents, 'public'), 'culture'), snap => {
+            const ret: PNPEvent[] = []
+            snap.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            consume(ret)
+        })
+    }
+
+
+
+    /**
+     * addListenerToCurrentUser
+     * @param userId a userid to be listened to
+     * @param consume callback that consumes the PNP user
+     * @returns onValue change listener for user
+     */
+    addListenerToCurrentUser = async (consume: (o: PNPUser) => void) => {
+        if (this.auth.currentUser != null)
+            return onValue(child(this.users, this.auth.currentUser!.uid), (snap) => consume(userFromDict(snap)))
+    }
+    /**
+     * updateClubEvent
+     * @param eventId eventid to be updated
+     * @param event event info to be updated
+     * @returns update callback
+     */
+    updateClubEvent = async (eventId: string, event: PNPEvent) => {
+        return await update(child(child(child(this.allEvents, 'public'), 'clubs'), eventId), event)
+            .catch((e) => this.createError('updateClubEvent', e))
+    }
+    /**
+     * removeClubEvent
+     * @param eventId eventid to be removed
+     * @returns remove callback
+     */
+    removeClubEvent = async (eventId: string) => {
+        return await remove(child(child(this.allEvents, 'clubs'), eventId))
+            .catch((e) => this.createError('removeClubEvent', e))
+    }
+    /**
+   * updateCultureEvent
+   * @param eventId eventid to be updated
+   * @param event event info to be updated
+   * @returns update callback
+   */
+    updateCultureEvent = async (eventId: string, event: PNPEvent) => {
+        return await update(child(child(child(this.allEvents, 'public'), 'culture'), eventId), event)
+            .catch(e => {
+                const date = new Date().toDateString()
+                let err: PNPError = {
+                    type: 'updateCultureEvent',
+                    date: date,
+                    errorId: '',
+                    error: e
+                }
+                return this.addError(err)
+            })
+    }
+    /**
+ * removeCultureEvent
+ * @param eventId eventid to be removed
+ * @returns remove callback
+ */
+    removeCultureEvent = async (eventId: string) => {
+        return await remove(child(child(child(this.allEvents, 'public'), 'culture'), eventId))
+            .catch((e) => this.createError('removeCultureEvent', e))
+    }
+
+    /**
+     * addClubEvent
+     * @param event event to be added
+     * @returns new reference callback
+     */
+
+    addClubEvent = async (event: PNPEvent): Promise<object | void> => {
+        const newRef = push(child(child(this.allEvents, 'public'), 'clubs'))
+        event.eventId = newRef.key!
+        return await set(newRef, event)
+            .catch((e) => this.createError('addClubEvent', e))
+    }
+    /**
+       * addCultureEvent
+       * @param event event to be added
+       * @returns new reference callback
+       */
+    addCultureEvent = async (event: PNPEvent): Promise<object | void> => {
+        const newRef = push(child(child(this.allEvents, 'public'), 'culture'))
+        event.eventId = newRef.key!
+        return await set(newRef, event)
+            .catch((e) => this.createError('addCultureEvent', e))
+    }
+
+    /**
+     * 
+     * @param image image to be updated for user
+     * @returns update callback
+     */
+    updateUserImage = async (image: string): Promise<object | void> => {
         if (this.auth.currentUser === null) return
         return await update(child(this.users, this.auth.currentUser!.uid), { image: image })
+            .catch((e) => this.createError('updateUserImage', e))
     }
 
-    addUser = async (user: PNPUser) => {
+
+    /**
+     * addUser
+     * @param user a user to be added to db
+     * @returns new reference callback
+     */
+    addUser = async (user: PNPUser): Promise<object | void> => {
         if (this.auth.currentUser === null) return
         return await set(child(this.users, this.auth.currentUser!.uid), user)
+            .catch((e) => this.createError('addUser', e))
     }
 
-    getEventById = async (id: string) => {
-        return await get(this.allEvents)
+
+    /**
+     * 
+     * @param id private event to be fetched by id
+     * @returns private event if found
+     */
+    getPrivateEventById = async (id: string): Promise<PNPPrivateEvent | void> => {
+        return await get(child(child(this.allEvents, 'private'), id))
+            .then(privateEventFromDict).catch((e) => this.createError('getPrivateEventById', e))
+    }
+
+    /**
+     * getPrivateEventRidesById
+     * @param id eventId to fetch rides for
+     * @returns all rides for given event
+     */
+    getPrivateEventRidesById = async (id: string): Promise<PNPPublicRide[] | void> => {
+        return await get(child(child(child(this.rides, 'private'), 'ridesForEvents'), id))
+            .then((snap) => {
+                const ret: PNPPublicRide[] = []
+                snap.forEach(ride => {
+                    ret.push(publicRideFromDict(ride))
+                })
+                return ret
+            }).catch((e) => this.createError('getPrivateEventRidesById', e))
+    }
+    /**
+       * getPublicRidesByEventId
+       * @param id eventId to fetch rides for
+       * @returns all rides for given event
+       */
+    getPublicRidesByEventId = async (eventId: string): Promise<PNPPublicRide[] | void> => {
+        return await get(child(child(this.rides, 'public'), eventId))
+            .then(snap => {
+                console.log(snap.ref)
+                const ret: PNPPublicRide[] = []
+                snap.forEach(ride => {
+                    ret.push(publicRideFromDict(ride))
+                })
+                return ret
+            }).catch((e) => this.createError('getPublicRidesByEventId', e))
+    }
+
+    /**
+     * getPublicEventById
+     * @param id eventid to fetch
+     * @returns event by id
+     */
+    getPublicEventById = async (id: string): Promise<PNPEvent | void | null> => {
+        return await get(child(this.allEvents, 'public'))
             .then(data => {
                 const c1 = data.child('clubs').child(id)
                 const c2 = data.child('culture').child(id)
                 return c1.exists() ? eventFromDict(c1) : c2.exists() ? eventFromDict(c2) : null
-            })
+            }).catch((e) => this.createError('getPublicEventById', e))
     }
-    getAllEventRidesById = async (eventId: string) => {
-        return await get(child(this.rides, eventId))
-            .then(snap => {
-                const ret: PNPRide[] = []
-                snap.forEach(ride => {
-                    ret.push(rideFromDict(ride))
-                })
-                return ret
-            })
-    }
-
 }
 
 export type FirebaseTools = {
     auth: Auth,
-    store: ExternalStoreActions,
     realTime: Realtime,
     temp: Firestore
 }
-export default function Store(auth: Auth, db: Database, firestore: Firestore) : FirebaseTools {
+export default function Store(auth: Auth, db: Database, firestore: Firestore): FirebaseTools {
     return {
         auth: auth,
-        store: CreateExternalStore(firestore),
         realTime: CreateRealTimeDatabase(auth, db),
         temp: firestore
     }
 }
+
+

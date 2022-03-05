@@ -8,53 +8,44 @@ import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 import { useFirebase } from "../../context/Firebase"
 import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
-import { PNPRide } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
-
+import { PNPPublicRide } from "../../store/external/types";
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
-    const [error, setError] = useState<string | null>(null)
 
-
-    const [eventRides, setEventRides] = useState<PNPRide[]>([])
+    const [eventRides, setEventRides] = useState<PNPPublicRide[]>([])
     const { firebase } = useFirebase()
     const { id } = useParams()
 
     useEffect(() => {
         doLoad()
+        const resize = () => {
+            const width = window.outerWidth
+            if (width < 720) {
+                $('#ride_start_point_list').css({ width: '95%' })
+            } else if (width < 1020) {
+                $('#ride_start_point_list').css({ width: '80%' })
+            }
+            else if (width > 1000) {
+                $('#ride_start_point_list').css({ width: '70%' })
+            }
+        }
+        
         if (id) {
-
-
-            firebase.realTime.getEventById(id)
-                .then((event: PNPEvent | null) => {
-                    setEvent(event)
+            firebase.realTime.getPublicEventById(id)
+                .then((event: PNPEvent | null | void) => {
+                    setEvent(event as PNPEvent)
                     cancelLoad()
-                    const resize = () => {
-                        const width = window.outerWidth
-                        if (width < 720) {
-                            $('#ride_start_point_list').css({ width: '95%' })
-                        } else if (width < 1020) {
-                            $('#ride_start_point_list').css({ width: '80%' })
-                        }
-                        else if (width > 1000) {
-                            $('#ride_start_point_list').css({ width: '70%' })
-                        }
-                    }
                     resize()
-                }).catch((err: any) => {
-                    setError(err)
                 })
-
-            firebase.realTime.getAllEventRidesById(id)
-                .then((rides: PNPRide[]) => {
-                    if (rides === null || rides.length === 0)
-                        return
-                    setEventRides(rides)
+            firebase.realTime.getPublicRidesByEventId(id)
+                .then((rides: PNPPublicRide[] | void) => {
+                    setEventRides(rides as PNPPublicRide[])
                 })
         }
     }, [])
@@ -63,9 +54,9 @@ export default function EventPage() {
 
     const [expanded, setExpanded] = useState<boolean>(false)
     const [expandedRides, setExpandedRides] = useState<boolean>(true)
-    const [selectedEventRide, setSelectedEventRide] = useState<PNPRide | null>(null)
+    const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
 
-    const handleSelectEventRide = (eventRide: PNPRide) => {
+    const handleSelectEventRide = (eventRide: PNPPublicRide) => {
         setSelectedEventRide(eventRide)
     }
 
@@ -95,7 +86,7 @@ export default function EventPage() {
     }, [])
     const { isLoading, doLoad, cancelLoad } = useLoading()
 
-    return (error || event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
+    return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <PageHolder >
             <List id='ride_start_point_list' style={{ alignItems: 'center', width: '95%' }}>
                 <ListItemIcon style={{ width: '100%' }}>

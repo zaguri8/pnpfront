@@ -12,7 +12,7 @@ export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת הי
 
 export const CONTINUE_TO_SECURE_PAYMENT = (lang) => lang === 'heb' ? 'עבור למסך תשלום מאובטח' : 'Continue to secure payment'
 export const PICK_START_POINT_REQUEST = (lang) => lang === 'heb' ? 'אנא בחר נקודת יציאה' : 'Please select starting point'
-
+export const ACCEPT_TERMS_REQUEST = (lang) => lang === 'heb' ? 'אנא אשר את התקנון על מנת להמשיך' : 'Please accept the terms of use before continuing'
 export const FILL_ALL_FIELDS = (lang) => lang === 'heb' ? 'אנא מלא את כל השדות הדרושים' : 'Please fill all required fields'
 export const CONTINUE_TO_CREATE = (lang) => lang === 'heb' ? 'בצע יצירת אירוע !' : 'Complete event creation'
 export const ATTENTION = (lang) => lang === 'heb' ? 'שימו לב !' : 'Attention !'
@@ -118,9 +118,15 @@ export const EVENT_TITLE = (lang) => lang === 'heb' ? 'כותרת האירוע' 
 export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע' : 'Event address'
 export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע' : 'Event start date'
 export const EVENT_END = (lang) => lang === 'heb' ? 'סיום האירוע' : 'Event end date'
+export const EVENT_DATE = (lang) => lang ==='heb' ? 'תאריך האירוע' : 'Event Date'
 export const EVENT_TYPE = (lang) => lang === 'heb' ? 'סוג האירוע' : 'Event type'
 export const EVENT_DESC = (lang) => lang === 'heb' ? 'תיאור האירוע' : 'Event description'
+export const EVENT_NUMBER_PPL = lang => lang === 'heb' ? 'מספר האנשים הצפוי' : 'Expected number of people'
 
-
+export const HELLO = (lang) => lang === 'heb' ? 'שלום' : 'Hello'
 export const MY_NAME = (lang) => lang === 'heb' ? 'שם' : 'Name'
 export const MY_COINS = (lang) => lang === 'heb' ? 'מטבעות PNP' : 'Coins'
+
+export const NOTFOUND = (lang) => lang === 'heb' ? 'עמוד לא נמצא' : 'Page not found'
+export const ERROR = (lang) => lang === 'heb' ? 'הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים': 'An unknown problem has occured please try again in a few moments'
+export const TERMS_OF_USE = (lang) => lang === 'heb' ? 'אני מאשר שקראתי את התקנון ואני מסכים לתנאי השימוש' : 'I confirm i read the terms of use and i accept them'

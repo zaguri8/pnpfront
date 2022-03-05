@@ -1,6 +1,6 @@
 import { profile } from '../assets/images.js';
 import logo from '../assets/images/logo_black.png';
-import { MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, MY_COINS, MY_NAME, PICK_IMAGE, REGISTER_TITLE, TOOLBAR_LOGIN } from '../settings/strings.js';
+import { HELLO, MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, MY_COINS, MY_NAME, PICK_IMAGE, REGISTER_TITLE, TOOLBAR_LOGIN } from '../settings/strings.js';
 import { flex } from '../settings/styles.js';
 import $ from 'jquery'
 import ToolbarItem from './toolbar/ToolbarItem';
@@ -93,14 +93,10 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                     padding: '4px',
                     cursor: 'pointer'
                 }}>{TOOLBAR_LOGIN(lang)}</span>
-            </div> : <List style={{ paddingLeft: '16px', paddingRight: '16px' }} >
-                <span style={{ fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>{MY_NAME(lang)}</span>
+            </div> : <List style={{ paddingLeft: '16px', paddingRight: '16px' ,marginTop:'-24px',marginRight:'-8px',paddingTop:'0px'}} >
+                <span style={{ fontSize: '18px', color: 'white', textUnderlinePosition: 'under'}}>{HELLO(lang)}</span>
                 <ListItemText style={{ color: 'white' }}>{user?.email?.split('@')[0]}</ListItemText>
                 
-                <span style={{display:'flex', fontSize: '14px', color: 'white', textUnderlinePosition: 'under', textDecoration: 'underline' }}>{MY_COINS(lang)}<img style = {{paddingRight:'4px',width:'25px',height:'25px',alignSelf:'baseline'}} src = {coins} /></span>
-                
-                <ListItemText style={{ color: 'white' }}>{appUser?.coins}</ListItemText>
-
             </List>}
         </div>
         {user && <span style={{ fontSize: '10px', color: 'white', margin: '0px', padding: '0px' }}>מזהה : <b>{user.uid} </b> </span>}

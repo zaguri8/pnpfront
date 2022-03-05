@@ -11,7 +11,6 @@ import { LanguageContextProvider } from './context/Language';
 
 
 ReactDOM.render(
-  <React.StrictMode>
     <HashRouter>
       <LanguageContextProvider>
         <GoogleMapsContextProvider>
@@ -22,7 +21,6 @@ ReactDOM.render(
           </LoadingContextProvider>
         </GoogleMapsContextProvider>
       </LanguageContextProvider>
-    </HashRouter>
-  </React.StrictMode>,
+    </HashRouter>,
   document.getElementById('root')
 );

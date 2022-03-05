@@ -1,17 +1,17 @@
 import '../../App.css'
-import InvitationCard from './InvitationCard.js'
+import InvitationCard from './InvitationCard'
 import { useEffect, useLayoutEffect } from 'react'
 import $ from 'jquery'
-const InvitationPage = (props) => {
-
-    useEffect(() => document.title = props.eventName, [])
+import { useParams } from 'react-router'
+const InvitationPage = () => {
+    const { id } = useParams()
     useLayoutEffect(() => {
         $('.dim').css({ 'display': 'none' })
     }, [])
     return <div >
         <div className="App" style={{ background: 'orange' }}>
 
-            <InvitationCard eventName={props.eventName} eventTime={props.eventTime} startPoint={props.startPoint} />
+            {id && <InvitationCard eventId={id} />}
         </div>
     </div>
 }
