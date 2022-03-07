@@ -1,5 +1,5 @@
 
-export const CREATE_EVENT = (lang) => lang === 'heb' ? 'יצירת אירוע' : 'Create event'
+export const CREATE_EVENT = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create event'
 export const TOOLBAR_LOGIN = (lang) => lang === 'heb' ? 'התחברות ' : 'Sign in'
 export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language'
 export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
@@ -7,9 +7,13 @@ export const CREATE_RIDE = (lang) => lang === 'heb' ? 'צור הסעה' : 'Creat
 export const NO_RIDES = (lang) => lang === 'heb' ? 'לאירוע זה תרם קיימות הסעות, לחץ כאן על מנת ליצור ביקוש להסעה' : 'This event currently has no rides, make a request to create a ride'
 export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על הכפתור ופתח ביקוש' : 'Your city is missing? lets open a request for a ride'
 export const RIDE_DATE = (lang) => lang === 'heb' ? 'תאריך הסעה' : 'Ride Date'
+export const CHOOSE_RIDE = (lang) => lang === 'heb' ? 'בחר הסעה' : 'Pick a ride'
+export const COMMENTS = (lang) => lang === 'heb' ? 'הערות' : 'Comments'
+export const LEAVE_HOUR = (lang) => lang === 'heb' ? 'שעת יציאה' : 'Ride hour'
+export const CONFIRM_RIDE = (lang) => lang === 'heb' ? 'אשר הגעה להסעה' : 'Confirm going to ride'
+export const RETURN_HOUR = (lang) => lang === 'heb' ? 'שעת חזרה' : 'Back hour'
 export const STARTING_POINT = (lang) => lang === 'heb' ? 'כל נקודות היציאה' : 'All starting points'
 export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת היציאה' : 'Starting point'
-
 export const CONTINUE_TO_SECURE_PAYMENT = (lang) => lang === 'heb' ? 'עבור למסך תשלום מאובטח' : 'Continue to secure payment'
 export const PICK_START_POINT_REQUEST = (lang) => lang === 'heb' ? 'אנא בחר נקודת יציאה' : 'Please select starting point'
 export const ACCEPT_TERMS_REQUEST = (lang) => lang === 'heb' ? 'אנא אשר את התקנון על מנת להמשיך' : 'Please accept the terms of use before continuing'
@@ -18,6 +22,7 @@ export const CONTINUE_TO_CREATE = (lang) => lang === 'heb' ? 'בצע יצירת 
 export const ATTENTION = (lang) => lang === 'heb' ? 'שימו לב !' : 'Attention !'
 export const NO_DELAYS = (lang) => lang === 'heb' ? 'ההסעות יוצאות בדיוק בשעה שנקבעה, לכן אין איחורים' : 'The rides leave exactly at the scheduled moment'
 export const DESTINATION_POINT = (lang) => lang === 'heb' ? 'בחר יעד ' : 'Choose Destination'
+export const DEST = (lang) => lang === 'heb' ? 'יעד' : 'Destination'
 export const EXTRA_STOP_POINTS = (lang) => lang === 'heb' ? 'נקודות אסיפה נוספות' : 'Extra stop points'
 export const PASSENGERS = (lang) => lang === 'heb' ? 'מספר נוסעים' : 'Number of passengers'
 export const NAME_OF_RIDE = (lang) => lang === 'heb' ? 'שם ההסעה' : 'Name of ride'
@@ -113,7 +118,7 @@ export const NO_MORE_ITEM_3 = (lang) => lang === 'heb' ? 'drink & drive' : 'drin
 export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'מוניות יקרות' : 'Expensive cabs'
 export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'מחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'
 
-export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'יצירת אירוע' : 'Create event'
+export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create event'
 export const EVENT_TITLE = (lang) => lang === 'heb' ? 'כותרת האירוע' : 'Event title'
 export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע' : 'Event address'
 export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע' : 'Event start date'

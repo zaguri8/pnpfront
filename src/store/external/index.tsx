@@ -184,7 +184,7 @@ export class Realtime {
      * @param event event info to be updated
      * @returns update callback
      */
-    updateClubEvent = async (eventId: string, event: PNPEvent) => {
+    updateClubEvent = async (eventId: string, event: object) => {
         return await update(child(child(child(this.allEvents, 'public'), 'clubs'), eventId), event)
             .catch((e) => this.createError('updateClubEvent', e))
     }
@@ -203,7 +203,7 @@ export class Realtime {
    * @param event event info to be updated
    * @returns update callback
    */
-    updateCultureEvent = async (eventId: string, event: PNPEvent) => {
+    updateCultureEvent = async (eventId: string, event: object) => {
         return await update(child(child(child(this.allEvents, 'public'), 'culture'), eventId), event)
             .catch(e => {
                 const date = new Date().toDateString()
@@ -216,6 +216,36 @@ export class Realtime {
                 return this.addError(err)
             })
     }
+
+    /**
+     * updatePrivateEvent
+     * @param eventId eventId to be updated
+     * @param event event values to be updated
+     * @returns update callback
+     */
+    updatePrivateEvent = async (eventId: string, event: object) => {
+        return await update(child(child(this.allEvents, 'private'), eventId), event)
+    }
+
+    /**
+     * updatePrivateRide
+     * @param eventId rideId to be updated
+     * @param event ride values to be updated
+     * @returns update callback
+     */
+    updatePrivateRide = async (rideId: string, ride: object) => {
+        return await update(child(child(this.rides, 'private'), rideId), ride)
+    }
+    /**
+      * updateCurrentUser
+      * @param user user values to be updated
+      * @returns update callback
+      */
+    updateCurrentUser = async (user: object) => {
+        if (this.auth.currentUser)
+            return await update(child(this.users, this.auth.currentUser!.uid), user)
+    }
+
     /**
  * removeCultureEvent
  * @param eventId eventid to be removed
@@ -256,8 +286,7 @@ export class Realtime {
      * @returns update callback
      */
     updateUserImage = async (image: string): Promise<object | void> => {
-        if (this.auth.currentUser === null) return
-        return await update(child(this.users, this.auth.currentUser!.uid), { image: image })
+        return await this.updateCurrentUser({ image: image })
             .catch((e) => this.createError('updateUserImage', e))
     }
 
@@ -272,6 +301,15 @@ export class Realtime {
         return await set(child(this.users, this.auth.currentUser!.uid), user)
             .catch((e) => this.createError('addUser', e))
     }
+    /**
+ * addUser
+ * @param user a user to be added to db
+ * @returns new reference callback
+ */
+    static addUserNoAuth = async (path: DatabaseReference, user: PNPUser): Promise<object | void> => {
+        return await set(path, user)
+    }
+
 
 
     /**
@@ -301,13 +339,12 @@ export class Realtime {
     }
     /**
        * getPublicRidesByEventId
-       * @param id eventId to fetch rides for
+       * @param eventId eventId to fetch rides for
        * @returns all rides for given event
        */
     getPublicRidesByEventId = async (eventId: string): Promise<PNPPublicRide[] | void> => {
         return await get(child(child(this.rides, 'public'), eventId))
             .then(snap => {
-                console.log(snap.ref)
                 const ret: PNPPublicRide[] = []
                 snap.forEach(ride => {
                     ret.push(publicRideFromDict(ride))

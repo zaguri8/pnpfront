@@ -32,8 +32,10 @@ export const privateEventFromDict: (snap: DataSnapshot) => PNPPrivateEvent = (sn
 }
 export const rideConfirmationFromDict: (snap: DataSnapshot) => PNPRideConfirmation = (snap) => {
     return {
-        confirmationId: snap.child('confirmationId').val(),
+        userId: snap.child('userId').val(),
         eventId: snap.child('eventId').val(),
+        confirmationTitle: snap.child('confirmationTitle').val(),
+        rideId: snap.child('rideId').val(),
         passengers: snap.child('passengers').val(),
         date: snap.child('date').val(),
         directions: snap.child('directions').val()

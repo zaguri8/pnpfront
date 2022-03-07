@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect, Context } from "react"
 import Store from "../store/external";
 import { ErrorFn, getAuth, Unsubscribe } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getDatabase, get } from "firebase/database";
+import { getDatabase, get, set } from "firebase/database";
+import { Realtime } from '../store/external/index'
 import { initializeApp } from 'firebase/app'
 import firebase from 'firebase/compat/app'
 import { User } from "firebase/auth";
@@ -40,6 +41,16 @@ export const FirebaseContextProvider = (props: object) => {
       if (user) {
         get(child(ref(getDatabase(app), '/users'), user.uid)).then(snap => {
           if (!snap.exists()) {
+            const u = {
+              coins: 0, phone: user?.phoneNumber ? user.phoneNumber! : '',
+              favoriteEvents: ['מסיבות ומועדונים'],
+              birthDate: '',
+              producer: false,
+              name: user!.displayName ? user!.displayName! : user!.email!,
+              email: user!.email!,
+              image: ''
+            }
+            set(child(ref(getDatabase(app), '/users'), user.uid), u).then(() => setAppUser(u))
             return
           }
           setAppUser(userFromDict(snap))
@@ -63,6 +74,11 @@ export const useFirebase = () => {
   return {
     ...firebaseContext,
     firebase: Store(auth, getDatabase(app), getFirestore(app)),
+    signOut: async () => {
+      firebaseContext?.setUser(null)
+      firebaseContext?.setAppUser(null)
+      return await auth.signOut()
+    },
     isAuthenticated: firebaseContext?.user != null,
     uploadUserImage: async (imageBlob: ArrayBuffer) => { if (firebaseContext?.user?.uid) return await uploadBytes(storageRef(storage, '/UserImages/' + (firebaseContext!.user!.uid ? firebaseContext!.user!.uid : '')), imageBlob) },
     uploadEventImage: async (eventId: string, imageBlob: ArrayBuffer) => await uploadBytes(storageRef(storage, 'EventImages/' + eventId), imageBlob)

@@ -11,7 +11,7 @@ import { useFirebase } from "../../context/Firebase"
 
 
 function MyAccountItem({ title }) {
-    return (<Box sx={{ boxShadow: 2  ,borderRadius: '12.5px'}}><Button className='my_account_item' sx={
+    return (<Box sx={{ boxShadow: 2, borderRadius: '12.5px' }}><Button className='my_account_item' sx={
         {
             backgroundImage: ORANGE_GRADIENT_PRIMARY,
             borderRadius: '12.5px',
@@ -33,7 +33,7 @@ function MyAccountItem({ title }) {
 
 export default function MyAccount() {
     const { lang } = useLanguage()
-    const { firebase } = useFirebase()
+    const { signOut } = useFirebase()
     useEffect(() => {
         function resize() {
             const currentWidth = window.innerWidth
@@ -68,7 +68,7 @@ export default function MyAccount() {
             </div>
         </InnerPageHolder>
 
-        <Button onClick={() => firebase.auth.signOut()} style={{
+        <Button onClick={() => signOut()} style={{
             color: 'white',
             margin: '16px',
             fontSize: '16px',

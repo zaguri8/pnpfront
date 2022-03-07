@@ -11,9 +11,11 @@ import { useNavigate } from "react-router"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
 import { useLanguage } from "../../context/Language"
+import { useLocation } from "react-router"
 export default function Login() {
 
     const nav = useNavigate()
+    const location = useLocation()
     const { firebase } = useFirebase()
     const useStyles = makeStyles(theme => ({
         labelRoot: {
@@ -29,7 +31,7 @@ export default function Login() {
         const u = e.target[0].value
         const p = e.target[1].value
         signInWithEmailAndPassword(firebase.auth, u, p)
-            .then(() => nav('/pnp'))
+            .then(() => (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/pnp'))
             .catch(err => alert('הפרטים שהכנסת אינם נכונים'))
 
     }
@@ -116,10 +118,10 @@ export default function Login() {
 
             </form>
 
-            <Auth style={{ margin: '0px' }} title='' redirect="/pnp" />
+            <Auth style={{ margin: '0px' }} title='' redirect= {(location.state && location.state.cachedLocation) ? location.state.cachedLocation : "/pnp"} />
 
             <div>
-                <Link to={'/register'}>{NO_ACCOUNT(lang)}</Link>
+                <Link to={(location.state && location.state.cachedLocation) ? { pathname: '/register', state: { cachedLocation: location.state.cachedLocation } } : '/register'} >{NO_ACCOUNT(lang)}</Link>
             </div>
 
             <div>

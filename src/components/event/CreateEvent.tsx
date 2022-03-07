@@ -74,6 +74,10 @@ export default function CreateEvent() {
             }
         })
     }
+    const updateEventAddress = (address: string) => {
+        setPnpEvent({ ...pnpEvent, ...{ eventLocation: address } })
+    }
+
     const updateEventDate = (event: string | undefined | null) => {
         event && setPnpEvent({ ...pnpEvent, ...{ eventDate: event as string } })
     }
@@ -146,7 +150,7 @@ export default function CreateEvent() {
                 </FormControl>
 
                 <FormControl>
-                    <Places types={['address']} className={''} id={''} fixed style={{ width: '100%' }} placeHolder={EVENT_ADDRESS(lang)} />
+                    <Places value = {''} handleAddressSelect={updateEventAddress} types={['address']} className={''} id={''} fixed style={{ width: '100%' }} placeHolder={EVENT_ADDRESS(lang)} />
 
                 </FormControl>
                 <FormControl sx={{ background: 'white' }}>

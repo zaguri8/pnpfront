@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
-import { InnerPageHolder,PageHolder } from "../utilities/Holders"
+import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import $ from 'jquery'
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
@@ -16,6 +16,7 @@ import { TextField } from "@mui/material"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { DatePicker } from "@mui/lab"
 import { useLoading } from "../../context/Loading"
+import { useLocation } from "react-router"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
 import { useLanguage } from "../../context/Language"
 
@@ -25,6 +26,7 @@ export default function Register() {
 
     const nav = useNavigate()
     const { firebase } = useFirebase()
+    const location = useLocation()
     const { doLoad, cancelLoad } = useLoading()
     const useStyles = makeStyles(theme => ({
         labelRoot: {
@@ -87,11 +89,11 @@ export default function Register() {
                     phone: phone,
                     birthDate: birthDate,
                     favoriteEvents: selectedFavoriteEvents,
-                    coins:0,
+                    coins: 0,
                     producer: false
                 }).then(result => {
                     cancelLoad()
-                    nav('/pnp')
+                        (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/pnp')
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
                     firebase.store.addError(err)
@@ -99,7 +101,6 @@ export default function Register() {
                 }
                 )
             }).catch(err => {
-                console.log(err)
                 alert('האימייל או סיסמא שהזנת אינם תקינים')
             })
 

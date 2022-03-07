@@ -10,8 +10,8 @@ const InvitationPage = () => {
     }, [])
     return <div >
         <div className="App" style={{ background: 'orange' }}>
-
-            {id && <InvitationCard eventId={id} />}
+            {!id && <div>Invitation is not valid</div>}
+            {id && <InvitationCard />}
         </div>
     </div>
 }

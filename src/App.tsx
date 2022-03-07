@@ -21,6 +21,7 @@ import { useLanguage } from './context/Language';
 import CreateEvent from './components/event/CreateEvent';
 import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
+import CreateRide from './components/ride/CreateRide';
 
 
 
@@ -162,9 +163,12 @@ function App() {
           <Route path='/home' element={<Home />} />
           <Route path='/pnp' element={<Home />} />
           <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
-          <Route path='/createevent' element={<CreateEvent />} />
+          <Route path='/createevent' element={!isAuthenticated ? <Login/> :  <CreateEvent />} />
+          <Route path='/createride' element={!isAuthenticated ? <Login/> :  <CreateRide />} />
+          
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
           <Route path='/event/:id' element={<EventPage />} />
+          <Route path='/invitation/:id' element={<InvitationPage />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />
           <Route path='/*' element={<h1>{NOTFOUND(lang)}</h1>}></Route>
         </Routes>

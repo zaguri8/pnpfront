@@ -14,7 +14,7 @@ export type PNPEventAgeRange = {
 
 export type PNPPublicRide = {
     rideId: string
-    eventId:string
+    eventId: string
     rideDestination: string
     rideStartingPoint: string
     rideTime: string
@@ -25,8 +25,8 @@ export type PNPPublicRide = {
 }
 
 export type PNPPrivateRide = {
-    rideCreatorId:string
-    rideName?:string
+    rideCreatorId: string
+    rideName?: string
     rideId: string
     rideDestination: string
     rideStartingPoint: string
@@ -38,7 +38,11 @@ export type PNPPrivateRide = {
     comments: string
 }
 
-/**TODO: Coin Type, Add 'Coins as a path at databsase for each user' */
+export type PNPCoupon = {
+    couponId: string
+    couponValue: string
+    couponExpirationDate: string
+}
 
 export type PNPUser = {
     image?: string
@@ -66,7 +70,7 @@ export type PNPEvent = {
 }
 
 export type PNPPrivateEvent = {
-    eventTitle:string
+    eventTitle: string
     eventLocation: string
     eventId: string
     eventDate: string
@@ -76,9 +80,11 @@ export type PNPPrivateEvent = {
 }
 
 export type PNPRideConfirmation = {
-    confirmationId:string
+    userId: string
+    rideId: string
     eventId: string
     passengers?: string
+    confirmationTitle:string
     date: string
     directions: string
 }

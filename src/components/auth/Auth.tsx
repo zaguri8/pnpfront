@@ -5,7 +5,7 @@ import { useFirebase } from "../../context/Firebase"
 import { CSSProperties } from "react"
 import { style } from "@mui/system"
 export default function Auth(props: { title: string, redirect?: string, style?: CSSProperties }) {
-    const { firebase } = useFirebase()
+    const { firebase, appUser, user } = useFirebase()
     const location = useLocation()
     return (<div style={{
         width: '100%',

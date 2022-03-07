@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app";
+import { GoogleAuthProvider} from "firebase/auth"
 // Configure Firebase.
 export const firebaseConfig = {
     apiKey: process.env.REACT_APP_apiKey,
@@ -19,6 +20,8 @@ export const uiConfig = (path) => ({
     signInSuccessUrl: path,
     // We will display Google and Facebook as auth providers.
     signInOptions: [
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID
+        GoogleAuthProvider.PROVIDER_ID
     ],
 });
+
+export const BETA = false

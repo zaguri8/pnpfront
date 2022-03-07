@@ -2,18 +2,22 @@ import { ListItem, FormControl, List, TextField } from "@mui/material";
 import { useState } from "react";
 import PlacesAutocomplete from 'react-places-autocomplete'
 import { useGoogleState } from "../../context/GoogleMaps";
+import { v4 } from 'uuid'
+import $ from 'jquery'
 import { SIDE } from "../../settings/strings";
 import { useLanguage } from "../../context/Language";
 
 import { makeStyles } from "@mui/styles";
-export default function Places({ placeHolder, style, fixed, id, className,types }) {
+export default function Places({ placeHolder, style, fixed, id, className, types, handleAddressSelect, value }) {
     const [address, setAddress] = useState('')
     const handleChange = (value) => {
         setAddress(value)
     }
     const { google } = useGoogleState()
+    const [cId, setCId] = useState(v4())
     const handleSelect = (value) => {
         setAddress(value)
+        handleAddressSelect(value)
     }
     const useStyles = makeStyles(() => ({
         root: {
@@ -36,7 +40,7 @@ export default function Places({ placeHolder, style, fixed, id, className,types 
                     componentRestrictions: { country: 'il' },
                     types: types
                 }}
-                value={address}
+                value={address != undefined && address != null && address.length > 0 ? address : value != undefined && value != null ? value : ''}
                 onChange={handleChange}
                 onSelect={handleSelect}  >
                 {({
@@ -53,6 +57,7 @@ export default function Places({ placeHolder, style, fixed, id, className,types 
                     }}>
                         <TextField
                             variant='outlined'
+                            id={cId}
                             className={classes.root}
                             sx={{ ...{ direction: SIDE(lang), maxHeight: '50px' }, ...style }}
                             {...getInputProps({
@@ -60,7 +65,13 @@ export default function Places({ placeHolder, style, fixed, id, className,types 
                             })}
                         />
 
-                        <List dir={SIDE(lang)} style={{ position: 'relative', zIndex: '9999', overflow: 'scroll', width: '100%', minWidth: fixed ? '300px' : 'fit-content' }}>
+                        <List dir={SIDE(lang)} style={{
+                            position: 'relative',
+                            zIndex: '9999',
+                            overflow: 'scroll',
+                            width: '100%',
+                            minWidth: fixed ? '300px' : 'fit-content'
+                        }}>
 
                             {suggestions.map((suggestion, index) => {
                                 const style = suggestion.active
@@ -80,3 +91,4 @@ export default function Places({ placeHolder, style, fixed, id, className,types 
     </ListItem >
     )
 }
+

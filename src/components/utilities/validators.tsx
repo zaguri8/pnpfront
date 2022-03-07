@@ -1,5 +1,5 @@
 
-import { PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "../../store/external/types";
+import { PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "../../store/external/types";
 
 export function isValidHttpUrl(string: string): boolean {
   let url;
@@ -59,6 +59,24 @@ export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
     && (event.eventTitle !== 'null')
 }
 
+export function isValidCoupon(coupon: PNPCoupon) {
+  return coupon != undefined && coupon != null
+    && coupon.couponExpirationDate.length > 0
+    && coupon.couponId.length > 0
+    && coupon.couponValue.length > 0
+}
+
+export function isCouponExpirationValid(coupon: PNPCoupon) {
+  const validateDateWithString = (date: string) => {
+    const now = new Date()
+    const components = date.split('/')
+    return Number(components[2]) >= now.getFullYear()
+      && Number(components[1]) >= now.getMonth()
+      && Number(components[0]) >= now.getDay()
+  }
+  return isValidCoupon(coupon) && validateDateWithString(coupon.couponExpirationDate)
+}
+
 export function isValidPrivateRide(ride: PNPPrivateRide): boolean {
   return ride !== undefined
     && ride !== null
@@ -99,8 +117,8 @@ export function isValidPublicRide(ride: PNPPublicRide): boolean {
 export function isValidRideConfirmation(ride: PNPRideConfirmation): boolean {
   return ride !== undefined
     && ride !== null
-    && (ride.confirmationId !== null
-      && ride.confirmationId !== 'null')
+    && (ride.userId !== null
+      && ride.userId !== 'null')
     && (ride.passengers !== null
       && ride.passengers !== 'null')
     && (ride.date !== null
