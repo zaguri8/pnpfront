@@ -131,7 +131,7 @@ function InvitationCard() {
                     <span style={{ padding: '16px', fontSize: '16px', fontWeight: 'bold' }}>{lang === 'heb' ? confirmation.directions.replace(' to ', ' ל ') : confirmation.directions}</span>  </div ></InnerPageHolder>
 
         } else if (eventDoesNotExist) {
-            return <div>Event Does not exist</div>
+            return <div style={{ padding: '32px' }}>Event Does not exist</div>
         } else if (eventIsValid) {
             return <EventInvitation />
         } else return null
@@ -147,8 +147,8 @@ function InvitationCard() {
         const validEvent = BETA ? null : event!
         return <List style={{ marginTop: '0px' }}>
             <EventImage e={validEvent} />
-            <div style={{ width: '100%', background: 'whitesmoke', marginTop: '-8px' }}>
-                <List style={{ width: '75%', background: 'whitesmoke', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
+            <div style={{ width: '100%', background: 'whitesmoke', marginTop: '-8px'}}>
+                <List style={{ width: '85%', background: 'whitesmoke',minWidth:'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
                     <span style={{ fontFamily: 'Open Sans Hebrew' }}>
                         {`${ADDRESS(lang)} ${validEvent?.eventLocation}`}
                     </span>
@@ -159,8 +159,8 @@ function InvitationCard() {
                     {rides ? <List style={{ width: '100%' }}>
 
                         <div style={{ width: '100%', display: 'flex', background: 'black', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                            <h4 style={{ marginRight: '32px', color: 'white', textAlign: 'center', width: '50%' }}>{STARTING_POINT_SINGLE(lang)}</h4>
-                            <h4 style={{ marginLeft: '32px', color: 'white', textAlign: 'center', width: '50%' }}>{DEST(lang)}</h4>
+                            <span style={{padding:'8px', marginRight: '32px',fontSize:'14px', color: 'white', textAlign: 'center', width: '50%' }}>{STARTING_POINT_SINGLE(lang)}</span>
+                            <span style={{ marginLeft: '32px',padding:'8px', color: 'white',fontSize:'14px', textAlign: 'center', width: '50%' }}>{DEST(lang)}</span>
                         </div>
                         {rides!.map(ride => {
                             return <MenuItem onClick={() => {
@@ -180,9 +180,9 @@ function InvitationCard() {
                             }} key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE} value={ride.rideId}>
                                 <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                                     <br />
-                                    <span style={{ padding: '4px', width: '50%', fontFamily: 'Open Sans Hebrew' }}>{` ${ride.rideStartingPoint}`}</span>
+                                    <span style={{ padding: '4px', width: '50%', fontSize: '14px', fontFamily: 'Open Sans Hebrew' }}>{` ${ride.rideStartingPoint}`}</span>
                                     <br />
-                                    <span style={{ fontFamily: 'Open Sans Hebrew', padding: '4px', width: '50%', fontWeight: 'bold' }}>{` ${ride.rideDestination}`}</span>
+                                    <span style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', padding: '4px', width: '50%', fontWeight: 'bold' }}>{` ${ride.rideDestination}`}</span>
                                 </div>
 
                             </MenuItem>
