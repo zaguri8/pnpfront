@@ -14,6 +14,7 @@ import { getStorage, uploadBytes, getDownloadURL, ref as storageRef } from "fire
 import { ref, child } from "firebase/database";
 import { userFromDict } from "../store/external/converters";
 import { firebaseConfig } from '../settings/config'
+import { createNewCustomer } from "../store/payments";
 firebase.initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
@@ -45,22 +46,21 @@ export const FirebaseContextProvider = (props: object) => {
               coins: 0, phone: user?.phoneNumber ? user.phoneNumber! : '',
               favoriteEvents: ['מסיבות ומועדונים'],
               birthDate: '',
+              customerId: '',
               producer: false,
               name: user!.displayName ? user!.displayName! : user!.email!,
               email: user!.email!,
               image: ''
             }
-            set(child(ref(getDatabase(app), '/users'), user.uid), u).then(() => setAppUser(u))
+            const db = getDatabase(app)
+            createNewCustomer(u, auth, db)
+            set(child(ref(db, '/users'), user.uid), u).then(() => setAppUser(u))
             return
           }
           setAppUser(userFromDict(snap))
           setUser(user)
         })
-      } else {
-        setUser(null)
-      }
-    }, setError)
-
+      } else setUser(null)}, setError)
     return () => unsubscribe()
   }, [])
 

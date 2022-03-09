@@ -9,6 +9,7 @@ import { useFirebase } from "../../context/Firebase"
 import { ADDRESS, CURRENCY, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, LOADING, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, TOTAL_COST, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import { PaymentForm } from "../payment/Payment";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
@@ -17,7 +18,8 @@ import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { PNPPublicRide } from "../../store/external/types";
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
-
+    const { openDialog } = useLoading()
+    const openRequestPaymentDialog = () => { openDialog({ content: <div style={{ padding: '32px', }}><PaymentForm product={{ name: event?.eventDetails, image: null, price: selectedEventRide?.ridePrice }} /></div> }) }
     const [eventRides, setEventRides] = useState<PNPPublicRide[]>([])
     const { firebase } = useFirebase()
     const { id } = useParams()
@@ -35,7 +37,7 @@ export default function EventPage() {
                 $('#ride_start_point_list').css({ width: '70%' })
             }
         }
-        
+
         if (id) {
             firebase.realTime.getPublicEventById(id)
                 .then((event: PNPEvent | null | void) => {
@@ -101,17 +103,6 @@ export default function EventPage() {
                 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
 
-                        <p style={{
-                            background: 'whitesmoke',
-                            fontFamily: 'Open Sans Hebrew',
-                            padding: '8px',
-                            fontSize: '22px',
-                            margin: '0px',
-                            fontWeight: '100',
-                            color: 'gray'
-                        }}>
-                            {`${TOTAL_COST(lang)}: ${selectedEventRide?.ridePrice ? selectedEventRide?.ridePrice : '0.00'} ${CURRENCY(lang)}`}
-                        </p>
                         <Accordion style={{ background: 'whitesmoke', margin: '0px', borderTopLeftRadius: '0px', borderTopRightRadius: '0px' }} expanded={true}>
                             <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
                                 <p style={{
@@ -155,14 +146,13 @@ export default function EventPage() {
                                                 columnGap: '8px'
                                             }}>
                                                 <DirectionsBusIcon /> <span style={{ fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
-                                                <span>{ride.rideTime}</span>
-                                                <span style={{ marginLeft: 'auto' }} dir={SIDE(lang)}>{ride.ridePrice + " " + CURRENCY(lang)}</span>
 
                                             </div>
+                                            <span>{ride.rideTime}</span>
                                         </MenuItem>
                                     })}
                                     <div style={{
-                                        display: 'flex',
+                                        display: event.eventCanAddRides ? 'flex' : 'none',
                                         rowGap: '8px',
                                         flexDirection: 'column'
                                     }}> <AddCircleOutlineIcon color="inherit" style={{
@@ -183,7 +173,7 @@ export default function EventPage() {
                                 }}>{NO_RIDES(lang)}</Button>}
                                 <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
                                     <span>
-                                        <Button id="request_event_order" aria-haspopup disabled={selectedEventRide === null} sx={{ ...submitButton(true), ...{ maxWidth: '250px' } }}> {ORDER(lang)}</Button>
+                                        <Button onClick={openRequestPaymentDialog} id="request_event_order" aria-haspopup disabled={selectedEventRide === null} sx={{ ...submitButton(true), ...{ maxWidth: '250px' } }}> {ORDER(lang)}</Button>
                                     </span>
                                 </HtmlTooltip>
                             </AccordionDetails>

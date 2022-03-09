@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react"
 import { PNPPrivateRide } from "../../store/external/types"
 import { useFirebase } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
-import { isValidPrivateRide } from '../utilities/validators'
+import { isValidPrivateRide } from '../../store/validators'
 import PhoneInput from 'react-phone-number-input'
 import $ from 'jquery'
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"

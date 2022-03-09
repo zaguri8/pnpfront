@@ -40,15 +40,15 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
 
                 {user != null && user != undefined && appUser != null && appUser != undefined && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
-                    <input onChange={(event) => {
+                    <input onChange={async (event) => {
                         if (event.target.files) {
                             doLoad()
                             const image = event.target.files[0]
-                            image.arrayBuffer()
+                            await image.arrayBuffer()
                                 .then(buffer => uploadUserImage(buffer))
-                                .then((res) => {
+                                .then(async (res) => {
                                     if (res) {
-                                        getDownloadURL(res.ref)
+                                        return await getDownloadURL(res.ref)
                                             .then(url => {
                                                 firebase.realTime.updateUserImage(url).then(() => {
                                                     $('#menu_profile_image').css('borderRadius', '42.5px')

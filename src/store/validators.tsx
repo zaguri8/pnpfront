@@ -1,5 +1,6 @@
 
-import { PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "../../store/external/types";
+import { PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./external/types";
+import { CreditCardTransaction } from "./payments/types";
 
 export function isValidHttpUrl(string: string): boolean {
   let url;
@@ -60,7 +61,7 @@ export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
 }
 
 export function isValidCoupon(coupon: PNPCoupon) {
-  return coupon != undefined && coupon != null
+  return coupon
     && coupon.couponExpirationDate.length > 0
     && coupon.couponId.length > 0
     && coupon.couponValue.length > 0
@@ -124,4 +125,14 @@ export function isValidRideConfirmation(ride: PNPRideConfirmation): boolean {
     && (ride.date !== null
       && ride.date !== 'null')
     && (ride.directions !== null)
+}
+
+export function isValidTransaction(transaction: CreditCardTransaction) {
+  var valid = transaction != null && transaction.customer.customer_name
+    && transaction.customer.email
+    && transaction.credit_card.auth_number.length > 0
+    && transaction.credit_card.exp_yy.length > 0
+    && transaction.credit_card.exp_mm.length > 0
+    && transaction.credit_card.number.length > 0
+  return valid
 }

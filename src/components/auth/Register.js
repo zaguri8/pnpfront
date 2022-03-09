@@ -86,6 +86,7 @@ export default function Register() {
                 firebase.realTime.addUser({
                     name: firstName + " " + lastName,
                     email: email,
+                    customerId: '',
                     phone: phone,
                     birthDate: birthDate,
                     favoriteEvents: selectedFavoriteEvents,
@@ -93,11 +94,11 @@ export default function Register() {
                     producer: false
                 }).then(result => {
                     cancelLoad()
-                        (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/pnp')
+                        (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/')
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
-                    firebase.store.addError(err)
-                    cancelLoad(false)
+                    firebase.realTime.createError('Register error', err)
+                    cancelLoad()
                 }
                 )
             }).catch(err => {

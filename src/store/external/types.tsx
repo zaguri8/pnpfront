@@ -46,6 +46,7 @@ export type PNPCoupon = {
 
 export type PNPUser = {
     image?: string
+    customerId:string
     name: string
     coins: number
     email: string
@@ -61,6 +62,7 @@ export type PNPEvent = {
     eventId: string
     eventProducerId: string
     eventDate: string
+    eventCanAddRides:boolean
     eventDetails: string
     eventPrice: string
     eventHours: PNPEventHours

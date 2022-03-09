@@ -8,6 +8,7 @@ export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
         eventId: snap.child('eventId').val(),
         eventName: snap.child('eventName').val(),
         eventProducerId: snap.child('eventProducerId').val(),
+        eventCanAddRides:snap.child('eventCanAddRides').val(),
         eventDate: snap.child('eventDate').val(),
         eventLocation: snap.child('eventLocation').val(),
         eventDetails: snap.child('eventDetails').val(),
@@ -74,6 +75,7 @@ export const userFromDict: (snap: DataSnapshot) => PNPUser = (snap) => {
     let user: PNPUser = {
         email: snap.child('email').val(),
         image: snap.child('image').val(),
+        customerId: snap.child('customerId').val(),
         coins: snap.child('coins').val(),
         birthDate: snap.child('birthDate').val(),
         phone: snap.child('phone').val(),

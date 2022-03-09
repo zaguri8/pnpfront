@@ -31,7 +31,7 @@ export default function Login() {
         const u = e.target[0].value
         const p = e.target[1].value
         signInWithEmailAndPassword(firebase.auth, u, p)
-            .then(() => (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/pnp'))
+            .then(() => (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/'))
             .catch(err => alert('הפרטים שהכנסת אינם נכונים'))
 
     }

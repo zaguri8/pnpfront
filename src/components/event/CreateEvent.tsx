@@ -19,7 +19,7 @@ import { event_placeholder } from "../../assets/images";
 import { useFirebase } from "../../context/Firebase";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from "../../settings/styles";
-import { isValidEvent } from "../utilities/validators";
+import { isValidEvent } from "../../store/validators";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 
 export default function CreateEvent() {
@@ -31,6 +31,7 @@ export default function CreateEvent() {
         eventName: 'null',
         eventLocation: 'null',
         eventId: 'null',
+        eventCanAddRides: true,
         eventProducerId: 'null',
         eventDate: 'null',
         eventDetails: 'null',
@@ -150,7 +151,7 @@ export default function CreateEvent() {
                 </FormControl>
 
                 <FormControl>
-                    <Places value = {''} handleAddressSelect={updateEventAddress} types={['address']} className={''} id={''} fixed style={{ width: '100%' }} placeHolder={EVENT_ADDRESS(lang)} />
+                    <Places value={''} handleAddressSelect={updateEventAddress} types={['address']} className={''} id={''} fixed style={{ width: '100%' }} placeHolder={EVENT_ADDRESS(lang)} />
 
                 </FormControl>
                 <FormControl sx={{ background: 'white' }}>

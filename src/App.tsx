@@ -1,11 +1,11 @@
 import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
-import { CLOSE, SIDE,NOTFOUND } from './settings/strings'
+import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
 import AppMenu from './components/AppMenu';
 import { Routes, Route, useNavigate } from 'react-router';
 import { Navigate } from 'react-router-dom'
@@ -22,6 +22,7 @@ import CreateEvent from './components/event/CreateEvent';
 import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
+import Payment from './components/payment/Payment';
 
 
 
@@ -33,7 +34,7 @@ function ImageHeader() {
     alignItems: 'center',
     justifyContent: 'center'
   }}>
-    <img onClick={() => nav('/pnp')} id='image-header' alt='' src={logo_white} style={{
+    <img onClick={() => nav('/')} id='image-header' alt='' src={logo_white} style={{
       cursor: 'pointer',
       height: '100px',
       padding: '8px'
@@ -107,12 +108,12 @@ function App() {
     function onScroll() {
       if (window.scrollY >= 222) {
         $('#toolbar').css('padding', '4')
-        $('#toolbar').css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
+        $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
         $('#toolbar').css('top', '0')
 
       } else {
         $('#toolbar').css('padding', '0')
-        $('#toolbar').css({ 'position': 'relative', 'boxShadow': 'none', 'background': TOOLBAR_COLOR, 'transition': 'all .2s' })
+        $('#toolbar').stop().css({ 'position': 'relative', 'boxShadow': 'none', 'background': TOOLBAR_COLOR, 'transition': 'all .2s' })
       }
     }
     onResize()
@@ -129,21 +130,19 @@ function App() {
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
 
-        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center' }} open={dialogContext.isDialogOpened}>
-          <DialogTitle style={{ fontFamily: 'Open Sans Hebrew', background: 'white' }}>{dialogContext.content.title}</DialogTitle>
+        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center',overflow:'stretch' }} open={dialogContext.isDialogOpened}>
           <List sx={{
             background: 'white',
-            overflowY: 'auto',
-            maxHeight: '600px',
+            overflowY: 'stretch',
+            maxHeight: '800px',
             pt: 0,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-
             {dialogContext.content.content}
-            <ListItem>
+            <ListItem style={{ marginTop: '0px', paddingTop: '0px' }}>
               <Button
                 style={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }}
                 onClick={() => {
@@ -161,16 +160,17 @@ function App() {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/home' element={<Home />} />
-          <Route path='/pnp' element={<Home />} />
           <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
-          <Route path='/createevent' element={!isAuthenticated ? <Login/> :  <CreateEvent />} />
-          <Route path='/createride' element={!isAuthenticated ? <Login/> :  <CreateRide />} />
-          
-          <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/pnp'} />} />
+          <Route path='/createevent' element={!isAuthenticated ? <Login /> : <CreateEvent />} />
+          <Route path='/createride' element={!isAuthenticated ? <Login /> : <CreateRide />} />
+          <Route path='/payment' element={<Payment product={{ name: 'Some product', price: '50' }} />} />
+          <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
           <Route path='/event/:id' element={<EventPage />} />
           <Route path='/invitation/:id' element={<InvitationPage />} />
-          <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/pnp'} />} />
+          <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
+
           <Route path='/*' element={<h1>{NOTFOUND(lang)}</h1>}></Route>
+
         </Routes>
       </div>
     </div>

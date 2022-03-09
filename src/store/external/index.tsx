@@ -12,8 +12,9 @@ import {
     QuerySnapshot,
     DocumentReference
 } from 'firebase/firestore'
-import { isValidPrivateEvent } from '../../components/utilities/validators'
+import { isValidPrivateEvent } from '../validators'
 import { FirebaseApp } from 'firebase/app'
+import { CreditCardTransaction } from '../payments/types'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -38,11 +39,13 @@ export class Realtime {
     private errs: DatabaseReference
     private users: DatabaseReference
     private auth: Auth
+    private transactions: DatabaseReference
     constructor(auth: Auth, db: Database) {
         this.allEvents = ref(db, '/events')
         this.rides = ref(db, "/rides")
         this.users = ref(db, '/users')
         this.errs = ref(db, '/errors')
+        this.transactions = ref(db, '/transactions')
         this.auth = auth
     }
     /**
@@ -57,20 +60,74 @@ export class Realtime {
     }
 
     /**
+     * addError
+     * @param error error to be added to db
+     * @returns new reference callback
+     */
+    static async addError(error: PNPError, db: Database) {
+        const newPath = push(child(ref(db, 'errors'), error.type))
+        error.errorId = newPath.key!
+        return await set(newPath, error)
+    }
+
+
+    static async addTransaction(auth: Auth, db: Database, transaction: CreditCardTransaction) {
+        if (!auth.currentUser)
+            return false
+        transaction.credit_card = {
+            number: '',
+            exp_mm: '',
+            exp_yy: '',
+            auth_number: ''
+        }
+        const newRef = push(child(child(ref(db, 'transactions'), 'ridePurchases'), auth.currentUser!.uid))
+        return await set(newRef, transaction)
+    }
+    async addTransaction(transaction: CreditCardTransaction) {
+        if (!this.auth.currentUser)
+            return false
+        transaction.credit_card = {
+            number: '',
+            exp_mm: '',
+            exp_yy: '',
+            auth_number: ''
+        }
+        const newRef = push(child(child(this.transactions, 'ridePurchases'), this.auth.currentUser!.uid))
+        return await set(newRef, transaction)
+    }
+
+    /**
      * createError
      * @param type error type
      * @param e error to be created
      * @returns new refernce callback
      */
     async createError(type: string, e: any) {
-        const date = new Date().toDateString()
+        const date = new Date().toUTCString()
+        let err: PNPError = {
+            type: type,
+            date: date,
+            errorId: '',
+            error: e.message ? e.message : e ? { ...e } : ''
+        }
+        return this.addError(err)
+    }
+
+    /**
+  * createError
+  * @param type error type
+  * @param e error to be created
+  * @returns new refernce callback
+  */
+    static async createError(type: string, e: any, db: Database) {
+        const date = new Date().toUTCString()
         let err: PNPError = {
             type: type,
             date: date,
             errorId: '',
             error: e
         }
-        return this.addError(err)
+        return Realtime.addError(err, db)
     }
 
     /**
@@ -244,6 +301,16 @@ export class Realtime {
     updateCurrentUser = async (user: object) => {
         if (this.auth.currentUser)
             return await update(child(this.users, this.auth.currentUser!.uid), user)
+    }
+
+    /**
+      * updateCurrentUser
+      * @param user user values to be updated
+      * @returns update callback
+      */
+    static updateCurrentUser = async (user: object, auth: Auth, db: Database) => {
+        if (auth.currentUser)
+            return await update(child(ref(db, 'users'), auth.currentUser!.uid), user)
     }
 
     /**

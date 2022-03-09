@@ -9,7 +9,7 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 
 import { useFirebase } from '../../context/Firebase';
 import { PNPPrivateEvent, PNPEvent, PNPRideConfirmation } from '../../store/external/types';
-import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../utilities/validators';
+import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../../store/validators';
 
 import { PNPPublicRide } from '../../store/external/types';
 import { useLocation, useNavigate, useParams } from 'react-router';
@@ -17,7 +17,7 @@ import { useLoading } from '../../context/Loading';
 import { BETA } from '../../settings/config';
 import { ORANGE_GRADIENT_PRIMARY } from '../../settings/colors';
 import { InnerPageHolder } from '../utilities/Holders';
-import { ADDRESS, CHOOSE_RIDE, CONFIRM_RIDE, CURRENCY, DEST, DESTINATION_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings';
+import { ADDRESS, CHOOSE_RIDE, CONFIRM_RIDE, CURRENCY, DEST, DESTINATION_POINT, PICK_POINT, PULL_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings';
 import { useLanguage } from '../../context/Language';
 import { HtmlTooltip } from '../utilities/HtmlTooltip';
 import { submitButton } from '../../settings/styles';
@@ -149,9 +149,9 @@ function InvitationCard() {
             <EventImage e={validEvent} />
             <div style={{ width: '100%', background: 'whitesmoke', marginTop: '-8px'}}>
                 <List style={{ width: '85%', background: 'whitesmoke',minWidth:'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
-                    <span style={{ fontFamily: 'Open Sans Hebrew' }}>
-                        {`${ADDRESS(lang)} ${validEvent?.eventLocation}`}
-                    </span>
+                    {rides && rides!.length > 0 && <span style={{ fontFamily: 'Open Sans Hebrew' }}>
+                        {lang === 'heb' ? ('כל ההסעות יוצאות מ ' + rides![0].rideStartingPoint + " בשעה " +  rides![0].rideTime) : 'All the rides leave from ' + rides![0].rideStartingPoint + ' at ' + rides![0].rideStartingPoint}
+                    </span>}
                     <br />
                     <span style={{ fontFamily: 'Open Sans Hebrew', margin: '32px' }}>
                         {CHOOSE_RIDE(lang)}
@@ -159,8 +159,8 @@ function InvitationCard() {
                     {rides ? <List style={{ width: '100%' }}>
 
                         <div style={{ width: '100%', display: 'flex', background: 'black', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                            <span style={{padding:'8px', marginRight: '32px',fontSize:'14px', color: 'white', textAlign: 'center', width: '50%' }}>{STARTING_POINT_SINGLE(lang)}</span>
-                            <span style={{ marginLeft: '32px',padding:'8px', color: 'white',fontSize:'14px', textAlign: 'center', width: '50%' }}>{DEST(lang)}</span>
+                            <span style={{padding:'8px', marginRight: '32px',fontSize:'14px', color: 'white', textAlign: 'center', width: '50%' }}>{PICK_POINT(lang)}</span>
+                            <span style={{ marginLeft: '32px',padding:'8px', color: 'white',fontSize:'14px', textAlign: 'center', width: '50%' }}>{PULL_POINT(lang)}</span>
                         </div>
                         {rides!.map(ride => {
                             return <MenuItem onClick={() => {
