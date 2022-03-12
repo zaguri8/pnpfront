@@ -128,8 +128,10 @@ export function isValidRideConfirmation(ride: PNPRideConfirmation): boolean {
 }
 
 export function isValidTransaction(transaction: CreditCardTransaction) {
+  console.log(transaction)
   var valid = transaction != null && transaction.customer.customer_name
     && transaction.customer.email
+    && transaction.credit_card
     && transaction.credit_card.auth_number.length > 0
     && transaction.credit_card.exp_yy.length > 0
     && transaction.credit_card.exp_mm.length > 0

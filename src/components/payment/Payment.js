@@ -1,8 +1,8 @@
 import { InputLabel, List, TextField, Button, Checkbox } from '@mui/material'
 import axios from 'axios'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
-import { ACCEPT_TERMS_REQUEST, FILL_ALL_FIELDS, PAY_COMPLETE, TERMS_OF_USE } from '../../settings/strings'
+import { ACCEPT_TERMS_REQUEST, FILL_ALL_FIELDS, PAY_COMPLETE, TERMS_OF_USE, TOS } from '../../settings/strings'
 import { submitButton } from '../../settings/styles'
 import { useFirebase } from '../../context/Firebase'
 import AddIcon from '@mui/icons-material/Add';
@@ -12,62 +12,93 @@ import { isValidTransaction } from '../../store/validators'
 
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useLanguage } from "../../context/Language";
-import { ORANGE_GRADIENT_PRIMARY } from '../../settings/colors'
 import { chargeCreditCard } from '../../store/payments'
 import { AMOUNT_OF_TICKETS, CARD_HOLDER_NAME, CARD_NUMBER, CVV, EXPIRATION, EXP_M, EXP_Y, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
+import { useLocation, useNavigate } from 'react-router'
+import { Link } from 'react-router-dom'
 export function PaymentForm({ product }) {
 
     const { lang } = useLanguage()
     const [termsOfUser, setTermsOfUse] = useState(false)
-
+    const { closeDialog } = useLoading()
+    const nav = useNavigate()
     const [ticketAmount, setTicketAmount] = useState(1)
-    const { firebase, appUser } = useFirebase()
+    const { firebase, appUser, user } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
-
+    const location = useLocation()
     const handleTermsOfUseChange = (e) => {
         setTermsOfUse(e.target.checked)
     }
     const requestPayment = () => {
+        if (!firebase.auth.currentUser || !appUser) {
+            nav('/login', { cachedLocation: location.pathname })
+            return
+        }
         doLoad()
         appUser && chargeCreditCard(appUser, transaction, firebase.realTime).then(res => {
             if (!res) {
-                alert("There was a problem proccessing your order, please try again later")
-            } else { alert('הזמנתך התקבלה בהצלחה. את/ה יכול/ה לראות את פרטי ההזמנה באיזור האישי') }
+                alert("אלון" + 'אירעתה שגיאה לא ידועה  אנא נסה שוב מאוחר יותר')
+                cancelLoad()
+                return
+            }
+            if (res.error) {
+                alert(res.error)
+            } else if (res.data && res.data.results && res.data.results.status === 'error') {
+                alert(res.data.results.description)
+            } else if (res.data.data) {
+                alert('הזמנתך התקבלה בהצלחה. את/ה יכול/ה לראות את פרטי ההזמנה באיזור האישי')
+            } else { alert('אירעתה שגיאה לא ידועה  אנא נסה שוב מאוחר יותר') }
             cancelLoad()
         })
     }
+
     const [transaction, setTransaction] = useState({
-        terminal_uid: process.env.REACT_APP_PAYME_TERMINAL_UID,
-        cashier_uid: process.env.REACT_APP_PAYME_CASHIER_UID,
         customer: {
             customer_name: '',
-            email: appUser ? appUser.email : firebase.auth.currentUser ? firebase.auth.currentUser.email : ''
+            email: appUser ? appUser.email : user.email ? user.email : ''
         },
-        amount: ticketAmount * product.price,
-        credit_terms: 1,
-        currency_code: "ILS",
-        use_token: false,
-        create_token: true,
         credit_card: {
             auth_number: "",
             exp_mm: "",
             exp_yy: "",
             number: ""
         },
-        payments: {
-            number: 1,
-            first_amount: 0,
-            nonfirst_amount: 0
-        },
-        extra_info: ""
+        "product": {
+            "price": (ticketAmount * Number(product.price)) + "",
+            "amount": ticketAmount,
+            "name": product.name
+        }
     })
+
+    const setTicketAmountForProduct = (amount) => {
+        setTransaction({
+            ...transaction, ...{
+                product: {
+                    "price": transaction.product.price,
+                    "amount": amount,
+                    "name": transaction.product.name
+                }
+            }
+        })
+    }
+    const setPriceForProduct = (price) => {
+        setTransaction({
+            ...transaction, ...{
+                product: {
+                    "price": price + "",
+                    "amount": transaction.product.amount,
+                    "name": transaction.product.name
+                }
+            }
+        })
+    }
 
     const setCreditCardNameHolder = (name) => {
         setTransaction({
             ...transaction, ...{
                 customer: {
                     customer_name: name,
-                    email: transaction.customer.email
+                    email: user.email
                 }
             }
         })
@@ -122,7 +153,7 @@ export function PaymentForm({ product }) {
         })
     }
     return (<List style={{ direction: SIDE(lang), width: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <label style={{ marginTop: '0px', padding: '4px', fontWeight: 'bold' }}>{PAYMENT_FOR_RIDE(lang)}</label><label style={{ padding: '4px', fontSize: '14px' }}>{`${product.name}`}</label>
+        <label style={{ marginTop: '0px', padding: '4px', fontWeight: 'bold' }}>{PAYMENT_FOR_RIDE(lang)}</label><label style={{ padding: '4px', fontSize: '14px' }}>{`${product.desc}`}</label>
 
         <img style={{ width: '48px', height: '18px', alignSelf: 'center', marginBottom: '0px' }} src={credit_cards} />
         <TextField
@@ -163,19 +194,32 @@ export function PaymentForm({ product }) {
         />
         <span style={{ padding: '8px', display: 'flex', flexDirection: 'column', rowGap: '8px', alignItems: 'center', justifyContent: 'center', columnGap: '8px' }}>
             <div style={{ background: 'whitesmoke', display: 'flex', alignContent: 'center', alignItems: 'center', columnGap: '4px' }}>
-                <AddIcon onClick={() => setTicketAmount(ticketAmount + 1 <= 10 ? ticketAmount + 1 : 10)} /><RemoveIcon onClick={() => setTicketAmount(ticketAmount - 1 >= 1 ? ticketAmount - 1 : 1)} /></div>
+                <AddIcon onClick={() => {
+                    const newAmountAdded = ticketAmount + 1 <= 10 ? ticketAmount + 1 : 10
+                    setTicketAmount(newAmountAdded)
+                    setTicketAmountForProduct(newAmountAdded)
+                    setPriceForProduct(newAmountAdded * Number(product.price))
+                }} /><RemoveIcon onClick={() => {
+                    const newAmountRemoved = ticketAmount - 1 >= 1 ? ticketAmount - 1 : 1
+                    setTicketAmount(newAmountRemoved)
+                    setTicketAmountForProduct(newAmountRemoved)
+                    setPriceForProduct(newAmountRemoved * Number(product.price))
+                }
+                } /></div>
             <span>{`${AMOUNT_OF_TICKETS(lang)} ${ticketAmount}`}</span>
         </span>
         <label style={{ fontSize: '24px', padding: '4px', fontWeight: '100' }}>{TOTAL_TO_PAY(lang, Number(product.price) * ticketAmount)}</label>
         <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidTransaction(transaction) ? FILL_ALL_FIELDS(lang) : !termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : PAY_COMPLETE(lang)} arrow>
             <span>
-                <Button onClick = {requestPayment} sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px', width: '100%' } }} disabled={!isValidTransaction(transaction) || !termsOfUser} >{PAY_COMPLETE(lang)}</Button>
+                <Button onClick={requestPayment} sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px', width: '100%' } }} disabled={!isValidTransaction(transaction) || !termsOfUser} >{PAY_COMPLETE(lang)}</Button>
             </span>
         </HtmlTooltip>
-        <span style={{ padding: '8px' }}><InputLabel style={{ textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+        <span style={{ padding: '8px' }}><InputLabel style={{fontSize:'14px',paddingTop:'16px', textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
             <Checkbox
                 onChange={handleTermsOfUseChange}
                 name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
+                <br/>
+            <Link  to={'/termsOfService'}>{TOS(lang)}</Link>
         </span>
     </List >)
 }

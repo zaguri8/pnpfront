@@ -11,8 +11,12 @@ import { Realtime } from "../../store/external"
 import QRCode from 'react-qr-code'
 import { useState } from "react"
 import { PNPEvent } from "../../store/external/types"
-import { CLUBS, CULTURE, SCHEDULED_EVENTS, WHY_US_TITLE } from "../../settings/strings"
+import { ABOUT, CLUBS, CULTURE, SCHEDULED_EVENTS, TOS, WHY_US_TITLE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
+import About from "../About"
+import { InnerPageHolder } from "../utilities/Holders"
+import { Link } from "react-router-dom"
+import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
 export default function Home() {
 
     const { user, firebase } = useFirebase()
@@ -39,22 +43,34 @@ export default function Home() {
 
     return <div>
         <RideFormPreview />
-       {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
-  
+        {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
+
         <img src={data} />
         <SectionTitle style={{
             padding: '32px',
-            fontStyle: 'italic',
             fontWeight: '100',
-            fontSize: '42px',
-            borderRadius: '2px'
+            color: 'white',
+            border: '.1px solid gray',
+            width:'80%',
+            alignSelf: 'center',
+            backgroundImage:ORANGE_GRADIENT_PRIMARY,
+            fontSize: '38px',
+            borderRadius: '8px'
         }} title={'We Say No more !'} />
+        <br/>
         <SayNoMoreContainer />
         <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
         <Gallery header={CULTURE(lang)} events={pnpCultureEvents} />
         <Gallery header={CLUBS(lang)} events={pnpClubEvents} />
         <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} />
         <WhyUsContainer />
+        <SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
+        <InnerPageHolder style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: '16px', width: '50%' }}>
+
+
+            <About />
+        </InnerPageHolder>
+        <Link style={{ paddingTop: '32px', paddingBottom: '24px' }} to={'/termsOfService'}>{TOS(lang)}</Link>
         <WhatsApp />
     </div>
 }

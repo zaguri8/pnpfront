@@ -40,7 +40,7 @@ export const CULTURE = (lang) => lang === 'heb' ? 'תרבות ופנאי' : 'Cul
 export const CLUBS = (lang) => lang === 'heb' ? 'מועדונים' : 'Clubs'
 export const SCHEDULED_EVENTS = (lang) => lang === 'heb' ? 'אירועים קרובים' : 'Upcomming Events'
 
-export const MY_ACCOUNT = (lang) => lang === 'heb' ? 'האזור שלי' : 'My Account'
+export const MY_ACCOUNT = (lang) => lang === 'heb' ? 'איזור אישי' : 'My Account'
 export const REGISTER_TITLE = (lang) => lang === 'heb' ? 'הרשמה' : 'Register'
 export const REGISTER_OK = (lang) => lang === 'heb' ? 'הירשם/י' : 'Register'
 export const LOGIN_OK = lang => lang === 'heb' ? 'התחבר/י' : 'Sign in'
@@ -138,8 +138,8 @@ export const MY_COINS = (lang) => lang === 'heb' ? 'מטבעות PNP' : 'Coins'
 
 export const NOTFOUND = (lang) => lang === 'heb' ? 'עמוד לא נמצא' : 'Page not found'
 export const ERROR = (lang) => lang === 'heb' ? 'הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים' : 'An unknown problem has occured please try again in a few moments'
-export const TERMS_OF_USE = (lang) => lang === 'heb' ? 'אני מאשר שקראתי את התקנון ואני מסכים לתנאי השימוש' : 'I confirm i read the terms of use and i accept them'
-
+export const TERMS_OF_USE = (lang) => lang === 'heb' ? 'אני מאשר שקראתי את התקנון ומסכים לתנאי השימוש' : 'I confirm i read the terms of use and i accept them'
+export const TOS = (lang) => lang === 'heb' ? 'תקנון ותנאי שימוש' : 'Terms of service'
 
 export const AMOUNT_OF_TICKETS = (lang) => lang === 'heb' ? 'מספר כרטיסים' : 'Number of tickets'
 export const CARD_HOLDER_NAME = (lang) => lang === 'heb' ? 'שם בעל הכרטיס' : 'Card holder name'
@@ -149,3 +149,14 @@ export const EXP_M = (lang) => lang === 'heb' ? 'חודש' : 'Month'
 export const EXP_Y = (lang) => lang === 'heb' ? 'שנה' : 'Year'
 export const CVV = (lang) => lang === 'heb' ? 'שלוש ספרות בגב כרטיס' : 'CVV'
 export const TOTAL_TO_PAY = (lang, price) => lang === 'heb' ? `סה"כ לתשלום: ${price} ש"ח` : `Total: ${price} ILS`
+
+
+
+export const TERMS_OF_SERVICE = (lang) => lang === 'heb' ? 'תקנון Pick n Pull' : 'Pick n Pull TOS'
+
+export const ABOUT = (lang) => lang === 'heb' ? 'אודות' : 'About us'
+export const ABOUT_CONTENT = (lang) => lang === 'heb' ? `הפלטפורמה שלנו היא הראשונה מסוגה בישראל ומהווה פריצת דרך בתחום ההסעות והתחבורה.
+החזון שלנו הוא שכל אדם יוכל להגיע אל היעד הבא שלו, בדרך נוחה, בטוחה ויעילה יותר. גם בסופי שבוע.
+אנחנו שואפים לשינוי חברתי ולמציאות טובה יותר בתחומים אלו.` : `Our platform is the first of its kind in Israel and is a breakthrough in the field of transportation and transportation.
+Our vision is that each person will be able to reach their next destination, in a more convenient, safe and efficient way. Even on weekends.
+We strive for social change and a better reality in these areas.`

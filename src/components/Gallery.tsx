@@ -11,42 +11,53 @@ export type GalleryProps = {
     events: PNPEvent[]
 }
 
-function GalleryItemTitle(props: { eventName: string }) {
-    return (<h4 style={{
-        background: 'rgba(0,0,0,0.5)',
+function GalleryItemTitle(props: { event:PNPEvent}) {
+    return (<div style={{
         margin: '0px',
         marginTop: 'auto',
-        padding: '8px',
-        color: 'white',
-        borderBottomLeftRadius: '8px',
-        borderBottomRightRadius: '8px'
-    }}>{props.eventName}</h4>);
+        background: 'white',
+        direction:'rtl',
+        textAlign: 'start',
+        marginBottom: '8px',
+        display: 'flex',
+        height: '25%',
+        flexDirection: 'column',
+        color: 'black',
+        borderBottomLeftRadius: '16px',
+        borderBottomRightRadius: '16px'
+    }}><h4 style={{ margin: '0px',padding:'6px',paddingBottom:'0px',paddingTop:'2px'}} >{props.event.eventName}</h4>
+    <span  style={{fontSize:'10px', margin: '0px',paddingBottom:'2px',paddingTop:'0px', marginRight: '8px' }} >{props.event.eventLocation}</span>
+    <hr style = {{width:'98%',borderWidth:'.1px',borderColor:'white',margin:'0px'}}/>
+    <h5 style={{ fontSize: '10px',fontWeight:'100', alignSelf: 'end',padding:'1px', marginLeft: '8px', marginTop: '0px', color: 'black' }}>{props.event.eventDate}</h5></div>);
 }
 
 
 export function Gallery(props: GalleryProps) {
-    const {lang} = useLanguage()
+    const { lang } = useLanguage()
     const containerStyle: CSSProperties = {
         overflow: 'scroll',
-        display:'flex',
+
+        display: 'flex',
         direction: SIDE(lang),
         paddingBottom: '32px',
     }
 
     const cardStyle: CSSProperties = {
 
-        maxWidth: '200px',
+
+        maxWidth: '225px',
+        border: '.1px solid gray',
         marginLeft: '32px',
         marginRight: '32px',
-        minWidth: '200px',
-        boxShadow: '0px 0px 6px 0px',
-        minHeight: '150px',
-        borderRadius: '4px'
+        minWidth: '225px',
+        minHeight: '190px',
+        borderRadius: '16px'
     }
     const imageContainer: CSSProperties = {
         display: 'flex',
-        width:'fit-content',
+        width: 'fit-content',
         padding: '8px',
+
         textAlign: 'center'
 
     }
@@ -55,6 +66,7 @@ export function Gallery(props: GalleryProps) {
         fontWeight: '300',
         fontFamily: 'Open Sans Hebrew ',
         position: 'relative',
+        border: '1px solid solid black',
         padding: '32px',
         fontSize: '28px',
         margin: '0px',
@@ -86,13 +98,13 @@ export function Gallery(props: GalleryProps) {
                             flexDirection: 'column',
                             cursor: 'pointer',
                             background: `url('${pnpEvent.eventImageURL}') `,
-                            backgroundSize: '100% 100%',
+                            backgroundSize: '100% 75%',
                             backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center center'
+                            backgroundPosition: 'top center'
                         }
                     }} onClick={() => handleOpen(pnpEvent)}>
-
-                        <GalleryItemTitle eventName={pnpEvent.eventName} />
+                        
+                        <GalleryItemTitle event = {pnpEvent} />
 
                     </div>)
                 })}

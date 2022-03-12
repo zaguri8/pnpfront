@@ -1,5 +1,5 @@
 import { Input, FormControl, InputLabel, Stack } from "@mui/material"
-import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE } from '../../settings/strings'
+import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE, ERROR } from '../../settings/strings'
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
@@ -81,12 +81,15 @@ export default function Register() {
             return
         }
         doLoad()
+
+
         createUserWithEmailAndPassword(firebase.auth, email, password)
             .then(() => {
                 firebase.realTime.addUser({
                     name: firstName + " " + lastName,
                     email: email,
                     customerId: '',
+                    admin: false,
                     phone: phone,
                     birthDate: birthDate,
                     favoriteEvents: selectedFavoriteEvents,
@@ -94,19 +97,25 @@ export default function Register() {
                     producer: false
                 }).then(result => {
                     cancelLoad()
-                        (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/')
+                    if (location.state && location.state.cachedLocation) {
+                        nav(location.state.cachedLocation)
+                    } else {
+                        nav('/')
+                    }
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
                     firebase.realTime.createError('Register error', err)
                     cancelLoad()
-                }
-                )
+                })
             }).catch(err => {
-                alert('האימייל או סיסמא שהזנת אינם תקינים')
+                if (err.message.includes('auth/email-already-in-use')) {
+                    alert('האימייל שהזנת קיים כבר במערכת')
+                } else {
+                    alert('האימייל או סיסמא שהזנת אינם תקינים')
+                }
+                cancelLoad()
             })
-
     }
-
 
     const [date, setDate] = useState()
     const classes = useStyles()

@@ -2,13 +2,14 @@ import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
+import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
-import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
+import { CLOSE, SIDE, NOTFOUND, TOS } from './settings/strings'
 import AppMenu from './components/AppMenu';
 import { Routes, Route, useNavigate } from 'react-router';
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
 
 import { TOOLBAR_COLOR } from './settings/colors';
@@ -23,6 +24,7 @@ import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
 import Payment from './components/payment/Payment';
+import MyPayments from './components/payment/MyPayments';
 
 
 
@@ -84,10 +86,13 @@ function App() {
     }
   }
 
+  const [scrollingScript, setScrollingScript] = useState(false)
+  const [resizingScript, setResizingScript] = useState(false)
   useLayoutEffect(() => {
     const d = document.createElement('div')
     d.classList.add('dim')
     $('.App').append(d)
+    $('#dialog').append(d)
     $('#menu').hide()
     d.style.display = 'none'
     $('.App').on('click', (event) => {
@@ -99,21 +104,29 @@ function App() {
     function onResize() {
       const windowWidth = window.outerWidth
 
-      if (windowWidth && windowWidth < 320) {
+      if (windowWidth && windowWidth < 320 && !resizingScript) {
         $('#lang').css('display', 'none')
+        setResizingScript(true)
       } else {
         $('#lang').css('display', 'flex')
+        setResizingScript(false)
       }
     }
+
+
     function onScroll() {
-      if (window.scrollY >= 222) {
+
+      if (window.scrollY >= 222 && !scrollingScript) {
         $('#toolbar').css('padding', '4')
         $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
         $('#toolbar').css('top', '0')
+        setScrollingScript(true)
+        console.log('S')
 
       } else {
         $('#toolbar').css('padding', '0')
         $('#toolbar').stop().css({ 'position': 'relative', 'boxShadow': 'none', 'background': TOOLBAR_COLOR, 'transition': 'all .2s' })
+        setScrollingScript(false)
       }
     }
     onResize()
@@ -130,10 +143,11 @@ function App() {
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
 
-        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center',overflow:'stretch' }} open={dialogContext.isDialogOpened}>
-          <List sx={{
+        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflow: 'stretch' }} open={dialogContext.isDialogOpened}>
+          <List id='dialog' sx={{
+
             background: 'white',
-            overflowY: 'stretch',
+            overflowY: 'scroll',
             maxHeight: '800px',
             pt: 0,
             display: 'flex',
@@ -166,9 +180,10 @@ function App() {
           <Route path='/payment' element={<Payment product={{ name: 'Some product', price: '50' }} />} />
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
           <Route path='/event/:id' element={<EventPage />} />
+          <Route path='termsOfService' element={<TermsOfService />} />
           <Route path='/invitation/:id' element={<InvitationPage />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
-
+          <Route path='/myaccount/transactions' element={!isAuthenticated ? <Login /> : <MyPayments />} />
           <Route path='/*' element={<h1>{NOTFOUND(lang)}</h1>}></Route>
 
         </Routes>

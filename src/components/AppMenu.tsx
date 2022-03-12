@@ -28,62 +28,21 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
         width: user ? '80%' : 'auto',
         margin: user ? '16px' : 'inherit',
         flexDirection: 'column',
-        padding: '16px'
+        paddingTop: '16px',
+        paddingBottom: '16px'
     }}>
         <div style={{
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
+            height: 'fit-content',
             justifyContent: 'center'
         }}>
-            {<div >
 
-                {user != null && user != undefined && appUser != null && appUser != undefined && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-
-                    <input onChange={async (event) => {
-                        if (event.target.files) {
-                            doLoad()
-                            const image = event.target.files[0]
-                            await image.arrayBuffer()
-                                .then(buffer => uploadUserImage(buffer))
-                                .then(async (res) => {
-                                    if (res) {
-                                        return await getDownloadURL(res.ref)
-                                            .then(url => {
-                                                firebase.realTime.updateUserImage(url).then(() => {
-                                                    $('#menu_profile_image').css('borderRadius', '42.5px')
-                                                    $('#menu_profile_image').attr('src', url)
-                                                    cancelLoad()
-                                                })
-                                            }).catch(error => { console.log(error) })
-                                    }
-                                }).catch(error => { console.log(error) })
-                        }
-
-                    }} type="file" id="files" style={{ display: 'none' }} />
-
-                </div>}
-                {user ? <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column'
-                }}>
-                    <img id='menu_profile_image' alt='' src={appUser != null ? appUser.image : profile} style={{
-                        width: '75px',
-                        borderRadius: '42.5px',
-                        border: '1px solid white',
-                        height: '75px'
-                    }} />          <label style={{
-                        fontSize: '10px',
-                        color: 'white',
-                        padding: '4px'
-                    }} onChange={(e) => alert(e)} htmlFor='files'>{PICK_IMAGE(lang, false)}</label></div> : null} </div>}
             {user === null ? <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
-                padding: '8px'
+                justifyContent: 'center'
             }}>
                 <span onClick={() => props.clickedItem(4)} style={{
                     padding: '4px',
@@ -93,13 +52,9 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
                     padding: '4px',
                     cursor: 'pointer'
                 }}>{TOOLBAR_LOGIN(lang)}</span>
-            </div> : <List style={{ paddingLeft: '16px', paddingRight: '16px', marginTop: '-24px', marginRight: '-8px', paddingTop: '0px' }} >
-                <span style={{ fontSize: '18px', color: 'white', textUnderlinePosition: 'under' }}>{HELLO(lang)}</span>
-                <ListItemText style={{ color: 'white' }}>{appUser?.name}</ListItemText>
-
-            </List>}
+            </div> : <div><span style={{ fontSize: '14px', color: 'white' }}>{`${HELLO(lang)}`}</span><br /><span style={{ fontSize: '14px', color: 'white' }}>{`${appUser?.name}`}</span></div>}
         </div>
-        {user && <span style={{ fontSize: '10px', color: 'white', margin: '0px', padding: '0px' }}>מזהה : <b>{user.uid} </b> </span>}
+        {user && <span style={{ fontSize: '10px', color: 'white', margin: '16px', padding: '0px' }}>מזהה : <b>{user.uid} </b> </span>}
     </div>);
 }
 
@@ -117,6 +72,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
                     nav('/myaccount')
                     break;
                 case 2:
+                    nav('/myaccount/transactions')
                     break;
                 case 3:
                     break;

@@ -179,8 +179,7 @@ export default function CreateRide() {
                         </span>
                     </HtmlTooltip>
                 </FormControl>
-                <span >
-                    <InputLabel>{TERMS_OF_USE(lang)}</InputLabel>
+                <span ><InputLabel style={{ paddingTop: '16px', fontSize: '14px' }}>{TERMS_OF_USE(lang)}</InputLabel>
                     <Checkbox
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />

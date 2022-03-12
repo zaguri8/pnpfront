@@ -15,6 +15,7 @@ import {
 import { isValidPrivateEvent } from '../validators'
 import { FirebaseApp } from 'firebase/app'
 import { CreditCardTransaction } from '../payments/types'
+import { createNewCustomer } from '../payments'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -83,16 +84,11 @@ export class Realtime {
         const newRef = push(child(child(ref(db, 'transactions'), 'ridePurchases'), auth.currentUser!.uid))
         return await set(newRef, transaction)
     }
-    async addTransaction(transaction: CreditCardTransaction) {
+    async addTransaction(transaction: CreditCardTransaction, type: 'failure' | 'success') {
         if (!this.auth.currentUser)
             return false
-        transaction.credit_card = {
-            number: '',
-            exp_mm: '',
-            exp_yy: '',
-            auth_number: ''
-        }
-        const newRef = push(child(child(this.transactions, 'ridePurchases'), this.auth.currentUser!.uid))
+        transaction.credit_card = null // safety
+        const newRef = push(child(child(child(this.transactions, 'ridePurchases'), type), this.auth.currentUser!.uid))
         return await set(newRef, transaction)
     }
 
@@ -365,8 +361,12 @@ export class Realtime {
      */
     addUser = async (user: PNPUser): Promise<object | void> => {
         if (this.auth.currentUser === null) return
-        return await set(child(this.users, this.auth.currentUser!.uid), user)
-            .catch((e) => this.createError('addUser', e))
+        createNewCustomer(user).then((customerUid: string) => {
+            user.customerId = customerUid
+            return set(child(this.users, this.auth.currentUser!.uid), user)
+                .catch((e) => this.createError('addUser', e))
+        }).catch(e => this.createError('addUser', e))
+
     }
     /**
  * addUser
@@ -437,7 +437,7 @@ export class Realtime {
 
 export type FirebaseTools = {
     auth: Auth,
-    realTime: Realtime,
+    realTime: Realtime
     temp: Firestore
 }
 export default function Store(auth: Auth, db: Database, firestore: Firestore): FirebaseTools {

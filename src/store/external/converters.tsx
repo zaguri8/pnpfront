@@ -75,6 +75,7 @@ export const userFromDict: (snap: DataSnapshot) => PNPUser = (snap) => {
     let user: PNPUser = {
         email: snap.child('email').val(),
         image: snap.child('image').val(),
+        admin:snap.child('admin').val(),
         customerId: snap.child('customerId').val(),
         coins: snap.child('coins').val(),
         birthDate: snap.child('birthDate').val(),

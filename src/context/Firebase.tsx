@@ -41,26 +41,11 @@ export const FirebaseContextProvider = (props: object) => {
 
       if (user) {
         get(child(ref(getDatabase(app), '/users'), user.uid)).then(snap => {
-          if (!snap.exists()) {
-            const u = {
-              coins: 0, phone: user?.phoneNumber ? user.phoneNumber! : '',
-              favoriteEvents: ['מסיבות ומועדונים'],
-              birthDate: '',
-              customerId: '',
-              producer: false,
-              name: user!.displayName ? user!.displayName! : user!.email!,
-              email: user!.email!,
-              image: ''
-            }
-            const db = getDatabase(app)
-            createNewCustomer(u, auth, db)
-            set(child(ref(db, '/users'), user.uid), u).then(() => setAppUser(u))
-            return
-          }
           setAppUser(userFromDict(snap))
           setUser(user)
         })
-      } else setUser(null)}, setError)
+      } else setUser(null)
+    }, setError)
     return () => unsubscribe()
   }, [])
 
@@ -79,6 +64,7 @@ export const useFirebase = () => {
       firebaseContext?.setAppUser(null)
       return await auth.signOut()
     },
+    freeDbRef: getDatabase(app),
     isAuthenticated: firebaseContext?.user != null,
     uploadUserImage: async (imageBlob: ArrayBuffer) => { if (firebaseContext?.user?.uid) return await uploadBytes(storageRef(storage, '/UserImages/' + (firebaseContext!.user!.uid ? firebaseContext!.user!.uid : '')), imageBlob) },
     uploadEventImage: async (eventId: string, imageBlob: ArrayBuffer) => await uploadBytes(storageRef(storage, 'EventImages/' + eventId), imageBlob)

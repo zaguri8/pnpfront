@@ -1,5 +1,5 @@
 import { v4 } from "uuid"
-
+import './SayNoMoreItem.css'
 export type SayNoMoreItemProps = {
     icon: string,
     content: string
@@ -7,14 +7,7 @@ export type SayNoMoreItemProps = {
 export default function SayNoMoreItem(props: SayNoMoreItemProps) {
 
     const nMore = "No more"
-    return <div key={v4()} style={{
-
-        minWidth: '120px',
-        background: 'rgb(232,232,232)',
-        color: 'black',
-        padding: '32px',
-        width: '16.6%'
-    }}>
+    return <div key={v4()} className = 'say_no_more_item'>
 
         <p style={{
             marginTop: '0px',

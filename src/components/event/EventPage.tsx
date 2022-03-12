@@ -15,14 +15,28 @@ import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import { useNavigate, useLocation } from 'react-router'
 import { PNPPublicRide } from "../../store/external/types";
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
-    const { openDialog } = useLoading()
-    const openRequestPaymentDialog = () => { openDialog({ content: <div style={{ padding: '32px', }}><PaymentForm product={{ name: event?.eventDetails, image: null, price: selectedEventRide?.ridePrice }} /></div> }) }
+    const [expanded, setExpanded] = useState<boolean>(false)
+    const [expandedRides, setExpandedRides] = useState<boolean>(true)
+    const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
+    const { isLoading, doLoad, cancelLoad, openDialog } = useLoading()
+    const { lang } = useLanguage()
+    const location = useLocation()
     const [eventRides, setEventRides] = useState<PNPPublicRide[]>([])
-    const { firebase } = useFirebase()
+    const { firebase, appUser } = useFirebase()
     const { id } = useParams()
+
+    const nav = useNavigate()
+    const openRequestPaymentDialog = () => {
+        if (!firebase.auth.currentUser || !appUser) {
+            nav('/login', { state: { cachedLocation: location.pathname } })
+            return
+        }
+        openDialog({ content: <div style={{ padding: '32px', }}><PaymentForm product={{ name: event ? `הסעה לאירוע ${event!.eventName} מ - ${selectedEventRide?.rideStartingPoint} ל - ${selectedEventRide?.rideDestination}` : '', desc: event?.eventDetails, image: null, price: selectedEventRide?.ridePrice }} /></div> })
+    }
 
     useEffect(() => {
         doLoad()
@@ -52,12 +66,6 @@ export default function EventPage() {
         }
     }, [])
 
-
-
-    const [expanded, setExpanded] = useState<boolean>(false)
-    const [expandedRides, setExpandedRides] = useState<boolean>(true)
-    const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
-
     const handleSelectEventRide = (eventRide: PNPPublicRide) => {
         setSelectedEventRide(eventRide)
     }
@@ -69,7 +77,6 @@ export default function EventPage() {
         setExpandedRides(!expandedRides);
     };
 
-    const { lang } = useLanguage()
 
     useLayoutEffect(() => {
         const resize = () => {
@@ -86,13 +93,12 @@ export default function EventPage() {
         $(window).resize(() => { resize() })
         resize()
     }, [])
-    const { isLoading, doLoad, cancelLoad } = useLoading()
 
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <PageHolder >
             <List id='ride_start_point_list' style={{ alignItems: 'center', width: '95%' }}>
                 <ListItemIcon style={{ width: '100%' }}>
-                    <img alt={event.eventName} style={{ alignSelf: 'center', width: '100%' }} src={event.eventImageURL} />
+                    {event.eventImageURL.length > 0 && <img alt={event.eventName} style={{ alignSelf: 'center', width: '100%' }} src={event.eventImageURL} />}
                 </ListItemIcon>
 
                 <div style={{

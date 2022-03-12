@@ -1,42 +1,39 @@
 
 import { formLabelClasses } from "@mui/material"
+import axios from "axios"
 import { Auth } from "firebase/auth"
 import { Database } from "firebase/database"
 import { Realtime } from "../external"
 import { PNPUser } from "../external/types"
 import { isValidTransaction } from "../validators"
 import { CreditCardTransaction } from "./types"
-
-
-const basePaymentsAPI = "https://restapidev.payplus.co.il/api/v1.0"
 const paymentsAPIRoutes = {
-    charge: basePaymentsAPI + '/Transactions/Charge',
-    customersAdd: basePaymentsAPI + '/Customers/Add',
-    customers: basePaymentsAPI + '/Customers/View/'
-}
-const paymentAPIHeaders = {
-    'Authorization': JSON.stringify({
-        "api_key": process.env.REACT_APP_PAYME_API_KEY,
-        "secret_key": process.env.REACT_APP_PAYME_SECRET_KEY
-    })
+    charge: 'https://nadavsolutions.com/gserver/transaction',
+    newCustomer: 'https://nadavsolutions.com/gserver/newcustomer'
 }
 
 export const chargeCreditCard = async (user: PNPUser, transaction: CreditCardTransaction, realTime: Realtime) => {
-    if (isValidTransaction(transaction) && user.customerId)
+    if (!isValidTransaction(transaction) || !user.customerId) {
         return false
-    return await fetch(paymentsAPIRoutes.charge,
-        {
-            headers: paymentAPIHeaders, method: 'POST',
-            body: JSON.stringify(transaction)
-        }).then(() => realTime.addTransaction(transaction))
-        .catch(err => console.log(err))
+    }
+    return await axios.post(paymentsAPIRoutes.charge, transaction, { headers: { 'Content-Type': 'application/json' } })
+        .then(response => {
+            if (response.data && response.data.data) {
+                if (response.data.data.results) {
+                    realTime.addTransaction({ ...response.data.data, product: transaction.product, date: new Date().toISOString() }, response.data.data.results.status === 'error' ? 'failure' : 'success')
+                }
+            }
+            return response.data
+        }).catch(err => {
+            return { error: err, data: null }
+        })
 }
 
-export const createNewCustomer = async (user: PNPUser, auth: Auth, db: Database) => {
-    return await fetch(paymentsAPIRoutes.customersAdd, { body: JSON.stringify({ email: user.email, customer_name: user.name }) })
-        .then(response => response.json())
-        .then(customer => Realtime.updateCurrentUser({ customerId: customer.data.customer_uid }, auth, db))
-        .catch(e => {
-            Realtime.createError('createNewCustomer', e, db)
+export const createNewCustomer = async (user: PNPUser) => {
+    return await axios.post(paymentsAPIRoutes.newCustomer,
+        { customer: { email: user.email, customer_name: user.name } },
+        { headers: { 'Content-Type': 'application/json' } })
+        .then(response => {
+            return response.data.data.customer_uid
         })
 }

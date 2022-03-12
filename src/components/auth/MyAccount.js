@@ -1,33 +1,47 @@
 import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_ACCOUNT_ITEM_3, MY_ACCOUNT_ITEM_4, SIDE } from "../../settings/strings"
 import SectionTitle from "../SectionTitle"
+import spoil from '../../assets/images/whyus/spoil.png'
+import settings from '../../assets/images/myaccount/settings.png'
+import coins from '../../assets/images/myaccount/coins.png'
+import ridehistory from '../../assets/images/myaccount/historyRides.png'
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import { useLanguage } from "../../context/Language"
-import { Box, Button } from "@mui/material"
+import { Box, Button, Icon } from "@mui/material"
 import $ from 'jquery'
 import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
 
 import { useEffect } from "react"
 import { useFirebase } from "../../context/Firebase"
+import { SpeedDialAction } from "@mui/lab"
 
 
-function MyAccountItem({ title }) {
-    return (<Box sx={{ boxShadow: 2, borderRadius: '12.5px' }}><Button className='my_account_item' sx={
+function MyAccountItem({ title, icon }) {
+    return (<Button className='my_account_item' sx={{
+        backgroundImage: ORANGE_GRADIENT_PRIMARY,
+        borderRadius: '12.5px',
+        height: '100px',
+        boxShadow: 'rgba(100, 100, 111, 0.2) 0px 2px 5px 0px',
+        fontFamily: 'Open Sans Hebrew',
+        lineHeight: 'normal',
+        width: '100px',
+        textTransform: 'capitalize',
+        fontWeight: 'bold',
+        color: 'white',
+        display:'flex',flexDirection:'column',
+        alignItems:'center',
+        padding: '0px',
+        fontSize: '16px'
+    }}><span className = 'my_account_item_text'  style={
         {
-            backgroundImage: ORANGE_GRADIENT_PRIMARY,
-            borderRadius: '12.5px',
-            height: '100px',
-            boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 5px 0px',
             fontFamily: 'Open Sans Hebrew',
-            lineHeight: 'normal',
-            width: '100px',
-            textTransform: 'capitalize',
-            fontWeight: 'bold',
+            background: 'none',
+            height: '50%',
+            fontSize:'16px',
+            fontWeight:'500',
             color: 'white',
-            padding: '0px',
-            fontSize: '16px'
+            lineHeight: 'normal'
         }
-
-    }>{title}</Button></Box>)
+    } >{title}</span><img style={{ width: '25px', height: '25px' }} src={icon}></img></Button>)
 }
 
 
@@ -39,8 +53,11 @@ export default function MyAccount() {
             const currentWidth = window.innerWidth
             if (currentWidth > 628) {
                 $('.my_account_item').css('width', '200px')
+                $('.my_account_item_text').css('width','50%')
+                
             } else {
                 $('.my_account_item').css('width', '100px')
+                $('.my_account_item_text').css('width','100%')
             }
         }
         $(window).resize(() => { resize() })
@@ -57,13 +74,13 @@ export default function MyAccount() {
                 gap: '4vw 6vw'
             }}>
 
-                <MyAccountItem title={MY_ACCOUNT_ITEM_1(lang)} />
-                <MyAccountItem title={MY_ACCOUNT_ITEM_2(lang)} />
+                <MyAccountItem icon = {coins} title={MY_ACCOUNT_ITEM_1(lang)} />
+                <MyAccountItem  icon={spoil} title={MY_ACCOUNT_ITEM_2(lang)} />
 
 
 
-                <MyAccountItem title={MY_ACCOUNT_ITEM_3(lang)} />
-                <MyAccountItem title={MY_ACCOUNT_ITEM_4(lang)} />
+                <MyAccountItem icon = {ridehistory} title={MY_ACCOUNT_ITEM_3(lang)} />
+                <MyAccountItem icon = {settings} title={MY_ACCOUNT_ITEM_4(lang)} />
 
             </div>
         </InnerPageHolder>

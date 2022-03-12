@@ -101,8 +101,8 @@ export default function CreateEvent() {
     return (<PageHolder>
         <SectionTitle title={CREATE_EVENT_TITLE(lang)} style={{}} />
         <InnerPageHolder>
-            <Stack spacing={3}>
-                <FormControl>
+            <Stack spacing={3} >
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
                     <input onChange={(event) => {
                         if (event.target.files) {
                             setImage(URL.createObjectURL(event.target.files[0]))
@@ -127,7 +127,7 @@ export default function CreateEvent() {
                         background: 'white'
                     }} onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}</label>
                 </FormControl>
-                <FormControl>
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
                     <TextField
                         placeholder={EVENT_TITLE(lang)}
                         onChange={(event) => { setPnpEvent({ ...pnpEvent, ...{ eventName: event.target.value } }) }}
@@ -138,7 +138,7 @@ export default function CreateEvent() {
                         }} />
                 </FormControl>
 
-                <FormControl>
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
                     <TextField
                         placeholder={EVENT_NUMBER_PPL(lang)}
                         onChange={(event) => { setPnpEvent({ ...pnpEvent, ...{ eventName: event.target.value } }) }}
@@ -150,11 +150,11 @@ export default function CreateEvent() {
                         }} />
                 </FormControl>
 
-                <FormControl>
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
                     <Places value={''} handleAddressSelect={updateEventAddress} types={['address']} className={''} id={''} fixed style={{ width: '100%' }} placeHolder={EVENT_ADDRESS(lang)} />
 
                 </FormControl>
-                <FormControl sx={{ background: 'white' }}>
+                <FormControl style={{ width: '80%', alignSelf: 'center', background: 'white' }}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                             onChange={(e) => updateEventDate(e)}
@@ -164,7 +164,7 @@ export default function CreateEvent() {
                         />
                     </LocalizationProvider>
                 </FormControl>
-                <FormControl sx={{ background: 'white' }}>
+                <FormControl style={{ width: '80%', alignSelf: 'center', background: 'white' }}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <TimePicker
                             label={EVENT_START(lang)}
@@ -174,7 +174,7 @@ export default function CreateEvent() {
                         />
                     </LocalizationProvider>
                 </FormControl>
-                <FormControl sx={{ background: 'white' }}>
+                <FormControl style={{ width: '80%', background: 'white', alignSelf: 'center' }}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <TimePicker
                             label={EVENT_END(lang)}
@@ -185,7 +185,7 @@ export default function CreateEvent() {
                     </LocalizationProvider>
                 </FormControl>
 
-                <FormControl fullWidth>
+                <FormControl style={{ width: '80%', alignSelf: 'center' }} fullWidth>
                     <InputLabel required id="create_event_type_select">{EVENT_TYPE(lang)}</InputLabel>
                     <Select
                         labelId="create_event_type_select"
@@ -198,7 +198,7 @@ export default function CreateEvent() {
                         {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} value={type}>{type}</MenuItem>)}
                     </Select>
                 </FormControl>
-                <FormControl>
+                <FormControl style={{ width: '90%', alignSelf: 'center' }}>
                     <Editor
                         editorStyle={{ background: 'white', minHeight: '200px' }}
                         editorState={editorState}
@@ -213,11 +213,12 @@ export default function CreateEvent() {
                         <Button sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px' } }} disabled={!isValidEvent(pnpEvent) || !termsOfUser} >{CREATE_EVENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
-                <span><InputLabel>{TERMS_OF_USE(lang)}</InputLabel>
-                    <Checkbox
-                        onChange={handleTermsOfUseChange}
-                        name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
-                </span></Stack>
+            </Stack>
+            <span ><InputLabel style={{ paddingTop: '16px', fontSize: '14px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+                <Checkbox
+                    onChange={handleTermsOfUseChange}
+                    name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
+            </span>
         </InnerPageHolder>
     </PageHolder>)
 

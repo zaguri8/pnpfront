@@ -10,7 +10,7 @@ body {
   scroll-behavior: smooth;
   font-family: 'Open Sans Hebrew', serif;
   -webkit-font-smoothing: antialiased;
-  background-color: rgb(232,232,232);
+  background-color: white;
   min-height: 100vh;
   -moz-osx-font-smoothing: grayscale;
 }

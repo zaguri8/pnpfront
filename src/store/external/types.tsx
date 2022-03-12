@@ -48,6 +48,7 @@ export type PNPUser = {
     image?: string
     customerId:string
     name: string
+    admin:boolean
     coins: number
     email: string
     phone: string
