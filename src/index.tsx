@@ -11,16 +11,16 @@ import { LanguageContextProvider } from './context/Language';
 
 
 ReactDOM.render(
-    <HashRouter>
-      <LanguageContextProvider>
-        <GoogleMapsContextProvider>
-          <LoadingContextProvider>
-            <FirebaseContextProvider>
-              <App />
-            </FirebaseContextProvider>
-          </LoadingContextProvider>
-        </GoogleMapsContextProvider>
-      </LanguageContextProvider>
-    </HashRouter>,
+  <HashRouter>
+    <LanguageContextProvider>
+      <GoogleMapsContextProvider>
+        <LoadingContextProvider>
+          <FirebaseContextProvider>
+            <App />
+          </FirebaseContextProvider>
+        </LoadingContextProvider>
+      </GoogleMapsContextProvider>
+    </LanguageContextProvider>
+  </HashRouter>,
   document.getElementById('root')
 );

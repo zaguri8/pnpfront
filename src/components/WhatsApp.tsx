@@ -13,7 +13,7 @@ export default function WhatsApp() {
         width: '50px',
         height: '50px'
     }}>
-        <img alt='' className={'side_icon'} style={{
+        <img alt='' onClick={() => window.open('https://wa.me/972533724658')} className={'side_icon'} style={{
             width: '50px',
             height: '50px',
             cursor: 'pointer'

@@ -52,7 +52,7 @@ export const MENU_ITEM_4 = (lang) => lang === 'heb' ? "חדש ב Pick n Pull" : 
 export const MENU_ITEM_5 = (lang) => lang === 'heb' ? "סגור" : 'Close'
 
 export const MY_ACCOUNT_ITEM_1 = (lang) => lang === 'heb' ? 'מטבעות שצברתי' : 'Coins ive earned'
-export const MY_ACCOUNT_ITEM_2 = (lang) => lang === 'heb' ? 'קופונים והטבות' : 'Coupons and discounts'
+export const MY_ACCOUNT_ITEM_2 = (lang) => lang === 'heb' ? 'קופונים והטבות' : 'Coupons & Discounts'
 export const MY_ACCOUNT_ITEM_3 = (lang) => lang === 'heb' ? 'היסטוריית נסיעות' : 'Rides history'
 export const MY_ACCOUNT_ITEM_4 = (lang) => lang === 'heb' ? 'הגדרות' : 'Settings'
 export const EMAIL = (lang) => lang === 'heb' ? 'כתובת אימייל' : 'Email address'

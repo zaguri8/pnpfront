@@ -17,6 +17,8 @@ import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { useNavigate, useLocation } from 'react-router'
 import { PNPPublicRide } from "../../store/external/types";
+import RideRequestForm from "../ride/RideRequestForm";
+import { Unsubscribe } from "firebase/database";
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
     const [expanded, setExpanded] = useState<boolean>(false)
@@ -52,17 +54,24 @@ export default function EventPage() {
             }
         }
 
+        let u1: Unsubscribe | null = null
+        let u2: Unsubscribe | null = null
         if (id) {
-            firebase.realTime.getPublicEventById(id)
-                .then((event: PNPEvent | null | void) => {
-                    setEvent(event as PNPEvent)
-                    cancelLoad()
-                    resize()
-                })
-            firebase.realTime.getPublicRidesByEventId(id)
-                .then((rides: PNPPublicRide[] | void) => {
-                    setEventRides(rides as PNPPublicRide[])
-                })
+            u1 = firebase.realTime.getPublicEventById(id, (event) => {
+                setEvent(event as PNPEvent)
+                cancelLoad()
+                resize()
+            })
+
+            u2 = firebase.realTime.getPublicRidesByEventId(id, (rides) => {
+                setEventRides(rides as PNPPublicRide[])
+            })
+
+        }
+
+        return () => {
+            u1 && (u1 as Unsubscribe) && (u1 as Unsubscribe)()
+            u2 && (u2 as Unsubscribe) && (u2 as Unsubscribe)()
         }
     }, [])
 
@@ -80,6 +89,7 @@ export default function EventPage() {
 
     useLayoutEffect(() => {
         const resize = () => {
+
             const width = window.outerWidth
             if (width < 720) {
                 $('#ride_start_point_list').css({ width: '95%' })
@@ -89,16 +99,18 @@ export default function EventPage() {
             else if (width > 1000) {
                 $('#ride_start_point_list').css({ width: '70%' })
             }
+
         }
         $(window).resize(() => { resize() })
         resize()
     }, [])
 
+
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <PageHolder >
             <List id='ride_start_point_list' style={{ alignItems: 'center', width: '95%' }}>
                 <ListItemIcon style={{ width: '100%' }}>
-                    {event.eventImageURL.length > 0 && <img alt={event.eventName} style={{ alignSelf: 'center', width: '100%' }} src={event.eventImageURL} />}
+                    {event.eventImageURL.length > 0 && <img id='event_image_eventpage' alt={event.eventName} style={{ alignSelf: 'center', width: '100%' }} src={event.eventImageURL} />}
                 </ListItemIcon>
 
                 <div style={{
@@ -161,22 +173,26 @@ export default function EventPage() {
                                         display: event.eventCanAddRides ? 'flex' : 'none',
                                         rowGap: '8px',
                                         flexDirection: 'column'
-                                    }}> <AddCircleOutlineIcon color="inherit" style={{
-                                        cursor: 'pointer',
-                                        width: '50px',
-                                        height: '50px',
-                                        alignSelf: 'center'
-                                    }} />
+                                    }}> <AddCircleOutlineIcon
+                                            onClick={() => openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> })}
+                                            color="inherit" style={{
+                                                cursor: 'pointer',
+                                                width: '50px',
+                                                height: '50px',
+                                                alignSelf: 'center'
+                                            }} />
                                         <span style={{ color: 'black' }}>{CANT_SEE_YOUR_CITY(lang)}</span></div>
 
-                                </Stack> : <Button style={{
-                                    cursor: 'pointer',
-                                    background: 'none',
-                                    textAlign: 'center',
-                                    fontFamily: 'Open Sans Hebrew',
-                                    width: '100%',
-                                    alignSelf: 'center'
-                                }}>{NO_RIDES(lang)}</Button>}
+                                </Stack> : <Button
+                                    onClick={() => openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> })}
+                                    style={{
+                                        cursor: 'pointer',
+                                        background: 'none',
+                                        textAlign: 'center',
+                                        fontFamily: 'Open Sans Hebrew',
+                                        width: '100%',
+                                        alignSelf: 'center'
+                                    }}>{NO_RIDES(lang)}</Button>}
                                 <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
                                     <span>
                                         <Button onClick={openRequestPaymentDialog} id="request_event_order" aria-haspopup disabled={selectedEventRide === null} sx={{ ...submitButton(true), ...{ maxWidth: '250px' } }}> {ORDER(lang)}</Button>
@@ -210,7 +226,7 @@ export default function EventPage() {
                             background: 'whitesmoke',
                             textAlign: 'right'
                         }}>{START_DATE(lang)}<span>{event.eventDate + " " + event.eventHours.startHour}</span></p>
-                        <p style={{
+                        <p dir={SIDE(lang)} style={{
                             background: 'whitesmoke',
                             padding: '8px',
 

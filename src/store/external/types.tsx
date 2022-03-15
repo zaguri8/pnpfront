@@ -44,11 +44,23 @@ export type PNPCoupon = {
     couponExpirationDate: string
 }
 
+
+export type PNPRideRequest = {
+    eventId: string,
+    requestUserId: string,
+    eventName: string,
+    fullName: string,
+    passengers: string,
+    names: string[],
+    phoneNumber: string,
+    startingPoint: string,
+}
+
 export type PNPUser = {
     image?: string
-    customerId:string
+    customerId: string
     name: string
-    admin:boolean
+    admin: boolean
     coins: number
     email: string
     phone: string
@@ -63,13 +75,14 @@ export type PNPEvent = {
     eventId: string
     eventProducerId: string
     eventDate: string
-    eventCanAddRides:boolean
+    eventCanAddRides: boolean
     eventDetails: string
     eventPrice: string
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange
     expectedNumberOfPeople: string
     eventImageURL: string
+    eventMobileImageURL?: string
 }
 
 export type PNPPrivateEvent = {
@@ -87,7 +100,7 @@ export type PNPRideConfirmation = {
     rideId: string
     eventId: string
     passengers?: string
-    confirmationTitle:string
+    confirmationTitle: string
     date: string
     directions: string
 }

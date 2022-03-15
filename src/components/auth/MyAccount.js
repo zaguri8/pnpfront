@@ -14,9 +14,10 @@ import { useEffect } from "react"
 import { useFirebase } from "../../context/Firebase"
 import { SpeedDialAction } from "@mui/lab"
 
-
-function MyAccountItem({ title, icon }) {
-    return (<Button className='my_account_item' sx={{
+import {useNavigate} from 'react-router'
+function MyAccountItem({ title, icon,navTo}) {
+    const nav = useNavigate()
+    return (<Button onClick = {() => nav(navTo)} className='my_account_item' sx={{
         backgroundImage: ORANGE_GRADIENT_PRIMARY,
         borderRadius: '12.5px',
         height: '100px',
@@ -74,13 +75,13 @@ export default function MyAccount() {
                 gap: '4vw 6vw'
             }}>
 
-                <MyAccountItem icon = {coins} title={MY_ACCOUNT_ITEM_1(lang)} />
-                <MyAccountItem  icon={spoil} title={MY_ACCOUNT_ITEM_2(lang)} />
+                <MyAccountItem navTo = {'/'} icon = {coins} title={MY_ACCOUNT_ITEM_1(lang)} />
+                <MyAccountItem navTo = {'/'}  icon={spoil} title={MY_ACCOUNT_ITEM_2(lang)} />
 
 
 
-                <MyAccountItem icon = {ridehistory} title={MY_ACCOUNT_ITEM_3(lang)} />
-                <MyAccountItem icon = {settings} title={MY_ACCOUNT_ITEM_4(lang)} />
+                <MyAccountItem navTo = {'/myaccount/transactions'} icon = {ridehistory} title={MY_ACCOUNT_ITEM_3(lang)} />
+                <MyAccountItem navTo = {'/'} icon = {settings} title={MY_ACCOUNT_ITEM_4(lang)} />
 
             </div>
         </InnerPageHolder>

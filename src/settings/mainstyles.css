@@ -1,0 +1,13 @@
+.list_events_admin:nth-child(2n) {
+
+
+
+    background:gray;
+}
+
+.list_events_admin:nth-child(3) {
+
+
+    background:white;
+
+}

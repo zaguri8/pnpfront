@@ -8,7 +8,6 @@
 // }
 // const convertContentToHTML = () => {
 //     let currentContentAsHTML = convertToHTML(editorState.getCurrentContent());
-//     console.log(currentContentAsHTML)
 // }
 // <Editor
 // editorState={editorState}

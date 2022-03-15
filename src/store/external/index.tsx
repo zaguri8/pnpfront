@@ -1,5 +1,5 @@
 import { Auth } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide } from './types'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest } from './types'
 import { privateRideFromDict, privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { DocumentData } from 'firebase/firestore'
@@ -14,8 +14,8 @@ import {
 } from 'firebase/firestore'
 import { isValidPrivateEvent } from '../validators'
 import { FirebaseApp } from 'firebase/app'
-import { CreditCardTransaction } from '../payments/types'
 import { createNewCustomer } from '../payments'
+import { TransactionFailure, TransactionSuccess } from '../payments/types'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -31,7 +31,12 @@ export type ExternalStoreActions = {
 
 }
 
+type PNPEventsList = {
+    clubs: PNPEvent[]
+}
+
 function CreateRealTimeDatabase(auth: Auth, db: Database) {
+
     return new Realtime(auth, db)
 }
 export class Realtime {
@@ -72,25 +77,53 @@ export class Realtime {
     }
 
 
-    static async addTransaction(auth: Auth, db: Database, transaction: CreditCardTransaction) {
-        if (!auth.currentUser)
-            return false
-        transaction.credit_card = {
-            number: '',
-            exp_mm: '',
-            exp_yy: '',
-            auth_number: ''
-        }
-        const newRef = push(child(child(ref(db, 'transactions'), 'ridePurchases'), auth.currentUser!.uid))
-        return await set(newRef, transaction)
+
+    getAllPublicEvents = (consume: (events: PNPEvent[]) => void) => {
+        const pRef = this.allEvents
+        return onValue(child(pRef, 'public'), (snap) => {
+            let events: PNPEvent[] = []
+            snap.forEach(eventCategorySnap => {
+                eventCategorySnap.forEach(eventSnap => {
+                    events.push(eventFromDict(eventSnap))
+                })
+            })
+            consume(events)
+        })
     }
-    async addTransaction(transaction: CreditCardTransaction, type: 'failure' | 'success') {
+    getAllPrivateEvents = (consume: (events: PNPEvent[]) => void) => {
+        const pRef = this.allEvents
+        return onValue(child(pRef, 'private'), (snap) => {
+            let events: PNPEvent[] = []
+            snap.forEach(eventCategorySnap => {
+                eventCategorySnap.forEach(eventSnap => {
+                    events.push(eventFromDict(eventSnap))
+                })
+            })
+            consume(events)
+        })
+    }
+
+    async addRideRequest(request: PNPRideRequest) {
+        if (!this.auth.currentUser)
+            return
+        const newRef = push(child(child(this.rides, 'rideRequests'), request.eventId))
+        return await set(newRef, request)
+    }
+
+    async addSuccessfulTransaction(transaction: TransactionSuccess) {
         if (!this.auth.currentUser)
             return false
-        transaction.credit_card = null // safety
-        const newRef = push(child(child(child(this.transactions, 'ridePurchases'), type), this.auth.currentUser!.uid))
+        const newRef = push(child(child(child(this.transactions, 'ridePurchases'), 'success'), this.auth.currentUser!.uid))
         return await set(newRef, transaction)
     }
+
+    async addFailureTransaction(transaction: TransactionFailure) {
+        if (!this.auth.currentUser)
+            return false
+        const newRef = push(child(child(child(this.transactions, 'ridePurchases'), 'failure'), this.auth.currentUser!.uid))
+        return await set(newRef, transaction)
+    }
+
 
     /**
      * createError
@@ -131,16 +164,12 @@ export class Realtime {
      * @param eventId to get confirmation for
      * @returns confirmation of event attendance for current user if exists
      */
-    async getRideConfirmationByEventId(eventId: string): Promise<PNPRideConfirmation | void | null> {
-        if (this.auth.currentUser != null) {
-            return await get(child(child(child(this.rides, 'confirmations'), this.auth.currentUser.uid), eventId))
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        return rideConfirmationFromDict(snapshot)
-                    } else return null;
-                })
-                .catch((e) => this.createError('getRideConfirmationByEventId', e))
-        }
+    async getRideConfirmationByEventId(eventId: string,userId:string, consume: ((confirmation: PNPRideConfirmation | null) => void)) {
+            return onValue(child(child(child(this.rides, 'confirmations'), userId), eventId), (snap) => {
+                if (snap.exists()) {
+                    consume(rideConfirmationFromDict(snap))
+                } else consume(null)
+            })
     }
 
     /**
@@ -227,7 +256,7 @@ export class Realtime {
      * @param consume callback that consumes the PNP user
      * @returns onValue change listener for user
      */
-    addListenerToCurrentUser = async (consume: (o: PNPUser) => void) => {
+    addListenerToCurrentUser = (consume: (o: PNPUser) => void) => {
         if (this.auth.currentUser != null)
             return onValue(child(this.users, this.auth.currentUser!.uid), (snap) => consume(userFromDict(snap)))
     }
@@ -361,9 +390,9 @@ export class Realtime {
      */
     addUser = async (user: PNPUser): Promise<object | void> => {
         if (this.auth.currentUser === null) return
-        createNewCustomer(user).then((customerUid: string) => {
+        createNewCustomer(user).then(async (customerUid: string) => {
             user.customerId = customerUid
-            return set(child(this.users, this.auth.currentUser!.uid), user)
+            return await set(child(this.users, this.auth.currentUser!.uid), user)
                 .catch((e) => this.createError('addUser', e))
         }).catch(e => this.createError('addUser', e))
 
@@ -384,9 +413,10 @@ export class Realtime {
      * @param id private event to be fetched by id
      * @returns private event if found
      */
-    getPrivateEventById = async (id: string): Promise<PNPPrivateEvent | void> => {
-        return await get(child(child(this.allEvents, 'private'), id))
-            .then(privateEventFromDict).catch((e) => this.createError('getPrivateEventById', e))
+    getPrivateEventById = (id: string, consume: ((event: PNPPrivateEvent) => void)) => {
+        return onValue(child(child(this.allEvents, 'private'), id), (val) => {
+            consume(privateEventFromDict(val))
+        })
     }
 
     /**
@@ -394,30 +424,29 @@ export class Realtime {
      * @param id eventId to fetch rides for
      * @returns all rides for given event
      */
-    getPrivateEventRidesById = async (id: string): Promise<PNPPublicRide[] | void> => {
-        return await get(child(child(child(this.rides, 'private'), 'ridesForEvents'), id))
-            .then((snap) => {
-                const ret: PNPPublicRide[] = []
-                snap.forEach(ride => {
-                    ret.push(publicRideFromDict(ride))
-                })
-                return ret
-            }).catch((e) => this.createError('getPrivateEventRidesById', e))
+    getPrivateEventRidesById = (id: string, consume: (consume: PNPPublicRide[]) => void) => {
+
+        return onValue(child(child(child(this.rides, 'private'), 'ridesForEvents'), id), (snap) => {
+            const ret: PNPPublicRide[] = []
+            snap.forEach(ride => {
+                ret.push(publicRideFromDict(ride))
+            })
+            consume(ret)
+        })
     }
     /**
        * getPublicRidesByEventId
        * @param eventId eventId to fetch rides for
        * @returns all rides for given event
        */
-    getPublicRidesByEventId = async (eventId: string): Promise<PNPPublicRide[] | void> => {
-        return await get(child(child(this.rides, 'public'), eventId))
-            .then(snap => {
-                const ret: PNPPublicRide[] = []
-                snap.forEach(ride => {
-                    ret.push(publicRideFromDict(ride))
-                })
-                return ret
-            }).catch((e) => this.createError('getPublicRidesByEventId', e))
+    getPublicRidesByEventId = (id: string, consume: (consume: PNPPublicRide[]) => void) => {
+        return onValue(child(child(child(this.rides, 'public'), 'ridesForEvents'), id), (snap) => {
+            const ret: PNPPublicRide[] = []
+            snap.forEach(ride => {
+                ret.push(publicRideFromDict(ride))
+            })
+            consume(ret)
+        })
     }
 
     /**
@@ -425,13 +454,12 @@ export class Realtime {
      * @param id eventid to fetch
      * @returns event by id
      */
-    getPublicEventById = async (id: string): Promise<PNPEvent | void | null> => {
-        return await get(child(this.allEvents, 'public'))
-            .then(data => {
-                const c1 = data.child('clubs').child(id)
-                const c2 = data.child('culture').child(id)
-                return c1.exists() ? eventFromDict(c1) : c2.exists() ? eventFromDict(c2) : null
-            }).catch((e) => this.createError('getPublicEventById', e))
+    getPublicEventById = (id: string, consume: ((event: PNPEvent | null) => void)) => {
+        return onValue(child(this.allEvents, 'public'), (data) => {
+            const c1 = data.child('clubs').child(id)
+            const c2 = data.child('culture').child(id)
+            consume(c1.exists() ? eventFromDict(c1) : c2.exists() ? eventFromDict(c2) : null)
+        })
     }
 }
 

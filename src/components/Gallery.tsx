@@ -12,11 +12,12 @@ export type GalleryProps = {
 }
 
 function GalleryItemTitle(props: { event:PNPEvent}) {
+
+    const {lang} = useLanguage()
     return (<div style={{
         margin: '0px',
         marginTop: 'auto',
         background: 'white',
-        direction:'rtl',
         textAlign: 'start',
         marginBottom: '8px',
         display: 'flex',
@@ -26,9 +27,9 @@ function GalleryItemTitle(props: { event:PNPEvent}) {
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
     }}><h4 style={{ margin: '0px',padding:'6px',paddingBottom:'0px',paddingTop:'2px'}} >{props.event.eventName}</h4>
-    <span  style={{fontSize:'10px', margin: '0px',paddingBottom:'2px',paddingTop:'0px', marginRight: '8px' }} >{props.event.eventLocation}</span>
+    <span  style={{fontSize:'10px', margin: '0px',paddingBottom:'1px',paddingTop:'0px', marginRight: '8px' }} >{props.event.eventLocation}</span>
     <hr style = {{width:'98%',borderWidth:'.1px',borderColor:'white',margin:'0px'}}/>
-    <h5 style={{ fontSize: '10px',fontWeight:'100', alignSelf: 'end',padding:'1px', marginLeft: '8px', marginTop: '0px', color: 'black' }}>{props.event.eventDate}</h5></div>);
+    <h5 dir = {'ltr'} style={{ fontSize: '10px',fontWeight:'100',padding:'1px', marginLeft: '8px', marginTop: '0px', color: 'black' }}>{props.event.eventDate}</h5></div>);
 }
 
 
@@ -38,7 +39,7 @@ export function Gallery(props: GalleryProps) {
         overflow: 'scroll',
 
         display: 'flex',
-        direction: SIDE(lang),
+        direction: 'rtl',
         paddingBottom: '32px',
     }
 

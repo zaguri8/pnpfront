@@ -37,6 +37,7 @@ export default function Register() {
             transformOrigin: "top right"
         }
     }));
+    
     const { lang } = useLanguage()
     function register(e) {
 
@@ -81,7 +82,6 @@ export default function Register() {
             return
         }
         doLoad()
-
 
         createUserWithEmailAndPassword(firebase.auth, email, password)
             .then(() => {
@@ -187,7 +187,7 @@ export default function Register() {
                     </LocalizationProvider>
                     <FavoriteEventsDialog />
 
-                    <Button title={REGISTER_OK(lang)} onClick={() => { }} type='submit' />
+                    <Button title={REGISTER_OK(lang)} type='submit' />
 
                     <div>
                         <Link to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>

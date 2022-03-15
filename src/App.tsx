@@ -2,6 +2,7 @@ import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
+import { useSearchParams } from 'react-router-dom'
 import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
@@ -25,6 +26,9 @@ import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
 import Payment from './components/payment/Payment';
 import MyPayments from './components/payment/MyPayments';
+import Test from './components/Test';
+import TransactionSuccessPage from './components/payment/TransactionSuccessPage';
+import AdminPanel from './components/AdminPanel';
 
 
 
@@ -42,6 +46,12 @@ function ImageHeader() {
       padding: '8px'
     }} />
   </div>);
+}
+
+
+
+function UNKNOWN(props: { lang: string }) {
+  return <h1>{NOTFOUND(props.lang)}</h1>;
 }
 
 
@@ -121,7 +131,6 @@ function App() {
         $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
         $('#toolbar').css('top', '0')
         setScrollingScript(true)
-        console.log('S')
 
       } else {
         $('#toolbar').css('padding', '0')
@@ -147,8 +156,8 @@ function App() {
           <List id='dialog' sx={{
 
             background: 'white',
-            overflowY: 'scroll',
             maxHeight: '800px',
+            marginTop: '32px',
             pt: 0,
             display: 'flex',
             flexDirection: 'column',
@@ -181,10 +190,16 @@ function App() {
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
           <Route path='/event/:id' element={<EventPage />} />
           <Route path='termsOfService' element={<TermsOfService />} />
+
+
           <Route path='/invitation/:id' element={<InvitationPage />} />
+          <Route path='/test' element={<Test />} />
+          <Route path='/adminpanel' element={<AdminPanel />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
+          <Route path='/transaction/success' element={<TransactionSuccessPage />}></Route>
+          <Route path='/transaction/failure' element={<TransactionSuccessPage />}></Route>
           <Route path='/myaccount/transactions' element={!isAuthenticated ? <Login /> : <MyPayments />} />
-          <Route path='/*' element={<h1>{NOTFOUND(lang)}</h1>}></Route>
+          <Route path='/*' element={<UNKNOWN lang={lang}></UNKNOWN>}></Route>
 
         </Routes>
       </div>

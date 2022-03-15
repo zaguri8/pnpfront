@@ -1,8 +1,26 @@
 
 import { DataSnapshot } from "firebase/database"
-import { PNPUser, PNPEvent, PNPPrivateRide, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent } from "./types"
+import { PNPUser, PNPEvent, PNPPrivateRide, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest } from "./types"
 
 
+
+export const rideRequestFromDict : (snap:DataSnapshot) => PNPRideRequest = (snap) => {
+    return {
+        eventId: snap.child('eventId').val(),
+        requestUserId: snap.child('requestUserId').val(),
+        eventName: snap.child('eventName').val(),
+        fullName:snap.child('fullName').val(),
+        passengers: snap.child('passengers').val(),
+        names: snap.child('names').val(),
+        phoneNumber: snap.child('phoneNumber').val(),
+        startingPoint: snap.child('startingPoint').val(),
+        eventAgeRange: snap.child('eventAgeRange').val(),
+        eventPrice: snap.child('eventPrice').val(),
+        expectedNumberOfPeople: snap.child('expectedNumberOfPeople').val(),
+        eventImageURL: snap.child('eventImageURL').val(),
+    }
+
+}
 export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
     return {
         eventId: snap.child('eventId').val(),
@@ -17,6 +35,7 @@ export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
         eventPrice: snap.child('eventPrice').val(),
         expectedNumberOfPeople: snap.child('expectedNumberOfPeople').val(),
         eventImageURL: snap.child('eventImageURL').val(),
+        eventMobileImageURL: snap.child('eventMobileImageURL').val(),
     }
 }
 

@@ -22,6 +22,7 @@ import { useLanguage } from '../../context/Language';
 import { HtmlTooltip } from '../utilities/HtmlTooltip';
 import { submitButton } from '../../settings/styles';
 import { v4 } from 'uuid';
+import { Unsubscribe } from 'firebase/database';
 function InvitationCard() {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
     const { doLoad, cancelLoad } = useLoading()
@@ -30,6 +31,8 @@ function InvitationCard() {
     const { isAuthenticated, firebase, appUser } = useFirebase()
     const [exists, setExists] = useState(true)
 
+
+    const { user } = useFirebase()
     const { lang } = useLanguage()
     const { id } = useParams()
     const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
@@ -38,21 +41,20 @@ function InvitationCard() {
         setSelectedEventRide(eventRide)
     }
     useEffect(() => {
-
         $('.dim').css('display', 'none')
         if (BETA) return
         doLoad()
-        firebase.realTime.getPrivateEventById(id!).then((event) => {
+        var secondUnsub: Unsubscribe | null | object = null
+        const unsubscribe = firebase.realTime.getPrivateEventById(id!, (event) => {
             if (isValidPrivateEvent(event as PNPPrivateEvent)) {
                 setEvent(event as PNPPrivateEvent)
-
-                firebase.realTime.getRideConfirmationByEventId(id!)
-                    .then((confirmation) => {
+                if (user) {
+                    secondUnsub = firebase.realTime.getRideConfirmationByEventId(id!, user.uid, (confirmation) => {
                         if (confirmation as PNPRideConfirmation && isValidRideConfirmation(confirmation as PNPRideConfirmation)) {
                             setConfirmation(confirmation as PNPRideConfirmation)
                             cancelLoad()
                         } else {
-                            firebase.realTime.getPrivateEventRidesById(id!).then(rides => {
+                            firebase.realTime.getPrivateEventRidesById(id!, (rides) => {
                                 if (rides as PNPPublicRide[]) {
                                     setRides(rides as PNPPublicRide[])
                                 }
@@ -60,6 +62,14 @@ function InvitationCard() {
                             })
                         }
                     })
+                } else {
+                    firebase.realTime.getPrivateEventRidesById(id!, (rides) => {
+                        if (rides as PNPPublicRide[]) {
+                            setRides(rides as PNPPublicRide[])
+                        }
+                        cancelLoad()
+                    })
+                }
             } else {
                 cancelLoad()
                 setEvent(null)
@@ -67,6 +77,10 @@ function InvitationCard() {
             }
         })
 
+        return () => {
+            unsubscribe()
+            secondUnsub && (secondUnsub as Unsubscribe) && (secondUnsub as Unsubscribe)()
+        }
     }, [])
 
     function validateForm(direction: string, phone: string) {
@@ -147,10 +161,10 @@ function InvitationCard() {
         const validEvent = BETA ? null : event!
         return <List style={{ marginTop: '0px' }}>
             <EventImage e={validEvent} />
-            <div style={{ width: '100%', background: 'whitesmoke', marginTop: '-8px'}}>
-                <List style={{ width: '85%', background: 'whitesmoke',minWidth:'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
+            <div style={{ width: '100%', background: 'whitesmoke', marginTop: '-8px' }}>
+                <List style={{ width: '85%', background: 'whitesmoke', minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
                     {rides && rides!.length > 0 && <span style={{ fontFamily: 'Open Sans Hebrew' }}>
-                        {lang === 'heb' ? ('כל ההסעות יוצאות מ ' + rides![0].rideStartingPoint + " בשעה " +  rides![0].rideTime) : 'All the rides leave from ' + rides![0].rideStartingPoint + ' at ' + rides![0].rideStartingPoint}
+                        {lang === 'heb' ? ('כל ההסעות יוצאות מ ' + rides![0].rideStartingPoint + " בשעה " + rides![0].rideTime) : 'All the rides leave from ' + rides![0].rideStartingPoint + ' at ' + rides![0].rideStartingPoint}
                     </span>}
                     <br />
                     <span style={{ fontFamily: 'Open Sans Hebrew', margin: '32px' }}>
@@ -159,8 +173,8 @@ function InvitationCard() {
                     {rides ? <List style={{ width: '100%' }}>
 
                         <div style={{ width: '100%', display: 'flex', background: 'black', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                            <span style={{padding:'8px', marginRight: '32px',fontSize:'14px', color: 'white', textAlign: 'center', width: '50%' }}>{PICK_POINT(lang)}</span>
-                            <span style={{ marginLeft: '32px',padding:'8px', color: 'white',fontSize:'14px', textAlign: 'center', width: '50%' }}>{PULL_POINT(lang)}</span>
+                            <span style={{ padding: '8px', marginRight: '32px', fontSize: '14px', color: 'white', textAlign: 'center', width: '50%' }}>{PICK_POINT(lang)}</span>
+                            <span style={{ marginLeft: '32px', padding: '8px', color: 'white', fontSize: '14px', textAlign: 'center', width: '50%' }}>{PULL_POINT(lang)}</span>
                         </div>
                         {rides!.map(ride => {
                             return <MenuItem onClick={() => {

@@ -16,7 +16,7 @@ import { useLanguage } from "../../context/Language"
 import About from "../About"
 import { InnerPageHolder } from "../utilities/Holders"
 import { Link } from "react-router-dom"
-import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
+import { ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY } from "../../settings/colors"
 export default function Home() {
 
     const { user, firebase } = useFirebase()
@@ -46,18 +46,21 @@ export default function Home() {
         {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
 
         <img src={data} />
-        <SectionTitle style={{
+        <SectionTitle  withBg style={{
             padding: '32px',
             fontWeight: '100',
-            color: 'white',
+            marginTop: '0px',
+            fontStyle:'italic',
             border: '.1px solid gray',
-            width:'80%',
+            color: 'black',
+            width: '80%',
+
+            background:'none',
+            paddingRight:'45px',
             alignSelf: 'center',
-            backgroundImage:ORANGE_GRADIENT_PRIMARY,
-            fontSize: '38px',
-            borderRadius: '8px'
-        }} title={'We Say No more !'} />
-        <br/>
+            fontSize: '38px'
+        }} title={'We Say No More!'} />
+        <br />
         <SayNoMoreContainer />
         <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
         <Gallery header={CULTURE(lang)} events={pnpCultureEvents} />

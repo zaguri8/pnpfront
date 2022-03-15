@@ -97,7 +97,7 @@ export default function Login() {
 
                     </FormControl>
                     <br />
-                    <Button title={LOGIN_OK(lang)} onClick={() => { }} type='submit' />
+                    <Button title={LOGIN_OK(lang)} type='submit' />
 
 
 

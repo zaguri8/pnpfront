@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, Context } from "react"
 import Store from "../store/external";
 import { ErrorFn, getAuth, Unsubscribe } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getDatabase, get, set } from "firebase/database";
+import { getDatabase, get, set, onValue } from "firebase/database";
 import { Realtime } from '../store/external/index'
 import { initializeApp } from 'firebase/app'
 import firebase from 'firebase/compat/app'
@@ -38,13 +38,16 @@ export const FirebaseContextProvider = (props: object) => {
   useEffect(() => {
 
     const unsubscribe = auth.onAuthStateChanged((user) => {
-
+      let unsub: Unsubscribe | null = null
       if (user) {
-        get(child(ref(getDatabase(app), '/users'), user.uid)).then(snap => {
-          setAppUser(userFromDict(snap))
+        unsub = onValue(child(ref(getDatabase(app), 'users'), user.uid), (snap) => {
+          const au = userFromDict(snap)
+          setAppUser(au)
           setUser(user)
         })
       } else setUser(null)
+
+      return () => { unsub as Unsubscribe && (unsub as Unsubscribe)() }
     }, setError)
     return () => unsubscribe()
   }, [])
