@@ -37,18 +37,35 @@ export function PaymentForm({ product }) {
             nav('/login', { cachedLocation: location.pathname })
             return
         }
+
+        if (!appUser.customerId || appUser.customerId.length < 1) {
+            alert('יש לרענן את הדף לונסות שוב, משתמשים רשומים דרך גוגל, אנא צרו משתמש חדש')
+            const email = user.email.split('@')[0]
+            firebase.realTime.addUser({
+                name: email ? email : 'Annonymous user',
+                email: user.email,
+                customerId: '',
+                admin: false,
+                phone: user.phoneNumber ? user.phoneNumber : '050-000-000',
+                birthDate: 'unset',
+                favoriteEvents: [],
+                coins: 0,
+                producer: false
+            })
+            return
+        }
         doLoad()
 
         const customer = {
             customer_name: appUser.name,
             uid: appUser.customerId,
-            email: appUser.email,
+            email: user.email,
             phone: appUser.phone
         }
         const payProduct = {
             name: product.name,
-            price: Number(product.price) * ticketAmount,
-            amount: 1
+            price: Number(product.price),
+            amount: ticketAmount
         }
 
         const send = {
@@ -68,13 +85,13 @@ export function PaymentForm({ product }) {
 
 
     const getElement = () => {
-        return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '320px' }} src={paymentLink} /> : (
+        return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '280px' }} src={paymentLink} /> : (
             <div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 
 
                     <span style={{ marginTop: '0px', padding: '4px', fontWeight: 'bold' }}>{PAYMENT_FOR_RIDE(lang)}</span>
-                    <label style={{ padding: '4px', fontSize: '14px' }}>{`${product.desc}`}</label>
+                    <label style={{ padding: '8px', fontSize: '14px' }}>{`${product.desc}`}</label>
 
                     <img style={{ width: '48px', height: '18px', alignSelf: 'center', marginBottom: '0px' }} src={credit_cards} />
                 </div>
@@ -97,17 +114,17 @@ export function PaymentForm({ product }) {
                 <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
                     <span>
                         <Button onClick={requestPayment}
-                            sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px',fontSize:'16px',marginTop:'16px', width: '75%' } }}
+                            sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
                             disabled={!termsOfUser} >{CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
-                <span style={{ padding: '8px' }}><InputLabel style={{ fontSize: '14px', paddingTop: '16px', textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+                <div style={{ padding: '8px' }}><InputLabel style={{ fontSize: '14px', paddingTop: '16px', textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
                     <Checkbox
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
                     <br />
                     <Link to={'/termsOfService'} onClick={closeDialog}>{TOS(lang)}</Link>
-                </span></div>
+                </div></div>
         )
     }
     return (<List style={{ paddingTop: '0px', direction: SIDE(lang), width: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

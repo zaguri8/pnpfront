@@ -28,12 +28,12 @@ export default function EventPage() {
     const { lang } = useLanguage()
     const location = useLocation()
     const [eventRides, setEventRides] = useState<PNPPublicRide[]>([])
-    const { firebase, appUser } = useFirebase()
+    const { firebase, appUser,user } = useFirebase()
     const { id } = useParams()
 
     const nav = useNavigate()
     const openRequestPaymentDialog = () => {
-        if (!firebase.auth.currentUser || !appUser) {
+        if (!user || !appUser) {
             nav('/login', { state: { cachedLocation: location.pathname } })
             return
         }
@@ -163,7 +163,7 @@ export default function EventPage() {
                                                 width: '100%',
                                                 columnGap: '8px'
                                             }}>
-                                                <DirectionsBusIcon /> <span style={{ fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
+                                                <DirectionsBusIcon /> <span style={{fontSize:'14px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
 
                                             </div>
                                             <span>{ride.rideTime}</span>
@@ -174,7 +174,7 @@ export default function EventPage() {
                                         rowGap: '8px',
                                         flexDirection: 'column'
                                     }}> <AddCircleOutlineIcon
-                                            onClick={() => openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> })}
+                                            onClick={() =>  user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
                                             color="inherit" style={{
                                                 cursor: 'pointer',
                                                 width: '50px',
@@ -184,7 +184,7 @@ export default function EventPage() {
                                         <span style={{ color: 'black' }}>{CANT_SEE_YOUR_CITY(lang)}</span></div>
 
                                 </Stack> : <Button
-                                    onClick={() => openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> })}
+                                    onClick={() => user ?  openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
                                     style={{
                                         cursor: 'pointer',
                                         background: 'none',

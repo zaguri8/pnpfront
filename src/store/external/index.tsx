@@ -1,9 +1,9 @@
 import { Auth } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest } from './types'
-import { privateRideFromDict, privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict } from './converters'
+import { privateRideFromDict, privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { DocumentData } from 'firebase/firestore'
-import { child, Database, DatabaseReference, get, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
+import { child, Database, DatabaseReference, DataSnapshot, get, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
 import {
     collection,
     getDoc,
@@ -141,6 +141,23 @@ export class Realtime {
         }
         return this.addError(err)
     }
+    /**
+  * createErrorCustomer
+  * @param type error type
+  * @param extraData  extra error to be created
+  * @returns new refernce callback
+  */
+    async createErrorCustomer(type: string, extraData?: { email: string, more: any }) {
+        const date = new Date().toUTCString()
+        let err: PNPError = {
+            type: type,
+            date: date,
+            errorId: '',
+            extraData: extraData,
+            error: ''
+        }
+        return this.addError(err)
+    }
 
     /**
   * createError
@@ -164,12 +181,52 @@ export class Realtime {
      * @param eventId to get confirmation for
      * @returns confirmation of event attendance for current user if exists
      */
-    async getRideConfirmationByEventId(eventId: string,userId:string, consume: ((confirmation: PNPRideConfirmation | null) => void)) {
-            return onValue(child(child(child(this.rides, 'confirmations'), userId), eventId), (snap) => {
-                if (snap.exists()) {
-                    consume(rideConfirmationFromDict(snap))
-                } else consume(null)
-            })
+    getRideConfirmationByEventId(eventId: string, userId: string, consume: ((confirmation: PNPRideConfirmation | null) => void)) {
+        return onValue(child(child(child(this.rides, 'confirmations'), userId), eventId), (snap) => {
+            if (snap.exists()) {
+                consume(rideConfirmationFromDict(snap))
+            } else consume(null)
+        })
+    }
+
+    /**
+  * getRideAllConfirmationByEventId
+  * @param eventId to get confirmation for
+  * @returns confirmation of event attendance for current user if exists
+  */
+    getAllRideConfirmationByEventId(eventId: string, consume: ((confirmations: PNPRideConfirmation[] | null) => void)) {
+        return onValue(child(this.rides, 'confirmations'), (snap) => {
+            if (snap.exists()) {
+                const total: PNPRideConfirmation[] = []
+                let relevant;
+                snap.forEach((userConfirmationsSnap) => {
+                    relevant = userConfirmationsSnap.child(eventId)
+                    if (relevant.exists()) {
+                        total.push(rideConfirmationFromDict(relevant))
+                    }
+                })
+                consume(total)
+            } else consume(null)
+        })
+    }
+
+
+    async getAllUsersByIds(ids: string[]): Promise<PNPUser[] | null> {
+        return await get(this.users)
+            .then(snap => {
+                const total: PNPUser[] = []
+                let check: any = {}
+                for (var id of ids) {
+                    check[id] = true
+                }
+
+                snap.forEach(userSnap => {
+                    if (check[userSnap.child('customerId').val()]) {
+                        total.push(userFromDict(userSnap))
+                    }
+                })
+                return total
+            }).catch(e => { this.createError('getAllUsersByIds', e); return null; })
     }
 
     /**
@@ -183,7 +240,7 @@ export class Realtime {
                 this.auth.currentUser.uid),
                 confirmation.eventId),
                 confirmation)
-                .catch((e) => this.createError('addRideConfirmation', e))
+                .catch((e) => { this.createError('addRideConfirmation', e) })
         }
     }
     /**
@@ -193,16 +250,17 @@ export class Realtime {
        */
     addPublicRide = async (eventId: string, ride: PNPPublicRide): Promise<object | void> => {
         const newRef = get(child(child(this.rides, 'public'), eventId))
+        ride.eventId = eventId
         await newRef.then(d => d.size)
             .then(async size => {
                 if (size === null || size === undefined || size === 0) {
-                    return await set(child(child(child(this.rides, 'public'), eventId), '0'), ride)
+                    return await set(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), '0'), ride)
                 } else {
-                    return await set(child(child(child(this.rides, 'public'), eventId), size + ""), ride)
+                    return await set(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), size + ""), ride)
                 }
 
             })
-            .catch((e) => this.createError('addPublicRide', e))
+            .catch((e) => { this.createError('addPublicRide', e) })
     }
 
     /**
@@ -215,9 +273,32 @@ export class Realtime {
             const p = push(child(child(child(this.rides, 'private'), 'ridesForPeople'), this.auth.currentUser!.uid))
             ride.rideId = p.key!
             return await set(p, ride)
-                .catch((e) => this.createError('addPublicRide', e))
+                .catch((e) => { this.createError('addPublicRide', e) })
         }
     }
+
+    /**
+    * addListenerToRideRequests
+    * @param consume a callback to consume the ride requests array
+    * @returns onValue change listener for ride requests
+    */
+
+    addListenerToRideRequestsByEventId = (eventId: string, consume: (requests: PNPRideRequest[]) => void) => {
+        return onValue(child(child(this.rides, 'rideRequests'), eventId), (snap) => {
+            const requests: PNPRideRequest[] = []
+            const hash: { [id: string]: boolean } = {}
+            const decode = (s: DataSnapshot) => {
+                if (!hash[s.child('requestUserId').val() as string]) {
+                    requests.push(rideRequestFromDict(s))
+                    hash[requests[requests.length - 1].requestUserId] = true
+                }
+            }
+            snap.forEach(decode)
+            consume(requests)
+        })
+    }
+
+
 
     /**
      * addListenerToClubEvents
@@ -268,7 +349,27 @@ export class Realtime {
      */
     updateClubEvent = async (eventId: string, event: object) => {
         return await update(child(child(child(this.allEvents, 'public'), 'clubs'), eventId), event)
-            .catch((e) => this.createError('updateClubEvent', e))
+            .catch((e) => { this.createError('updateClubEvent', e) })
+    }
+
+    /**
+     * removeRideRequestByUser&EventIds
+     * @param eventId eventId to be for ride request to be removed from
+     * @param userId requesteer userId
+     * @returns remove callback
+     */
+
+    removeRideRequest = async (eventId: string, userId: string) => {
+        get(child(child(this.rides, 'rideRequests'), eventId))
+            .then(snap => {
+                snap.forEach(aChild => {
+                    if (aChild.child('requestUserId').val() === userId && aChild.child('eventId').val() === eventId) {
+                        remove(aChild.ref)
+                            .catch((e) => { this.createError('removeRideRequest', e) })
+                    }
+                })
+            })
+
     }
     /**
      * removeClubEvent
@@ -277,7 +378,7 @@ export class Realtime {
      */
     removeClubEvent = async (eventId: string) => {
         return await remove(child(child(this.allEvents, 'clubs'), eventId))
-            .catch((e) => this.createError('removeClubEvent', e))
+            .catch((e) => { this.createError('removeClubEvent', e) })
     }
     /**
    * updateCultureEvent
@@ -345,7 +446,7 @@ export class Realtime {
  */
     removeCultureEvent = async (eventId: string) => {
         return await remove(child(child(child(this.allEvents, 'public'), 'culture'), eventId))
-            .catch((e) => this.createError('removeCultureEvent', e))
+            .catch((e) => { this.createError('removeCultureEvent', e) })
     }
 
     /**
@@ -358,7 +459,7 @@ export class Realtime {
         const newRef = push(child(child(this.allEvents, 'public'), 'clubs'))
         event.eventId = newRef.key!
         return await set(newRef, event)
-            .catch((e) => this.createError('addClubEvent', e))
+            .catch((e) => { this.createError('addClubEvent', e) })
     }
     /**
        * addCultureEvent
@@ -369,7 +470,7 @@ export class Realtime {
         const newRef = push(child(child(this.allEvents, 'public'), 'culture'))
         event.eventId = newRef.key!
         return await set(newRef, event)
-            .catch((e) => this.createError('addCultureEvent', e))
+            .catch((e) => { this.createError('addCultureEvent', e) })
     }
 
     /**
@@ -379,7 +480,7 @@ export class Realtime {
      */
     updateUserImage = async (image: string): Promise<object | void> => {
         return await this.updateCurrentUser({ image: image })
-            .catch((e) => this.createError('updateUserImage', e))
+            .catch((e) => { this.createError('updateUserImage', e) })
     }
 
 
@@ -388,13 +489,13 @@ export class Realtime {
      * @param user a user to be added to db
      * @returns new reference callback
      */
-    addUser = async (user: PNPUser): Promise<object | void> => {
+    addUser = async (user: PNPUser): Promise<object | undefined> => {
         if (this.auth.currentUser === null) return
-        createNewCustomer(user).then(async (customerUid: string) => {
+        createNewCustomer((type: string, e: any) => this.createErrorCustomer(type, e), user).then(async (customerUid: string) => {
             user.customerId = customerUid
             return await set(child(this.users, this.auth.currentUser!.uid), user)
-                .catch((e) => this.createError('addUser', e))
-        }).catch(e => this.createError('addUser', e))
+                .catch((e) => { this.createError('addUser', e) })
+        }).catch(e => { this.createError('addUser', e) })
 
     }
     /**

@@ -11,7 +11,7 @@ export default function TermsOfService() {
         <InnerPageHolder style={{ maxWidth: '65%', width: '65%', marginLeft: 'auto', marginRight: 'auto' }}>
 
             {lang === 'heb' ?
-                <div style = {{maxWidth:'500px',minWidth:'320px'}}>
+                <div style={{ maxWidth: '500px', minWidth: '320px' }}>
                     <p>תקנון, תנאי שימוש ומדיניות פרטיות לאתר "Pick N Pull"</p>
                     <p>Pick N Pull מברכים את בחירתכם לגלוש באתר האינטרנט המופעל על ידה בכתובת: www.Pick - N - Pull.co.il("האתר"). </p>
                     <p>האתר מספק פלטפורמה אינטרנטית לקהל הלקוחות של האתר להזמנה ולרכישה נוחה ובטוחה של שירותי הסעות לכל מטרה לרבות אירועים, פסטיבלים וכיו"ב ("השירותים") ממיטב הנהגים ובעלי המקצוע בתחום ההסעות ("נותני השירות"). כמו כן ניתן למצוא באתר מידע אודות אופן השימוש בשירותי האתר, עלויות ועוד ("המוצרים").</p>
@@ -60,6 +60,7 @@ export default function TermsOfService() {
                     <p>	•	בקשה להחזר, שינוי או ביטול עסקה יועברו לאתר באחד מאמצעי ההתקשרות המופיעים בתחתית התקנון. </p>
                     <p>	•	שינוי או ביטול הזמנת שירותים, יתאפשרו בתוך 14 ימים מיום ביצוע העסקה או ממועד קבלת פרטי העסקה(לפי המאוחר), ובתנאי שביטול כאמור ייעשה לפחות שני ימים, שאינם ימי מנוחה, קודם למועד שבו נקבע מתן השירות.</p>
                     <p>	•	ההחזר הכספי יעשה באמצעי התשלום שבו ביצע הלקוח את ההזמנה.</p>
+                    <p> •	האתר רשאי לבטל עסקה והסעה על פי שיקולו ומחוייב לתת החזר כספי ללקוח המשלם</p>
                     <p>	•	במקרה של ביטול שירותים שהוזמנו כאמור, יגבו דמי ביטול בגובה 5 % מסכום השירות או בסך 100 ש״ח(לפי הנמוך מבניהם).</p>
                     <p>	•	האמור בתקנון זה ובסעיף 6 לעיל כפוף להוראות חוק הגנת הצרכן, התשמ"א-1981.</p>
                     <p>	•	אחריות האתר:</p>
@@ -174,8 +175,9 @@ export default function TermsOfService() {
                     <p>	• Closing the economy so that the site's activities and / or service providers and / or its suppliers and / or service providers are impaired, for any reason.</p>
                     <p>	• The customer must update the site and the business from the service provider for any changes to the service order details made on the site as soon as possible.</p>
                     <p>	• Refund, change and cancellation policy:</p>
+                    <p> • The site may cancel a transaction and transportation at its discretion to demand a refund to the paying customer </p>
                     <p>	• A request for a refund, change or cancellation of a transaction will be forwarded to the site in one of the means of contracting listed at the bottom of the bylaws.</p>
-                    <p> 	• Change or cancellation of a service order shall be possible within 14 days of the transaction being executed or from the date of receipt of the transaction details(by the later), provided that such cancellation is made at least two days, other than rest days, prior to the date on which the service is provided.</p>
+                    <p> • Change or cancellation of a service order shall be possible within 14 days of the transaction being executed or from the date of receipt of the transaction details(by the later), provided that such cancellation is made at least two days, other than rest days, prior to the date on which the service is provided.</p>
                     <p>	• The refund will be made by the form of payment in which the customer placed the order.</p>
                     <p>	• In the event of cancellation of such commissioned services, a cancellation fee of 5 % of the service amount or NIS 100(according to their lower construction) will be charged.</p>
                     <p>	• The provisions of these By - Laws and Section 6 above are governed by the provisions of the Consumer Protection Act, 1981.</p>

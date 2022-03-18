@@ -29,6 +29,7 @@ import MyPayments from './components/payment/MyPayments';
 import Test from './components/Test';
 import TransactionSuccessPage from './components/payment/TransactionSuccessPage';
 import AdminPanel from './components/AdminPanel';
+import WhatsApp from './components/WhatsApp';
 
 
 
@@ -126,16 +127,16 @@ function App() {
 
     function onScroll() {
 
-      if (window.scrollY >= 222 && !scrollingScript) {
+      if (window.scrollY >= 222) {
         $('#toolbar').css('padding', '4')
         $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
         $('#toolbar').css('top', '0')
-        setScrollingScript(true)
+
 
       } else {
         $('#toolbar').css('padding', '0')
         $('#toolbar').stop().css({ 'position': 'relative', 'boxShadow': 'none', 'background': TOOLBAR_COLOR, 'transition': 'all .2s' })
-        setScrollingScript(false)
+
       }
     }
     onResize()
@@ -144,7 +145,8 @@ function App() {
     $(window).on('scroll', onScroll)
   }, [])
 
-  const { isAuthenticated } = useFirebase()
+  const { isAuthenticated, appUser } = useFirebase()
+
 
 
   return (
@@ -152,29 +154,34 @@ function App() {
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
 
-        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflow: 'stretch' }} open={dialogContext.isDialogOpened}>
+        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflowY: 'stretch', overflowX: 'hidden' }} open={dialogContext.isDialogOpened}>
+          {dialogContext.dialogTitle && <div
+            style={
+              {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }
+            }
+          >{dialogContext.dialogTitle}</div>}
           <List id='dialog' sx={{
-
+            overflowX: 'hidden',
             background: 'white',
             maxHeight: '800px',
-            marginTop: '32px',
-            pt: 0,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center'
           }}>
             {dialogContext.content.content}
-            <ListItem style={{ marginTop: '0px', paddingTop: '0px' }}>
-              <Button
-                style={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }}
-                onClick={() => {
-                  dialogContext.closeDialog()
-                }}
-                sx={{ width: '100%', color: 'white' }} >{CLOSE(lang)}</Button>
-            </ListItem>
-
           </List>
+          <ListItem style={{ marginTop: '0px', paddingTop: '0px' }}>
+            <Button
+              onClick={() => {
+                dialogContext.closeDialog()
+              }}
+              sx={{ width: '100%', color: 'white', fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} >{CLOSE(lang)}</Button>
+          </ListItem>
         </Dialog>
           : null}
         <ImageHeader />
@@ -194,7 +201,7 @@ function App() {
 
           <Route path='/invitation/:id' element={<InvitationPage />} />
           <Route path='/test' element={<Test />} />
-          <Route path='/adminpanel' element={<AdminPanel />} />
+          <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <div>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div> : <AdminPanel />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
           <Route path='/transaction/success' element={<TransactionSuccessPage />}></Route>
           <Route path='/transaction/failure' element={<TransactionSuccessPage />}></Route>
@@ -202,6 +209,7 @@ function App() {
           <Route path='/*' element={<UNKNOWN lang={lang}></UNKNOWN>}></Route>
 
         </Routes>
+        <WhatsApp />
       </div>
     </div>
   );

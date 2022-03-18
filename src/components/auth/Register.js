@@ -54,17 +54,17 @@ export default function Register() {
                 || phone.includes('058')
                 || phone.includes('059')))
                 || phone.length !== 10) {
-                errors.push(`Invalid phone number ${phone}`)
+                errors.push(lang === 'heb' ? 'יש להזין מס טלפון תקין':  `Invalid phone number ${phone}`)
             }
             if ((selectedFavoriteEvents.length < 1
                 || selectedFavoriteEvents.length === 1) && selectedFavoriteEvents[0].length === 0) {
-                errors.push('Invalid favorite events, please pick atleast 1')
+                errors.push(lang === 'heb' ? 'יש לבחור לפחות סוג אחד של אירועים על מנת להירשם' : 'Invalid favorite events, please pick atleast 1')
             }
             if (firstname.length < 2) {
-                errors.push(`Invalid firstname ${firstname}`)
+                errors.push(lang === 'heb' ? 'יש להזין שם פרטי תקין' : `Invalid firstname ${firstname}`)
             }
             if (lastname.length < 2) {
-                errors.push(`Invalid last name ${lastname}`)
+                errors.push(lang === 'heb' ? 'יש להזין שם משפחה תקין' : `Invalid last name ${lastname}`)
             }
             return errors
         }
@@ -185,6 +185,7 @@ export default function Register() {
                             renderInput={(params) => <TextField {...params} />}
                         />
                     </LocalizationProvider>
+                    <label>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך': 'Help us know you better: Choose your favorite event types'}</label>
                     <FavoriteEventsDialog />
 
                     <Button title={REGISTER_OK(lang)} type='submit' />

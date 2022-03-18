@@ -74,6 +74,6 @@ export default function Home() {
             <About />
         </InnerPageHolder>
         <Link style={{ paddingTop: '32px', paddingBottom: '24px' }} to={'/termsOfService'}>{TOS(lang)}</Link>
-        <WhatsApp />
+     
     </div>
 }

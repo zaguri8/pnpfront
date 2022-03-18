@@ -11,7 +11,7 @@ const MyPayments = () => {
     const { doLoad, cancelLoad } = useLoading()
     const [transactions, setTransactions] = useState()
     useEffect(() => {
-        if (user) {
+        if (user && appUser) {
             doLoad()
             axios.post('https://nadavsolutions.com/gserver/transactions', { uid: appUser.customerId }, { headers: { 'Content-Type': 'application/json' } })
                 .then(response => {

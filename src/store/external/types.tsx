@@ -116,4 +116,5 @@ export type PNPError = {
     date: string
     type: string
     error: string
+    extraData?: { [key: string]: any }
 }

@@ -20,20 +20,20 @@ import {
 } from '../../settings/strings';
 import { Checkbox } from '@mui/material';
 import { useLoading } from '../../context/Loading';
-import {useLanguage} from '../../context/Language'
+import { useLanguage } from '../../context/Language'
 
-   
+
 export default function FavoriteEventsDialog() {
 
-const {lang} = useLanguage()
-const events = [
-    PICK_FAVORITE_1(lang),
-    PICK_FAVORITE_2(lang),
-    PICK_FAVORITE_3(lang),
-    PICK_FAVORITE_4(lang),
-    PICK_FAVORITE_5(lang),
-    PICK_FAVORITE_6(lang),
-    PICK_FAVORITE_7(lang)];
+    const { lang } = useLanguage()
+    const events = [
+        PICK_FAVORITE_1(lang),
+        PICK_FAVORITE_2(lang),
+        PICK_FAVORITE_3(lang),
+        PICK_FAVORITE_4(lang),
+        PICK_FAVORITE_5(lang),
+        PICK_FAVORITE_6(lang),
+        PICK_FAVORITE_7(lang)];
     const [selectedValue, setSelectedValue] = React.useState('');
     const dialogContext = useLoading()
     const handleListItemClick = (pickedValues) => {
@@ -41,10 +41,12 @@ const events = [
         dialogContext.closeDialog()
     }
     const handleClickOpen = () => {
+        var x = null
         dialogContext.openDialog({
             content: <div style={{ width: '100%' }}>
-                {events.map((event) => (
-                    <ListItem sx={{ textAlign: 'center' }} button key={event}>
+                {/** TODO: 18/03/22 :    assign to value in a condition to make item keys and map for check box behaviour     */}
+                {x = (function makeKeys() { })() && events.map((event) => (
+                    <ListItem sx={{ textAlign: 'center' }} key={event}>
 
                         <ListItemText primary={event} />
                         <Checkbox value={event} className={'event_checkBox'} />
@@ -70,10 +72,9 @@ const events = [
 
     return (
         <div dir={SIDE(lang)}>
-            <Button sx={{ color: 'white' }} variant="outlined" onClick={handleClickOpen}>
+            <Button sx={{ color: 'white', fontSize: '16px' }} variant="outlined" onClick={handleClickOpen}>
                 {OPEN_FAVORITE_EVENTS_DIALOG(lang)}
             </Button>
-            <br /><br />
             <Typography id='selected_favorite_events' variant="subtitle1" component="div">
                 {selectedValue.length > 0 ? `${PICKED(lang)}${selectedValue}` : ''}
             </Typography>
