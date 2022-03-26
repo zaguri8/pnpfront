@@ -1,14 +1,15 @@
-import { Stack, FormControl, Button, InputLabel, Input, TextField } from "@mui/material";
+import { Stack, FormControl, Button, TextField } from "@mui/material";
 import { useLanguage } from "../../context/Language";
-import { CONTINUE_TO_CREATE, FILL_ALL_FIELDS, FULL_NAME, PASSENGERS, PHONE_NUMBER, SIDE, STARTING_POINT } from "../../settings/strings";
+import { FILL_ALL_FIELDS, FULL_NAME, PASSENGERS, PHONE_NUMBER, SIDE, STARTING_POINT_SINGLE } from "../../settings/strings";
 import { makeStyles } from "@mui/styles";
 import { PNPEvent, PNPRideRequest } from "../../store/external/types";
 import { useFirebase } from "../../context/Firebase";
 import Places from "../utilities/Places";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { submitButton } from "../../settings/styles";
 import { useLoading } from "../../context/Loading";
+import { PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
 
 export default function RideRequestForm(props: { event: PNPEvent | undefined | null }) {
     const { lang } = useLanguage()
@@ -75,46 +76,66 @@ export default function RideRequestForm(props: { event: PNPEvent | undefined | n
 
     }
 
-
+    const useStyles = makeStyles(() => ({
+        root: {
+            "& .MuiOutlinedInput-root": {
+                background: "none",
+                borderRadius: '32px',
+                padding:'0px',
+                border:'.1px solid white',
+                color:PRIMARY_WHITE
+            }
+        }, noBorder: {
+            border: "1px solid red",
+            outline: 'none'
+        }
+    }));
+    const classes = useStyles()
     return <Stack spacing={3} sx={{ width: '80%', padding: '16px' }}>
-        <label>{lang === 'heb' ? `בקשת פתיחת הסעה לאירוע : ${props.event?.eventName ?? ''}` : ` Request a ride for event:  ${props.event?.eventName ?? ''}`}</label>
+        <label style = {{color:SECONDARY_WHITE}}>{lang === 'heb' ? `בקשת פתיחת הסעה לאירוע : ${props.event?.eventName ?? ''}` : ` Request a ride for event:  ${props.event?.eventName ?? ''}`}</label>
         <FormControl>
+            <label style = {{color:SECONDARY_WHITE}}>{FULL_NAME(lang)}</label>
             <TextField
-                label={FULL_NAME(lang)}
+                className={classes.root}
+           
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder={appUser?.name ?? ''} name="name" sx={{ direction: SIDE(lang) }} id="fn_input_ride_request" aria-describedby="fn_input_ride_request" />
 
         </FormControl>
         <FormControl>
 
-
+        <label style = {{color:SECONDARY_WHITE}}>{PHONE_NUMBER(lang)}</label>
             <TextField
-                label={PHONE_NUMBER(lang)}
+                className={classes.root}
+          
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder={appUser?.phone ?? ''} type='number' name='phone' sx={{ direction: SIDE(lang) }} id="phone_number_input_ride_request" aria-describedby="phone_number_helper_text" />
 
         </FormControl>
         <FormControl>
+        <label style = {{color:SECONDARY_WHITE}}>{PASSENGERS(lang)}</label>
             <TextField
-                label={PASSENGERS(lang)}
+                className={classes.root}
+             
                 onChange={(e) => setPassengers(e.target.value)}
                 placeholder={PASSENGERS(lang)} sx={{ direction: SIDE(lang) }} type='number' id="passenger_input_0" aria-describedby="passenger_input_0" />
 
         </FormControl>
 
 
-        <label>{lang === 'heb' ? 'הכנס שמות מלאים של כל הנוסעים, מופרדים בפסיק' : 'Enter full names of passenger seperated by comma'}</label>
+        <label style = {{color:PRIMARY_WHITE}}>{lang === 'heb' ? 'הכנס שמות מלאים של כל הנוסעים, מופרדים בפסיק' : 'Enter full names of passenger seperated by comma'}</label>
         <FormControl>
 
             <TextField
-                label={lang === 'heb' ? 'שמות הנוסעים ' : 'Passenger names'}
+                className={classes.root}
+              
                 onChange={(e) => setNames(e.target.value)}
                 placeholder={lang === 'heb' ? 'שמות הנוסעים' : 'Passenger names'} sx={{ direction: SIDE(lang) }} type='text' id="passengers_input" aria-describedby="passengers_helper_text" />
         </FormControl>
 
         <FormControl>
-
-            <Places value={request.startingPoint} handleAddressSelect={setStartingPoint} types={['address']} className='ride_request_places' id={'ride_request_places'} fixed={false} placeHolder={lang === 'heb' ? 'בחר נקודת יציאה' : 'Choose starting point'} style={{ ...{ padding: '0px', margin: '0px', width: '100%' }, ...{ cursor: 'pointer' } }} />
+        <label style = {{color:SECONDARY_WHITE}}>{STARTING_POINT_SINGLE(lang)}</label>
+            <Places value={request.startingPoint} handleAddressSelect={setStartingPoint} types={['address']} className='ride_request_places' id={'ride_request_places'} fixed={false} placeHolder={lang === 'heb' ? 'בחר נקודת יציאה' : 'Choose starting point'} style={{ ...{ padding: '0px', margin: '0px', width: '100%' ,color:PRIMARY_WHITE}, ...{ cursor: 'pointer' } }} />
         </FormControl>
         <FormControl>
             <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!validateRequest() ? FILL_ALL_FIELDS(lang) : (lang === 'heb' ? 'צור ביקוש' : 'Create ride Request')} arrow>
@@ -122,7 +143,7 @@ export default function RideRequestForm(props: { event: PNPEvent | undefined | n
                     <Button
                         onClick={() => {
                             if (isLoading) return
-                            let ride: PNPRideRequest = {
+                            const ride: PNPRideRequest = {
                                 ...request,
                                 eventId: props.event?.eventId ?? '',
                                 requestUserId: user?.uid ?? '',

@@ -1,30 +1,27 @@
 import { Auth } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest } from './types'
-import { privateRideFromDict, privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict } from './converters'
+import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { DocumentData } from 'firebase/firestore'
-import { child, Database, DatabaseReference, DataSnapshot, get, onChildAdded, onValue, push, ref, remove, set, update } from 'firebase/database'
+import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
+import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, ref, remove, set, update } from 'firebase/database'
 import {
-    collection,
-    getDoc,
-    doc,
     Firestore,
     QuerySnapshot,
     DocumentReference
 } from 'firebase/firestore'
-import { isValidPrivateEvent } from '../validators'
-import { FirebaseApp } from 'firebase/app'
 import { createNewCustomer } from '../payments'
-import { TransactionFailure, TransactionSuccess } from '../payments/types'
+import { TransactionSuccess } from '../payments/types'
+import { transactionSuccessFromDict } from '../payments/converters'
 
 export type ExternalStoreActions = {
     /*  events */
     getErrors: () => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[]>;
     getEvents: () => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[]>;
-    getRides: (userId: String) => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[] | ((options?: SnapshotOptions | undefined) => DocumentData | undefined)>;
+    getRides: (userId: string) => Promise<QuerySnapshot<object> | ((options?: SnapshotOptions | undefined) => DocumentData)[] | ((options?: SnapshotOptions | undefined) => DocumentData | undefined)>;
     addError: (error: string) => Promise<DocumentReference<DocumentData>>;
     addEvent: (event: PNPEvent) => Promise<DocumentReference<DocumentData>>;
-    removeEvent: (eventId: String) => Promise<void>;
+    removeEvent: (eventId: string) => Promise<void>;
     updateEvent: (event: PNPEvent) => Promise<void>;
     /* rides */
     addRide: (ride: PNPPublicRide) => Promise<DocumentReference<DocumentData>>;
@@ -35,9 +32,9 @@ type PNPEventsList = {
     clubs: PNPEvent[]
 }
 
-function CreateRealTimeDatabase(auth: Auth, db: Database) {
+function CreateRealTimeDatabase(auth: Auth, db: Database, storage: FirebaseStorage) {
 
-    return new Realtime(auth, db)
+    return new Realtime(auth, db, storage)
 }
 export class Realtime {
     private rides: DatabaseReference
@@ -45,14 +42,16 @@ export class Realtime {
     private errs: DatabaseReference
     private users: DatabaseReference
     private auth: Auth
+    private storage: FirebaseStorage
     private transactions: DatabaseReference
-    constructor(auth: Auth, db: Database) {
+    constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
         this.allEvents = ref(db, '/events')
         this.rides = ref(db, "/rides")
         this.users = ref(db, '/users')
         this.errs = ref(db, '/errors')
         this.transactions = ref(db, '/transactions')
         this.auth = auth
+        this.storage = storage
     }
     /**
      * addError
@@ -77,11 +76,45 @@ export class Realtime {
     }
 
 
+    getTransaction(customer_uid: string,
+        transaction_uid: string,
+        consume: (transaction: TransactionSuccess) => void,
+        onError: (e: Error) => void) {
+        return onValue(child(child(this.transactions, customer_uid), transaction_uid), (snap) => {
+            consume(transactionSuccessFromDict(snap))
+        }, onError)
+    }
+
+
+
+    getAllTransactions(customer_uid: string, consume: (transactions: TransactionSuccess[]) => void, onError: (e: Error) => void) {
+        return onValue(child(this.transactions, customer_uid), (snap) => {
+            const transactions: TransactionSuccess[] = []
+            snap.forEach(transactionSnap => {
+                console.log(transactionSnap)
+                transactions.push(transactionSuccessFromDict(transactionSnap))
+            })
+
+            consume(transactions)
+        }, onError)
+    }
+
+    addListersForRideSearch(onSuccess: (rides: PNPPublicRide[]) => void, onFailure: (o: Error) => void) {
+        return onValue(child(child(this.rides, 'public'), 'ridesForEvents'), snap => {
+            const rides: PNPPublicRide[] = []
+            snap.forEach(eventSnap => {
+                eventSnap.forEach(rideSnap => {
+                    rides.push(publicRideFromDict(rideSnap))
+                })
+            })
+            onSuccess(rides)
+        }, onFailure)
+    }
 
     getAllPublicEvents = (consume: (events: PNPEvent[]) => void) => {
         const pRef = this.allEvents
         return onValue(child(pRef, 'public'), (snap) => {
-            let events: PNPEvent[] = []
+            const events: PNPEvent[] = []
             snap.forEach(eventCategorySnap => {
                 eventCategorySnap.forEach(eventSnap => {
                     events.push(eventFromDict(eventSnap))
@@ -93,7 +126,7 @@ export class Realtime {
     getAllPrivateEvents = (consume: (events: PNPEvent[]) => void) => {
         const pRef = this.allEvents
         return onValue(child(pRef, 'private'), (snap) => {
-            let events: PNPEvent[] = []
+            const events: PNPEvent[] = []
             snap.forEach(eventCategorySnap => {
                 eventCategorySnap.forEach(eventSnap => {
                     events.push(eventFromDict(eventSnap))
@@ -110,20 +143,6 @@ export class Realtime {
         return await set(newRef, request)
     }
 
-    async addSuccessfulTransaction(transaction: TransactionSuccess) {
-        if (!this.auth.currentUser)
-            return false
-        const newRef = push(child(child(child(this.transactions, 'ridePurchases'), 'success'), this.auth.currentUser!.uid))
-        return await set(newRef, transaction)
-    }
-
-    async addFailureTransaction(transaction: TransactionFailure) {
-        if (!this.auth.currentUser)
-            return false
-        const newRef = push(child(child(child(this.transactions, 'ridePurchases'), 'failure'), this.auth.currentUser!.uid))
-        return await set(newRef, transaction)
-    }
-
 
     /**
      * createError
@@ -133,7 +152,7 @@ export class Realtime {
      */
     async createError(type: string, e: any) {
         const date = new Date().toUTCString()
-        let err: PNPError = {
+        const err: PNPError = {
             type: type,
             date: date,
             errorId: '',
@@ -149,7 +168,7 @@ export class Realtime {
   */
     async createErrorCustomer(type: string, extraData?: { email: string, more: any }) {
         const date = new Date().toUTCString()
-        let err: PNPError = {
+        const err: PNPError = {
             type: type,
             date: date,
             errorId: '',
@@ -167,7 +186,7 @@ export class Realtime {
   */
     static async createError(type: string, e: any, db: Database) {
         const date = new Date().toUTCString()
-        let err: PNPError = {
+        const err: PNPError = {
             type: type,
             date: date,
             errorId: '',
@@ -215,8 +234,8 @@ export class Realtime {
         return await get(this.users)
             .then(snap => {
                 const total: PNPUser[] = []
-                let check: any = {}
-                for (var id of ids) {
+                const check: any = {}
+                for (const id of ids) {
                     check[id] = true
                 }
 
@@ -249,19 +268,16 @@ export class Realtime {
        * @returns a new reference or error reference
        */
     addPublicRide = async (eventId: string, ride: PNPPublicRide): Promise<object | void> => {
-        const newRef = get(child(child(this.rides, 'public'), eventId))
         ride.eventId = eventId
-        await newRef.then(d => d.size)
-            .then(async size => {
-                if (size === null || size === undefined || size === 0) {
-                    return await set(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), '0'), ride)
-                } else {
-                    return await set(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), size + ""), ride)
-                }
-
-            })
-            .catch((e) => { this.createError('addPublicRide', e) })
+        const newRef = push(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId))
+        ride.rideId = newRef.key!
+        return await set(newRef, ride).catch((e) => { this.createError('addPublicRide', e) })
     }
+
+    removePublicRide = async (eventId: string, rideId: string): Promise<object | void> => {
+        return await remove(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId))
+    }
+
 
     /**
      * addPrivateRide
@@ -299,7 +315,6 @@ export class Realtime {
     }
 
 
-
     /**
      * addListenerToClubEvents
      * @param consume a callback to consume the events array
@@ -310,6 +325,18 @@ export class Realtime {
             const ret: PNPEvent[] = []
             snap.forEach(ev => {
                 ret.push(eventFromDict(ev))
+            })
+
+            ret.sort((a, b) => {
+                const x = a.eventDate.split('/')
+                const y = b.eventDate.split('/')
+                if (x.length < 3 || y.length < 3)
+                    return 0
+                else if (Number(x[2]) > Number(y[2]) || Number(x[1] > y[1]) || Number(x[0]) > Number(y[0])) {
+                    return 1
+                } else if (Number(x[2]) < Number(y[2]) || Number(x[1] < y[1]) || Number(x[0]) < Number(y[0])) {
+                    return -1
+                } else return 0
             })
             consume(ret)
         })
@@ -328,6 +355,27 @@ export class Realtime {
             consume(ret)
         })
     }
+    /**
+* addListenerToPublicEvents
+* @param consume a callback to consume the events array
+* @returns onValue change listener for events
+*/
+    addListenerToPublicEvents = (consume: (o: PNPEvent[]) => void) => {
+        return onValue(child(this.allEvents, 'public'), snap => {
+            const culture = snap.child('culture')
+            const clubs = snap.child('clubs')
+            const ret: PNPEvent[] = []
+            clubs.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            culture.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            consume(ret)
+        })
+    }
+
+
 
 
 
@@ -390,7 +438,7 @@ export class Realtime {
         return await update(child(child(child(this.allEvents, 'public'), 'culture'), eventId), event)
             .catch(e => {
                 const date = new Date().toDateString()
-                let err: PNPError = {
+                const err: PNPError = {
                     type: 'updateCultureEvent',
                     date: date,
                     errorId: '',
@@ -412,12 +460,26 @@ export class Realtime {
 
     /**
      * updatePrivateRide
-     * @param eventId rideId to be updated
-     * @param event ride values to be updated
+     * @param rideId rideId to be updated
+     * @param ride ride values to be updated
      * @returns update callback
      */
     updatePrivateRide = async (rideId: string, ride: object) => {
         return await update(child(child(this.rides, 'private'), rideId), ride)
+    }
+
+
+    /**
+ * updatePublicRide
+ * @param eventId eventId that the ride is connected to
+ * @param rideId rideId to be updated
+ * @param ride ride values to be updated
+ * @returns update callback
+ */
+    updatePublicRide = async (eventId: string, rideId: string, ride: object) => {
+        console.log(eventId)
+        console.log(rideId)
+        return await update(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId), ride)
     }
     /**
       * updateCurrentUser
@@ -472,6 +534,113 @@ export class Realtime {
         return await set(newRef, event)
             .catch((e) => { this.createError('addCultureEvent', e) })
     }
+
+
+    /**
+   * createEvent
+   * @param event event to be added
+   * @param blob : image blob for event *required
+   * @param uploadEventImage
+   * @returns new reference callback
+   */
+    createEvent = async (event: PNPEvent, blob: ArrayBuffer): Promise<object | void> => {
+
+        const type = getEventType(event)
+        const newRef = push(child(child(this.allEvents, 'public'), 'waiting'))
+        event.eventId = newRef.key!
+        return await uploadBytes(storageRef(this.storage, 'EventImages/' + type + "/" + event.eventId), blob)
+            .then(async snap => {
+                return await getDownloadURL(snap.ref)
+                    .then(async url => {
+                        event.eventImageURL = url
+                        return await set(newRef, event)
+                            .catch((e) => { this.createError('addEvent', e) })
+                    })
+            })
+    }
+
+    addListenerToWaitingEvents(consume: (waiting: PNPEvent[]) => void) {
+        return onValue(child(child(this.allEvents, 'public'), 'waiting'), snap => {
+            const events: PNPEvent[] = []
+            snap.forEach(event => {
+                events.push(eventFromDict(event))
+            })
+            consume(events)
+        })
+    }
+
+    addListenerToPublicAndWaitingEvents(consumePublicEvents: (waiting: PNPEvent[]) => void, consumeWaitingEvents: (o: PNPEvent[]) => void) {
+
+        return onValue(child(this.allEvents, 'public'), snap => {
+            const culture = snap.child('culture')
+            const clubs = snap.child('clubs')
+            const waiting = snap.child('waiting')
+            const ret: PNPEvent[] = []
+            const ret2: PNPEvent[] = []
+            clubs.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            culture.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            waiting.forEach(ev => {
+                ret2.push(eventFromDict(ev))
+            })
+            consumePublicEvents(ret)
+            consumeWaitingEvents(ret2)
+        })
+
+        /*
+         addListenerToPublicEvents = (consume: (o: PNPEvent[]) => void) => {
+        return onValue(child(this.allEvents, 'public'), snap => {
+            const culture = snap.child('culture')
+            const clubs = snap.child('clubs')
+            const ret: PNPEvent[] = []
+            clubs.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            culture.forEach(ev => {
+                ret.push(eventFromDict(ev))
+            })
+            consume(ret)
+        })
+    }
+
+        */
+    }
+
+    approveEvent = async (eventId: string) => {
+        const eventRef = child(child(child(this.allEvents, 'public'), 'waiting'), eventId)
+        get(eventRef)
+            .then(snap => {
+                remove(eventRef)
+                    .then(async () => {
+                        const event = eventFromDict(snap)
+                        return await set(child(child(child(this.allEvents, 'public'), getEventType(event)), eventId), event)
+                    }).catch(e => {
+                        this.createError('approveEvent', e)
+                    })
+            }).catch(e => {
+                this.createError('approveEvent', e)
+            })
+    }
+
+    declineEvent = async (eventId: string) => {
+        const eventRef = child(child(child(this.allEvents, 'public'), 'waiting'), eventId)
+        get(eventRef)
+            .then(snap => {
+                remove(eventRef)
+                    .then(async () => {
+                        const event = eventFromDict(snap)
+                        return await set(child(child(child(this.allEvents, 'public'), 'declined'), eventId), event)
+                    }).catch(e => {
+                        this.createError('declineEvent', e)
+                    })
+            }).catch(e => {
+                this.createError('declineEvent', e)
+            })
+    }
+
 
     /**
      * 
@@ -566,13 +735,13 @@ export class Realtime {
 
 export type FirebaseTools = {
     auth: Auth,
-    realTime: Realtime
+    realTime: Realtime,
     temp: Firestore
 }
 export default function Store(auth: Auth, db: Database, firestore: Firestore): FirebaseTools {
     return {
         auth: auth,
-        realTime: CreateRealTimeDatabase(auth, db),
+        realTime: CreateRealTimeDatabase(auth, db, getStorage(auth.app)),
         temp: firestore
     }
 }

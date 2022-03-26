@@ -12,6 +12,8 @@ export type PNPEventAgeRange = {
     maxAge: string
 }
 
+// TODO : Add Ride Status 20/03/22
+
 export type PNPPublicRide = {
     rideId: string
     eventId: string
@@ -22,6 +24,13 @@ export type PNPPublicRide = {
     backTime: string
     passengers: string
     date: string
+    extras?: PNPRideExtras
+}
+
+export type PNPRideExtras = {
+    isRidePassengersLimited: boolean
+    rideStatus: 'on-going' | 'sold-out' | 'running-out'
+    rideMaxPassengers?: string
 }
 
 export type PNPPrivateRide = {
@@ -77,12 +86,19 @@ export type PNPEvent = {
     eventDate: string
     eventCanAddRides: boolean
     eventDetails: string
+    eventType?:string
     eventPrice: string
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange
     expectedNumberOfPeople: string
+    eventAttention?: PNPEventAttention
     eventImageURL: string
     eventMobileImageURL?: string
+}
+
+export type PNPEventAttention = {
+    eventAttention1: string,
+    eventAttention2: string
 }
 
 export type PNPPrivateEvent = {

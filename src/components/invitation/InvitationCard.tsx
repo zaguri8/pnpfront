@@ -1,27 +1,24 @@
 import 'firebaseui/dist/firebaseui.css'
-import { FormEvent, useEffect, useState } from 'react';
-import Auth from '../auth/Auth';
+import { useEffect, useState } from 'react';
 import 'firebase/compat/auth';
 
 import $ from 'jquery'
-import { FormControlLabel, ImageListItem, List, ListItemText, Radio, Button, RadioGroup, MenuItem, ListItem } from '@mui/material';
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import { List, Button, MenuItem } from '@mui/material';
 
 import { useFirebase } from '../../context/Firebase';
-import { PNPPrivateEvent, PNPEvent, PNPRideConfirmation } from '../../store/external/types';
+import { PNPPrivateEvent, PNPRideConfirmation } from '../../store/external/types';
 import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../../store/validators';
 
 import { PNPPublicRide } from '../../store/external/types';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useLoading } from '../../context/Loading';
 import { BETA } from '../../settings/config';
-import { ORANGE_GRADIENT_PRIMARY } from '../../settings/colors';
+import { DARK_BLACK, PRIMARY_BLACK } from '../../settings/colors';
 import { InnerPageHolder } from '../utilities/Holders';
-import { ADDRESS, CHOOSE_RIDE, CONFIRM_RIDE, CURRENCY, DEST, DESTINATION_POINT, PICK_POINT, PULL_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings';
+import { CHOOSE_RIDE, CONFIRM_RIDE, PICK_POINT, PULL_POINT } from '../../settings/strings';
 import { useLanguage } from '../../context/Language';
 import { HtmlTooltip } from '../utilities/HtmlTooltip';
 import { submitButton } from '../../settings/styles';
-import { v4 } from 'uuid';
 import { Unsubscribe } from 'firebase/database';
 function InvitationCard() {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
@@ -44,7 +41,7 @@ function InvitationCard() {
         $('.dim').css('display', 'none')
         if (BETA) return
         doLoad()
-        var secondUnsub: Unsubscribe | null | object = null
+        let secondUnsub: Unsubscribe | null | object = null
         const unsubscribe = firebase.realTime.getPrivateEventById(id!, (event) => {
             if (isValidPrivateEvent(event as PNPPrivateEvent)) {
                 setEvent(event as PNPPrivateEvent)
@@ -113,7 +110,7 @@ function InvitationCard() {
                 userId: firebase.auth.currentUser?.uid ?? '',
                 rideId: selectedEventRide.rideId,
                 confirmationTitle: event.eventTitle,
-                eventId: id!!,
+                eventId: id!,
                 directions: selectedEventRide.rideStartingPoint + " to " + selectedEventRide.rideDestination,
                 date: event!.eventDate,
                 passengers: '1',
@@ -137,7 +134,7 @@ function InvitationCard() {
 
             >
                 <EventImage e={event} />
-                <div style={{ background: 'white', padding: '16px', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
+                <div style={{ background: PRIMARY_BLACK, padding: '16px', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
 
 
                     <div style={{ fontSize: '22px', margin: '8px' }}>{`תודה ${appUser?.name}, קיבלנו את אישורך להסעה `}</div>
@@ -161,8 +158,8 @@ function InvitationCard() {
         const validEvent = BETA ? null : event!
         return <List style={{ marginTop: '0px' }}>
             <EventImage e={validEvent} />
-            <div style={{ width: '100%', background: 'whitesmoke', marginTop: '-8px' }}>
-                <List style={{ width: '85%', background: 'whitesmoke', minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
+            <div style={{ width: '100%', background: PRIMARY_BLACK, marginTop: '-8px' }}>
+                <List style={{ width: '85%', background: PRIMARY_BLACK, minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
                     {rides && rides!.length > 0 && <span style={{ fontFamily: 'Open Sans Hebrew' }}>
                         {lang === 'heb' ? ('כל ההסעות יוצאות מ ' + rides![0].rideStartingPoint + " בשעה " + rides![0].rideTime) : 'All the rides leave from ' + rides![0].rideStartingPoint + ' at ' + rides![0].rideStartingPoint}
                     </span>}
@@ -180,7 +177,7 @@ function InvitationCard() {
                             return <MenuItem onClick={() => {
                                 handleSelectEventRide(ride)
                             }} style={{
-                                background: selectedEventRide === ride ? 'orange' : 'white',
+                                background: selectedEventRide === ride ? DARK_BLACK : 'white',
                                 alignSelf: 'center',
                                 justifyContent: 'space-between',
                                 textAlign: 'center',
@@ -212,7 +209,7 @@ function InvitationCard() {
         </List>
     }
     return (
-        <div dir='rtl' style={{ marginTop: '-8px', background: 'orange', display: 'flex', flexDirection: 'column' }}>
+        <div dir='rtl' style={{ marginTop: '-8px', background: DARK_BLACK, display: 'flex', flexDirection: 'column' }}>
             {render()}
         </div>
     );

@@ -1,4 +1,3 @@
-import firebase from "firebase/compat/app";
 import { GoogleAuthProvider} from "firebase/auth"
 // Configure Firebase.
 export const firebaseConfig = {

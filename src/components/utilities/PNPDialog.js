@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import ListItem from '@mui/material/ListItem';
+import { PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors';
 import $ from 'jquery'
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
@@ -21,6 +22,7 @@ import {
 import { Checkbox } from '@mui/material';
 import { useLoading } from '../../context/Loading';
 import { useLanguage } from '../../context/Language'
+import { submitButton } from '../../settings/styles';
 
 
 export default function FavoriteEventsDialog() {
@@ -44,12 +46,11 @@ export default function FavoriteEventsDialog() {
         var x = null
         dialogContext.openDialog({
             content: <div style={{ width: '100%' }}>
-                {/** TODO: 18/03/22 :    assign to value in a condition to make item keys and map for check box behaviour     */}
-                {x = (function makeKeys() { })() && events.map((event) => (
-                    <ListItem sx={{ textAlign: 'center' }} key={event}>
+                {events.map((event) => (
+                    <ListItem sx={{ textAlign: 'center', color: SECONDARY_WHITE }} key={event}>
 
                         <ListItemText primary={event} />
-                        <Checkbox value={event} className={'event_checkBox'} />
+                        <Checkbox value={event} style={{ color: PRIMARY_WHITE }} className={'event_checkBox'} />
 
                     </ListItem>
                 ))}
@@ -64,7 +65,7 @@ export default function FavoriteEventsDialog() {
                             })
                             handleListItemClick(allPicked)
                         }}
-                        sx={{ width: '100%', color: 'white' }} >{PICK(lang)}</Button>
+                        sx={{ ...submitButton(false),...{width:'100%',padding:'4px'} }} >{PICK(lang)}</Button>
                 </ListItem>
             </div>, title: PICK_FAVORITE_EVENTS(lang)
         })
@@ -72,7 +73,7 @@ export default function FavoriteEventsDialog() {
 
     return (
         <div dir={SIDE(lang)}>
-            <Button sx={{ color: 'white', fontSize: '16px' }} variant="outlined" onClick={handleClickOpen}>
+            <Button style={{ ...submitButton(false), ...{ padding: '8px', margin: '0px', fontSize: '14px', width: '100%' } }} variant="outlined" onClick={handleClickOpen}>
                 {OPEN_FAVORITE_EVENTS_DIALOG(lang)}
             </Button>
             <Typography id='selected_favorite_events' variant="subtitle1" component="div">

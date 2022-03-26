@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useFirebase } from "../context/Firebase"
-import { createNewCustomer } from "../store/payments"
 import axios from 'axios'
 
 

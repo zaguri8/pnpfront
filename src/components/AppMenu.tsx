@@ -1,18 +1,13 @@
-import { profile } from '../assets/images.js';
-import logo from '../assets/images/logo_black.png';
-import { HELLO, MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, MY_COINS, MY_NAME, PICK_IMAGE, REGISTER_TITLE, TOOLBAR_LOGIN } from '../settings/strings.js';
+import logo from '../assets/images/logo_white.png';
+import { HELLO, MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, TOOLBAR_LOGIN } from '../settings/strings.js';
 import { flex } from '../settings/styles.js';
-import $ from 'jquery'
 import ToolbarItem from './toolbar/ToolbarItem';
 import { useFirebase } from '../context/Firebase';
 import { useLanguage } from '../context/Language.js';
-import { List, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useLoading } from '../context/Loading';
-import { getDownloadURL } from 'firebase/storage';
-import coins from '../assets/images/coins.png'
-import { ORANGE_GRADIENT_PRIMARY } from '../settings/colors.js';
-function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
+import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE } from '../settings/colors.js';
+function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
 
     const { user, appUser, firebase, uploadUserImage } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
@@ -46,15 +41,17 @@ function MenuProfile(props: { clickedItem: (indexPath: Number) => void }) {
             }}>
                 <span onClick={() => props.clickedItem(4)} style={{
                     padding: '4px',
+                    color:SECONDARY_WHITE,
                     cursor: 'pointer'
                 }}>{REGISTER_TITLE(lang)}</span>
                 <span onClick={() => props.clickedItem(5)} style={{
                     padding: '4px',
+                    color:SECONDARY_WHITE,
                     cursor: 'pointer'
                 }}>{TOOLBAR_LOGIN(lang)}</span>
             </div> : <div><span style={{ fontSize: '14px', color: 'white' }}>{`${HELLO(lang)}`}</span><br /><span style={{ fontSize: '14px', color: 'white' }}>{`${appUser?.name}`}</span></div>}
         </div>
-        {user && <span style={{ fontSize: '10px', color: 'white', margin: '16px', padding: '0px' }}>מזהה : <b>{user.uid} </b> </span>}
+        {/* {user && <span style={{ fontSize: '10px', color: 'white', margin: '16px', padding: '0px' }}>מזהה : <b>{user.uid} </b> </span>} */}
     </div>);
 }
 
@@ -63,7 +60,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
 
 
     const nav = useNavigate()
-    const clickedItem = (indexPath: Number) => {
+    const clickedItem = (indexPath: number) => {
         props.menuToggle(() => {
             switch (indexPath) {
                 case 0:
@@ -99,7 +96,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
             zIndex: '9999',
         },
         ...flex('column', 'center'),
-        ...{ background: 'white' }
+        ...{ background: PRIMARY_BLACK}
     }}>
         <ToolbarItem bold image={logo} />
         <MenuProfile clickedItem={clickedItem} />

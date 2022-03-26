@@ -5,20 +5,20 @@ import settings from '../../assets/images/myaccount/settings.png'
 import coins from '../../assets/images/myaccount/coins.png'
 import ridehistory from '../../assets/images/myaccount/historyRides.png'
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
+import '../saynomore/SayNoMoreItem.css'
 import { useLanguage } from "../../context/Language"
-import { Box, Button, Icon } from "@mui/material"
+import { Button } from "@mui/material"
 import $ from 'jquery'
-import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
+import { DARK_BLACK } from "../../settings/colors"
 
 import { useEffect } from "react"
 import { useFirebase } from "../../context/Firebase"
-import { SpeedDialAction } from "@mui/lab"
 
-import {useNavigate} from 'react-router'
-function MyAccountItem({ title, icon,navTo}) {
+import { useNavigate } from 'react-router'
+function MyAccountItem({ title, icon, navTo }) {
     const nav = useNavigate()
-    return (<Button onClick = {() => nav(navTo)} className='my_account_item' sx={{
-        backgroundImage: ORANGE_GRADIENT_PRIMARY,
+    return (<Button onClick={() => nav(navTo)} className='my_account_item' sx={{
+        backgroundImage: DARK_BLACK,
         borderRadius: '12.5px',
         height: '100px',
         boxShadow: 'rgba(100, 100, 111, 0.2) 0px 2px 5px 0px',
@@ -28,17 +28,17 @@ function MyAccountItem({ title, icon,navTo}) {
         textTransform: 'capitalize',
         fontWeight: 'bold',
         color: 'white',
-        display:'flex',flexDirection:'column',
-        alignItems:'center',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center',
         padding: '0px',
         fontSize: '16px'
-    }}><span className = 'my_account_item_text'  style={
+    }}><span className='my_account_item_text' style={
         {
             fontFamily: 'Open Sans Hebrew',
             background: 'none',
             height: '50%',
-            fontSize:'16px',
-            fontWeight:'500',
+            fontSize: '16px',
+            fontWeight: '500',
             color: 'white',
             lineHeight: 'normal'
         }
@@ -54,18 +54,20 @@ export default function MyAccount() {
             const currentWidth = window.innerWidth
             if (currentWidth > 628) {
                 $('.my_account_item').css('width', '200px')
-                $('.my_account_item_text').css('width','50%')
-                
+                $('.my_account_item_text').css('width', '50%')
+
             } else {
                 $('.my_account_item').css('width', '100px')
-                $('.my_account_item_text').css('width','100%')
+                $('.my_account_item_text').css('width', '100%')
             }
         }
         $(window).resize(() => { resize() })
         resize()
     }, [])
-    return (<PageHolder>
+    return (<PageHolder >
+
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
+
         <InnerPageHolder  >
             <div dir={SIDE(lang)} id='my_account_grid' style={{
                 display: 'grid',
@@ -75,13 +77,13 @@ export default function MyAccount() {
                 gap: '4vw 6vw'
             }}>
 
-                <MyAccountItem navTo = {'/'} icon = {coins} title={MY_ACCOUNT_ITEM_1(lang)} />
-                <MyAccountItem navTo = {'/'}  icon={spoil} title={MY_ACCOUNT_ITEM_2(lang)} />
+                <MyAccountItem navTo={'/'} icon={coins} title={MY_ACCOUNT_ITEM_1(lang)} />
+                <MyAccountItem navTo={'/'} icon={spoil} title={MY_ACCOUNT_ITEM_2(lang)} />
 
 
 
-                <MyAccountItem navTo = {'/myaccount/transactions'} icon = {ridehistory} title={MY_ACCOUNT_ITEM_3(lang)} />
-                <MyAccountItem navTo = {'/'} icon = {settings} title={MY_ACCOUNT_ITEM_4(lang)} />
+                <MyAccountItem navTo={'/myaccount/transactions'} icon={ridehistory} title={MY_ACCOUNT_ITEM_3(lang)} />
+                <MyAccountItem navTo={'/'} icon={settings} title={MY_ACCOUNT_ITEM_4(lang)} />
 
             </div>
         </InnerPageHolder>

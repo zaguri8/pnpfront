@@ -8,10 +8,11 @@
 .say_no_more_item {
         min-width: 120px;
         border:.1px solid gray;
-        color: black;
-        
+        color: whitesmoke;
+        background-color: rgb(65,68,82);
         margin:4px;
         padding: 32px;
+        border-radius: 32px;
         width: 16.6%;
     
 }

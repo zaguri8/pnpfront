@@ -5,8 +5,8 @@ import { flex } from "../../settings/styles"
 import search from '../../assets/images/search.png'
 import israel from '../../assets/images/israel.png'
 import america from '../../assets/images/america.png'
-import { menuIcon_black } from "../../assets/images"
-import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
+import { menuIcon } from "../../assets/images"
+import { DARKER_BLACK_SELECTED, PRIMARY_WHITE } from "../../settings/colors"
 import { useFirebase } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
 import { useNavigate } from "react-router"
@@ -25,7 +25,7 @@ export function ToolBar(props: ToolbarProps) {
             ...{ zIndex: '9', overflow: 'hidden' }
         }}>
             <ToolbarItem style={{
-                'backgroundImage': ORANGE_GRADIENT_PRIMARY,
+                'backgroundImage': DARKER_BLACK_SELECTED,
                 color: 'white',
                 paddingTop: '4px',
                 paddingBottom: '4px',
@@ -34,11 +34,13 @@ export function ToolBar(props: ToolbarProps) {
                 minWidth: 'fit-content',
                 marginRight: '4px'
             }} id='create_event' text={CREATE_EVENT(lang)} action={() => { nav('/createevent') }} />
-            <ToolbarItem id='login' text={user === null ? TOOLBAR_LOGIN(lang) : MY_ACCOUNT(lang)} action={() => {
+            <ToolbarItem id='login' style={{ color: PRIMARY_WHITE }} text={user === null ? TOOLBAR_LOGIN(lang) : MY_ACCOUNT(lang)} action={() => {
                 user === null ? nav('/login') : nav('/myaccount')
             }} />
 
-            <ToolbarItem id='search' style={{ paddingLeft: '4px' }} image={search} /> </div>
+            <ToolbarItem
+                action={() => nav('/searchRide')}
+                id='search' style={{ paddingLeft: '4px' }} image={search} /> </div>
         <div style={{ ...flex('row', 'center', 'center') }}>
             <div id='lang' style={{
                 cursor: 'pointer',
@@ -46,11 +48,11 @@ export function ToolBar(props: ToolbarProps) {
                 justifyContent: 'center',
                 alignItems: 'center'
             }} onClick={() => setLang(lang === 'heb' ? 'en' : 'heb')}>
-                <ToolbarItem id='language' text={lang === 'heb' ? 'HE' : 'EN'} style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', margin: '0px', padding: '2px' }} action={() => { }} />
+                <ToolbarItem id='language' text={lang === 'heb' ? 'HE' : 'EN'} style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', margin: '0px', color: 'white', padding: '2px' }} action={() => { }} />
                 <img style={{ padding: '4px', width: '25px', height: '25px' }} src={lang === 'heb' ? israel : america} />
 
             </div>
-            <ToolbarItem id='options' image={menuIcon_black} style={{ 'marginRight': '24px' }} action={props.menuToggle} />
+            <ToolbarItem id='options' image={menuIcon} style={{ 'marginRight': '24px' }} action={props.menuToggle} />
 
         </div>
 

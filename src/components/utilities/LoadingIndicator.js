@@ -1,8 +1,9 @@
 import {ThreeDots} from 'react-loader-spinner'
+import { PRIMARY_BLACK } from '../../settings/colors';
 export function LoadingIndicator(props) {
     return (<div style={{
         display: props.loading ? 'inherit' : 'none',
-        background: 'white',
+        background: PRIMARY_BLACK,
         zIndex: '9999',
         padding: '8px',
         borderRadius: '8px',
@@ -11,7 +12,7 @@ export function LoadingIndicator(props) {
         left: '0',
         transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
     }}>
-        <ThreeDots ariaLabel='loading-indicator' color={'orangered'} />
+        <ThreeDots ariaLabel='loading-indicator' color={'white'} />
     </div>);
 }
 export default LoadingIndicator

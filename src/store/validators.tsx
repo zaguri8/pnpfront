@@ -14,7 +14,7 @@ export function isValidHttpUrl(string: string): boolean {
 }
 
 export function isValidEvent(event: PNPEvent): boolean {
-  return event !== undefined
+  const bool =  event !== undefined
     && event !== null
     && (event.eventAgeRange !== null
       && event.eventAgeRange.minAge !== null
@@ -38,6 +38,9 @@ export function isValidEvent(event: PNPEvent): boolean {
       && event.eventPrice !== 'null')
     && (event.eventProducerId !== null
       && event.eventProducerId !== 'null')
+
+      console.log(event)
+      return bool
 }
 export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
   return event !== undefined

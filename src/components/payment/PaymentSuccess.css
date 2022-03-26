@@ -1,0 +1,13 @@
+.payment_details_holder label {
+    margin:0px;
+    padding:0px;
+    color:black;
+    color:orange;
+    font-weight: bold;
+    font-size: 14px;
+}
+.payment_details_holder span {
+    font-size: 12px;
+    color:whitesmoke;
+    max-width: 200px;
+}

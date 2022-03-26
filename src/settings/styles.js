@@ -1,4 +1,4 @@
-import { ORANGE_GRADIENT_PRIMARY } from "./colors"
+import { DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY } from "./colors"
 
 export const bgColor = (color, size) => {
     return {
@@ -18,7 +18,7 @@ export const submitButton = (margin) => {
         width: '50%',
         alignSelf: 'center',
         borderRadius: '4px',
-        backgroundImage: ORANGE_GRADIENT_PRIMARY
+        backgroundImage: DARKER_BLACK_SELECTED
     }
 }
 export const flex = (direction, align, justify) => {

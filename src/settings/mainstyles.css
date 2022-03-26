@@ -1,9 +1,21 @@
+
 .list_events_admin:nth-child(2n) {
 
-
-
-    background:gray;
+background: gray;
 }
+.list_rides_admin:nth-child(1)  {
+    background: whitesmoke;
+    border-radius: 4px;
+    }
+.list_rides_admin:nth-child(2n)  {
+    border-radius: 4px;
+background: white;
+}
+.list_rides_admin:nth-child(3n)  {
+    border-radius: 4px;
+    background: rgb(218, 218, 218);
+    }
+    
 
 .list_events_admin:nth-child(3) {
 

@@ -18,7 +18,7 @@ export default function SayNoMoreItem(props: SayNoMoreItemProps) {
         }}><b style={{
 
             fontStyle: 'italic',
-            color: 'orangered',
+            color: "#ff6a3c",
             fontSize: '26px'
         }}>{nMore + " "}</b><br /> {props.content}</p>
 

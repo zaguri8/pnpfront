@@ -5,9 +5,9 @@ export default function SectionTitle(props: { title: string, withBg?: boolean, s
     return (<h1 style={{
         ...{
             alignSelf: 'center',
-            color: 'black',
+            color: PRIMARY_WHITE,
             fontWeight: '100',
-            background: props.withBg ? 'white' : PRIMARY_WHITE,
+            background: 'none',
             marginLeft: 'auto',
             marginTop: '32px',
             marginBottom: '0px',

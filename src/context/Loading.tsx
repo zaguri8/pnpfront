@@ -54,7 +54,7 @@ export const useLoading = () => {
         loadingContext!.setDialogTitle(null)
     }
     return {
-        isLoading: loadingContext!.loading,
+        isLoading: loadingContext?.loading,
         doLoad: doLoad,
         cancelLoad: cancelLoad,
         openDialog: (content: any) => openDialog(content),

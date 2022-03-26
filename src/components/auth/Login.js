@@ -1,9 +1,7 @@
 import { Input, FormControl, InputLabel } from "@mui/material"
 import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE, TOOLBAR_LOGIN } from '../../settings/strings'
-import Auth from "./Auth"
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
-import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import Button from "../Button"
 import { Stack } from "@mui/material"
 import { useFirebase } from "../../context/Firebase"
@@ -12,6 +10,8 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
 import { useLanguage } from "../../context/Language"
 import { useLocation } from "react-router"
+import { PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { submitButton } from "../../settings/styles"
 export default function Login() {
 
     const nav = useNavigate()
@@ -49,7 +49,7 @@ export default function Login() {
     }}>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <div style={{
-            background: 'whitesmoke',
+            background: SECONDARY_BLACK,
             width: '50%',
             maxWidth: '500px',
             marginTop: '32px',
@@ -73,31 +73,40 @@ export default function Login() {
                 alignItems: 'center'
             }}>
                 <SectionTitle title={TOOLBAR_LOGIN(lang)} style={{
-                    background: 'whitesmoke',
+                    background: SECONDARY_BLACK,
                     marginTop: '0px',
                     marginBottom: '32px'
                 }} />
                 <Stack spacing={3} style={{ width: '80%' }}>
 
                     <FormControl >
-                        <InputLabel classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
 
                         }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
-                        <Input type='email' sx={{ direction: SIDE(lang) }} id="email_input" aria-describedby="email_helper_text" />
+                        <Input
+                            name="email"
+                            style={{ color: SECONDARY_WHITE }}
+                            autoComplete="username"
+                            type="email" sx={{ direction: SIDE(lang) }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
                     <FormControl >
-                        <InputLabel classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
-                        <Input type="password" dir={SIDE(lang)} id="password_input" aria-describedby="password_helper_text" />
+                        <Input
+                            autoComplete="current-password"
+                            type='password'
+                            name='password'
+                            style={{ color: SECONDARY_WHITE }}
+                            dir={SIDE(lang)} id="password_input" aria-describedby="password_helper_text" />
 
                     </FormControl>
                     <br />
-                    <Button title={LOGIN_OK(lang)} type='submit' />
+                    <Button title={LOGIN_OK(lang)} style={{ ...submitButton(false), ...{ padding: '8px', width: '100%' } }} variant="outlined" type='submit' />
 
 
 
@@ -110,7 +119,7 @@ export default function Login() {
                     }}>
 
                         <hr style={{ width: '42%', height: '.1px' }} />
-                        <p style={{ width: '20%' }}>{OR(lang)}</p>
+                        <p style={{ width: '20%', color: PRIMARY_WHITE }}>{OR(lang)}</p>
                         <hr style={{ width: '42%', height: '.1px' }} />
                     </div>
 
@@ -121,11 +130,11 @@ export default function Login() {
             {/* <Auth style={{ margin: '0px' }} title='' redirect= {(location.state && location.state.cachedLocation) ? location.state.cachedLocation : "/pnp"} /> */}
 
             <div>
-                <Link to={(location.state && location.state.cachedLocation) ? { pathname: '/register', state: { cachedLocation: location.state.cachedLocation } } : '/register'} >{NO_ACCOUNT(lang)}</Link>
+                <Link style={{ textDecoration: 'underline', color: SECONDARY_WHITE }} to={(location.state && location.state.cachedLocation) ? { pathname: '/register', state: { cachedLocation: location.state.cachedLocation } } : '/register'} >{NO_ACCOUNT(lang)}</Link>
             </div>
 
             <div>
-                <Link style={{ fontSize: '12px', textDecoration: 'none red' }} to={'/register'}>{FORGOT_PASSWORD(lang)}</Link>
+                <Link style={{ fontSize: '12px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/register'}>{FORGOT_PASSWORD(lang)}</Link>
             </div>
         </div>
     </div >)

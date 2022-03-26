@@ -1,19 +1,18 @@
 import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
-import { useSearchParams } from 'react-router-dom'
 import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
-import { Dialog, DialogTitle, List, ListItem, Button } from '@mui/material';
+import { Dialog, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
-import { CLOSE, SIDE, NOTFOUND, TOS } from './settings/strings'
+import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
 import AppMenu from './components/AppMenu';
 import { Routes, Route, useNavigate } from 'react-router';
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
 
-import { TOOLBAR_COLOR } from './settings/colors';
+import { DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE, TOOLBAR_COLOR } from './settings/colors';
 import Home from './components/home/Home';
 import { useFirebase } from './context/Firebase';
 import Login from './components/auth/Login';
@@ -27,11 +26,11 @@ import CreateRide from './components/ride/CreateRide';
 import Payment from './components/payment/Payment';
 import MyPayments from './components/payment/MyPayments';
 import Test from './components/Test';
-import TransactionSuccessPage from './components/payment/TransactionSuccessPage';
-import AdminPanel from './components/AdminPanel';
+import EventStatistics from './components/admin/EventStatistics';
+import AdminPanel from './components/admin/AdminPanel';
 import WhatsApp from './components/WhatsApp';
-
-
+import PaymentSuccess from './components/payment/PaymentSuccess'
+import SearchRide from './components/search/SearchRide';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -129,7 +128,7 @@ function App() {
 
       if (window.scrollY >= 222) {
         $('#toolbar').css('padding', '4')
-        $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': 'white', 'backgroundImage': 'none', 'transition': 'all .2s' })
+        $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': PRIMARY_BLACK, 'backgroundImage': 'none', 'transition': 'all .2s' })
         $('#toolbar').css('top', '0')
 
 
@@ -154,7 +153,7 @@ function App() {
       {<AppMenu menuToggle={toggleMenu} />}
       <div className="App">
 
-        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflowY: 'stretch', overflowX: 'hidden' }} open={dialogContext.isDialogOpened}>
+        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflowY: 'stretch', overflowX: 'hidden', background: PRIMARY_BLACK }} open={dialogContext.isDialogOpened}>
           {dialogContext.dialogTitle && <div
             style={
               {
@@ -167,7 +166,7 @@ function App() {
           >{dialogContext.dialogTitle}</div>}
           <List id='dialog' sx={{
             overflowX: 'hidden',
-            background: 'white',
+            background: PRIMARY_BLACK,
             maxHeight: '800px',
             display: 'flex',
             flexDirection: 'column',
@@ -175,12 +174,12 @@ function App() {
           }}>
             {dialogContext.content.content}
           </List>
-          <ListItem style={{ marginTop: '0px', paddingTop: '0px' }}>
+          <ListItem style={{ marginTop: '0px', paddingTop: '0px', color: SECONDARY_WHITE, background: PRIMARY_BLACK, textDecoration: 'underline', }}>
             <Button
               onClick={() => {
                 dialogContext.closeDialog()
               }}
-              sx={{ width: '100%', color: 'white', fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} >{CLOSE(lang)}</Button>
+              style={{ width: '100%', color: 'white', backgroundImage: DARK_BLACK, fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} >{CLOSE(lang)}</Button>
           </ListItem>
         </Dialog>
           : null}
@@ -199,15 +198,15 @@ function App() {
           <Route path='termsOfService' element={<TermsOfService />} />
 
 
+          <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />
+          <Route path='/payment/success' element={<PaymentSuccess />} />
           <Route path='/invitation/:id' element={<InvitationPage />} />
           <Route path='/test' element={<Test />} />
           <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <div>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div> : <AdminPanel />} />
+          <Route path='/adminpanel/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <div>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div> : <EventStatistics />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
-          <Route path='/transaction/success' element={<TransactionSuccessPage />}></Route>
-          <Route path='/transaction/failure' element={<TransactionSuccessPage />}></Route>
           <Route path='/myaccount/transactions' element={!isAuthenticated ? <Login /> : <MyPayments />} />
           <Route path='/*' element={<UNKNOWN lang={lang}></UNKNOWN>}></Route>
-
         </Routes>
         <WhatsApp />
       </div>

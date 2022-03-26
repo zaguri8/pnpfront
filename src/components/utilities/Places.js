@@ -3,15 +3,16 @@ import { useState } from "react";
 import PlacesAutocomplete from 'react-places-autocomplete'
 import { useGoogleState } from "../../context/GoogleMaps";
 import { v4 } from 'uuid'
-import $ from 'jquery'
 import { SIDE } from "../../settings/strings";
 import { useLanguage } from "../../context/Language";
 
 import { makeStyles } from "@mui/styles";
+import { PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 export default function Places({ placeHolder, style, fixed, id, className, types, handleAddressSelect, value }) {
     const [address, setAddress] = useState('')
     const handleChange = (value) => {
         setAddress(value)
+        handleAddressSelect(value)
     }
     const { google } = useGoogleState()
     const [cId, setCId] = useState(v4())
@@ -22,7 +23,9 @@ export default function Places({ placeHolder, style, fixed, id, className, types
     const useStyles = makeStyles(() => ({
         root: {
             "& .MuiOutlinedInput-root": {
-                background: "white"
+                color: PRIMARY_BLACK,
+                background: (style && style.background) ? style.background : SECONDARY_WHITE,
+                borderRadius: '32px'
             }
         }
     }));

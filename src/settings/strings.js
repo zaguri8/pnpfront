@@ -14,7 +14,7 @@ export const CONFIRM_RIDE = (lang) => lang === 'heb' ? 'אשר הגעה להסע
 export const RETURN_HOUR = (lang) => lang === 'heb' ? 'שעת חזרה' : 'Back hour'
 export const STARTING_POINT = (lang) => lang === 'heb' ? 'כל נקודות היציאה' : 'All starting points'
 export const PAYMENT_FOR_RIDE = (lang) => lang === 'heb' ? `תשלום עבור הסעה` : 'Payment for ride'
-export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת היציאה' : 'Starting point'
+export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת יציאה' : 'Starting point'
 export const PICK_POINT = (lang) => lang === 'heb' ? 'נקודת יציאה - הלוך' : 'Start point - first direction'
 export const PULL_POINT = (lang) => lang === 'heb' ? 'נקודת הורדה - חזור' : 'End point - return direction'
 export const CONTINUE_TO_SECURE_PAYMENT = (lang) => lang === 'heb' ? 'עבור למסך תשלום מאובטח' : 'Continue to secure payment'
@@ -109,10 +109,10 @@ export const WHY_US_ITEM_3_CONTENT = (lang) => lang === 'heb' ? 'לא תצטרכ
 export const WHY_US_ITEM_4_TITLE = (lang) => lang === 'heb' ? 'מפנקים אותך' : 'Spoiling you'
 export const WHY_US_ITEM_4_CONTENT = (lang) => lang === 'heb' ? 'Pick N Pull מעניקה לך שלל הטבות, מבצעים וקופונים.' : 'Pick N Pull offers you a wide range of discounts and special offers'
 
-export const WHY_US_ITEM_5_TITLE = (lang) => lang === 'heb' ? '!don’t drink and drive' : '!don’t drink and drive'
+export const WHY_US_ITEM_5_TITLE = (lang) => lang === 'heb' ? `don't drink and drive!` : `don't drink and drive!`
 export const WHY_US_ITEM_5_CONTENT = (lang) => lang === 'heb' ? 'אנחנו מאמינים שצריך להנות מבלי לקחת סיכונים מיותרים, החיים יקרים!' : 'We believe in having fun without taking stupid risks, life is too precious!'
 
-export const WHY_US_ITEM_6_TITLE = (lang) => lang === 'heb' ? 'מערכת יחסים ארוכה' : 'Long term relationshop'
+export const WHY_US_ITEM_6_TITLE = (lang) => lang === 'heb' ? 'מערכת יחסים ארוכה' : 'Long term Relationship'
 export const WHY_US_ITEM_6_CONTENT = (lang) => lang === 'heb' ? 'בכל נסיעה תצברו נקודה, ולאחר 5 נקודות תוכלו לממש אותן ולקבל נסיעה חינם!' : 'Each ride you take, you gain points too use in your next rides!'
 
 
@@ -151,6 +151,8 @@ export const CVV = (lang) => lang === 'heb' ? 'שלוש ספרות בגב כרט
 export const TOTAL_TO_PAY = (lang, price) => lang === 'heb' ? `סה"כ לתשלום: ${price} ש"ח` : `Total: ${price} ILS`
 
 
+
+export const TRANSACTION_DETAILS = (lang) => lang === 'heb' ? 'קבלה עבור רכישה' : 'Receipt Details'
 
 export const TERMS_OF_SERVICE = (lang) => lang === 'heb' ? 'תקנון Pick n Pull' : 'Pick n Pull TOS'
 

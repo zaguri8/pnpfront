@@ -3,12 +3,9 @@ import SectionTitle from "../SectionTitle"
 import { RideFormPreview } from "../ride/RideFormPreview"
 import { Gallery } from "../Gallery"
 import WhyUsContainer from "../whyus/WhyUsContainer"
-import WhatsApp from "../WhatsApp"
 import { useFirebase } from "../../context/Firebase"
 import { useEffect, useRef } from "react"
 import React from 'react'
-import { Realtime } from "../../store/external"
-import QRCode from 'react-qr-code'
 import { useState } from "react"
 import { PNPEvent } from "../../store/external/types"
 import { ABOUT, CLUBS, CULTURE, SCHEDULED_EVENTS, TOS, WHY_US_TITLE } from "../../settings/strings"
@@ -16,7 +13,8 @@ import { useLanguage } from "../../context/Language"
 import About from "../About"
 import { InnerPageHolder } from "../utilities/Holders"
 import { Link } from "react-router-dom"
-import { ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY } from "../../settings/colors"
+import { PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import Spacer from "../utilities/Spacer"
 export default function Home() {
 
     const { user, firebase } = useFirebase()
@@ -46,25 +44,27 @@ export default function Home() {
         {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
 
         <img src={data} />
-        <SectionTitle  withBg style={{
+        <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
+        <Gallery header={CULTURE(lang)} events={pnpCultureEvents} />
+        <Gallery header={CLUBS(lang)} events={pnpClubEvents} />
+        <Spacer offset={4} />
+        <SectionTitle withBg style={{
             padding: '32px',
             fontWeight: '100',
             marginTop: '0px',
-            fontStyle:'italic',
+            fontStyle: 'italic',
             border: '.1px solid gray',
-            color: 'black',
+            color: PRIMARY_WHITE,
             width: '80%',
-
-            background:'none',
-            paddingRight:'45px',
+            borderRadius: '16px',
+            paddingRight: '45px',
+            background: SECONDARY_BLACK,
             alignSelf: 'center',
             fontSize: '38px'
         }} title={'We Say No More!'} />
         <br />
         <SayNoMoreContainer />
-        <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
-        <Gallery header={CULTURE(lang)} events={pnpCultureEvents} />
-        <Gallery header={CLUBS(lang)} events={pnpClubEvents} />
+
         <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} />
         <WhyUsContainer />
         <SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
@@ -73,7 +73,7 @@ export default function Home() {
 
             <About />
         </InnerPageHolder>
-        <Link style={{ paddingTop: '32px', paddingBottom: '24px' }} to={'/termsOfService'}>{TOS(lang)}</Link>
-     
+        <Link style={{ paddingTop: '32px', paddingBottom: '24px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/termsOfService'}>{TOS(lang)}</Link>
+
     </div>
 }

@@ -10,7 +10,7 @@ body {
   scroll-behavior: smooth;
   font-family: 'Open Sans Hebrew', serif;
   -webkit-font-smoothing: antialiased;
-  background-color: white;
+  background-color: rgb(36,38,43);
   min-height: 100vh;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -24,7 +24,7 @@ button {
   transition: background 400ms;
   color: #fff;
   
-  background-image: linear-gradient(orange,orange,orange);
+  background-image: linear-gradient(rgb(82, 90, 128),rgb(66, 75, 118),rgb(62, 69, 100));
   padding: 14px 24px;
   font-family: 'Open Sans Hebrew';
   font-size: 18px;

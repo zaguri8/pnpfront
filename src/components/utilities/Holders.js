@@ -1,3 +1,5 @@
+import { SECONDARY_BLACK } from "../../settings/colors"
+
 export const PageHolder = ({ children, style = {} }) => {
     return <div style={{
         ...{
@@ -14,7 +16,7 @@ export const PageHolder = ({ children, style = {} }) => {
 export const InnerPageHolder = ({ children, style = {} }) => {
     return <div style={{
         ...{
-            background: 'whitesmoke',
+            background: SECONDARY_BLACK,
             width: '50%',
             maxWidth: '500px',
             marginTop: '32px',

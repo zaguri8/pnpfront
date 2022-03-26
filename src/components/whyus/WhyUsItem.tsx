@@ -1,4 +1,4 @@
-import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
+import { SECONDARY_BLACK } from "../../settings/colors";
 
 export type WhyUsItemProps = {
     title: string,
@@ -8,8 +8,11 @@ export type WhyUsItemProps = {
 
 function ContainerTitle(props: { title: string }) {
     return (<p style={{
+        direction:props.title === `don't drink and drive` ? 'rtl' : 'ltr',
         marginTop: '0px',
         marginBottom: '0px',
+        color:'#ff6a3c',
+        fontWeight:'550',
         fontSize: '24px'
     }}>{props.title}</p>);
 }
@@ -38,7 +41,7 @@ function ContainerContent(props: { content: string }) {
 
 export default function WhyUsItem(props: WhyUsItemProps) {
     return <div key={props.content} style={{
-        color: 'white',
+
         padding: '1rem',
         alignSelf: 'center',
         width: '50%',
@@ -46,7 +49,7 @@ export default function WhyUsItem(props: WhyUsItemProps) {
         marginBottom: '16px',
         margin: '8px',
         borderRadius: '12px',
-        backgroundImage: ORANGE_GRADIENT_PRIMARY
+        background: SECONDARY_BLACK
     }}>
         <ContainerImage icon={props.icon} />
         <ContainerTitle title={props.title} />

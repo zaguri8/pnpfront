@@ -1,9 +1,8 @@
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useState } from "react"
 import { PNPPrivateRide } from "../../store/external/types"
 import { useFirebase } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
 import { isValidPrivateRide } from '../../store/validators'
-import PhoneInput from 'react-phone-number-input'
 import $ from 'jquery'
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import { Checkbox, InputLabel, TextFieldProps } from "@mui/material"
@@ -13,12 +12,13 @@ import { LocalizationProvider, TimePicker } from "@mui/lab"
 import AdapterDateFns from "@mui/lab/AdapterDateFns"
 import { DatePicker } from "@mui/lab"
 
-import { ACCEPT_TERMS_REQUEST, COMMENTS, CONTINUE_TO_CREATE, CREATE_RIDE, DESTINATION_POINT, EMAIL, EVENT_START, FILL_ALL_FIELDS, FULL_NAME, LEAVE_HOUR, PASSENGERS, PHONE_NUMBER, RETURN_HOUR, RIDE_DATE, STARTING_POINT, STARTING_POINT_SINGLE, TERMS_OF_USE } from "../../settings/strings"
+import { ACCEPT_TERMS_REQUEST, COMMENTS, CONTINUE_TO_CREATE, CREATE_RIDE, DESTINATION_POINT, FILL_ALL_FIELDS, LEAVE_HOUR, PASSENGERS, RIDE_DATE, STARTING_POINT_SINGLE, TERMS_OF_USE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
 import { FormControl, TextField, Stack, Button } from "@mui/material"
 import { FormElementType, RideFormItem } from "./RideFormItem"
 import { HtmlTooltip } from "../utilities/HtmlTooltip"
 import { submitButton } from "../../settings/styles"
+import { PRIMARY_BLACK } from "../../settings/colors"
 
 
 
@@ -62,7 +62,7 @@ export default function CreateRide() {
         setRide({ ...ride, ...{ extraStopPoints: [...ride.extraStopPoints, point] } })
     }
     const removeExtraStopPoint = (point: string) => {
-        let cur = ride.extraStopPoints
+        const cur = ride.extraStopPoints
         const i = cur.findIndex(p => p === point)
         cur.splice(i, 1)
         setRide({ ...ride, ...{ extraStopPoints: cur } })
@@ -128,7 +128,7 @@ export default function CreateRide() {
                 <FormControl >
                     <label style={labelStyle}>{RIDE_DATE(lang)}</label>
                     <div
-                        style={{ background: 'white' }}>
+                        style={{ background: PRIMARY_BLACK}}>
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DatePicker
 
@@ -140,7 +140,7 @@ export default function CreateRide() {
                         </LocalizationProvider>
                     </div>
                 </FormControl>
-                <FormControl sx={{ background: 'white' }}>
+                <FormControl sx={{ background: PRIMARY_BLACK}}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <TimePicker
                             label={LEAVE_HOUR(lang)}
@@ -175,7 +175,7 @@ export default function CreateRide() {
                 <FormControl>
                     <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidPrivateRide(ride) ? FILL_ALL_FIELDS(lang) : !termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_CREATE(lang)} arrow>
                         <span>
-                            <Button sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px' } }} disabled={!isValidPrivateRide(ride) || !termsOfUser} >{CREATE_RIDE(lang)}</Button>
+                            <Button sx={{ ...submitButton(false), ... {  padding: '8px',width:'90%',marginTop:'16px' } }} variant="outlined" disabled={!isValidPrivateRide(ride) || !termsOfUser} >{CREATE_RIDE(lang)}</Button>
                         </span>
                     </HtmlTooltip>
                 </FormControl>

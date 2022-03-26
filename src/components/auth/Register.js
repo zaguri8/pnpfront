@@ -1,8 +1,9 @@
 import { Input, FormControl, InputLabel, Stack } from "@mui/material"
-import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE, ERROR } from '../../settings/strings'
+import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE } from '../../settings/strings'
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
+import { SECONDARY_BLACK, SECONDARY_WHITE} from '../../settings/colors'
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
@@ -19,6 +20,7 @@ import { useLoading } from "../../context/Loading"
 import { useLocation } from "react-router"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
 import { useLanguage } from "../../context/Language"
+import { submitButton } from "../../settings/styles"
 
 
 export default function Register() {
@@ -37,7 +39,7 @@ export default function Register() {
             transformOrigin: "top right"
         }
     }));
-    
+
     const { lang } = useLanguage()
     function register(e) {
 
@@ -54,7 +56,7 @@ export default function Register() {
                 || phone.includes('058')
                 || phone.includes('059')))
                 || phone.length !== 10) {
-                errors.push(lang === 'heb' ? 'יש להזין מס טלפון תקין':  `Invalid phone number ${phone}`)
+                errors.push(lang === 'heb' ? 'יש להזין מס טלפון תקין' : `Invalid phone number ${phone}`)
             }
             if ((selectedFavoriteEvents.length < 1
                 || selectedFavoriteEvents.length === 1) && selectedFavoriteEvents[0].length === 0) {
@@ -131,67 +133,87 @@ export default function Register() {
                 alignItems: 'center'
             }}>
                 <SectionTitle title={REGISTER_TITLE(lang)} style={{
-                    background: 'whitesmoke',
+                    background: SECONDARY_BLACK,
                     marginTop: '0px',
                     marginBottom: '32px'
                 }} />
                 <Stack spacing={3} style={{ width: '80%' }}>
                     <FormControl>
-                        <InputLabel required classes={{
+                        <InputLabel style= {{color:SECONDARY_WHITE}} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="first_name_input">{FIRST_NAME(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang) }} id="first_name_input" aria-describedby="first_name_helper_text" />
+                        <Input sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }}
+
+                            id="first_name_input" aria-describedby="first_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel required classes={{
+                        <InputLabel  style= {{color:SECONDARY_WHITE}} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="last_name_input">{LAST_NAME(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang) }} id="last_name_input" aria-describedby="last_name_helper_text" />
+                        <Input
+                            type="text"
+                            name="last-name"
+                            autoComplete="last-name"
+                            sx={{ direction: SIDE(lang) ,color:SECONDARY_WHITE}} id="last_name_input" aria-describedby="last_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel required classes={{
+                        <InputLabel  style= {{color:SECONDARY_WHITE}} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="phone_number_input">{PHONE_NUMBER(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang) }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
+                        <Input
+                            type="tel"
+                            name="phone"
+                            autoComplete="phone"
+                            sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel required classes={{
+                        <InputLabel  style= {{color:SECONDARY_WHITE}} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang) }} type='email' id="email_input" aria-describedby="email_helper_text" />
+                        <Input
+                            autoComplete="username"
+                            type='email'
+                            name="email"
+                            sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
 
                     <FormControl>
-                        <InputLabel variant="outlined" required classes={{
+                        <InputLabel  style= {{color:SECONDARY_WHITE}} variant="outlined" required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang) }} type='password' id="password_input" aria-describedby="password_helper_text" />
+                        <Input
+                            autoComplete="new-password"
+                            type="password"
+                            name="new-password"
+                            sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
                     </FormControl>
 
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                            label={<p >{BIRTH_DATE(lang)}</p>}
+                            label={<p style = {{color:SECONDARY_WHITE}} >{BIRTH_DATE(lang)}</p>}
                             value={date}
+                            
                             onChange={(newValue) => setDate(newValue)}
-                            renderInput={(params) => <TextField {...params} />}
+                            renderInput={(params) => <TextField style = {{color:SECONDARY_WHITE}} {...params} />}
                         />
                     </LocalizationProvider>
-                    <label>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך': 'Help us know you better: Choose your favorite event types'}</label>
+                    <label style = {{color:SECONDARY_WHITE}}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
                     <FavoriteEventsDialog />
 
-                    <Button title={REGISTER_OK(lang)} type='submit' />
+
+                    <Button  title={REGISTER_OK(lang)} style = {{...submitButton(false),...{padding:'8px',width:'100%',marginTop:'16px'}}} variant="outlined" type='submit' />
 
                     <div>
-                        <Link to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
+                        <Link style = {{textDecoration:'underline',color:SECONDARY_WHITE}} to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
                     </div>
 
 

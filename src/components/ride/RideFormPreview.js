@@ -4,12 +4,10 @@ import $ from 'jquery'
 import { useLayoutEffect } from "react";
 import { FormElementType } from "./RideFormItem";
 import { useState } from "react";
-import { ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK } from "../../settings/colors";
 import { useLoading } from "../../context/Loading";
-import { v4 } from 'uuid'
-import Places from "../utilities/Places";
 
-import { COMMENTS, CONTINUE, CREATE_RIDE, DESTINATION_POINT, FULL_NAME, PASSENGERS, SIDE, STARTING_POINT, STARTING_POINT_SINGLE } from "../../settings/strings";
+import { COMMENTS, CONTINUE, CREATE_RIDE, DESTINATION_POINT, PASSENGERS, SIDE, STARTING_POINT_SINGLE } from "../../settings/strings";
 import { useLanguage } from "../../context/Language";
 import { useNavigate } from "react-router";
 
@@ -35,7 +33,7 @@ export function RideFormPreview() {
         justifyContent: 'center',
 
         alignItems: 'center',
-        background: 'white',
+        background: PRIMARY_BLACK,
         display: 'flex',
         flexDirection: 'row'
     }
@@ -68,7 +66,6 @@ export function RideFormPreview() {
         function resize() {
             const windowWidth = window.outerWidth
             if (windowWidth < 726) {
-                $('.ride_form_item').css({ 'borderRadius': '0px' })
                 $('#ride_form').css('padding', '8px')
                 $('#ride_form').css('marginTop', '0px')
                 $('#ride_form').css('marginBottom', '0px')
@@ -76,14 +73,16 @@ export function RideFormPreview() {
                 $('#ride_form').css('flexDirection', 'column')
                 $('#dest_start_input').css('width', '100%')
                 $('#form_item_1').css('width', '100%')
+                $('#form_item_5').css('width', '35%')
                 $('#form_item_2').css('width', '100%')
                 $('#form_header').css('maxWidth', 'inherit')
             } else {
-                $('.ride_form_item').css({ 'borderRadius': '16px' })
+                
                 $('#ride_form').css('padding', '32px')
                 $('#dest_start_input').css('flexDirection', 'row')
                 $('#ride_form').css('flexDirection', 'row')
                 $('#dest_start_input').css('width', 'auto')
+                $('#form_item_5').css('width', '100%')
                 $('#form_header').css('maxWidth', '50px')
             }
         }
@@ -99,7 +98,7 @@ export function RideFormPreview() {
     return <div dir={SIDE(lang)} style={formstyle}>
         <div id='ride_form' style={{
             display: 'flex',
-            backgroundImage: ORANGE_GRADIENT_PRIMARY,
+            backgroundImage: DARK_BLACK,
             flexDirection: 'column',
             justifyContent: 'center',
             columnGap: '8px',
@@ -144,7 +143,7 @@ export function RideFormPreview() {
 
                 <RideFormItem actionButton={() => {
                     nav('/createride', { state: ride })
-                }} id='form_item_5' style={{ fontWeight: 'bold', borderRadius: '8px', background: 'orange', border: '1px solid white', color: 'white' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
+                }} id='form_item_5' style={{ fontWeight: 'bold',fontSize:'22px',width:'50%', borderRadius: '8px', background: DARKER_BLACK_SELECTED, border: '1px solid white', color: 'white' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
             </div>
         </div>
     </div>

@@ -1,21 +1,21 @@
-import { InputLabel, List, TextField, Button, Checkbox } from '@mui/material'
+import { InputLabel, List, Button, Checkbox } from '@mui/material'
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
-import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, FILL_ALL_FIELDS, PAY_COMPLETE, TERMS_OF_USE, TOS } from '../../settings/strings'
+import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, TERMS_OF_USE, TOS } from '../../settings/strings'
 import { submitButton } from '../../settings/styles'
 import { useFirebase } from '../../context/Firebase'
 import AddIcon from '@mui/icons-material/Add';
 import { useLoading } from '../../context/Loading'
 import { credit_cards } from '../../assets/images'
-import { isValidTransaction } from '../../store/validators'
 
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useLanguage } from "../../context/Language";
-import { chargeCreditCard } from '../../store/payments'
-import { AMOUNT_OF_TICKETS, CARD_HOLDER_NAME, CARD_NUMBER, CVV, EXPIRATION, EXP_M, EXP_Y, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
+import { AMOUNT_OF_TICKETS, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
 import { useLocation, useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
+import { DARK_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import HTMLFromText from '../utilities/HtmlFromText'
 export function PaymentForm({ product }) {
 
     const { lang } = useLanguage()
@@ -87,30 +87,32 @@ export function PaymentForm({ product }) {
     const getElement = () => {
         return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '280px' }} src={paymentLink} /> : (
             <div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: SECONDARY_WHITE, justifyContent: 'center' }}>
 
 
                     <span style={{ marginTop: '0px', padding: '4px', fontWeight: 'bold' }}>{PAYMENT_FOR_RIDE(lang)}</span>
-                    <label style={{ padding: '8px', fontSize: '14px' }}>{`${product.desc}`}</label>
+                    <div style={{ padding: '8px' }}>
+                        <HTMLFromText text={product.desc} />
+                    </div>
 
                     <img style={{ width: '48px', height: '18px', alignSelf: 'center', marginBottom: '0px' }} src={credit_cards} />
                 </div>
 
                 <span style={{ padding: '8px', display: 'flex', flexDirection: 'column', rowGap: '8px', alignItems: 'center', justifyContent: 'center', columnGap: '8px' }}>
                     <div style={{ background: 'none', display: 'flex', alignContent: 'center', alignItems: 'center', columnGap: '4px' }}>
-                        <AddIcon sx={{ cursor: 'pointer', background: 'orange', color: 'white' }} onClick={() => {
+                        <AddIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
                             const newAmountAdded = ticketAmount + 1 <= 10 ? ticketAmount + 1 : 10
                             setTicketAmount(newAmountAdded)
                             setTotalPrice(newAmountAdded * Number(product.price))
-                        }} /><RemoveIcon sx={{ cursor: 'pointer', background: 'orange', color: 'white' }} onClick={() => {
+                        }} /><RemoveIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
                             const newAmountRemoved = ticketAmount - 1 >= 1 ? ticketAmount - 1 : 1
                             setTicketAmount(newAmountRemoved)
                             setTotalPrice(newAmountRemoved * Number(product.price))
                         }
                         } /></div>
-                    <span>{`${AMOUNT_OF_TICKETS(lang)} ${ticketAmount}`}</span>
+                    <span style={{ color: SECONDARY_WHITE }}>{`${AMOUNT_OF_TICKETS(lang)} ${ticketAmount}`}</span>
                 </span>
-                <label style={{ fontSize: '24px', padding: '4px', fontWeight: '100' }}>{TOTAL_TO_PAY(lang, Number(product.price) * ticketAmount)}</label>
+                <label style={{ fontSize: '24px', padding: '4px', fontWeight: '100', color: SECONDARY_WHITE }}>{TOTAL_TO_PAY(lang, Number(product.price) * ticketAmount)}</label>
                 <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
                     <span>
                         <Button onClick={requestPayment}
@@ -118,12 +120,12 @@ export function PaymentForm({ product }) {
                             disabled={!termsOfUser} >{CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
-                <div style={{ padding: '8px' }}><InputLabel style={{ fontSize: '14px', paddingTop: '16px', textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+                <div style={{ padding: '8px' }}><InputLabel style={{ color: SECONDARY_WHITE, fontSize: '14px', paddingTop: '16px', textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
                     <Checkbox
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
                     <br />
-                    <Link to={'/termsOfService'} onClick={closeDialog}>{TOS(lang)}</Link>
+                    <Link style={{ color: SECONDARY_WHITE, textDecoration: 'underline' }} to={'/termsOfService'} onClick={closeDialog}>{TOS(lang)}</Link>
                 </div></div>
         )
     }

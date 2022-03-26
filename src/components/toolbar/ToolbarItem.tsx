@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+import { PRIMARY_WHITE } from "../../settings/colors";
 
 export default function ToolbarItem(props: {
     text?: string,
@@ -20,7 +21,7 @@ export default function ToolbarItem(props: {
             textAlign: 'center',
             borderRadius: '8px',
             background: props.image ? 'none' : 'rgba(0,0,0,0.0)',
-            color: 'black',
+            color: PRIMARY_WHITE,
             maxHeight: 'inherit'
         }, ...props.style
     }}>

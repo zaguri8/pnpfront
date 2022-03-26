@@ -1,20 +1,18 @@
-import { createContext, useContext, useState, useEffect, Context } from "react"
+import { useContext, useState, useEffect } from "react"
 import Store from "../store/external";
-import { ErrorFn, getAuth, Unsubscribe } from "firebase/auth";
+import { getAuth, Unsubscribe } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getDatabase, get, set, onValue } from "firebase/database";
-import { Realtime } from '../store/external/index'
+import { getDatabase, onValue } from "firebase/database";
 import { initializeApp } from 'firebase/app'
 import firebase from 'firebase/compat/app'
 import { User } from "firebase/auth";
 import React from "react";
 import { PNPUser } from "../store/external/types";
 import 'firebase/compat/app'
-import { getStorage, uploadBytes, getDownloadURL, ref as storageRef } from "firebase/storage";
+import { getStorage, uploadBytes, ref as storageRef } from "firebase/storage";
 import { ref, child } from "firebase/database";
 import { userFromDict } from "../store/external/converters";
 import { firebaseConfig } from '../settings/config'
-import { createNewCustomer } from "../store/payments";
 firebase.initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)

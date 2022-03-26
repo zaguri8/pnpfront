@@ -4,7 +4,6 @@ import { PRIMARY_WHITE } from "../settings/colors";
 import { useNavigate } from 'react-router'
 import { PNPEvent } from "../store/external/types";
 import { useLanguage } from "../context/Language";
-import { SIDE } from "../settings/strings";
 
 export type GalleryProps = {
     header: string
@@ -21,15 +20,15 @@ function GalleryItemTitle(props: { event:PNPEvent}) {
         textAlign: 'start',
         marginBottom: '8px',
         display: 'flex',
-        height: '25%',
+        height: '26%',
         flexDirection: 'column',
         color: 'black',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
-    }}><h4 style={{ margin: '0px',padding:'6px',paddingBottom:'0px',paddingTop:'2px'}} >{props.event.eventName}</h4>
-    <span  style={{fontSize:'10px', margin: '0px',paddingBottom:'1px',paddingTop:'0px', marginRight: '8px' }} >{props.event.eventLocation}</span>
+    }}><h4 style={{ margin: '0px' ,padding:'6px',paddingBottom:'0px',paddingTop:'2px'}} >{props.event.eventName}</h4>
+    <span  style={{fontSize:'10px',background:'white', margin: '0px',paddingBottom:'1px',paddingTop:'0px', marginRight: '8px' }} >{props.event.eventLocation}</span>
     <hr style = {{width:'98%',borderWidth:'.1px',borderColor:'white',margin:'0px'}}/>
-    <h5 dir = {'ltr'} style={{ fontSize: '10px',fontWeight:'100',padding:'1px', marginLeft: '8px', marginTop: '0px', color: 'black' }}>{props.event.eventDate}</h5></div>);
+    <span dir = {'ltr'} style={{fontSize: '12px',fontWeight:'600',padding:'1px', marginLeft: '8px', marginTop: '0px', color: 'gray' }}>{props.event.eventDate}</span></div>);
 }
 
 
@@ -45,20 +44,20 @@ export function Gallery(props: GalleryProps) {
 
     const cardStyle: CSSProperties = {
 
-
         maxWidth: '225px',
         border: '.1px solid gray',
         marginLeft: '32px',
         marginRight: '32px',
         minWidth: '225px',
         minHeight: '190px',
-        borderRadius: '16px'
+        borderRadius: '16px',
+
+        background:'white'
     }
     const imageContainer: CSSProperties = {
         display: 'flex',
         width: 'fit-content',
         padding: '8px',
-
         textAlign: 'center'
 
     }
@@ -71,7 +70,7 @@ export function Gallery(props: GalleryProps) {
         padding: '32px',
         fontSize: '28px',
         margin: '0px',
-        color: 'black'
+        color: PRIMARY_WHITE
     }
     // POPUP VERSION //const dialogContext = useLoading()
     // PAGE VERSION
@@ -98,6 +97,7 @@ export function Gallery(props: GalleryProps) {
                             display: 'flex',
                             flexDirection: 'column',
                             cursor: 'pointer',
+                            backgroundColor:'white',
                             background: `url('${pnpEvent.eventImageURL}') `,
                             backgroundSize: '100% 75%',
                             backgroundRepeat: 'no-repeat',

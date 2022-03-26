@@ -4,12 +4,12 @@ import { PNPUser, PNPEvent, PNPPrivateRide, PNPRideConfirmation, PNPPublicRide, 
 
 
 
-export const rideRequestFromDict : (snap:DataSnapshot) => PNPRideRequest = (snap) => {
+export const rideRequestFromDict: (snap: DataSnapshot) => PNPRideRequest = (snap) => {
     return {
         eventId: snap.child('eventId').val(),
         requestUserId: snap.child('requestUserId').val(),
         eventName: snap.child('eventName').val(),
-        fullName:snap.child('fullName').val(),
+        fullName: snap.child('fullName').val(),
         passengers: snap.child('passengers').val(),
         names: snap.child('names').val(),
         phoneNumber: snap.child('phoneNumber').val(),
@@ -26,8 +26,9 @@ export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
         eventId: snap.child('eventId').val(),
         eventName: snap.child('eventName').val(),
         eventProducerId: snap.child('eventProducerId').val(),
-        eventCanAddRides:snap.child('eventCanAddRides').val(),
+        eventCanAddRides: snap.child('eventCanAddRides').val(),
         eventDate: snap.child('eventDate').val(),
+        eventAttention: snap.child('eventAttention').val(),
         eventLocation: snap.child('eventLocation').val(),
         eventDetails: snap.child('eventDetails').val(),
         eventHours: snap.child('eventHours').val(),
@@ -91,10 +92,10 @@ export const publicRideFromDict: (snap: DataSnapshot) => PNPPublicRide = (snap) 
 }
 
 export const userFromDict: (snap: DataSnapshot) => PNPUser = (snap) => {
-    let user: PNPUser = {
+    const user: PNPUser = {
         email: snap.child('email').val(),
         image: snap.child('image').val(),
-        admin:snap.child('admin').val(),
+        admin: snap.child('admin').val(),
         customerId: snap.child('customerId').val(),
         coins: snap.child('coins').val(),
         birthDate: snap.child('birthDate').val(),
@@ -104,4 +105,33 @@ export const userFromDict: (snap: DataSnapshot) => PNPUser = (snap) => {
         producer: snap.child('producer').val(),
     }
     return user
+}
+
+export function getEventType(event: PNPEvent) {
+    let type = 'clubs'
+    switch (event.eventType) {
+        case "הופעות":
+            type = 'concerts'
+            break
+        case "מסיבות ומועדונים":
+            type = 'clubs'
+            break
+        case "משחקי כדורגל":
+            type = 'football'
+            break
+        case "פסטיבלים":
+            type = 'fetivals'
+            break
+        case "ברים":
+            type = 'bars'
+            break
+        case "ספורט כללי":
+            type = 'sports'
+            break
+        case "אירועי ילדים":
+            type = 'children'
+            break
+    }
+
+    return type
 }

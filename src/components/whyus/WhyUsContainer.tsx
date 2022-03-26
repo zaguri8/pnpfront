@@ -5,7 +5,7 @@ import alcohol from '../../assets/images/whyus/alcohol.png'
 import handshake from '../../assets/images/whyus/handshake.png'
 import spoil from '../../assets/images/whyus/spoil.png'
 import time from '../../assets/images/whyus/time.png'
-import { PRIMARY_WHITE } from "../../settings/colors"
+import { PRIMARY_BLACK } from "../../settings/colors"
 import {
     WHY_US_ITEM_1_TITLE,
     WHY_US_ITEM_1_CONTENT,
@@ -53,7 +53,7 @@ export default function WhyUsContainer() {
             flexDirection: 'column',
             overflow: 'scroll',
             columnGap: '16px',
-            background: PRIMARY_WHITE,
+            background: PRIMARY_BLACK,
             justifyContent: 'center'
         }}>
 
