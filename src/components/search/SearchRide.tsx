@@ -1,7 +1,7 @@
 import './SearchRide.css'
 import { InnerPageHolder, PageHolder } from '../utilities/Holders'
-import { Input, Stack, MenuItem } from '@mui/material'
-import { DARK_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
+import { Input, Stack, TextField, MenuItem } from '@mui/material'
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import { useEffect, useState } from 'react'
 import { PNPPublicRide } from '../../store/external/types'
 import { useLoading } from '../../context/Loading'
@@ -9,7 +9,8 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useFirebase } from '../../context/Firebase'
 import { useLocation, useNavigate } from 'react-router'
 
-import { SIDE } from '../../settings/strings'
+import { v4 } from 'uuid'
+import { DESTINATION_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
 import SectionTitle from '../SectionTitle'
 import Spacer from '../utilities/Spacer'
@@ -55,7 +56,6 @@ export default function SearchRide() {
         }
         return (<Stack spacing={2}>
             {function filter() {
-
                 if (!searchQuery && !secondQuery) {
                     return <span style={{ fontSize: '12px', color: PRIMARY_WHITE }} dir={SIDE(lang)}>{lang === 'heb' ? 'חפש משהו..' : 'Search something..'}</span>
                 }
