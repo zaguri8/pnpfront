@@ -61,11 +61,14 @@ export default function PaymentSuccess() {
 
             {transaction ? <Stack className='payment_details_holder' dir={SIDE(lang)}>
                 <label>{lang === 'heb' ? 'מוצר' : 'Product'}</label>
-                {transaction ? <span>{transaction.more_info.productName}/</span> : <span>{LOADING(lang)}</span>}
+                {transaction ? <span>{transaction.more_info.productName}</span> : <span>{LOADING(lang)}</span>}
                 <label>{lang === 'heb' ? 'כמות' : 'Product'}</label>
-                {transaction ? <span>{transaction.more_info.amount}/</span> : <span>{LOADING(lang)}</span>}
+                {transaction ? <span>{transaction.more_info.amount}</span> : <span>{LOADING(lang)}</span>}
                 <label>{lang === 'heb' ? 'כיווני נסיעה' : 'Product'}</label>
-                {transaction ? <span>{transaction.more_info.twoWay ? 'שני כיוונים' : 'כיוון אחד'}/</span> : <span>{LOADING(lang)}</span>}
+                {transaction ? <span>{transaction.more_info.twoWay ? 'שני כיוונים' : 'כיוון אחד'}</span> : <span>{LOADING(lang)}</span>}
+                {transaction && !transaction.more_info.twoWay &&
+                    <div><label>{lang === 'heb' ? 'כיוון נסיעה' : 'Product'}</label>
+                        <span>{transaction.more_info.direction === '1' ? 'הלוך' : 'חזור'}</span></div>}
                 <Spacer offset={1} />
                 <label>{lang === 'heb' ? 'סטאטוס' : 'Status'}</label>
                 {transaction ? <span>{transaction.status_description}</span> : <span>{LOADING(lang)}</span>}

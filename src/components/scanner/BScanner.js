@@ -24,7 +24,7 @@ function BScanner() {
             }
         }
     }
-    const [faceMode, setFaceMode] = useState('user')
+    const [faceMode, setFaceMode] = useState('environment')
     return <div>
         {!useScan ? <button onClick={() => {
             setUseScan(true)
@@ -35,7 +35,7 @@ function BScanner() {
         >{'בטל'}</button>}
         <br />
         <br />
-        <select onChange={(e) => {
+        <select style={{ padding: '4px' }} onChange={(e) => {
             setFaceMode(e.target.value)
         }}>
             <option value={'user'}>
@@ -49,7 +49,7 @@ function BScanner() {
             containerStyle={{ maxWidth: window.outerWidth < 400 ? '75%' : '50%', maxHeight: '75%', marginLeft: 'auto', marginRight: 'auto' }}
             onError={setError}
 
-            constraints={{ facingMode: {  exact: faceMode } }}
+            constraints={{ facingMode: { exact: faceMode } }}
             onResult={(result, error) => {
                 if (!!result) {
                     updateScanResult(result)

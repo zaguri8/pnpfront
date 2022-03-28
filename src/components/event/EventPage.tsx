@@ -46,6 +46,7 @@ export default function EventPage() {
                     product={{
                         name: `הסעה לאירוע ${event.eventName}`,
                         desc: event.eventDetails,
+                        direction: '2', // 2 - first way , 1 second way
                         twoWay: ride ? ride?.twoWay : selectedEventRide ? selectedEventRide.twoWay : '',
                         price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
                         eventId: event.eventId,

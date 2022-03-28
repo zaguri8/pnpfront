@@ -69,7 +69,8 @@ export function PaymentForm({ product }) {
             amount: ticketAmount,
             eventId: product.eventId,
             rideId: product.rideId,
-            twoWay: product.twoWay
+            twoWay: product.twoWay,
+            direction: product.direction 
         }
 
         const send = {
@@ -89,7 +90,7 @@ export function PaymentForm({ product }) {
 
 
     const getElement = () => {
-        return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '280px', maxWidth: '90%',maxHeight:'90%' }} src={paymentLink} /> : (
+        return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '280px', maxWidth: '90%', maxHeight: '90%' }} src={paymentLink} /> : (
             <div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: SECONDARY_WHITE, justifyContent: 'center' }}>
 

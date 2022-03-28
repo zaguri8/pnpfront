@@ -5,6 +5,8 @@ import { Unsubscribe } from "firebase/database"
 import { PNPTransactionConfirmation } from "../../store/external/types"
 import Spacer from "../utilities/Spacer"
 import { SECONDARY_WHITE } from "../../settings/colors"
+import { useLoading } from "../../context/Loading"
+import { Button } from "@mui/material"
 function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
@@ -31,6 +33,7 @@ export default function BScanResult() {
 
     const nav = useNavigate()
 
+    const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
 
     function getElem() {
 
@@ -44,26 +47,70 @@ export default function BScanResult() {
                         (<button
                             style={{ margin: '4px' }}
                             onClick={() => {
-                                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, 1)
-                                    .then(() => {
-                                        alert('נסיעה הלוך מומשה')
-                                        nav('/scan')
-                                    }).catch((e) => {
-                                        alert('נסיעה לא מומשה')
-                                    })
+                                openDialog({
+                                    content: <div style={{ padding: '6px', color: SECONDARY_WHITE }}>
+
+                                        <label style={{ color: SECONDARY_WHITE, padding: '6px', margin: '4px' }}>{'מימוש נסיעה, כיוון : הלוך'}</label>
+                                        <Button
+                                            onClick={() => {
+                                                doLoad()
+                                                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, 1)
+                                                    .then(() => {
+                                                        cancelLoad()
+                                                        closeDialog()
+                                                        alert('נסיעה הלוך מומשה')
+                                                        nav('/scan')
+                                                    }).catch((e) => {
+                                                        cancelLoad()
+                                                        closeDialog()
+                                                        alert('נסיעה לא מומשה')
+                                                    })
+                                            }}
+                                            style={{
+                                                width: '75%',
+                                                textTransform: 'none',
+                                                margin: '8px',
+                                                fontSize: '16px'
+                                            }}>
+                                            {'בצע מימוש נסיעה הלוך'}
+                                        </Button>
+                                    </div>
+                                })
                             }}>{'ממש נסיעה הלוך'}</button>)}
                     <hr />
                     {(confirmation && confirmation.isValid) && confirmation.ridesLeft === 1 &&
                         <button
                             style={{ margin: '4px' }}
                             onClick={() => {
-                                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, 0)
-                                    .then(() => {
-                                        alert('נסיעה חזרה מומשה')
-                                        nav('/scan')
-                                    }).catch((e) => {
-                                        alert('הנסיעה לא מומשה')
-                                    })
+                                openDialog({
+                                    content: <div style={{ padding: '6px', color: SECONDARY_WHITE }}>
+
+                                        <label style={{ color: SECONDARY_WHITE, padding: '6px', margin: '4px' }}>{'מימוש נסיעה, כיוון : הלוך'}</label>
+                                        <Button
+                                            onClick={() => {
+                                                doLoad()
+                                                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, 0)
+                                                    .then(() => {
+                                                        cancelLoad()
+                                                        closeDialog()
+                                                        alert('נסיעה חזור מומשה')
+                                                        nav('/scan')
+                                                    }).catch((e) => {
+                                                        cancelLoad()
+                                                        closeDialog()
+                                                        alert('נסיעה לא מומשה')
+                                                    })
+                                            }}
+                                            style={{
+                                                width: '75%',
+                                                textTransform: 'none',
+                                                margin: '8px',
+                                                fontSize: '16px'
+                                            }}>
+                                            {'בצע מימוש נסיעה חזור'}
+                                        </Button>
+                                    </div>
+                                })
                             }}>{'ממש נסיעה חזור'}</button>}
                 </div>
             )

@@ -26,6 +26,7 @@ export type TransactionSuccess = {
     more_info: {
         productName: string,
         amount: string,
+        direction: string,
         eventId: string,
         rideId: string,
         twoWay: string
