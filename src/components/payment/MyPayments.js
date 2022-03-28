@@ -43,7 +43,7 @@ const MyPayments = () => {
             <td style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.more_info}</td>
             <td style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}><Button
                 onClick={() => nav('/payment/success', { state: transaction })}
-                style={{ ...submitButton(false), ...{ width: '100%', paddingLeft: '4px', paddingRight: '4px', fontSize: '16px' } }}>{lang === 'heb' ? 'הצג פירוט' : 'Show details'}</Button></td>
+                style={{ ...submitButton(false), ...{textTransform:'none', width: '100%', paddingLeft: '4px', paddingRight: '4px', fontSize: '16px' } }}>{lang === 'heb' ? 'הצג פירוט' : 'Show details'}</Button></td>
         </tr> : null)
     }
 

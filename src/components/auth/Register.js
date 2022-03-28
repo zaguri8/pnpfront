@@ -1,9 +1,9 @@
-import { Input, FormControl, InputLabel, Stack } from "@mui/material"
-import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE } from '../../settings/strings'
+import { Input, FormControl, InputLabel, Stack, Checkbox } from "@mui/material"
+import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE, TERMS_OF_USE } from '../../settings/strings'
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
-import { SECONDARY_BLACK, SECONDARY_WHITE} from '../../settings/colors'
+import { ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
@@ -46,6 +46,8 @@ export default function Register() {
         function validate(phone, firstname, lastname, selectedFavoriteEvents) {
             let errors = []
 
+
+
             if (!((phone.includes('050')
                 || phone.includes('052')
                 || phone.includes('053')
@@ -67,6 +69,9 @@ export default function Register() {
             }
             if (lastname.length < 2) {
                 errors.push(lang === 'heb' ? 'יש להזין שם משפחה תקין' : `Invalid last name ${lastname}`)
+            }
+            if (!termsOfUse) {
+                errors.push('יש לאשר את תנאי השימוש')
             }
             return errors
         }
@@ -121,6 +126,11 @@ export default function Register() {
 
     const [date, setDate] = useState()
     const classes = useStyles()
+
+    const [termsOfUse, setTermsOfUse] = useState()
+    const handleTermsOfUseChange = (e) => {
+        setTermsOfUse(e.target.checked)
+    }
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder>
@@ -139,17 +149,17 @@ export default function Register() {
                 }} />
                 <Stack spacing={3} style={{ width: '80%' }}>
                     <FormControl>
-                        <InputLabel style= {{color:SECONDARY_WHITE}} required classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="first_name_input">{FIRST_NAME(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }}
+                        <Input sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
 
                             id="first_name_input" aria-describedby="first_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel  style= {{color:SECONDARY_WHITE}} required classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="last_name_input">{LAST_NAME(lang)}</InputLabel>
@@ -157,11 +167,11 @@ export default function Register() {
                             type="text"
                             name="last-name"
                             autoComplete="last-name"
-                            sx={{ direction: SIDE(lang) ,color:SECONDARY_WHITE}} id="last_name_input" aria-describedby="last_name_helper_text" />
+                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="last_name_input" aria-describedby="last_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel  style= {{color:SECONDARY_WHITE}} required classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="phone_number_input">{PHONE_NUMBER(lang)}</InputLabel>
@@ -169,11 +179,11 @@ export default function Register() {
                             type="tel"
                             name="phone"
                             autoComplete="phone"
-                            sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
+                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel  style= {{color:SECONDARY_WHITE}} required classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
@@ -181,12 +191,12 @@ export default function Register() {
                             autoComplete="username"
                             type='email'
                             name="email"
-                            sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
+                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
 
                     <FormControl>
-                        <InputLabel  style= {{color:SECONDARY_WHITE}} variant="outlined" required classes={{
+                        <InputLabel style={{ color: SECONDARY_WHITE }} variant="outlined" required classes={{
                             root: classes.labelRoot,
                             shrink: classes.shrink
                         }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
@@ -194,28 +204,36 @@ export default function Register() {
                             autoComplete="new-password"
                             type="password"
                             name="new-password"
-                            sx={{ direction: SIDE(lang),color:SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
+                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
                     </FormControl>
 
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                            label={<p style = {{color:SECONDARY_WHITE}} >{BIRTH_DATE(lang)}</p>}
+                            label={<p style={{ color: SECONDARY_WHITE }} >{BIRTH_DATE(lang)}</p>}
                             value={date}
-                            
+
                             onChange={(newValue) => setDate(newValue)}
-                            renderInput={(params) => <TextField style = {{color:SECONDARY_WHITE}} {...params} />}
+                            renderInput={(params) => <TextField style={{ color: SECONDARY_WHITE }} {...params} />}
                         />
                     </LocalizationProvider>
-                    <label style = {{color:SECONDARY_WHITE}}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
+                    <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
                     <FavoriteEventsDialog />
 
 
-                    <Button  title={REGISTER_OK(lang)} style = {{...submitButton(false),...{padding:'8px',width:'100%',marginTop:'16px'}}} variant="outlined" type='submit' />
+                    <Button title={REGISTER_OK(lang)} style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '16px' } }} variant="outlined" type='submit' />
 
                     <div>
-                        <Link style = {{textDecoration:'underline',color:SECONDARY_WHITE}} to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
+                        <Link style={{ textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
                     </div>
+                    <Stack >
 
+
+                        <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
+                        <Checkbox
+                            style={{ width: 'fit-content', alignSelf: 'center', background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
+                            onChange={handleTermsOfUseChange}
+                            name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
+                    </Stack>
 
                 </Stack>
             </form>

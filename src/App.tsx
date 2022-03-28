@@ -23,7 +23,6 @@ import CreateEvent from './components/event/CreateEvent';
 import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
-import Payment from './components/payment/Payment';
 import MyPayments from './components/payment/MyPayments';
 import Test from './components/Test';
 import EventStatistics from './components/admin/EventStatistics';
@@ -31,6 +30,8 @@ import AdminPanel from './components/admin/AdminPanel';
 import WhatsApp from './components/WhatsApp';
 import PaymentSuccess from './components/payment/PaymentSuccess'
 import SearchRide from './components/search/SearchRide';
+import BScanner from './components/scanner/BScanner.js';
+import BScanResult from './components/scanner/BScanResult';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -51,7 +52,7 @@ function ImageHeader() {
 
 
 function UNKNOWN(props: { lang: string }) {
-  return <h1>{NOTFOUND(props.lang)}</h1>;
+  return <h1 style ={{color:SECONDARY_WHITE}}>{NOTFOUND(props.lang)}</h1>;
 }
 
 
@@ -147,6 +148,7 @@ function App() {
   const { isAuthenticated, appUser } = useFirebase()
 
 
+  const NoPerms = () => (<div style ={{color:SECONDARY_WHITE}}>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div>)
 
   return (
     <div>
@@ -192,18 +194,19 @@ function App() {
           <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
           <Route path='/createevent' element={!isAuthenticated ? <Login /> : <CreateEvent />} />
           <Route path='/createride' element={!isAuthenticated ? <Login /> : <CreateRide />} />
-          <Route path='/payment' element={<Payment product={{ name: 'Some product', price: '50' }} />} />
           <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
           <Route path='/event/:id' element={<EventPage />} />
           <Route path='termsOfService' element={<TermsOfService />} />
 
 
+          <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
+          <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />
           <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />
           <Route path='/payment/success' element={<PaymentSuccess />} />
           <Route path='/invitation/:id' element={<InvitationPage />} />
-          <Route path='/test' element={<Test />} />
-          <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <div>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div> : <AdminPanel />} />
-          <Route path='/adminpanel/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <div>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div> : <EventStatistics />} />
+          {/* <Route path='/test' element={<Test />} /> */}
+          <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
+          <Route path='/adminpanel/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventStatistics />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
           <Route path='/myaccount/transactions' element={!isAuthenticated ? <Login /> : <MyPayments />} />
           <Route path='/*' element={<UNKNOWN lang={lang}></UNKNOWN>}></Route>

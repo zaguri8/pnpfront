@@ -1,6 +1,6 @@
 
 import { DataSnapshot } from "firebase/database"
-import { PNPUser, PNPEvent, PNPPrivateRide, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest } from "./types"
+import { PNPUser, PNPEvent, PNPPrivateRide, PNPTransactionConfirmation, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest } from "./types"
 
 
 
@@ -28,6 +28,7 @@ export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
         eventProducerId: snap.child('eventProducerId').val(),
         eventCanAddRides: snap.child('eventCanAddRides').val(),
         eventDate: snap.child('eventDate').val(),
+        eventType: snap.child('eventType').val(),
         eventAttention: snap.child('eventAttention').val(),
         eventLocation: snap.child('eventLocation').val(),
         eventDetails: snap.child('eventDetails').val(),
@@ -77,13 +78,27 @@ export const privateRideFromDict: (snap: DataSnapshot) => PNPPrivateRide = (snap
         comments: snap.child('comments').val()
     }
 }
+
+export const transactionConfirmationFromDict: (snap: DataSnapshot) => PNPTransactionConfirmation = (snap) => {
+    return {
+        eventId: snap.child('eventId').val(),
+        twoWay: snap.child('twoWay').val(),
+        ridesLeft: snap.child('ridesLeft').val(),
+        rideId: snap.child('rideId').val(),
+        confirmationVoucher: snap.child('confirmationVoucher').val(),
+        isValid: snap.child('isValid').val()
+    }
+}
+
 export const publicRideFromDict: (snap: DataSnapshot) => PNPPublicRide = (snap) => {
     return {
         eventId: snap.child('eventId').val(),
         rideId: snap.child('rideId').val(),
+        twoWay: snap.child('twoWay').val(),
         backTime: snap.child('backTime').val(),
         date: snap.child('date').val(),
         passengers: snap.child('passengers').val(),
+        extras: snap.child('extras').val(),
         rideDestination: snap.child('rideDestination').val(),
         rideStartingPoint: snap.child('rideStartingPoint').val(),
         rideTime: snap.child('rideTime').val(),

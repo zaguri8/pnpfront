@@ -12,6 +12,7 @@ import { useLanguage } from "../../context/Language"
 import { useLocation } from "react-router"
 import { PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { submitButton } from "../../settings/styles"
+import { useLoading } from "../../context/Loading"
 export default function Login() {
 
     const nav = useNavigate()
@@ -26,13 +27,24 @@ export default function Login() {
             transformOrigin: "top right"
         }
     }));
+    const { doLoad, cancelLoad } = useLoading()
     function login(e) {
         e.preventDefault()
         const u = e.target[0].value
         const p = e.target[1].value
+        doLoad()
         signInWithEmailAndPassword(firebase.auth, u, p)
-            .then(() => (location.state && location.state.cachedLocation) ? nav(location.state.cachedLocation) : nav('/'))
-            .catch(err => alert('הפרטים שהכנסת אינם נכונים'))
+            .then(() => {
+
+                if (location.state && location.state.cachedLocation)
+                    nav(location.state.cachedLocation)
+                else
+                    nav('/')
+            })
+            .catch(err => {
+                alert('הפרטים שהכנסת אינם נכונים')
+                cancelLoad()
+            })
 
     }
     const classes = useStyles()

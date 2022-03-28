@@ -22,44 +22,19 @@ import { useLoading } from "../../context/Loading";
 import { submitButton } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
-import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { useNavigate } from "react-router";
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
 
 export default function CreateEvent() {
     const { lang } = useLanguage()
     const [editorState, setEditorState] = useState<EditorState | undefined>()
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
     const { user, firebase } = useFirebase()
-    const [pnpEvent, setPnpEvent] = useState<PNPEvent>({
-        eventName: 'null',
-        eventLocation: 'null',
-        eventId: 'null',
-        eventCanAddRides: true,
-        eventProducerId: user ? user.uid : 'null',
-        eventDate: 'null',
-        eventType: 'null',
-        eventDetails: 'null',
-        eventPrice: 'null',
-        eventHours: { startHour: 'null', endHour: 'null' },
-        eventAgeRange: { minAge: 'null', maxAge: 'null' },
-        expectedNumberOfPeople: 'null',
-        eventImageURL: 'null'
-    })
-    const [startDate, setStartDate] = useState<string>()
-    const [endDate, setEndDate] = useState<string>()
-    const onEditorStateChanged = (state: EditorState) => {
-        setEditorState(state)
-        if (editorState) {
-            const eventDetailsHTML = draftToHtml(convertToRaw(editorState.getCurrentContent()))
-            setPnpEvent({ ...pnpEvent, ...{ eventDetails: eventDetailsHTML } })
-        }
-    }
+    const nav = useNavigate()
 
-
-    useEffect(() => {
-        console.log(pnpEvent.eventDetails)
-    })
+    const [termsOfUser, setTermsOfUse] = useState<boolean>(false)
     const eventTypes = [
         "מסיבות ומועדונים",
         "משחקי כדורגל",
@@ -71,10 +46,39 @@ export default function CreateEvent() {
     ]
 
 
+    const [selectedEventType, setSelectedEventType] = useState<string>(eventTypes[0])
+
+    const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
+    const [image, setImage] = useState<string>('')
+    const [pnpEvent, setPnpEvent] = useState<PNPEvent>({
+        eventName: 'null',
+        eventLocation: 'null',
+        eventId: 'null',
+        eventCanAddRides: true,
+        eventProducerId: user ? user.uid : 'null',
+        eventDate: dateStringFromDate(new Date()),
+        eventType: selectedEventType ?? 'null',
+        eventDetails: 'null',
+        eventPrice: 'null',
+        eventHours: { startHour: 'null', endHour: 'null' },
+        eventAgeRange: { minAge: 'null', maxAge: 'null' },
+        expectedNumberOfPeople: 'null',
+        eventImageURL: 'null'
+    })
+    const [startDate, setStartDate] = useState<string>('00:00')
+    const [endDate, setEndDate] = useState<string>('00:00')
+    const onEditorStateChanged = (state: EditorState) => {
+        setEditorState(state)
+        if (editorState) {
+            const eventDetailsHTML = draftToHtml(convertToRaw(editorState.getCurrentContent()))
+            setPnpEvent({ ...pnpEvent, ...{ eventDetails: eventDetailsHTML } })
+        }
+    }
+
+
 
     const updateEventHours = (type: 'end' | 'start', event: string | undefined | null) => {
-        const formatted = formatDateHours(new Date(event as string))
-        const dict = type === 'end' ? { startHour: formatted } : { endHour: formatted }
+        const dict = type === 'end' ? { startHour: event as string } : { endHour: event as string }
         type === 'end' ? setEndDate(event as string) : setStartDate(event as string)
         event && setPnpEvent({
             ...pnpEvent, ...{
@@ -89,12 +93,10 @@ export default function CreateEvent() {
     }
 
     const updateEventDate = (event: string | undefined | null) => {
+
         if (event as string) {
-            const date = new Date(event as string)
-            const d = String(date.getDay()).length === 1 ? "0" + date.getDay() : date.getDay()
-            const m = String(date.getMonth()).length === 1 ? "0" + date.getMonth() : date.getMonth()
-            const dateString = d + "/" + m + "/" + date.getFullYear()
-            setPnpEvent({ ...pnpEvent, ...{ eventDate: dateString } })
+            const split = reverseDate(event)
+            setPnpEvent({ ...pnpEvent, ...{ eventDate: split } })
         }
     }
     const useStyles = makeStyles(() => ({
@@ -104,7 +106,19 @@ export default function CreateEvent() {
                 borderRadius: '32px',
                 padding: '0px',
                 border: '.1px solid white',
-                color: PRIMARY_BLACK
+                color: PRIMARY_BLACK, ...{
+                    '& input[type=number]': {
+                        '-moz-appearance': 'textfield'
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    },
+                    '& input[type=number]::-webkit-inner-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    }
+                }
             }
         }, noBorder: {
             border: "1px solid red",
@@ -161,15 +175,9 @@ export default function CreateEvent() {
     const handleTermsOfUseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTermsOfUse(e.target.checked)
     }
-    const nav = useNavigate()
-
-    const [termsOfUser, setTermsOfUse] = useState<boolean>(false)
 
 
-    const [selectedEventType, setSelectedEventType] = useState<string>(eventTypes[0])
 
-    const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
-    const [image, setImage] = useState<string>('')
     return (<PageHolder>
         <SectionTitle title={CREATE_EVENT_TITLE(lang)} style={{}} />
         <InnerPageHolder>
@@ -286,52 +294,64 @@ export default function CreateEvent() {
 
                 </FormControl>
                 <FormControl style={{ width: '80%', alignSelf: 'center' }}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker
-                            onChange={(e) => updateEventDate(e)}
-                            value={pnpEvent.eventDate}
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_DATE(lang)}</label>
+                    <TextField
 
-                            label={EVENT_DATE(lang)}
-                            renderInput={(params: TextFieldProps) => <TextField
+                        value={unReverseDate(pnpEvent.eventDate)}
+                        classes={{ root: classes.root }}
+                        InputLabelProps={{
+                            shrink: true,
+                            style: { color: SECONDARY_WHITE }
+                        }}
 
-                                required disabled {...params} />}
-                        />
-                    </LocalizationProvider>
+                        type='date'
+                        onChange={(e) => updateEventDate(e.target.value)}
+                        required />
                 </FormControl>
                 <FormControl style={{ width: '80%', alignSelf: 'center' }}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <TimePicker
-                            label={EVENT_START(lang)}
-                            value={startDate}
-                            onChange={(e) => updateEventHours('start', e)}
-                            renderInput={(params: TextFieldProps) => <TextField
 
-                                required disabled {...params} />}
-                        />
-                    </LocalizationProvider>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_START(lang)}</label>
+                    <TextField
+
+
+                        value={startDate}
+                        classes={{ root: classes.root }}
+                        InputLabelProps={{
+                            shrink: true,
+                            style: { color: SECONDARY_WHITE }
+                        }}
+
+                        type='time'
+                        onChange={(e) => updateEventHours('start', e.target.value)}
+                        required />
                 </FormControl>
                 <FormControl style={{ width: '80%', alignSelf: 'center' }}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <TimePicker
-                            label={EVENT_END(lang)}
-                            value={endDate}
-                            onChange={(e) => updateEventHours('end', e)}
-                            renderInput={(params: TextFieldProps) => <TextField
 
-                                required disabled {...params} />}
-                        />
-                    </LocalizationProvider>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_END(lang)}</label>
+                    <TextField
+                        value={endDate}
+                        classes={{ root: classes.root }}
+
+                        InputLabelProps={{
+                            shrink: true,
+                            style: { color: SECONDARY_WHITE }
+                        }}
+
+                        type='time'
+                        onChange={(e) => updateEventHours('end', e.target.value)}
+                        required />
                 </FormControl>
 
                 <FormControl style={{ width: '80%', alignSelf: 'center' }} fullWidth>
-                    <InputLabel style={{ color: SECONDARY_WHITE }} required id="create_event_type_select">{EVENT_TYPE(lang)}</InputLabel>
+
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}
+                        id="create_event_type_select">{EVENT_TYPE(lang)}</label>
                     <Select
                         labelId="create_event_type_select"
-                        id="create_event_type_select"
-                        style={{ color: SECONDARY_WHITE }}
-                        value={selectedEventType}
-                        label={EVENT_TYPE(lang)}
 
+                        id="create_event_type_select"
+                        value={selectedEventType}
+                        style={{ background: DARK_BLACK, borderRadius: '32px', color: SECONDARY_WHITE }}
                         onChange={(e) => {
                             setPnpEvent({ ...pnpEvent, ...{ eventType: e.target.value } })
                             setSelectedEventType(e.target.value)
@@ -361,8 +381,9 @@ export default function CreateEvent() {
                     </span>
                 </HtmlTooltip>
             </Stack>
-            <span ><InputLabel style={{ paddingTop: '16px', fontSize: '14px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+            <span ><InputLabel style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</InputLabel>
                 <Checkbox
+                    style={{ background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
                     onChange={handleTermsOfUseChange}
                     name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
             </span>

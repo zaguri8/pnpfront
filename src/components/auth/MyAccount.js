@@ -1,6 +1,6 @@
 import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_ACCOUNT_ITEM_3, MY_ACCOUNT_ITEM_4, SIDE } from "../../settings/strings"
 import SectionTitle from "../SectionTitle"
-import spoil from '../../assets/images/whyus/spoil.png'
+import spoil from '../../assets/images/myaccount/spoil-black.png'
 import settings from '../../assets/images/myaccount/settings.png'
 import coins from '../../assets/images/myaccount/coins.png'
 import ridehistory from '../../assets/images/myaccount/historyRides.png'

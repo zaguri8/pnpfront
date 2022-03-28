@@ -38,7 +38,21 @@ export default function EventPage() {
             nav('/login', { state: { cachedLocation: location.pathname } })
             return
         }
-        openDialog({ content: <div style={{ padding: '32px', }}><PaymentForm product={{ name: event ? `הסעה לאירוע ${event!.eventName} מ - ${ride ? ride.rideStartingPoint : selectedEventRide?.rideStartingPoint} ל - ${ride ? ride.rideDestination : selectedEventRide?.rideDestination}` : '', desc: event?.eventDetails, image: null, price: ride ? ride.ridePrice : selectedEventRide?.ridePrice }} /></div> })
+
+        if (event) {
+            openDialog({
+                content: <div style={{ padding: '32px', }}><PaymentForm
+
+                    product={{
+                        name: `הסעה לאירוע ${event.eventName}`,
+                        desc: event.eventDetails,
+                        twoWay: ride ? ride?.twoWay : selectedEventRide ? selectedEventRide.twoWay : '',
+                        price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
+                        eventId: event.eventId,
+                        rideId: ride ? ride.rideId : selectedEventRide ? selectedEventRide.rideId : ''
+                    }} /></div>
+            })
+        }
     }
 
     useEffect(() => {

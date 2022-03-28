@@ -45,12 +45,3 @@ export const transactionFailureFromDict = (snap: DataSnapshot): TransactionFailu
         status_description: status_description
     }
 }
-
-export const transactionSuccessFromParams = (queryParams: URLSearchParams): TransactionSuccess | null => {
-
-    const tryObject = Object.fromEntries(queryParams)
-    if (tryObject as TransactionSuccess) {
-        return tryObject as TransactionSuccess
-    }
-    return null
-}

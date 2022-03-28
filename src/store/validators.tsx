@@ -14,7 +14,7 @@ export function isValidHttpUrl(string: string): boolean {
 }
 
 export function isValidEvent(event: PNPEvent): boolean {
-  const bool =  event !== undefined
+  const bool = event !== undefined
     && event !== null
     && (event.eventAgeRange !== null
       && event.eventAgeRange.minAge !== null
@@ -38,9 +38,7 @@ export function isValidEvent(event: PNPEvent): boolean {
       && event.eventPrice !== 'null')
     && (event.eventProducerId !== null
       && event.eventProducerId !== 'null')
-
-      console.log(event)
-      return bool
+  return bool
 }
 export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
   return event !== undefined
@@ -83,20 +81,16 @@ export function isCouponExpirationValid(coupon: PNPCoupon) {
 export function isValidPrivateRide(ride: PNPPrivateRide): boolean {
   return ride !== undefined
     && ride !== null
-    && (ride.backTime !== null
-      && ride.backTime !== 'null')
-    && (ride.comments !== null
-      && ride.comments !== 'null')
     && (ride.date !== null
       && ride.date !== 'null')
+    && (ride.rideTime !== null
+      && ride.rideTime !== 'null')
     && (ride.passengers !== null
       && ride.passengers !== 'null')
     && (ride.rideDestination !== null
       && ride.rideDestination !== 'null'
       && ride.rideStartingPoint !== null
       && ride.rideStartingPoint !== 'null')
-    && (ride.rideTime !== null
-      && ride.rideTime !== 'null')
 }
 
 export function isValidPublicRide(ride: PNPPublicRide): boolean {

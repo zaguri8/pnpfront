@@ -3,6 +3,7 @@ import { ChangeEventHandler, CSSProperties, HTMLInputTypeAttribute } from "react
 import { makeStyles } from "@mui/styles"
 import Places from "../utilities/Places"
 import { InputBaseComponentProps } from "@mui/material"
+import { PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 
 export enum FormElementType {
     button, input, selector, place
@@ -29,8 +30,23 @@ export function RideFormItem(props: RideFormProps) {
     const useStyles = makeStyles(() => ({
         root: {
             "& .MuiOutlinedInput-root": {
-                background: "white",
-                borderRadius:'32px'
+                background: SECONDARY_WHITE,
+                borderRadius: '32px',
+                padding: '0px',
+                border: '.1px solid white',
+                color: PRIMARY_BLACK, ...{
+                    '& input[type=number]': {
+                        '-moz-appearance': 'textfield'
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    },
+                    '& input[type=number]::-webkit-inner-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    }
+                }
             }
         }, noBorder: {
             border: "1px solid red",

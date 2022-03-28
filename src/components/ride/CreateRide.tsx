@@ -12,13 +12,16 @@ import { LocalizationProvider, TimePicker } from "@mui/lab"
 import AdapterDateFns from "@mui/lab/AdapterDateFns"
 import { DatePicker } from "@mui/lab"
 
-import { ACCEPT_TERMS_REQUEST, COMMENTS, CONTINUE_TO_CREATE, CREATE_RIDE, DESTINATION_POINT, FILL_ALL_FIELDS, LEAVE_HOUR, PASSENGERS, RIDE_DATE, STARTING_POINT_SINGLE, TERMS_OF_USE } from "../../settings/strings"
+import { ACCEPT_TERMS_REQUEST, COMMENTS, CONTINUE_TO_CREATE, CREATE_RIDE, DESTINATION_POINT, FILL_ALL_FIELDS, LEAVE_HOUR, PASSENGERS, RETURN_HOUR, RIDE_DATE, STARTING_POINT_SINGLE, TERMS_OF_USE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
 import { FormControl, TextField, Stack, Button } from "@mui/material"
 import { FormElementType, RideFormItem } from "./RideFormItem"
 import { HtmlTooltip } from "../utilities/HtmlTooltip"
 import { submitButton } from "../../settings/styles"
-import { PRIMARY_BLACK } from "../../settings/colors"
+import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { makeStyles } from "@mui/styles"
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions"
+import Spacer from "../utilities/Spacer"
 
 
 
@@ -39,9 +42,9 @@ export default function CreateRide() {
         rideStartingPoint: 'null',
         extraStopPoints: [],
         backTime: 'null',
-        rideTime: 'null',
+        rideTime: '00:00',
         passengers: 'null',
-        date: 'null',
+        date: dateStringFromDate(new Date()),
         comments: 'null'
     })
 
@@ -79,31 +82,75 @@ export default function CreateRide() {
         setRide({ ...ride, ...{ passengers: passengers } })
     }
     const updateRideDate = (date: string) => {
-        setRide({ ...ride, ...{ date: date } })
+        setRide({ ...ride, ...{ date: reverseDate(date) } })
     }
     const updateRideComments = (comments: any) => {
         setRide({ ...ride, ...{ comments: comments } })
     }
 
-    const save = () => {
 
-        if (isValidPrivateRide(ride)) {
-            doLoad()
-            
-            firebase.realTime.addPrivateRide(ride)
-            .then((an) => (an as object) != null)
-        } else {
-
+    const useStyles = makeStyles(() => ({
+        root: {
+            "& .MuiOutlinedInput-root": {
+                background: SECONDARY_WHITE,
+                borderRadius: '32px',
+                padding: '0px',
+                border: '.1px solid white',
+                color: PRIMARY_BLACK, ...{
+                    '& input[type=number]': {
+                        '-moz-appearance': 'textfield'
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    },
+                    '& input[type=number]::-webkit-inner-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    }
+                }
+            }
+        }, noBorder: {
+            border: "1px solid red",
+            outline: 'none'
         }
-
-    }
+    }));
+    const classes = useStyles()
     const transformNull = (s: string) => s === 'null' ? '' : s
-    const labelStyle = { padding: '8px', fontSize: '14px' }
+    const labelStyle = { padding: '8px', fontSize: '14px', color: SECONDARY_WHITE }
 
+
+    function createRide() {
+        const inflate = () => {
+            const entries = Object.entries(ride)
+            const elms: any[] = []
+            entries.forEach(entry => {
+                elms.push(<Stack  spacing={1} direction={'row'}>
+                    <span>
+                        {entry[0]}
+                    </span>
+                    <Spacer offset={1} />
+                    <span>
+                        { entry[1]}
+                    </span>)</Stack>)
+            })
+            return <Stack spacing={1}>{elms}</Stack>
+        }
+        doLoad()
+        firebase.realTime.addPrivateRide(ride)
+            .then(() => {
+                alert('בקשה לנסיעה חדשה נשלחה בהצלחה, הצוות שלנו ייצור עמך קשר בהקדם')
+                setConfirmation(inflate())
+                cancelLoad()
+            }).catch(() => {
+                alert('אירעתה שגיאה בשליחת הבקשה להסעה, אנא נסא שוב מאוחר יותר')
+            })
+    }
+    const [confirmation, setConfirmation] = useState<JSX.Element | undefined>()
     return <PageHolder>
         <SectionTitle style={{}} title={CREATE_RIDE(lang)} />
         <InnerPageHolder >
-            <Stack spacing={2} style={{ width: '100%' }}>
+            {!confirmation ? <Stack spacing={2} style={{ width: '100%' }}>
                 <FormControl>
                     <label style={labelStyle}>{STARTING_POINT_SINGLE(lang)}</label>
                     <RideFormItem
@@ -125,39 +172,61 @@ export default function CreateRide() {
                         text={DESTINATION_POINT(lang)} />
                 </FormControl>
 
-                <FormControl >
-                    <label style={labelStyle}>{RIDE_DATE(lang)}</label>
-                    <div
-                        style={{ background: PRIMARY_BLACK}}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <DatePicker
 
-                                label={RIDE_DATE(lang)}
-                                value={transformNull(ride.date)}
-                                onChange={(e) => e && updateRideDate(e)}
-                                renderInput={(params: TextFieldProps) => <TextField style={{ textAlign: 'center', width: '100%' }} required disabled {...params} />}
-                            />
-                        </LocalizationProvider>
-                    </div>
+
+
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
+                    <label style={labelStyle}>{RIDE_DATE(lang)}</label>
+                    <TextField
+                        value={unReverseDate(ride.date)}
+                        classes={{ root: classes.root }}
+                        InputLabelProps={{
+                            shrink: true,
+                            style: { color: SECONDARY_WHITE }
+                        }}
+                        type='date'
+                        onChange={(e) => e && updateRideDate(e.target.value)}
+                        required />
                 </FormControl>
-                <FormControl sx={{ background: PRIMARY_BLACK}}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <TimePicker
-                            label={LEAVE_HOUR(lang)}
-                            value={ride.rideTime}
-                            onChange={(e) => e && updateRideTime(e!)}
-                            renderInput={(params: TextFieldProps) => <TextField required disabled {...params} />}
-                        />
-                    </LocalizationProvider>
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
+
+                    <label style={labelStyle}>{LEAVE_HOUR(lang)}</label>
+                    <TextField
+                        value={ride.rideTime}
+                        onChange={(e) => e && updateRideTime(e.target.value)}
+                        classes={classes}
+                        InputLabelProps={{
+                            shrink: true,
+                            style: { color: SECONDARY_WHITE }
+                        }}
+
+                        type='time'
+                        required />
+                </FormControl>
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
+
+                    <label style={labelStyle}>{RETURN_HOUR(lang)}</label>
+                    <TextField
+                        value={ride.backTime}
+                        onChange={(e) => e && updateBackTime(e.target.value)}
+                        classes={classes}
+                        InputLabelProps={{
+                            shrink: true,
+                            style: { color: SECONDARY_WHITE }
+                        }}
+
+                        type='time'
+                        required />
                 </FormControl>
                 <FormControl>
-                    <label style={{ padding: '8px', fontSize: '14px' }}>{PASSENGERS(lang)}</label>
+                    <label style={labelStyle}>{PASSENGERS(lang)}</label>
                     <RideFormItem
                         type={'number'}
                         value={transformNull(ride.passengers)}
                         action={(e: ChangeEvent) => { e.target && updateRidePassengers($(e.target).val()) }}
                         inputProps={{ inputMode: 'numeric', min: 1, max: 250 }}
                         style={{}}
+
                         elem={FormElementType.input}
                         text={PASSENGERS(lang)} />
                 </FormControl>
@@ -175,16 +244,23 @@ export default function CreateRide() {
                 <FormControl>
                     <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidPrivateRide(ride) ? FILL_ALL_FIELDS(lang) : !termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_CREATE(lang)} arrow>
                         <span>
-                            <Button sx={{ ...submitButton(false), ... {  padding: '8px',width:'90%',marginTop:'16px' } }} variant="outlined" disabled={!isValidPrivateRide(ride) || !termsOfUser} >{CREATE_RIDE(lang)}</Button>
+                            <Button
+
+                                onClick={() => { createRide() }}
+                                sx={{ ...submitButton(false), ... { padding: '8px', width: '90%', marginTop: '16px' } }} variant="outlined" disabled={!isValidPrivateRide(ride) || !termsOfUser} >{CREATE_RIDE(lang)}</Button>
                         </span>
                     </HtmlTooltip>
                 </FormControl>
-                <span ><InputLabel style={{ paddingTop: '16px', fontSize: '14px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+                <Stack >
+
+
+                    <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                     <Checkbox
+                        style={{ width: 'fit-content', alignSelf: 'center', background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
-                </span>
-            </Stack>
+                </Stack>
+            </Stack> : confirmation}
         </InnerPageHolder>
     </PageHolder >
 }

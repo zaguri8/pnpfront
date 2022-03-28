@@ -23,7 +23,13 @@ export type TransactionSuccess = {
     currency: string,
     date: string,
     card_holder_name: string,
-    more_info: string,
+    more_info: {
+        productName: string,
+        amount: string,
+        eventId: string,
+        rideId: string,
+        twoWay: string
+    },
     number_of_payments: string,
     method: string,
     approval_num: string,

@@ -1,9 +1,10 @@
-import { Accordion, TextField, AccordionDetails, AccordionSummary, Button, List, Stack } from "@mui/material";
+import { Accordion, TextField, AccordionDetails, AccordionSummary, Button, List, Stack, alertTitleClasses } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { useFirebase } from "../../context/Firebase";
 import { useLanguage } from "../../context/Language";
 import $ from 'jquery'
+import { CSVLink } from "react-csv";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { SIDE } from "../../settings/strings";
 import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPUser } from "../../store/external/types";
@@ -15,9 +16,11 @@ import { useLoading } from "../../context/Loading";
 import { v4 } from "uuid";
 import { isValidPublicRide } from "../../store/validators";
 import { submitButton } from "../../settings/styles";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
-import { DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import Spacer from "../utilities/Spacer";
+import { makeStyles } from "@mui/styles";
 
 
 
@@ -26,11 +29,11 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
 
     const { firebase } = useFirebase()
     return (<List>
-        <h1 style = {{color:SECONDARY_WHITE}}>{'ניהול נסיעות'}</h1>
+        <h1 style={{ color: SECONDARY_WHITE }}>{'ניהול נסיעות'}</h1>
         {props.rides.length > 0 ? <table dir={'rtl'} style={{ width: '100%' }}  >
 
             <thead>
-                <tr style={{ background: 'black', color: 'white' }}>
+                <tr style={{ background: 'black', color: SECONDARY_WHITE }}>
                     <th>
                         <span style={{ color: SECONDARY_WHITE }}>{`שם הסעה`}</span>
                     </th>
@@ -42,7 +45,7 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
 
             <tbody >
                 {props.rides.map((ride, index) =>
-                    <tr key={v4()} style={{ background: index % 2 === 0 ? PRIMARY_BLACK : SECONDARY_BLACK}}>
+                    <tr key={v4()} style={{ background: PRIMARY_BLACK }}>
                         <th style={{ width: '50%', padding: '8px' }}>
                             <div style={{ fontSize: '12px', fontWeight: 'bold', color: SECONDARY_WHITE }}>{'נקודת יציאה'}</div>
                             <div style={{ fontSize: '10px', fontWeight: '100', color: SECONDARY_WHITE }}>{ride.rideStartingPoint}</div>
@@ -69,7 +72,7 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
                                         }>{`נקודת יציאה : ${ride.rideStartingPoint}`}</h4></div>)
                                     openDialog({ content: <AddUpdateEventRide event={props.event} ride={ride} />, title: `עריכת הסעה לאירוע` })
                                 }}
-                                style={{ color: 'white', border: '.1px solid black', background: DARK_BLACK }}>
+                                style={{ color: SECONDARY_WHITE, border: '.1px solid black', background: DARK_BLACK }}>
                                 {`ערוך הסעה`}
                             </Button>}
 
@@ -98,11 +101,11 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
                                                 minWidth: '100px',
                                                 fontSize: '18px',
                                                 background: '#bd3333',
-                                                color: 'white'
+                                                color: SECONDARY_WHITE
                                             }}>{'מחק'}</button></div>, title: `מחיקת הסעה לאירוע`
                                     })
                                 }}
-                                style={{ color: 'white', margin: '4px', border: '1px solid black', background: '#bd3333' }}>
+                                style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: '#bd3333' }}>
                                 {`מחק הסעה`}
                             </Button>}
                         </th>
@@ -123,12 +126,47 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         rideDestination: props.event.eventName,
         rideStartingPoint: "null",
         rideTime: "00:00",
+        twoWay:false,
         ridePrice: "null",
         backTime: "04:00",
-        passengers: "",
-        date: props.event.eventDate
+        passengers: "0",
+        date: props.event.eventDate,
+        extras: {
+            isRidePassengersLimited: true,
+            rideStatus: 'on-going',
+            rideMaxPassengers: '54'
+        }
     })
+    const useStyles = makeStyles(() => (
+        {
+            root: {
+                "& .MuiOutlinedInput-root": {
+                    background: SECONDARY_WHITE,
+                    borderRadius: '32px',
+                    padding: '0px',
+                    border: '.1px solid white',
+                    color: PRIMARY_BLACK,
+                    WebkitAppearance: 'none'
+                    , ...{
+                        '& input[type=number]': {
+                            '-moz-appearance': 'textfield'
+                        },
+                        '& input[type=number]::-webkit-outer-spin-button': {
+                            '-webkit-appearance': 'none',
+                            margin: 0
+                        },
+                        '& input[type=number]::-webkit-inner-spin-button': {
+                            '-webkit-appearance': 'none',
+                            margin: 0
+                        }
+                    }
+                }
+            }
 
+        }
+    ))
+
+    const classes = useStyles()
     const changeRideStartingPoint = (newStartPoint: string) => {
         setRide({
             ...ride,
@@ -191,6 +229,8 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
             InputLabelProps={{
                 style: { color: SECONDARY_WHITE },
             }}
+            classes={{ root: classes.root }}
+
             style={{ color: SECONDARY_WHITE }}
             placeholder={props.ride ? props.ride.rideStartingPoint : 'נקודת יציאה'}
             onChange={(e) => changeRideStartingPoint(e.target.value)}
@@ -198,6 +238,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         <label style={{ color: SECONDARY_WHITE }}>{'הכנס מחיר'}</label>
         <TextField
             required
+            classes={{ root: classes.root }}
             InputLabelProps={{
 
                 style: { color: SECONDARY_WHITE },
@@ -211,10 +252,12 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         />
         <label style={{ color: SECONDARY_WHITE }}> {'הכנס שעה'}</label>
         <TextField
+            classes={{ root: classes.root }}
             InputLabelProps={{
                 style: { color: SECONDARY_WHITE },
             }}
             required
+            type='time'
             style={{ color: SECONDARY_WHITE }}
 
             placeholder={props.ride ? props.ride.rideTime : '00:00'}
@@ -307,17 +350,17 @@ const Requests = (props: { eventId: string, requests?: PNPRideRequest[] }) => {
                             minWidth: '100px',
                             fontSize: '18px',
                             background: '#bd3333',
-                            color: 'white'
+                            color: SECONDARY_WHITE
                         }}>{'הסר'}</button></div>
                 })
             }} />}</span>)
     }
 
     return (props.requests ? <div>
-        <h1 style = {{color:SECONDARY_WHITE}}>{'בקשות להסעה'}</h1>
+        <h1 style={{ color: SECONDARY_WHITE }}>{'בקשות להסעה'}</h1>
         <List sx={{ maxHeight: '400px', overflowY: 'scroll' }}>
             {Array.from(new Set(props.requests).values()).map(request => <RequestCard key={v4()} request={request} />)}
-        </List></div> : <h4 style = {{color:SECONDARY_WHITE}}>{'אין בקשות לאירוע זה'}</h4>)
+        </List></div> : <h4 style={{ color: SECONDARY_WHITE }}>{'אין בקשות לאירוע זה'}</h4>)
 
 
 }
@@ -408,20 +451,20 @@ const EventRideStatistics = (props: { statistics: RideStatistics }) => {
             setObjectsFromStatistics(rideStatistics)
         }
     }, [])
-    return <div >  <h1 style = {{color:SECONDARY_WHITE}}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
-        {objectsFromStatistics && objectsFromStatistics.length > 0 ? <div> {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ`} : <b>{objectsFromStatistics.reduce((before: any, p: any) => Number(before) + Number(p.numberOfPeople), 0)}</b></h4>}<div dir={'rtl'} style={{color:SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
+    return <div >  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
+        {objectsFromStatistics && objectsFromStatistics.length > 0 ? <div> {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ`} : <b>{objectsFromStatistics.reduce((before: any, p: any) => Number(before) + Number(p.numberOfPeople), 0)}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
             {objectsFromStatistics && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: `repeat(${Math.floor(Object.keys(props.statistics.rideStatistics).length / 2)},1fr)` }}>
                 {objectsFromStatistics.map((each: any, index: number) => <div key={each.rideStartPoint + index} style={{ padding: '4px', margin: '4px', maxWidth: '200px', fontSize: '12px', fontWeight: 'bold' }}>
                     {each.rideStartPoint}
                     <div style={{ fontWeight: '500', padding: '4px' }}>
                         {each.numberOfPeople}
                     </div>
-                    <button onClick={() => fetchUsersWithIds(each.rideStartPoint, props.statistics.rideTransactionUserIds[each.rideStartPoint])} style={{ margin: '4px', fontSize: '12px', padding: '4px', border: 'none', background: DARKER_BLACK_SELECTED, color: 'white' }}>
+                    <button onClick={() => fetchUsersWithIds(each.rideStartPoint, props.statistics.rideTransactionUserIds[each.rideStartPoint])} style={{ margin: '4px', fontSize: '12px', padding: '4px', border: 'none', background: DARKER_BLACK_SELECTED, color: SECONDARY_WHITE }}>
                         {'הצג משתמשים'}
                     </button>
                     <hr /></div>)} </div>}
         </div>
-        </div> : <h4>{'אין הזמנות לאירוע זה'}</h4>}
+        </div> : <h4 style={{ color: 'gray' }}>{'אין הזמנות לאירוע זה'}</h4>}
     </div>
 
 }
@@ -506,7 +549,39 @@ export default function EventStatistics() {
     }
 
 
+    const nav = useNavigate()
+    const deleteEvent = () => {
+        if (event) {
+            doLoad()
+            firebase.realTime.removeEvent(event)
+                .then(() => {
+                    alert('אירוע נמחק בהצלחה')
+                    nav('/adminpanel')
+                    closeDialog()
+                    cancelLoad()
+                })
+                .catch(() => {
+                    cancelLoad()
+                    closeDialog()
+                    alert('מחיקה נכשלה, אנא פנא אל המתכנת')
+                })
+        } else {
+            closeDialog()
+            alert('מחיקה נכשלה, אנא פנא אל המתכנת')
+            alert(event)
+            alert(event!.eventType)
+        }
+    }
 
+
+
+    const buttonStyle = {
+        textDecoration: 'none',
+        borderRadius: '16px',
+        fontFamily: 'Open Sans Hebrew',
+        background: DARK_BLACK,
+        color: SECONDARY_WHITE
+    }
 
     return (event ? <PageHolder>
         <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
@@ -517,34 +592,67 @@ export default function EventStatistics() {
 
                 <Button
                     dir={'rtl'}
-                    style={{ background: DARK_BLACK, color: 'white' }}
+                    style={buttonStyle}
 
                     onClick={() => {
-                        event && openDialogWithTitle(<h3 style={{
-                            fontWeight: '14px',
-                            textAlign: 'center'
-                        }}>{`הוסף הסעה ל ${event.eventName}`}</h3>)
-                        event && openDialog({ content: <AddUpdateEventRide event={event} /> })
+
+                        event && openDialog({
+                            content: <div style={{ padding: '16px' }}>
+                                <h3 style={{
+                                    fontWeight: '14px',
+                                    background: PRIMARY_BLACK,
+                                    color: SECONDARY_WHITE,
+                                    padding: '4px',
+                                    textAlign: 'center'
+                                }}>{`הוסף הסעה ל ${event.eventName}`}</h3>
+                                <AddUpdateEventRide event={event} />
+                            </div>
+                        })
                     }}>
                     {event ? `הוסף הסעה` : ''}
                 </Button>
 
                 <Button
-                    style={{ background: DARK_BLACK, color: 'white' }}
+                    style={buttonStyle}
                     onClick={() => { setShowingComponent(AdminScreens.rideTransactions) }}>
                     {'סטטיסטיקת הזמנות'}
                 </Button>
 
                 <Button
-                    style={{ background: DARK_BLACK, color: 'white' }}
+                    style={buttonStyle}
                     onClick={() => { setShowingComponent(AdminScreens.ridesOverview) }}>
                     {'ניהול נסיעות'}
                 </Button>
 
                 <Button
-                    style={{ background: DARK_BLACK, color: 'white' }}
+                    style={buttonStyle}
                     onClick={() => { setShowingComponent(AdminScreens.rideRequests) }}>
                     {'בקשות נסיעה'}
+                </Button>
+
+
+
+                <CSVLink filename={event.eventName} style={{ ...buttonStyle, ...{ padding: '8px', background: ORANGE_GRADIENT_PRIMARY } }} dir='rtl' data={[event]}>{'ייצא לקובץ CSV'}</CSVLink>
+
+                <Button
+                    style={{ fontFamily: 'Open Sans Hebrew', background: '#bd3333', fontWeight: 'bold', color: SECONDARY_WHITE }}
+                    onClick={() => {
+                        openDialog({
+                            content: <div>
+                                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{'פעולה זו תמחק גם את ההסעות שיש לאירוע זה'}</label>
+                                <Spacer offset={1} />
+                                <label style={{ color: SECONDARY_WHITE }}>{'האם אתה בטוח שברצונך להמשיך?'}</label>
+                                <Spacer offset={1} />
+                                <Button
+                                    onClick={deleteEvent}
+                                    style={{ padding: '8px', margin: '8px', color: SECONDARY_WHITE, width: '50%', background: '#bd3333', fontSize: '14px' }}>
+                                    {'כן, מחק אירוע סופית'}
+                                </Button>
+                            </div>
+                        })
+
+                    }}>
+                    {'מחק אירוע'}
                 </Button>
             </Stack>
             {statistics && event && <ShowingPanelScreen

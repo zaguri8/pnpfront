@@ -21,6 +21,7 @@ export const submitButton = (margin) => {
         backgroundImage: DARKER_BLACK_SELECTED
     }
 }
+
 export const flex = (direction, align, justify) => {
     return {
         display: 'flex',

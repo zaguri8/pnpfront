@@ -41,12 +41,12 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
             }}>
                 <span onClick={() => props.clickedItem(4)} style={{
                     padding: '4px',
-                    color:SECONDARY_WHITE,
+                    color: SECONDARY_WHITE,
                     cursor: 'pointer'
                 }}>{REGISTER_TITLE(lang)}</span>
                 <span onClick={() => props.clickedItem(5)} style={{
                     padding: '4px',
-                    color:SECONDARY_WHITE,
+                    color: SECONDARY_WHITE,
                     cursor: 'pointer'
                 }}>{TOOLBAR_LOGIN(lang)}</span>
             </div> : <div><span style={{ fontSize: '14px', color: 'white' }}>{`${HELLO(lang)}`}</span><br /><span style={{ fontSize: '14px', color: 'white' }}>{`${appUser?.name}`}</span></div>}
@@ -58,6 +58,8 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
 
 function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
 
+
+    const { lang } = useLanguage()
 
     const nav = useNavigate()
     const clickedItem = (indexPath: number) => {
@@ -96,14 +98,14 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
             zIndex: '9999',
         },
         ...flex('column', 'center'),
-        ...{ background: PRIMARY_BLACK}
+        ...{ background: PRIMARY_BLACK }
     }}>
         <ToolbarItem bold image={logo} />
         <MenuProfile clickedItem={clickedItem} />
-        <ToolbarItem text={MENU_ITEM_1('heb')} bold={true} action={() => clickedItem(0)} line={true} style={{ width: '80%' }} />
-        <ToolbarItem text={MENU_ITEM_2('heb')} bold={true} action={() => clickedItem(1)} line={true} style={{ width: '80%' }} />
-        <ToolbarItem text={MENU_ITEM_3('heb')} bold={true} action={() => clickedItem(2)} line={true} style={{ width: '80%' }} />
-        <ToolbarItem text={MENU_ITEM_4('heb')} bold={true} action={() => clickedItem(3)} style={{ width: '80%' }} />
+        <ToolbarItem text={MENU_ITEM_1(lang)} bold={true} action={() => clickedItem(0)} line={true} style={{ width: '80%' }} />
+        <ToolbarItem text={MENU_ITEM_2(lang)} bold={true} action={() => clickedItem(1)} line={true} style={{ width: '80%' }} />
+        <ToolbarItem text={MENU_ITEM_3(lang)} bold={true} action={() => clickedItem(2)} line={true} style={{ width: '80%' }} />
+        <ToolbarItem text={MENU_ITEM_4(lang)} bold={true} action={() => clickedItem(3)} style={{ width: '80%' }} />
 
     </div>
 }

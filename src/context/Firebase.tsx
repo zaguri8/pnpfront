@@ -13,6 +13,7 @@ import { getStorage, uploadBytes, ref as storageRef } from "firebase/storage";
 import { ref, child } from "firebase/database";
 import { userFromDict } from "../store/external/converters";
 import { firebaseConfig } from '../settings/config'
+import { useLoading } from "./Loading";
 firebase.initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
@@ -33,6 +34,7 @@ export const FirebaseContextProvider = (props: object) => {
   const [appUser, setAppUser] = useState<PNPUser | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
+  const { cancelLoad } = useLoading()
   useEffect(() => {
 
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -42,8 +44,12 @@ export const FirebaseContextProvider = (props: object) => {
           const au = userFromDict(snap)
           setAppUser(au)
           setUser(user)
-        })
-      } else setUser(null)
+          cancelLoad()
+        }, () => { cancelLoad() })
+      } else {
+        setUser(null)
+        cancelLoad()
+      }
 
       return () => { unsub as Unsubscribe && (unsub as Unsubscribe)() }
     }, setError)

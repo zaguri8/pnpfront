@@ -1,4 +1,4 @@
-import { InputLabel, List, Button, Checkbox } from '@mui/material'
+import { InputLabel, List, Button, Checkbox, Stack } from '@mui/material'
 import axios from 'axios'
 import { useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
@@ -14,7 +14,7 @@ import { useLanguage } from "../../context/Language";
 import { AMOUNT_OF_TICKETS, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
 import { useLocation, useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
-import { DARK_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, SECONDARY_WHITE } from '../../settings/colors'
 import HTMLFromText from '../utilities/HtmlFromText'
 export function PaymentForm({ product }) {
 
@@ -62,10 +62,14 @@ export function PaymentForm({ product }) {
             email: user.email,
             phone: appUser.phone
         }
+
         const payProduct = {
             name: product.name,
             price: Number(product.price),
-            amount: ticketAmount
+            amount: ticketAmount,
+            eventId: product.eventId,
+            rideId: product.rideId,
+            twoWay: product.twoWay
         }
 
         const send = {
@@ -85,7 +89,7 @@ export function PaymentForm({ product }) {
 
 
     const getElement = () => {
-        return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '280px' }} src={paymentLink} /> : (
+        return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '280px', maxWidth: '90%',maxHeight:'90%' }} src={paymentLink} /> : (
             <div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: SECONDARY_WHITE, justifyContent: 'center' }}>
 
@@ -120,28 +124,20 @@ export function PaymentForm({ product }) {
                             disabled={!termsOfUser} >{CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
-                <div style={{ padding: '8px' }}><InputLabel style={{ color: SECONDARY_WHITE, fontSize: '14px', paddingTop: '16px', textAlign: 'center', marginLeft: '8px', marginRight: '8px' }}>{TERMS_OF_USE(lang)}</InputLabel>
+
+                <Stack >
+
+
+                    <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                     <Checkbox
+                        style={{ width: 'fit-content', alignSelf: 'center', background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
-                    <br />
-                    <Link style={{ color: SECONDARY_WHITE, textDecoration: 'underline' }} to={'/termsOfService'} onClick={closeDialog}>{TOS(lang)}</Link>
-                </div></div>
+                </Stack>
+            </div>
         )
     }
     return (<List style={{ paddingTop: '0px', direction: SIDE(lang), width: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {getElement()}
     </List >)
 }
-function Payment({ product }) {
-    const { openDialog } = useLoading()
-    const { lang } = useLanguage()
-
-    const openRequestPaymentDialog = () => { openDialog({ content: <PaymentForm product={product} />, title: product.name }) }
-
-    return <div style={{ display: 'flex', flexDirection: 'column', alignSelf: 'center', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-
-        <button onClick={() => openRequestPaymentDialog()}>{lang === 'heb' ? 'שלם' : 'Pay'}</button>
-    </div>
-}
-export default Payment

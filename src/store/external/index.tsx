@@ -1,6 +1,6 @@
 import { Auth } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest } from './types'
-import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType } from './converters'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation } from './types'
+import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { DocumentData } from 'firebase/firestore'
 import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
@@ -44,11 +44,13 @@ export class Realtime {
     private auth: Auth
     private storage: FirebaseStorage
     private transactions: DatabaseReference
+    private transactionConfirmations: DatabaseReference
     constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
         this.allEvents = ref(db, '/events')
         this.rides = ref(db, "/rides")
         this.users = ref(db, '/users')
         this.errs = ref(db, '/errors')
+        this.transactionConfirmations = ref(db, '/transactionConfirmations')
         this.transactions = ref(db, '/transactions')
         this.auth = auth
         this.storage = storage
@@ -75,6 +77,16 @@ export class Realtime {
         return await set(newPath, error)
     }
 
+    addListenerToTransactionConfirmation(voucher: string, consume: (c: PNPTransactionConfirmation) => void) {
+        return onValue(child(this.transactionConfirmations, voucher), (snap) => {
+            consume(transactionConfirmationFromDict(snap))
+        })
+    }
+
+    async invalidateTransactionConfirmations(voucher: string, ridesLeft: number) {
+        return await update(child(this.transactionConfirmations, String(voucher)), { isValid: ridesLeft > 0, ridesLeft: ridesLeft })
+    }
+
 
     getTransaction(customer_uid: string,
         transaction_uid: string,
@@ -91,7 +103,6 @@ export class Realtime {
         return onValue(child(this.transactions, customer_uid), (snap) => {
             const transactions: TransactionSuccess[] = []
             snap.forEach(transactionSnap => {
-                console.log(transactionSnap)
                 transactions.push(transactionSuccessFromDict(transactionSnap))
             })
 
@@ -425,8 +436,17 @@ export class Realtime {
      * @returns remove callback
      */
     removeClubEvent = async (eventId: string) => {
-        return await remove(child(child(this.allEvents, 'clubs'), eventId))
+        return await remove(child(child(child(this.allEvents, 'public'), 'clubs'), eventId))
             .catch((e) => { this.createError('removeClubEvent', e) })
+    }
+
+    removeEvent = async (event: PNPEvent) => {
+        return await remove(child(child(child(this.allEvents, 'public'), getEventType(event)), event.eventId))
+            .catch((e) => { this.createError('removeEvent', e) })
+            .then(async () => {
+                return await remove(child(child(this.rides, 'ridesForEvents'), event.eventId))
+                    .catch(e => { this.createError('removeEvent', e) })
+            })
     }
     /**
    * updateCultureEvent
@@ -477,8 +497,6 @@ export class Realtime {
  * @returns update callback
  */
     updatePublicRide = async (eventId: string, rideId: string, ride: object) => {
-        console.log(eventId)
-        console.log(rideId)
         return await update(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId), ride)
     }
     /**
