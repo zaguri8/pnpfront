@@ -1,11 +1,13 @@
 import { toolbar } from "../../settings/styles"
-import ToolbarItem from "./ToolbarItem"
+import ToolbarItem, { toolbarItemStyle } from "./ToolbarItem"
 import { CREATE_EVENT, TOOLBAR_LOGIN, MY_ACCOUNT } from "../../settings/strings"
 import { flex } from "../../settings/styles"
 import search from '../../assets/images/search.png'
 import israel from '../../assets/images/israel.png'
 import america from '../../assets/images/america.png'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { menuIcon } from "../../assets/images"
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { DARKER_BLACK_SELECTED, PRIMARY_WHITE } from "../../settings/colors"
 import { useFirebase } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
@@ -15,7 +17,7 @@ export type ToolbarProps = {
 }
 export function ToolBar(props: ToolbarProps) {
 
-    const { user } = useFirebase()
+    const { user, appUser } = useFirebase()
 
     const nav = useNavigate()
     const { lang, setLang } = useLanguage()
@@ -40,7 +42,24 @@ export function ToolBar(props: ToolbarProps) {
 
             <ToolbarItem
                 action={() => nav('/searchRide')}
-                id='search' style={{ paddingLeft: '4px' }} image={search} /> </div>
+                id='search' style={{ paddingLeft: '4px' }} image={search} />
+
+            {appUser && appUser.producer && <QrCodeScannerIcon
+                onClick={() => nav('/scan')}
+                id='scan'
+
+                sx={{ ... { width: '18px', height: '18px', marginBottom: '2px' }, ...toolbarItemStyle({ image: true }) }}
+            />}
+
+            {appUser && appUser.admin && <AdminPanelSettingsIcon
+                onClick={() => nav('/adminPanel')}
+                id='scan'
+
+                sx={{ ... { width: '18px', height: '18px', marginBottom: '2px' }, ...toolbarItemStyle({ image: true }) }}
+            />}
+        </div>
+
+
         <div style={{ ...flex('row', 'center', 'center') }}>
             <div id='lang' style={{
                 cursor: 'pointer',

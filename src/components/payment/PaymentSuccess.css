@@ -11,3 +11,36 @@
     color:whitesmoke;
     max-width: 200px;
 }
+@keyframes changeY {
+    from {
+      margin-bottom: 24px;
+    }
+  
+    to {
+        margin-bottom: 36px;
+    }
+  }
+#floating_indicator_payment {
+    width: fit-content;
+    color: whitesmoke;
+    left: 0px;
+    align-items: center;
+    padding: 0px;
+    margin: 24px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 9999;
+    bottom: 0;
+    right: 0;
+    position:fixed;
+    width: fit-content;
+    height: 50px;
+
+    animation-direction: alternate-reverse;
+    animation-duration: .5s;
+    animation-iteration-count: infinite;
+    animation-name: changeY;
+}
+
+

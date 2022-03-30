@@ -1,4 +1,4 @@
-import { Input, FormControl, InputLabel } from "@mui/material"
+import { Input, FormControl, InputLabel, TextField } from "@mui/material"
 import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE, TOOLBAR_LOGIN } from '../../settings/strings'
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
@@ -10,9 +10,10 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
 import { useLanguage } from "../../context/Language"
 import { useLocation } from "react-router"
-import { PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { submitButton } from "../../settings/styles"
 import { useLoading } from "../../context/Loading"
+import { useState } from "react"
 export default function Login() {
 
     const nav = useNavigate()
@@ -23,17 +24,41 @@ export default function Login() {
             right: '-64px'
 
         },
+        root: {
+            "& .MuiOutlinedInput-root": {
+                background: SECONDARY_WHITE,
+                borderRadius: '32px',
+                padding: '0px',
+                minWidth:'275px',
+                alignSelf:'center',
+                border: '.1px solid white',
+                color: PRIMARY_BLACK, ...{
+                    '& input[type=number]': {
+                        '-moz-appearance': 'textfield'
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    },
+                    '& input[type=number]::-webkit-inner-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    }
+                }
+            }
+        },
         shrink: {
             transformOrigin: "top right"
         }
     }));
     const { doLoad, cancelLoad } = useLoading()
+
+    const [user, setUser] = useState({ u: '', p: '' })
     function login(e) {
         e.preventDefault()
-        const u = e.target[0].value
-        const p = e.target[1].value
+
         doLoad()
-        signInWithEmailAndPassword(firebase.auth, u, p)
+        signInWithEmailAndPassword(firebase.auth, user.u, user.p)
             .then(() => {
 
                 if (location.state && location.state.cachedLocation)
@@ -61,7 +86,7 @@ export default function Login() {
     }}>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <div style={{
-            background: SECONDARY_BLACK,
+            background: ORANGE_GRADIENT_PRIMARY,
             width: '50%',
             maxWidth: '500px',
             marginTop: '32px',
@@ -85,32 +110,29 @@ export default function Login() {
                 alignItems: 'center'
             }}>
                 <SectionTitle title={TOOLBAR_LOGIN(lang)} style={{
-                    background: SECONDARY_BLACK,
+                    background: 'none',
                     marginTop: '0px',
                     marginBottom: '32px'
                 }} />
                 <Stack spacing={3} style={{ width: '80%' }}>
 
                     <FormControl >
-                        <InputLabel style={{ color: SECONDARY_WHITE }} classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-
-                        }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
-                        <Input
+                        <label style={{ color: SECONDARY_WHITE, padding: '4px' }} htmlFor="email_input">{EMAIL(lang)}</label>
+                        <TextField
+                            classes={{ root: classes.root }}
                             name="email"
+                            onChange={(e) => { setUser({ ...user, ...{ u: e.target.value } }) }}
                             style={{ color: SECONDARY_WHITE }}
                             autoComplete="username"
                             type="email" sx={{ direction: SIDE(lang) }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
                     <FormControl >
-                        <InputLabel style={{ color: SECONDARY_WHITE }} classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-                        }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
-                        <Input
+                        <label style={{ color: SECONDARY_WHITE, padding: '4px' }} htmlFor="password_input">{PASSWORD(lang)}</label>
+                        <TextField
+                            classes={{ root: classes.root }}
                             autoComplete="current-password"
+                            onChange={(e) => { setUser({ ...user, ...{ p: e.target.value } }) }}
                             type='password'
                             name='password'
                             style={{ color: SECONDARY_WHITE }}
@@ -146,7 +168,7 @@ export default function Login() {
             </div>
 
             <div>
-                <Link style={{ fontSize: '12px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/register'}>{FORGOT_PASSWORD(lang)}</Link>
+                <Link style={{ fontSize: '12px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/forgotPass'}>{FORGOT_PASSWORD(lang)}</Link>
             </div>
         </div>
     </div >)

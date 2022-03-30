@@ -23,19 +23,19 @@ import { Checkbox } from '@mui/material';
 import { useLoading } from '../../context/Loading';
 import { useLanguage } from '../../context/Language'
 import { submitButton } from '../../settings/styles';
-
+export const events = (lang) => [
+    PICK_FAVORITE_1(lang),
+    PICK_FAVORITE_2(lang),
+    PICK_FAVORITE_3(lang),
+    PICK_FAVORITE_4(lang),
+    PICK_FAVORITE_5(lang),
+    PICK_FAVORITE_6(lang),
+    PICK_FAVORITE_7(lang)];
 
 export default function FavoriteEventsDialog() {
 
     const { lang } = useLanguage()
-    const events = [
-        PICK_FAVORITE_1(lang),
-        PICK_FAVORITE_2(lang),
-        PICK_FAVORITE_3(lang),
-        PICK_FAVORITE_4(lang),
-        PICK_FAVORITE_5(lang),
-        PICK_FAVORITE_6(lang),
-        PICK_FAVORITE_7(lang)];
+
     const [selectedValue, setSelectedValue] = React.useState('');
     const dialogContext = useLoading()
     const handleListItemClick = (pickedValues) => {
@@ -43,10 +43,9 @@ export default function FavoriteEventsDialog() {
         dialogContext.closeDialog()
     }
     const handleClickOpen = () => {
-        var x = null
         dialogContext.openDialog({
             content: <div style={{ width: '100%' }}>
-                {events.map((event) => (
+                {events(lang).map((event) => (
                     <ListItem sx={{ textAlign: 'center', color: SECONDARY_WHITE }} key={event}>
 
                         <ListItemText primary={event} />
@@ -65,7 +64,7 @@ export default function FavoriteEventsDialog() {
                             })
                             handleListItemClick(allPicked)
                         }}
-                        sx={{ ...submitButton(false),...{width:'100%',padding:'4px'} }} >{PICK(lang)}</Button>
+                        sx={{ ...submitButton(false), ...{ width: '100%', padding: '4px' } }} >{PICK(lang)}</Button>
                 </ListItem>
             </div>, title: PICK_FAVORITE_EVENTS(lang)
         })
@@ -76,7 +75,9 @@ export default function FavoriteEventsDialog() {
             <Button style={{ ...submitButton(false), ...{ padding: '8px', margin: '0px', fontSize: '14px', width: '100%' } }} variant="outlined" onClick={handleClickOpen}>
                 {OPEN_FAVORITE_EVENTS_DIALOG(lang)}
             </Button>
-            <Typography id='selected_favorite_events' variant="subtitle1" component="div">
+            <Typography id='selected_favorite_events'
+                style={{ color: SECONDARY_WHITE, padding: '2px' }}
+                variant="subtitle1" component="div">
                 {selectedValue.length > 0 ? `${PICKED(lang)}${selectedValue}` : ''}
             </Typography>
         </div>

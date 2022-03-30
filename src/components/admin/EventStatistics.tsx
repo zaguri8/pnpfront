@@ -1,7 +1,8 @@
-import { Accordion, TextField, AccordionDetails, AccordionSummary, Button, List, Stack, alertTitleClasses } from "@mui/material";
+import { Accordion, TextField, MenuItem, Checkbox, Select, AccordionDetails, AccordionSummary, Button, List, Stack, alertTitleClasses } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import { useFirebase } from "../../context/Firebase";
+import { Unsubscribe } from "firebase/database";
 import { useLanguage } from "../../context/Language";
 import $ from 'jquery'
 import { CSVLink } from "react-csv";
@@ -126,7 +127,6 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         rideDestination: props.event.eventName,
         rideStartingPoint: "null",
         rideTime: "00:00",
-        twoWay:false,
         ridePrice: "null",
         backTime: "04:00",
         passengers: "0",
@@ -134,7 +134,11 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         extras: {
             isRidePassengersLimited: true,
             rideStatus: 'on-going',
-            rideMaxPassengers: '54'
+            rideMaxPassengers: '54',
+            twoWay: true,
+            rideDirection: '2',
+            exactBackPoint: props.event.eventName,
+            exactStartPoint: ''
         }
     })
     const useStyles = makeStyles(() => (
@@ -174,6 +178,39 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         })
     }
 
+    const changeRideExactStartPoint = (newStartPoint: string) => {
+        setRide({
+            ...ride,
+            extras: { ...ride.extras, exactStartPoint: newStartPoint }
+        })
+    }
+
+    const changeRideExactBackPoint = (newBackPoint: string) => {
+        setRide({
+            ...ride,
+            extras: { ...ride.extras, exactBackPoint: newBackPoint }
+        })
+    }
+
+    const changeRideWays = (twoWay: boolean) => {
+        setRide({
+            ...ride,
+            extras: { ...ride.extras, twoWay: twoWay }
+        })
+    }
+
+    const changeRideDirections = (directions: '1' | '2') => {
+        setRide({
+            ...ride,
+            extras: { ...ride.extras, rideDirection: directions }
+        })
+    }
+
+
+
+
+
+
     const changeRidePrice = (newPrice: string) => {
         setRide({
             ...ride,
@@ -184,6 +221,12 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         setRide({
             ...ride,
             rideTime: newTime
+        })
+    }
+    const changeRideBackTime = (newTime: string) => {
+        setRide({
+            ...ride,
+            backTime: newTime
         })
     }
 
@@ -221,20 +264,72 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         }
 
     }
-    return <Stack spacing={2} sx={{ padding: '4px' }}>
-        <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת יציאה'}</label>
-        <TextField
-            autoComplete=""
-            required
-            InputLabelProps={{
-                style: { color: SECONDARY_WHITE },
-            }}
-            classes={{ root: classes.root }}
+    return <Stack spacing={2} style={{ padding: '4px' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}><label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית'}</label>
+            <Checkbox
+                style={{ width: 'fit-content', alignSelf: 'center' }}
+                checked={ride.extras.twoWay}
+                onChange={(e) => {
+                    changeRideWays(e.target.checked)
+                }}
+                inputProps={{ 'aria-label': 'controlled' }}
+            /></div>
+        {!ride.extras.twoWay &&
+            <Stack direction='column' spacing={2}>
+                <label style={{ color: SECONDARY_WHITE }}>{'בחר כיוון נסיעה'}</label>
+                <Select
+                    value={ride.extras.rideDirection}
+                    style={{ color: PRIMARY_BLACK, borderRadius: '32px', background: SECONDARY_WHITE }}
+                    onChange={(e) => {
+                        if (e.target.value === '1' || e.target.value === '2')
+                            changeRideDirections(e.target.value)
+                    }}>
+                    <MenuItem value={'1'}>{'חזור בלבד'}</MenuItem>
+                    <MenuItem value={'2'}>{'הלוך בלבד'}</MenuItem>
+                </Select></Stack>}
+        {(ride.extras.twoWay || ride.extras.rideDirection === '2') &&
+            <Stack direction='column' spacing={2}>
+                <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת יציאה'}</label>
+                <TextField
+                    autoComplete=""
+                    InputLabelProps={{
+                        style: { color: SECONDARY_WHITE },
+                    }}
+                    classes={{ root: classes.root }}
 
-            style={{ color: SECONDARY_WHITE }}
-            placeholder={props.ride ? props.ride.rideStartingPoint : 'נקודת יציאה'}
-            onChange={(e) => changeRideStartingPoint(e.target.value)}
-        />
+                    style={{ color: SECONDARY_WHITE }}
+                    placeholder={props.ride ? props.ride.rideStartingPoint : 'נקודת יציאה'}
+                    onChange={(e) => changeRideStartingPoint(e.target.value)}
+                />
+                <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת יציאה מדויקת'}</label>
+                <TextField
+                    autoComplete=""
+                    InputLabelProps={{
+                        style: { color: SECONDARY_WHITE },
+                    }}
+                    classes={{ root: classes.root }}
+
+                    style={{ color: SECONDARY_WHITE }}
+                    placeholder={props.ride ? props.ride.extras.exactStartPoint : 'נקודת יציאה מדויקת'}
+                    onChange={(e) => changeRideExactStartPoint(e.target.value)}
+                />
+
+            </Stack>}
+
+        {(ride.extras.twoWay || ride.extras.rideDirection === '1') && <Stack direction='column' spacing={2}>
+            <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת חזרה מדויקת'}</label>
+            <TextField
+                autoComplete=""
+                InputLabelProps={{
+                    style: { color: SECONDARY_WHITE },
+                }}
+                classes={{ root: classes.root }}
+
+                style={{ color: SECONDARY_WHITE }}
+                placeholder={props.ride ? props.ride.extras.exactBackPoint : 'נקודת חזרה מדויקת'}
+                onChange={(e) => changeRideExactBackPoint(e.target.value)}
+            />
+        </Stack>}
         <label style={{ color: SECONDARY_WHITE }}>{'הכנס מחיר'}</label>
         <TextField
             required
@@ -250,7 +345,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
             type='number'
             onChange={(e) => changeRidePrice(e.target.value)}
         />
-        <label style={{ color: SECONDARY_WHITE }}> {'הכנס שעה'}</label>
+        <label style={{ color: SECONDARY_WHITE }}> {'הכנס שעת יציאה'}</label>
         <TextField
             classes={{ root: classes.root }}
             InputLabelProps={{
@@ -263,6 +358,20 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
             placeholder={props.ride ? props.ride.rideTime : '00:00'}
             name='time'
             onChange={(e) => changeRideTime(e.target.value)}
+        />
+        <label style={{ color: SECONDARY_WHITE }}> {'הכנס שעת חזרה'}</label>
+        <TextField
+            classes={{ root: classes.root }}
+            InputLabelProps={{
+                style: { color: SECONDARY_WHITE },
+            }}
+            required
+            type='time'
+            style={{ color: SECONDARY_WHITE }}
+
+            placeholder={props.ride ? props.ride.backTime : '00:00'}
+            name='time'
+            onChange={(e) => changeRideBackTime(e.target.value)}
         />
         <Button sx={{ ...submitButton(false), ...{ width: '100%' } }}
             onClick={() => createNewRide()}
@@ -290,7 +399,7 @@ const Requests = (props: { eventId: string, requests?: PNPRideRequest[] }) => {
     const RequestCard = (props: { request: PNPRideRequest }) => {
 
 
-        return (<span style={{ display: 'flex', color: SECONDARY_WHITE, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+        return (<span style={{ marginLeft: '12px', marginRight: '12px', maxWidth: '90%', display: 'flex', color: PRIMARY_BLACK, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
 
             <Accordion sx={{ flexGrow: '1', overflowY: 'scroll', margin: '8px', background: 'whitesmoke' }}
                 expanded={expand[props.request.requestUserId + props.request.eventId]} onClick={() => {
@@ -304,7 +413,7 @@ const Requests = (props: { eventId: string, requests?: PNPRideRequest[] }) => {
                 <AccordionSummary dir={'rtl'} aria-controls="panel1d-content" id="panel1d-header">
                     <p style={{
                         textAlign: 'right',
-                        color: SECONDARY_WHITE,
+                        color: PRIMARY_BLACK,
                         margin: '0px',
                         fontSize: '12px'
                     }}>
@@ -342,7 +451,7 @@ const Requests = (props: { eventId: string, requests?: PNPRideRequest[] }) => {
                 </AccordionDetails>
             </Accordion>{!expand[props.request.requestUserId + props.request.eventId] && <RemoveCircleIcon sx={{ flexGrow: '0', color: '#bd3333', cursor: 'pointer' }} onClick={() => {
                 openDialog({
-                    content: <div style={{ padding: '10px' }}> {`האם תרצה להסיר ביקוש זה (אישור, אי רלוונטיות)`} <br /><br />{`ביקוש מעת`} <b>{`${props.request.fullName}`}</b><br /><button
+                    content: <div style={{ padding: '10px', color: SECONDARY_WHITE }}> {`האם תרצה להסיר ביקוש זה (אישור, אי רלוונטיות)`} <br /><br />{`ביקוש מעת`} <b>{`${props.request.fullName}`}</b><br /><button
                         onClick={() => { firebase.realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
                         style={{
                             padding: '4px',
@@ -369,14 +478,15 @@ enum AdminScreens {
 }
 
 type RideStatistics = {
-    rideStatistics: { [rideStartingPoint: string]: number; }
-    rideTransactionUserIds: { [rideStartingPoint: string]: Array<string> }
+    amount: string,
+    uid: string,
+    rideStartPoint: string
 }
 
 
 
-const EventRideStatistics = (props: { statistics: RideStatistics }) => {
-    const [objectsFromStatistics, setObjectsFromStatistics] = useState<{ rideStartPoint: string | number, numberOfPeople: number }[]>()
+const EventRideStatistics = (props: { statistics: RideStatistics[] }) => {
+    const [objectsFromStatistics, setObjectsFromStatistics] = useState<{ [rideStartingPoint: string]: { amount: number, users: string[] } }>()
 
     const { doLoad, openDialog, openDialogWithTitle, cancelLoad } = useLoading()
     const { firebase } = useFirebase()
@@ -442,24 +552,34 @@ const EventRideStatistics = (props: { statistics: RideStatistics }) => {
                 }
             }).catch(() => { cancelLoad(); openDialog({ content: <h2>{'אירעה שגיאה בהבאת המשתמשים'}</h2> }) })
     }
+
+    const [total, setTotal] = useState(0)
+
     useEffect(() => {
-        const rideStatistics: { rideStartPoint: string | number, numberOfPeople: number }[] = []
-        if (props.statistics) {
-            $.each(props.statistics.rideStatistics, (k, v) => {
-                rideStatistics.push({ rideStartPoint: k, numberOfPeople: v })
-            })
-            setObjectsFromStatistics(rideStatistics)
-        }
+        let t = total
+        const hash: { [rideStartingPoint: string]: { amount: number, users: string[] } } = {}
+        props.statistics.forEach(stat => {
+            if (!hash[stat.rideStartPoint]) {
+                hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [stat.uid] }
+            } else {
+                hash[stat.rideStartPoint].amount += Number(stat.amount)
+                hash[stat.rideStartPoint].users.push(stat.uid)
+            }
+            t += Number(stat.amount)
+        })
+        setTotal(t)
+        setObjectsFromStatistics(hash)
     }, [])
+
     return <div >  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
-        {objectsFromStatistics && objectsFromStatistics.length > 0 ? <div> {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ`} : <b>{objectsFromStatistics.reduce((before: any, p: any) => Number(before) + Number(p.numberOfPeople), 0)}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
-            {objectsFromStatistics && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: `repeat(${Math.floor(Object.keys(props.statistics.rideStatistics).length / 2)},1fr)` }}>
-                {objectsFromStatistics.map((each: any, index: number) => <div key={each.rideStartPoint + index} style={{ padding: '4px', margin: '4px', maxWidth: '200px', fontSize: '12px', fontWeight: 'bold' }}>
-                    {each.rideStartPoint}
+        {objectsFromStatistics ? <div> {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ`} : <b>{total}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
+            {objectsFromStatistics && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: `repeat(${Math.floor(props.statistics.length / 2)},1fr)` }}>
+                {Object.entries(objectsFromStatistics).map((each, index: number) => <div key={each[0] + index} style={{ padding: '4px', margin: '4px', maxWidth: '200px', fontSize: '12px', fontWeight: 'bold' }}>
+                    {each[0]}
                     <div style={{ fontWeight: '500', padding: '4px' }}>
-                        {each.numberOfPeople}
+                        {each[1].amount}
                     </div>
-                    <button onClick={() => fetchUsersWithIds(each.rideStartPoint, props.statistics.rideTransactionUserIds[each.rideStartPoint])} style={{ margin: '4px', fontSize: '12px', padding: '4px', border: 'none', background: DARKER_BLACK_SELECTED, color: SECONDARY_WHITE }}>
+                    <button onClick={() => fetchUsersWithIds(each[0], each[1].users)} style={{ margin: '4px', fontSize: '12px', padding: '4px', border: 'none', background: DARKER_BLACK_SELECTED, color: SECONDARY_WHITE }}>
                         {'הצג משתמשים'}
                     </button>
                     <hr /></div>)} </div>}
@@ -468,7 +588,7 @@ const EventRideStatistics = (props: { statistics: RideStatistics }) => {
     </div>
 
 }
-const ShowingPanelScreen = (props: { event: PNPEvent, rides: PNPPublicRide[], requests: PNPRideRequest[], statistics: RideStatistics, showingComponent: AdminScreens }) => {
+const ShowingPanelScreen = (props: { event: PNPEvent, rides: PNPPublicRide[], requests: PNPRideRequest[], statistics: RideStatistics[], showingComponent: AdminScreens }) => {
     return props.showingComponent === AdminScreens.ridesOverview ?
         <Rides rides={props.rides} event={props.event} /> : props.showingComponent === AdminScreens.rideTransactions ?
             <EventRideStatistics statistics={props.statistics} /> : <Requests requests={props.requests} eventId={props.event.eventId} />
@@ -488,48 +608,23 @@ export default function EventStatistics() {
     const event: PNPEvent | null = location.state ? location.state as PNPEvent : null
     const [showingComponent, setShowingComponent] = useState<AdminScreens>(AdminScreens.rideTransactions)
 
-    const [statistics, setStatistics] = useState<RideStatistics | null>(null)
+    const [statistics, setStatistics] = useState<RideStatistics[] | null>(null)
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
     const { firebase } = useFirebase()
     const { lang } = useLanguage()
     const { openDialog, closeDialog, doLoad, cancelLoad, openDialogWithTitle } = useLoading()
     const [requests, setRequests] = useState<PNPRideRequest[] | null>(null)
     useEffect(() => {
+        let unsub3: Unsubscribe | null = null
         if (event) {
             doLoad()
-            axios.post('https://nadavsolutions.com/gserver/transactions', { uid: undefined }, { headers: { 'Content-Type': 'application/json' } })
-                .then(response => {
-                    const send = response.data.map((transaction: any) => ({
-                        transactionDate: transaction.transaction.date,
-                        transactionProduct: transaction.transaction.more_info,
-                        transactionTotalAmount: transaction.data.items[0].quantity,
-                        transactionId: transaction.transaction_uid,
-                        transactionUid: transaction.data.customer_uid,
-                        transactionTotalPrice: transaction.transaction.amount,
-                        status_description: transaction.transaction.status_code === '000' ? 'Success' : 'Failure'
-                    }))
-
-                    const rideStatistics: { [rideStartingPoint: string]: number; } = {};
-                    const rideTransactionUserIds: { [rideStartingPoint: string]: Array<string> } = {}
-                    const filteredTransactions: any = send.filter((transaction: any) => transaction.transactionProduct.includes(event.eventName))
-                    filteredTransactions.forEach((transaction: any) => transaction.transactionProduct = transaction.transactionProduct.split(' מ -')[1].split(' ל -')[0])
-
-                    for (const transaction of filteredTransactions) {
-                        if (rideStatistics[transaction.transactionProduct]) {
-                            rideStatistics[transaction.transactionProduct] += Number(transaction.transactionTotalAmount)
-                        } else {
-                            rideStatistics[transaction.transactionProduct] = transaction.transactionTotalAmount
-                        }
-                        if (rideTransactionUserIds[transaction.transactionProduct]) {
-                            rideTransactionUserIds[transaction.transactionProduct].push(transaction.transactionUid)
-                        } else {
-                            rideTransactionUserIds[transaction.transactionProduct] = [transaction.transactionUid]
-                        }
-                    }
-
-                    setStatistics({ rideStatistics: rideStatistics, rideTransactionUserIds: rideTransactionUserIds })
-                    cancelLoad()
-                }).catch(() => { cancelLoad() })
+            unsub3 = firebase.realTime.getAllTransactionsForEvent(event.eventId, (stats) => {
+                setStatistics(stats)
+                cancelLoad()
+            }, (e) => {
+                console.log(e)
+                cancelLoad()
+            })
         }
 
         const unsub = event ? firebase.realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
@@ -538,7 +633,7 @@ export default function EventStatistics() {
             setRides(e)
         }) : null
 
-        return () => { unsub && unsub(); unsub2 && unsub2() }
+        return () => { unsub && unsub(); unsub2 && unsub2(); unsub3 && unsub3() }
     }, [])
 
     const ActionCard = () => {

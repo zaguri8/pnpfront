@@ -12,7 +12,7 @@ export default function TermsOfService() {
         <InnerPageHolder style={{ maxWidth: '65%', width: '65%', marginLeft: 'auto', marginRight: 'auto' }}>
 
             {lang === 'heb' ?
-                <div style={{ maxWidth: '500px', minWidth: '320px' ,color:PRIMARY_WHITE}}>
+                <div style={{ maxWidth: '500px', minWidth: '320px', color: PRIMARY_WHITE }}>
                     <p>תקנון, תנאי שימוש ומדיניות פרטיות לאתר "Pick N Pull"</p>
                     <p>Pick N Pull מברכים את בחירתכם לגלוש באתר האינטרנט המופעל על ידה בכתובת: www.Pick - N - Pull.co.il("האתר"). </p>
                     <p>האתר מספק פלטפורמה אינטרנטית לקהל הלקוחות של האתר להזמנה ולרכישה נוחה ובטוחה של שירותי הסעות לכל מטרה לרבות אירועים, פסטיבלים וכיו"ב ("השירותים") ממיטב הנהגים ובעלי המקצוע בתחום ההסעות ("נותני השירות"). כמו כן ניתן למצוא באתר מידע אודות אופן השימוש בשירותי האתר, עלויות ועוד ("המוצרים").</p>
@@ -124,13 +124,13 @@ export default function TermsOfService() {
                     <p>	•	צרו קשר:</p>
                     <p>	•	האתר מקפיד על קיום הוראות החוק ומכבד את זכותם של משתמשי האתר ואחרים לפרטיות ולשם טוב.אם אתה סבור כי פורסם באתר תוכן הפוגע בך מטעם כלשהו, נא פנה אלינו לפי הפרטים שלהלן ואנו נשתדל לטפל בפנייתך בכל ההקדם.פניות כאמור ניתן להעביר באמצעים הבאים:</p>
                     <p>כתובת: הפטל 3, הוד השרון;</p>
-                    <p>טלפון: 053 - 3724658;</p>
+                    <p>טלפון:  053-500-6117;</p>
                     <p>דוא"ל: PickNPull99@Gmail.com</p>
                     <p></p>
                     <p>כל הזכויות בתקנון זה שמורות לדניאל עורכי דין ואין להעתיק, לשכפל או להפיץ אותו.</p>
                     <p>עדכון אחרון: מרץ 2021</p>
                 </div> :
-                <div className="container" style = {{color:PRIMARY_WHITE}}>
+                <div className="container" style={{ color: PRIMARY_WHITE }}>
                     <p>Bylaws, Terms of Use and Privacy Policy for the "Pick N Pull" website</p>
                     <p>Pick N Pull welcomes your choice to browse the website operated by it at: www.Pick - N - Pull.co.il("the Website").</p>
                     <p> The site provides an internet platform for the site's clientele to order and purchase convenient and safe transportation services for any purpose, including events, festivals and the chair ("services") from the best drivers and shuttle professionals ("service providers"). Information on how to use the site services, costs and more ("the products") can also be found on the site.</p>

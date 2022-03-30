@@ -83,10 +83,10 @@ export const transactionConfirmationFromDict: (snap: DataSnapshot) => PNPTransac
     return {
         eventId: snap.child('eventId').val(),
         twoWay: snap.child('twoWay').val(),
+        amount: snap.child('amount').val(),
         ridesLeft: snap.child('ridesLeft').val(),
         rideId: snap.child('rideId').val(),
-        confirmationVoucher: snap.child('confirmationVoucher').val(),
-        isValid: snap.child('isValid').val()
+        confirmationVoucher: snap.child('confirmationVoucher').val()
     }
 }
 
@@ -94,7 +94,6 @@ export const publicRideFromDict: (snap: DataSnapshot) => PNPPublicRide = (snap) 
     return {
         eventId: snap.child('eventId').val(),
         rideId: snap.child('rideId').val(),
-        twoWay: snap.child('twoWay').val(),
         backTime: snap.child('backTime').val(),
         date: snap.child('date').val(),
         passengers: snap.child('passengers').val(),
@@ -137,6 +136,9 @@ export function getEventType(event: PNPEvent) {
         case "פסטיבלים":
             type = 'fetivals'
             break
+        case "חתונות":
+            type = 'weddings'
+            break
         case "ברים":
             type = 'bars'
             break
@@ -145,6 +147,39 @@ export function getEventType(event: PNPEvent) {
             break
         case "אירועי ילדים":
             type = 'children'
+            break
+    }
+
+    return type
+}
+
+export function getEventTypeFromString(t: string) {
+    let type = 'clubs'
+    switch (t) {
+        case "concerts":
+            type = 'הופעות'
+            break
+        case "clubs":
+            type = 'מסיבות ומועדונים'
+            break
+        case "football":
+            type = 'משחקי כדורגל'
+            break
+        case "fetivals":
+            type = 'פסטיבלים'
+            break
+        case "bars":
+            type = 'ברים'
+            break
+
+        case "weddings":
+            type = "חתונות"
+            break
+        case "sports":
+            type = 'ספורט כללי'
+            break
+        case "children":
+            type = 'אירועי ילדים'
             break
     }
 

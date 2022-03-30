@@ -3,7 +3,7 @@ import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
-import { ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
@@ -21,6 +21,8 @@ import { useLocation } from "react-router"
 import FavoriteEventsDialog from "../utilities/PNPDialog"
 import { useLanguage } from "../../context/Language"
 import { submitButton } from "../../settings/styles"
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions"
+import { Welcome } from "./Welcome"
 
 
 export default function Register() {
@@ -35,12 +37,68 @@ export default function Register() {
             right: '-64px'
 
         },
+        root: {
+            "& .MuiOutlinedInput-root": {
+                background: SECONDARY_WHITE,
+                borderRadius: '32px',
+                minWidth: '275px',
+                alignSelf: 'center',
+                padding: '0px',
+                border: '.1px solid white',
+                color: PRIMARY_BLACK, ...{
+                    '& input[type=number]': {
+                        '-moz-appearance': 'textfield'
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    },
+                    '& input[type=number]::-webkit-inner-spin-button': {
+                        '-webkit-appearance': 'none',
+                        margin: 0
+                    }
+                }
+            }
+        },
         shrink: {
             transformOrigin: "top right"
         }
     }));
 
     const { lang } = useLanguage()
+    const [user, setUser] = useState({
+        phone: '',
+        firstname: '',
+        lastname: '',
+        email: '',
+        password: '',
+        birthDate: dateStringFromDate(new Date()),
+        selectedFavoriteEvents: ''
+    })
+
+    function updateUserPhone(phone) {
+        setUser({ ...user, ...{ phone: phone } })
+    }
+    function updateFirstName(name) {
+        setUser({ ...user, ...{ firstname: name } })
+    }
+    function updateLastName(name) {
+        setUser({ ...user, ...{ lastname: name } })
+    }
+    function updateEmail(email) {
+        setUser({ ...user, ...{ email: email } })
+    }
+    function updatePassword(pass) {
+        setUser({ ...user, ...{ password: pass } })
+    }
+    function updateBirthDate(bd) {
+        const s = reverseDate(bd)
+        setUser({ ...user, ...{ birthDate: s } })
+    }
+    function updateSelectedFavoriteEvents(favs) {
+        setUser({ ...user, ...{ selectedFavoriteEvents: favs } })
+    }
+    const { openDialog } = useLoading()
     function register(e) {
 
         function validate(phone, firstname, lastname, selectedFavoriteEvents) {
@@ -75,31 +133,24 @@ export default function Register() {
             }
             return errors
         }
-        e.preventDefault()
-        const firstName = e.target[0].value
-        const lastName = e.target[1].value
-        const phone = e.target[2].value
-        const email = e.target[3].value
-        const password = e.target[4].value
-        const birthDate = e.target[5].value
-        const selectedFavoriteEvents = $('#selected_favorite_events').text().replace(`${PICKED(lang)}`, "").replaceAll(' 🎉 ', ',').split(',')
-        const validationErrors = validate(phone, firstName, lastName, selectedFavoriteEvents)
+        const selectedEvents = $('#selected_favorite_events').text().replace(`${PICKED(lang)}`, "").replaceAll(' 🎉 ', ',').split(',')
+        const validationErrors = validate(user.phone, user.firstname, user.lastname, selectedEvents)
         if (validationErrors.length > 0) {
             alert(validationErrors.join('\n'))
             return
         }
         doLoad()
 
-        createUserWithEmailAndPassword(firebase.auth, email, password)
+        createUserWithEmailAndPassword(firebase.auth, user.email, user.password)
             .then(() => {
                 firebase.realTime.addUser({
-                    name: firstName + " " + lastName,
-                    email: email,
+                    name: user.firstname + " " + user.lastname,
+                    email: user.email,
                     customerId: '',
                     admin: false,
-                    phone: phone,
-                    birthDate: birthDate,
-                    favoriteEvents: selectedFavoriteEvents,
+                    phone: user.phone,
+                    birthDate: user.birthDate,
+                    favoriteEvents: selectedEvents,
                     coins: 0,
                     producer: false
                 }).then(result => {
@@ -109,6 +160,7 @@ export default function Register() {
                     } else {
                         nav('/')
                     }
+                    openDialog({ content: <Welcome /> })
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
                     firebase.realTime.createError('Register error', err)
@@ -124,7 +176,6 @@ export default function Register() {
             })
     }
 
-    const [date, setDate] = useState()
     const classes = useStyles()
 
     const [termsOfUse, setTermsOfUse] = useState()
@@ -134,7 +185,7 @@ export default function Register() {
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder>
-            <form onSubmit={register} style={{
+            <div style={{
                 display: 'flex',
                 justifyContent: 'center',
                 width: '80%',
@@ -143,84 +194,93 @@ export default function Register() {
                 alignItems: 'center'
             }}>
                 <SectionTitle title={REGISTER_TITLE(lang)} style={{
-                    background: SECONDARY_BLACK,
+                    background: 'none',
                     marginTop: '0px',
                     marginBottom: '32px'
                 }} />
                 <Stack spacing={3} style={{ width: '80%' }}>
                     <FormControl>
-                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-                        }} htmlFor="first_name_input">{FIRST_NAME(lang)}</InputLabel>
-                        <Input sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
-
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{FIRST_NAME(lang)}</label>
+                        <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
+                            classes={{ root: classes.root }}
+                            placeholder={FIRST_NAME(lang)}
+                            onChange={(e) => { updateFirstName(e.target.value) }}
                             id="first_name_input" aria-describedby="first_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-                        }} htmlFor="last_name_input">{LAST_NAME(lang)}</InputLabel>
-                        <Input
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{LAST_NAME(lang)}</label>
+                        <TextField
+                            placeholder={LAST_NAME(lang)}
+                            onChange={(e) => { updateLastName(e.target.value) }}
+                            classes={{ root: classes.root }}
                             type="text"
                             name="last-name"
                             autoComplete="last-name"
-                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="last_name_input" aria-describedby="last_name_helper_text" />
+                            sx={{ direction: SIDE(lang), color: SECONDARY_BLACK }} id="last_name_input" aria-describedby="last_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-                        }} htmlFor="phone_number_input">{PHONE_NUMBER(lang)}</InputLabel>
-                        <Input
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PHONE_NUMBER(lang)}</label>
+                        <TextField
                             type="tel"
+                            placeholder={PHONE_NUMBER(lang)}
+                            onChange={(e) => { updateUserPhone(e.target.value) }}
                             name="phone"
+                            classes={{ root: classes.root }}
                             autoComplete="phone"
                             sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
 
                     </FormControl>
                     <FormControl>
-                        <InputLabel style={{ color: SECONDARY_WHITE }} required classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-                        }} htmlFor="email_input">{EMAIL(lang)}</InputLabel>
-                        <Input
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EMAIL(lang)}</label>
+                        <TextField
                             autoComplete="username"
                             type='email'
+                            onChange={(e) => { updateEmail(e.target.value) }}
+                            placeholder={EMAIL(lang)}
                             name="email"
+                            classes={{ root: classes.root }}
                             sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
 
                     </FormControl>
 
                     <FormControl>
-                        <InputLabel style={{ color: SECONDARY_WHITE }} variant="outlined" required classes={{
-                            root: classes.labelRoot,
-                            shrink: classes.shrink
-                        }} htmlFor="password_input">{PASSWORD(lang)}</InputLabel>
-                        <Input
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PASSWORD(lang)}</label>
+                        <TextField
                             autoComplete="new-password"
                             type="password"
+                            placeholder={PASSWORD(lang)}
+                            onChange={(e) => { updatePassword(e.target.value) }}
+                            classes={{ root: classes.root }}
                             name="new-password"
                             sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
                     </FormControl>
 
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker
-                            label={<p style={{ color: SECONDARY_WHITE }} >{BIRTH_DATE(lang)}</p>}
-                            value={date}
+                    <FormControl style={{ width: '80%', alignSelf: 'center' }}>
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{BIRTH_DATE(lang)}</label>
+                        <TextField
 
-                            onChange={(newValue) => setDate(newValue)}
-                            renderInput={(params) => <TextField style={{ color: SECONDARY_WHITE }} {...params} />}
-                        />
-                    </LocalizationProvider>
+                            value={unReverseDate(user.birthDate)}
+                            classes={{ root: classes.root }}
+                            InputLabelProps={{
+                                shrink: true,
+                                style: { color: SECONDARY_WHITE }
+                            }}
+
+                            type='date'
+                            onChange={(e) => { updateBirthDate(e.target.value) }}
+                            required />
+                    </FormControl>
                     <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
                     <FavoriteEventsDialog />
 
 
-                    <Button title={REGISTER_OK(lang)} style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '16px' } }} variant="outlined" type='submit' />
+                    <Button title={REGISTER_OK(lang)}
+                        type={'button'}
+                        style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '16px' } }}
+                        variant="outlined"
+                        onClick={register} />
 
                     <div>
                         <Link style={{ textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
@@ -230,13 +290,13 @@ export default function Register() {
 
                         <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                         <Checkbox
-                            style={{ width: 'fit-content', alignSelf: 'center', background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
+                            style={{ width: 'fit-content', alignSelf: 'center', background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
                             onChange={handleTermsOfUseChange}
                             name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
                     </Stack>
 
                 </Stack>
-            </form>
+            </div>
         </InnerPageHolder>
     </PageHolder >)
 }

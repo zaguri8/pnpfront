@@ -13,40 +13,31 @@ import { useLanguage } from "../../context/Language"
 import About from "../About"
 import { InnerPageHolder } from "../utilities/Holders"
 import { Link } from "react-router-dom"
-import { PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import Spacer from "../utilities/Spacer"
+import { getEventType, getEventTypeFromString } from "../../store/external/converters"
+import { v4 } from "uuid"
 export default function Home() {
-
     const { user, firebase } = useFirebase()
-    const [pnpCultureEvents, setPNPCultureEvents] = useState<PNPEvent[]>([])
-    const [pnpClubEvents, setPNPClubEvents] = useState<PNPEvent[]>([])
-    const realTime = firebase.realTime
+    const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
     const [data, setdata] = useState<string>()
 
-    const qr = useRef<HTMLDivElement | null>(null)
     useEffect(() => {
-
-        const unsubscribeCulture = realTime.addListenerToCultureEvents(events => {
-            setPNPCultureEvents(events)
-        })
-        const unsubscribeClubs = realTime.addListenerToClubEvents(events => {
-            setPNPClubEvents(events)
-        })
-        return () => {
-            unsubscribeCulture()
-            unsubscribeClubs()
-        }
+        const unsubEvents = firebase.realTime.addListenerToPublicEvents(setPnpEvents)
+        return () => unsubEvents()
     }, [])
     const { lang } = useLanguage()
 
-    return <div>
+    return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
         <RideFormPreview />
         {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
 
-        <img src={data} />
+
         <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
-        <Gallery header={CULTURE(lang)} events={pnpCultureEvents} />
-        <Gallery header={CLUBS(lang)} events={pnpClubEvents} />
+        {pnpEvents && Object.entries(pnpEvents).map((k) => <Gallery
+            key={v4()}
+            events={k[1]}
+            header={lang === 'heb' ? getEventTypeFromString(k[0]) : k[0].slice(0,1).toUpperCase() + k[0].substring(1)} />)}
         <Spacer offset={4} />
         <SectionTitle withBg style={{
             padding: '32px',
@@ -58,7 +49,7 @@ export default function Home() {
             width: '80%',
             borderRadius: '16px',
             paddingRight: '45px',
-            background: SECONDARY_BLACK,
+            background: ORANGE_GRADIENT_PRIMARY,
             alignSelf: 'center',
             fontSize: '38px'
         }} title={'We Say No More!'} />
@@ -68,7 +59,7 @@ export default function Home() {
         <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} />
         <WhyUsContainer />
         <SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
-        <InnerPageHolder style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: '16px', width: '50%' }}>
+        <InnerPageHolder style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: '16px', width: '50%', background: ORANGE_GRADIENT_PRIMARY }}>
 
 
             <About />

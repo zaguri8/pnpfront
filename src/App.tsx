@@ -1,6 +1,6 @@
 import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
@@ -32,6 +32,7 @@ import PaymentSuccess from './components/payment/PaymentSuccess'
 import SearchRide from './components/search/SearchRide';
 import BScanner from './components/scanner/BScanner.js';
 import BScanResult from './components/scanner/BScanResult';
+import ForgotPass from './components/auth/ForgotPass';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -52,7 +53,7 @@ function ImageHeader() {
 
 
 function UNKNOWN(props: { lang: string }) {
-  return <h1 style ={{color:SECONDARY_WHITE}}>{NOTFOUND(props.lang)}</h1>;
+  return <h1 style={{ color: SECONDARY_WHITE }}>{NOTFOUND(props.lang)}</h1>;
 }
 
 
@@ -99,7 +100,7 @@ function App() {
 
   const [scrollingScript, setScrollingScript] = useState(false)
   const [resizingScript, setResizingScript] = useState(false)
-  useLayoutEffect(() => {
+  useEffect(() => {
     const d = document.createElement('div')
     d.classList.add('dim')
     $('.App').append(d)
@@ -141,14 +142,23 @@ function App() {
     }
     onResize()
     onScroll()
-    $(window).on('resize', onResize)
-    $(window).on('scroll', onScroll)
+
+    window.addEventListener('resize', onResize)
+    window.addEventListener('scroll', onScroll)
+
+
+    return () => {
+
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('scroll', onScroll)
+
+    }
   }, [])
 
   const { isAuthenticated, appUser } = useFirebase()
 
 
-  const NoPerms = () => (<div style ={{color:SECONDARY_WHITE}}>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div>)
+  const NoPerms = () => (<div style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div>)
 
   return (
     <div>
@@ -204,7 +214,7 @@ function App() {
           <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />
           <Route path='/payment/success' element={<PaymentSuccess />} />
           <Route path='/invitation/:id' element={<InvitationPage />} />
-          {/* <Route path='/test' element={<Test />} /> */}
+          <Route path='/forgotPass' element={isAuthenticated ? <Navigate to={'/'} /> : <ForgotPass />} />
           <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
           <Route path='/adminpanel/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventStatistics />} />
           <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />

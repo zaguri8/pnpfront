@@ -33,6 +33,15 @@ export default function EventPage() {
     const { id } = useParams()
 
     const nav = useNavigate()
+
+
+    const buildName = (e: PNPEvent, r?: PNPPublicRide, s?: PNPPublicRide | null) => {
+        const f1 = `הסעה לאירוע ${e.eventName}`
+        const f2 = (r?.extras.exactStartPoint || s?.extras.exactStartPoint) ? `${' יציאה מ-' + (r && r.extras.exactStartPoint ? r.extras.exactStartPoint : s && s.extras.exactStartPoint ? s.extras.exactStartPoint : '')}` : ''
+        const f3 = (r?.extras.exactBackPoint || s?.extras.exactBackPoint) ? `${' חזרה מ-' + (r && r?.extras.exactBackPoint ? r?.extras.exactBackPoint : s && s.extras.exactBackPoint ? s.extras.exactBackPoint : '')}` : ''
+        return `${f1} ${f2} ${f3}`
+    }
+
     const openRequestPaymentDialog = (ride?: PNPPublicRide) => {
         if (!user || !appUser) {
             nav('/login', { state: { cachedLocation: location.pathname } })
@@ -42,12 +51,16 @@ export default function EventPage() {
         if (event) {
             openDialog({
                 content: <div style={{ padding: '32px', }}><PaymentForm
-
                     product={{
-                        name: `הסעה לאירוע ${event.eventName}`,
+                        name: `${event.eventName}`,
                         desc: event.eventDetails,
-                        direction: '2', // 2 - first way , 1 second way
-                        twoWay: ride ? ride?.twoWay : selectedEventRide ? selectedEventRide.twoWay : '',
+                        startPoint:ride ? ride.rideStartingPoint : selectedEventRide ? selectedEventRide.rideStartingPoint : '',
+                        rideTime: ride ? ride.rideTime : selectedEventRide ? selectedEventRide.rideTime : '',
+                        backTime: ride ? ride.backTime : selectedEventRide ? selectedEventRide.backTime : '',
+                        exactStartPoint: ride && ride.extras.exactStartPoint ? ride.extras.exactStartPoint : selectedEventRide && selectedEventRide.extras.exactStartPoint ? selectedEventRide?.extras.exactStartPoint : null,
+                        exactBackPoint: ride && ride.extras.exactBackPoint ? ride.extras.exactBackPoint : selectedEventRide && selectedEventRide.extras.exactBackPoint ? selectedEventRide?.extras.exactBackPoint : null,
+                        direction: ride ? ride.extras.rideDirection : selectedEventRide?.extras.rideDirection, // 2 - first way , 1 second way
+                        twoWay: ride ? ride?.extras.twoWay : selectedEventRide ? selectedEventRide.extras.twoWay : '',
                         price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
                         eventId: event.eventId,
                         rideId: ride ? ride.rideId : selectedEventRide ? selectedEventRide.rideId : ''
@@ -125,8 +138,10 @@ export default function EventPage() {
             }
 
         }
-        $(window).resize(() => { resize() })
+        window.addEventListener('resize', resize)
         resize()
+
+        return () => { window.removeEventListener('resize', resize) }
     }, [])
 
 
@@ -210,7 +225,7 @@ export default function EventPage() {
                                                 <DirectionsBusIcon /> <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
 
                                             </div>
-                                            <span>{ride.rideTime}</span>
+                                            <span>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
                                         </MenuItem>
                                     })}
                                     <div style={{

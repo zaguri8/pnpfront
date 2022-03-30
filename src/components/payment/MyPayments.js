@@ -40,22 +40,22 @@ const MyPayments = () => {
     const TransactionRow = ({ transaction, index }) => {
         return (transaction ? <tr style={{ display: 'flex', justifyContent: 'space-around', background: index % 2 === 0 ? 'white' : 'whitesmoke', color: 'black', padding: '8px' }}>
             <td style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.date}</td>
-            <td style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.more_info}</td>
+            <td style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.more_info.productName}</td>
             <td style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}><Button
                 onClick={() => nav('/payment/success', { state: transaction })}
-                style={{ ...submitButton(false), ...{textTransform:'none', width: '100%', paddingLeft: '4px', paddingRight: '4px', fontSize: '16px' } }}>{lang === 'heb' ? 'הצג פירוט' : 'Show details'}</Button></td>
+                style={{ ...submitButton(false), ...{textTransform:'none', width: '100%', paddingLeft: '4px', paddingRight: '4px', fontSize: '12px' } }}>{lang === 'heb' ? 'הצג פירוט וברקוד' : 'Show details & Barcode'}</Button></td>
         </tr> : null)
     }
 
 
 
     return (transactions && transactions.length > 0 ? <PageHolder>
-        <SectionTitle title={lang === 'heb' ? 'היסטוריית רכישות' : 'Ride History'} style={{}} />
+        <SectionTitle title={lang === 'heb' ? 'היסטוריית נסיעות' : 'Ride History'} style={{}} />
         <table style={{ marginTop: '32px', width: window.outerWidth < 500 ? '90%' : '75%', maxWidth: '500px' }} id={'transactions_table'}>
 
             <tbody id='table_transactions_content' dir={SIDE(lang)} style={{ alignItems: 'center' }}>
                 <tr style={{ backgroundImage: ORANGE_GRADIENT_PRIMARY, height: 'fit-content', color: 'white', display: 'flex', justifyContent: 'space-around', padding: '8px', alignItems: 'center' }}>
-                    <th style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{lang === 'heb' ? 'תאריך' : 'Date'}</th>
+                    <th style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{lang === 'heb' ? 'תאריך' : 'Purchase date'}</th>
                     <th style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{lang === 'heb' ? 'נסיעה' : 'Ride'}</th>
                     <th style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{lang === 'heb' ? 'פרטים' : 'Details'}</th>
                 </tr>

@@ -7,7 +7,6 @@ code {
 }
 body {
   margin: 0;
-  scroll-behavior: smooth;
   font-family: 'Open Sans Hebrew', serif;
   -webkit-font-smoothing: antialiased;
   background-color: rgb(36,38,43);
@@ -16,6 +15,7 @@ body {
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; 
 }
+
 html {
 overflow-x: hidden;
 scrollbar-width: none;

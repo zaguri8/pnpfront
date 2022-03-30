@@ -15,10 +15,10 @@ export type PNPEventAgeRange = {
 export type PNPTransactionConfirmation = {
     eventId: string
     rideId: string
-    twoWay:boolean
+    amount:string
+    twoWay: boolean
     ridesLeft: number
     confirmationVoucher: string
-    isValid: boolean
 }
 
 // TODO : Add Ride Status 20/03/22
@@ -31,16 +31,19 @@ export type PNPPublicRide = {
     rideTime: string
     ridePrice: string
     backTime: string
-    twoWay: boolean
     passengers: string
     date: string
-    extras?: PNPRideExtras
+    extras: PNPRideExtras
 }
 
 export type PNPRideExtras = {
     isRidePassengersLimited?: boolean
     rideStatus?: 'on-going' | 'sold-out' | 'running-out'
     rideMaxPassengers?: string
+    rideDirection: '2' | '1'
+    twoWay: boolean
+    exactStartPoint?: string
+    exactBackPoint?: string
 }
 
 

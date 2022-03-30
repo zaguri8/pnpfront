@@ -1,19 +1,16 @@
-import { Stack } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { QrReader } from 'react-qr-reader';
-import { SECONDARY_WHITE } from "../../settings/colors";
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
+import { PageHolder } from "../utilities/Holders";
+import Spacer from "../utilities/Spacer";
 function BScanner() {
-    const [data, setData] = useState('No result');
+
     const nav = useNavigate()
-    //  nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + result.text })
-
-
-    const [scan, setScan] = useState()
     const [error, setError] = useState()
 
-
-    const [useScan, setUseScan] = useState(false)
+    const location = useLocation()
+    const [useScan, setUseScan] = useState(!location.state)
     const updateScanResult = (res) => {
         if (res) {
             try {
@@ -25,30 +22,50 @@ function BScanner() {
         }
     }
     const [faceMode, setFaceMode] = useState('environment')
-    return <div>
-        {!useScan ? <button onClick={() => {
-            setUseScan(true)
-        }}>{'סרוק'}</button> : <button
+    return <div style={{
+        padding: '16px',
+        borderRadius: '32px',
+        height: '100%',
+        marginTop: '32px',
+        minHeight:'420px',
+        marginBottom:'32px',
+        width: window.outerWidth < 400 ? '80%' : '60%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        background: ORANGE_GRADIENT_PRIMARY
+    }}>
+
+        <Spacer offset={1} />
+        {!useScan ? <button
+            style={{ background: DARK_BLACK }}
             onClick={() => {
-                setUseScan(false)
-            }}
-        >{'בטל'}</button>}
+                setUseScan(true)
+            }}>{'פתח סורק'}</button> : <button
+                style={{ background: '#bd3333' }}
+                onClick={() => {
+                    setUseScan(false)
+                }}
+            >{'סגור סורק'}</button>}
         <br />
         <br />
-        <select style={{ padding: '4px' }} onChange={(e) => {
-            setFaceMode(e.target.value)
-        }}>
-            <option value={'user'}>
+        <select style={{ padding: '4px', margin: '4px', fontSize: '16px' }}
+            value={faceMode}
+            onChange={(e) => {
+                setFaceMode(e.target.value)
+            }}>
+            <option
+
+                value={'user'}>
                 {'מצלמה קדמית'}
             </option>
             <option value={'environment'}>
                 {'מצלמה אחורית'}
             </option>
         </select>
+        <br />
         {useScan && <QrReader
-            containerStyle={{ maxWidth: window.outerWidth < 400 ? '75%' : '50%', maxHeight: '75%', marginLeft: 'auto', marginRight: 'auto' }}
+            containerStyle={{ maxWidth: window.outerWidth < 400 ? '75%' : '50%', maxHeight: '100%', marginLeft: 'auto', marginRight: 'auto' }}
             onError={setError}
-
             constraints={{ facingMode: { exact: faceMode } }}
             onResult={(result, error) => {
                 if (!!result) {
@@ -56,7 +73,9 @@ function BScanner() {
                 }
             }}
         />}
+        <span style={{ color: SECONDARY_WHITE, fontSize: '12px' }}>{'סורק זה דורש מצלמה של טלפון חכם'}</span>
         <br />
+
         <br />
     </div>
 }

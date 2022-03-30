@@ -35,7 +35,7 @@ export const toolbar = () => {
     return {
         ...flex('row', 'center', 'space-between'),
 
-        ...{ zIndex: '100', width: '100%' },
+        ...{ zIndex: '100', width: '100%',...{boxShadow:'rgba(0, 0, 0, 0.3) 0px 2px 8px 1px'} },
         ...bgColor(ORANGE_GRADIENT_PRIMARY, { height: '50px' })
     }
 }

@@ -1,5 +1,5 @@
 
-export const CREATE_EVENT = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create event'
+export const CREATE_EVENT = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create'
 export const TOOLBAR_LOGIN = (lang) => lang === 'heb' ? 'התחברות ' : 'Sign in'
 export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language'
 export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
@@ -40,14 +40,14 @@ export const CULTURE = (lang) => lang === 'heb' ? 'תרבות ופנאי' : 'Cul
 export const CLUBS = (lang) => lang === 'heb' ? 'מועדונים' : 'Clubs'
 export const SCHEDULED_EVENTS = (lang) => lang === 'heb' ? 'אירועים קרובים' : 'Upcomming Events'
 
-export const MY_ACCOUNT = (lang) => lang === 'heb' ? 'איזור אישי' : 'My Account'
+export const MY_ACCOUNT = (lang) => lang === 'heb' ? 'איזור אישי' : 'Account'
 export const REGISTER_TITLE = (lang) => lang === 'heb' ? 'הרשמה' : 'Register'
 export const REGISTER_OK = (lang) => lang === 'heb' ? 'הירשם/י' : 'Register'
 export const LOGIN_OK = lang => lang === 'heb' ? 'התחבר/י' : 'Sign in'
 export const LOGOUT = (lang) => lang === 'heb' ? 'התנתק' : 'Sign out'
 export const MENU_ITEM_1 = (lang) => lang === 'heb' ? "אודות" : "About us"
 export const MENU_ITEM_2 = (lang) => MY_ACCOUNT(lang)
-export const MENU_ITEM_3 = (lang) => lang === 'heb' ? "היסטוריית הסעות" : 'Ride history'
+export const MENU_ITEM_3 = (lang) => lang === 'heb' ? "היסטוריית נסיעות וברקודים" : 'Ride history'
 export const MENU_ITEM_4 = (lang) => lang === 'heb' ? "חדש ב Pick n Pull" : 'New at Pick n Pull'
 export const MENU_ITEM_5 = (lang) => lang === 'heb' ? "סגור" : 'Close'
 
@@ -122,7 +122,7 @@ export const NO_MORE_ITEM_3 = (lang) => lang === 'heb' ? 'drink & drive' : 'drin
 export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'מוניות יקרות' : 'Expensive cabs'
 export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'מחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'
 
-export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create event'
+export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create'
 export const EVENT_TITLE = (lang) => lang === 'heb' ? 'כותרת האירוע' : 'Event title'
 export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע' : 'Event address'
 export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע' : 'Event start date'
@@ -150,6 +150,8 @@ export const EXP_Y = (lang) => lang === 'heb' ? 'שנה' : 'Year'
 export const CVV = (lang) => lang === 'heb' ? 'שלוש ספרות בגב כרטיס' : 'CVV'
 export const TOTAL_TO_PAY = (lang, price) => lang === 'heb' ? `סה"כ לתשלום: ${price} ש"ח` : `Total: ${price} ILS`
 
+
+export const RIDE_INFO = (lang) => lang === 'heb' ? 'מספר המקומות מוגבל ל50 הרוכשים הראשונים. ההסעות הינן דו כיווניות - הלוך חזור.ברכישת הכרטיס תקבלו ברקוד שיופיע בהיסטוריית הנסיעות, אותו תראו בעליה לאוטובוס.' : 'The number of places is limited to the first 50 buyers. The shuttles are two-way - round trip. When purchasing the ticket, you will receive confirmation of an email that will also appear in the travel history, which you will see when boarding the bus.'
 
 
 export const TRANSACTION_DETAILS = (lang) => lang === 'heb' ? 'קבלה עבור רכישה' : 'Receipt Details'

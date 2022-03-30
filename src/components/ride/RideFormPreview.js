@@ -15,8 +15,9 @@ function FormHeader() {
     const { lang } = useLanguage()
     return (<h4 id='form_header' style={{
         margin: '0px',
-        fontSize: '18px',
-        fontWeight: '500',
+        fontSize: lang === 'heb' ?  '18px' : '16px',
+        maxHeight:lang ==='heb' ? 'inherit' : '10px',
+        fontWeight: '600',
         maxWidth: '50px',
         padding: '8px',
         color: 'whitesmoke'
@@ -31,7 +32,8 @@ export function RideFormPreview() {
     const formstyle = {
         overflow: 'hidden',
         justifyContent: 'center',
-
+        position:'relative',
+        marginTop:'0px',
         alignItems: 'center',
         background: PRIMARY_BLACK,
         display: 'flex',
@@ -77,7 +79,7 @@ export function RideFormPreview() {
                 $('#form_item_2').css('width', '100%')
                 $('#form_header').css('maxWidth', 'inherit')
             } else {
-                
+
                 $('#ride_form').css('padding', '32px')
                 $('#dest_start_input').css('flexDirection', 'row')
                 $('#ride_form').css('flexDirection', 'row')
@@ -87,8 +89,10 @@ export function RideFormPreview() {
             }
         }
         // Change ride form for small screen
-        $(window).on('resize', resize)
+        window.addEventListener('resize', resize)
         resize()
+
+        return () => { window.removeEventListener('resize', resize) }
     }, [])
 
 
@@ -143,7 +147,7 @@ export function RideFormPreview() {
 
                 <RideFormItem actionButton={() => {
                     nav('/createride', { state: ride })
-                }} id='form_item_5' style={{ fontWeight: 'bold',fontSize:'22px',width:'50%', borderRadius: '8px', background: DARKER_BLACK_SELECTED, border: '1px solid white', color: 'white' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
+                }} id='form_item_5' style={{textTransform:'none', fontWeight: 'bold', fontSize: '22px', width: '50%', borderRadius: '8px', background: DARKER_BLACK_SELECTED, border: '1px solid white', color: 'white' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
             </div>
         </div>
     </div>

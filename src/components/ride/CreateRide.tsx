@@ -256,7 +256,7 @@ export default function CreateRide() {
 
                     <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                     <Checkbox
-                        style={{ width: 'fit-content', alignSelf: 'center', background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
+                        style={{ width: 'fit-content', alignSelf: 'center', background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
                 </Stack>

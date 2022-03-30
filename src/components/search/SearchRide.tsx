@@ -111,9 +111,9 @@ export default function SearchRide() {
         setSecondQuery(query)
     }
     return <PageHolder>
-        <SectionTitle title={lang === 'heb' ? 'חיפוש הסעה' : 'Ride Search'} style={{ fontSize: '24px' }} />
+        <SectionTitle title={lang === 'heb' ? 'חיפוש הסעה' : 'Ride Search'} style={{ fontSize: '32px' }} />
         <Spacer offset={3} />
-        <Stack direction="row" spacing={3}>
+        <Stack direction="row" spacing={3} style ={{marginLeft:'8px',marginRight:'8px',width:'90%',maxWidth:'100%'}}>
 
             <Stack style={{ width: '50%' }}>
 

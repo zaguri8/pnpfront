@@ -9,7 +9,7 @@ import '../saynomore/SayNoMoreItem.css'
 import { useLanguage } from "../../context/Language"
 import { Button } from "@mui/material"
 import $ from 'jquery'
-import { DARK_BLACK } from "../../settings/colors"
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
 
 import { useEffect } from "react"
 import { useFirebase } from "../../context/Firebase"
@@ -52,8 +52,8 @@ export default function MyAccount() {
     useEffect(() => {
         function resize() {
             const currentWidth = window.innerWidth
-            if (currentWidth > 628) {
-                $('.my_account_item').css('width', '200px')
+            if (currentWidth > 720) {
+                $('.my_account_item').css('width', '150px')
                 $('.my_account_item_text').css('width', '50%')
 
             } else {
@@ -61,8 +61,10 @@ export default function MyAccount() {
                 $('.my_account_item_text').css('width', '100%')
             }
         }
-        $(window).resize(() => { resize() })
+        window.addEventListener('resize', resize)
         resize()
+
+        return () => { window.removeEventListener('resize', resize) }
     }, [])
     return (<PageHolder >
 
@@ -78,7 +80,7 @@ export default function MyAccount() {
             }}>
 
                 <MyAccountItem navTo={'/'} icon={coins} title={MY_ACCOUNT_ITEM_1(lang)} />
-                <MyAccountItem navTo={'/'} icon={spoil} title={MY_ACCOUNT_ITEM_2(lang)} />
+                <MyAccountItem navTo={'/'} icon={'https://img.icons8.com/ios/50/000000/gift--v1.png'} title={MY_ACCOUNT_ITEM_2(lang)} />
 
 
 

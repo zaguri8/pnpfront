@@ -2,7 +2,7 @@ import { InputLabel, List, Button, Checkbox, Stack } from '@mui/material'
 import axios from 'axios'
 import { useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
-import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, TERMS_OF_USE, TOS } from '../../settings/strings'
+import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, RIDE_INFO, TERMS_OF_USE, TOS } from '../../settings/strings'
 import { submitButton } from '../../settings/styles'
 import { useFirebase } from '../../context/Firebase'
 import AddIcon from '@mui/icons-material/Add';
@@ -14,7 +14,7 @@ import { useLanguage } from "../../context/Language";
 import { AMOUNT_OF_TICKETS, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
 import { useLocation, useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, SECONDARY_WHITE } from '../../settings/colors'
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import HTMLFromText from '../utilities/HtmlFromText'
 export function PaymentForm({ product }) {
 
@@ -69,8 +69,9 @@ export function PaymentForm({ product }) {
             amount: ticketAmount,
             eventId: product.eventId,
             rideId: product.rideId,
+            startPoint:product.startPoint,
             twoWay: product.twoWay,
-            direction: product.direction 
+            direction: product.direction
         }
 
         const send = {
@@ -84,6 +85,7 @@ export function PaymentForm({ product }) {
                     cancelLoad()
                 }
             }).catch(e => {
+                console.log(e)
             })
 
     }
@@ -95,12 +97,40 @@ export function PaymentForm({ product }) {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: SECONDARY_WHITE, justifyContent: 'center' }}>
 
 
-                    <span style={{ marginTop: '0px', padding: '4px', fontWeight: 'bold' }}>{PAYMENT_FOR_RIDE(lang)}</span>
+                    <span style={{ marginTop: '0px', padding: '0px', fontWeight: 'bold' }}>{PAYMENT_FOR_RIDE(lang)}</span>
                     <div style={{ padding: '8px' }}>
-                        <HTMLFromText text={product.desc} />
+                        <HTMLFromText style={{ color: PRIMARY_WHITE, fontSize: '14px' }} text={RIDE_INFO(lang)} />
+                        <hr style={{ borderWidth: '.1px', borderColor: 'gray' }} />
+                        <Stack direction='row'>
+
+                            <Stack  >
+                                {product.exactStartPoint ? <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold' }}>
+                                        {(lang === 'heb' ? 'נקודת יציאה' : 'Starting point: ')}
+                                    </label>
+
+                                    <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.exactStartPoint}</label></div> : null}
+                                {product.exactBackPoint ? <div><label style={{ display: 'block', fontWeight: 'bold' }}>
+                                    {(lang === 'heb' ? 'נקודת חזרה' : 'Back point: ')}
+                                </label>
+                                    <div>
+                                        <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{(lang == 'heb' ? 'במקום בו האוטובוס הוריד בהלוך' : 'Same spot where the bus stopped on arrival')}</label> </div> </div> : ''}
+                            </Stack>
+                            <Stack >
+                                {(product.twoWay || product.direction === '2') && <div><label style={{ fontWeight: 'bold' }}>
+                                    {(lang === 'heb' ? 'שעת יציאה' : 'Ride time: ')}
+                                </label>
+                                    <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.rideTime}</label> </div></div>}
+                                {(product.twoWay || product.direction === '1') && <div><label style={{ fontWeight: 'bold' }}>
+                                    {(lang === 'heb' ? 'שעת חזרה' : 'Ride time: ')}
+                                </label>
+                                    <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.backTime}</label> </div></div>}
+                            </Stack>
+                        </Stack>
+                        <hr style={{ borderWidth: '.1px', borderColor: 'gray' }} />
                     </div>
 
-                    <img style={{ width: '48px', height: '18px', alignSelf: 'center', marginBottom: '0px' }} src={credit_cards} />
+                    <img style={{ width: '48px', height: '18px', alignSelf: 'center', background: SECONDARY_WHITE, marginBottom: '0px' }} src={credit_cards} />
                 </div>
 
                 <span style={{ padding: '8px', display: 'flex', flexDirection: 'column', rowGap: '8px', alignItems: 'center', justifyContent: 'center', columnGap: '8px' }}>
@@ -126,7 +156,7 @@ export function PaymentForm({ product }) {
                     </span>
                 </HtmlTooltip>
 
-                <Stack >
+                <Stack  >
 
 
                     <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
@@ -134,6 +164,10 @@ export function PaymentForm({ product }) {
                         style={{ width: 'fit-content', alignSelf: 'center', background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
                         onChange={handleTermsOfUseChange}
                         name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
+
+                    <Link
+                        onClick={() => { closeDialog() }}
+                        style={{ fontSize: '12px', paddingTop: '8px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/termsOfService'}>{TOS(lang)}</Link>
                 </Stack>
             </div>
         )

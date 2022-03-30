@@ -77,14 +77,14 @@ export class Realtime {
         return await set(newPath, error)
     }
 
-    addListenerToTransactionConfirmation(voucher: string, consume: (c: PNPTransactionConfirmation) => void) {
-        return onValue(child(this.transactionConfirmations, voucher), (snap) => {
+    async addListenerToTransactionConfirmation(voucher: string, consume: (c: PNPTransactionConfirmation) => void) {
+        return await get(child(this.transactionConfirmations, voucher)).then((snap) => {
             consume(transactionConfirmationFromDict(snap))
         })
     }
 
     async invalidateTransactionConfirmations(voucher: string, ridesLeft: number) {
-        return await update(child(this.transactionConfirmations, String(voucher)), { isValid: ridesLeft > 0, ridesLeft: ridesLeft })
+        return await update(child(this.transactionConfirmations, String(voucher)), { ridesLeft: ridesLeft })
     }
 
 
@@ -107,6 +107,28 @@ export class Realtime {
             })
 
             consume(transactions)
+        }, onError)
+    }
+
+    getAllTransactionsForEvent(eid: string, consume: (transactions: { rideStartPoint: string, uid: string, amount: string }[]) => void, onError: (e: Error) => void) {
+        return onValue(this.transactions, (snap) => {
+            const allTransactions: { rideStartPoint: string, uid: string, amount: string }[] = []
+            let nextRef: DataSnapshot | null = null
+            snap.forEach(user => {
+                user.forEach(transaction => {
+                    nextRef = transaction.child('more_info')
+                    if (nextRef.exists()
+                        && nextRef!.child('eventId').val() === eid) {
+                        allTransactions.push({
+                            rideStartPoint: nextRef!.child('startPoint').val(),
+                            uid: user.key!,
+                            amount: transaction.child('amount').val()
+                        })
+                    }
+                })
+            })
+
+            consume(allTransactions)
         }, onError)
     }
 
@@ -371,18 +393,22 @@ export class Realtime {
 * @param consume a callback to consume the events array
 * @returns onValue change listener for events
 */
-    addListenerToPublicEvents = (consume: (o: PNPEvent[]) => void) => {
+
+
+    addListenerToPublicEvents = (consume: (o: { [type: string]: PNPEvent[] }) => void) => {
         return onValue(child(this.allEvents, 'public'), snap => {
-            const culture = snap.child('culture')
-            const clubs = snap.child('clubs')
-            const ret: PNPEvent[] = []
-            clubs.forEach(ev => {
-                ret.push(eventFromDict(ev))
+            const hashTable: { [type: string]: PNPEvent[] } = {}
+
+            let p: any = null;
+            snap.forEach((type) => {
+                p = type.key!
+                type.forEach(event => {
+                    if (!p || !hashTable[p])
+                        hashTable[p] = [eventFromDict(event)]
+                    else hashTable[p].push(eventFromDict(event))
+                })
             })
-            culture.forEach(ev => {
-                ret.push(eventFromDict(ev))
-            })
-            consume(ret)
+            consume(hashTable)
         })
     }
 
@@ -744,9 +770,14 @@ export class Realtime {
      */
     getPublicEventById = (id: string, consume: ((event: PNPEvent | null) => void)) => {
         return onValue(child(this.allEvents, 'public'), (data) => {
-            const c1 = data.child('clubs').child(id)
-            const c2 = data.child('culture').child(id)
-            consume(c1.exists() ? eventFromDict(c1) : c2.exists() ? eventFromDict(c2) : null)
+            let consumed = false
+            data.forEach((c => {
+                if (c.exists() && c.hasChild(id)) {
+                    consume(eventFromDict(c.child(id)))
+                    consumed = true
+                }
+            }))
+            if (!consumed) consume(null)
         })
     }
 }

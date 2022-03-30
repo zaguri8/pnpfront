@@ -22,7 +22,7 @@ import { useLoading } from "../../context/Loading";
 import { submitButton } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { useNavigate } from "react-router";
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
@@ -90,6 +90,13 @@ export default function CreateEvent() {
     }
     const updateEventAddress = (address: string) => {
         setPnpEvent({ ...pnpEvent, ...{ eventLocation: address } })
+    }
+
+    const updateEventAttention1 = (attention: string) => {
+        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention1: attention, eventAttention2: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention2 : '' } } })
+    }
+    const updateEventAttention2 = (attention: string) => {
+        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention2: attention, eventAttention1: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention1 : '' } } })
     }
 
     const updateEventDate = (event: string | undefined | null) => {
@@ -205,6 +212,7 @@ export default function CreateEvent() {
                         alignSelf: 'center',
                         minHeight: '150px',
                         width: '80%',
+                        maxWidth: '225px',
                         height: '75px'
                     }} />          <label style={{
                         color: PRIMARY_WHITE,
@@ -214,7 +222,7 @@ export default function CreateEvent() {
                         alignSelf: 'center',
                         marginTop: '16px',
                         width: 'fit-content',
-                        backgroundImage: ORANGE_GRADIENT_PRIMARY
+                        backgroundImage: DARK_BLACK
                     }} onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}</label>
                 </FormControl>
                 <FormControl style={{ width: '80%', alignSelf: 'center' }}>
@@ -250,6 +258,34 @@ export default function CreateEvent() {
                         className={classes.root}
                         placeholder={lang === 'heb' ? 'הכנס מחיר' : 'Price'}
                         onChange={(event) => { setPnpEvent({ ...pnpEvent, ...{ eventPrice: event.target.value } }) }}
+                        dir='rtl'
+                        type='number'
+                        sx={{
+
+                            direction: SIDE(lang)
+                        }} />
+                </FormControl>
+
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'שימו לב 1 (אופציונלי)' : 'Attention 1 (Optional)'}</label>
+                    <TextField
+                        className={classes.root}
+                        placeholder={lang === 'heb' ? 'הכנס שימו לב 1' : 'Enter Attention 1 (Optional)'}
+                        onChange={(event) => { updateEventAttention1(event.target.value) }}
+                        dir='rtl'
+                        type='number'
+                        sx={{
+
+                            direction: SIDE(lang)
+                        }} />
+                </FormControl>
+
+                <FormControl style={{ width: '80%', alignSelf: 'center' }}>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'שימו לב 2 (אופציונלי)' : 'Attention 2 (Optional)'}</label>
+                    <TextField
+                        className={classes.root}
+                        placeholder={lang === 'heb' ? 'הכנס שימו לב 2' : 'Enter Attention 2 (Optional)'}
+                        onChange={(event) => { updateEventAttention2(event.target.value) }}
                         dir='rtl'
                         type='number'
                         sx={{
@@ -361,10 +397,11 @@ export default function CreateEvent() {
                         {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} value={type}>{type}</MenuItem>)}
                     </Select>
                 </FormControl>
-                <FormControl style={{ width: '90%', alignSelf: 'center' }}>
+                <FormControl style={{ width: '90%', alignSelf: 'center'}}>
                     <Editor
-                        editorStyle={{ background: SECONDARY_WHITE, minHeight: '200px' }}
+                        editorStyle={{ background: SECONDARY_WHITE, minHeight: '200px', maxWidth: '300px' }}
                         editorState={editorState}
+                        wrapperStyle={{maxWidth:'100%'}}
                         toolbarClassName="toolbarClassName"
                         wrapperClassName="wrapperClassName"
                         editorClassName="editorClassName"
@@ -383,7 +420,7 @@ export default function CreateEvent() {
             </Stack>
             <span ><InputLabel style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</InputLabel>
                 <Checkbox
-                    style={{ background: ORANGE_GRADIENT_PRIMARY, color: SECONDARY_WHITE, margin: '8px' }}
+                    style={{ background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
                     onChange={handleTermsOfUseChange}
                     name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
             </span>

@@ -1,4 +1,4 @@
-import { SECONDARY_BLACK } from "../../settings/colors";
+import { ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK } from "../../settings/colors";
 
 export type WhyUsItemProps = {
     title: string,
@@ -49,7 +49,7 @@ export default function WhyUsItem(props: WhyUsItemProps) {
         marginBottom: '16px',
         margin: '8px',
         borderRadius: '12px',
-        background: SECONDARY_BLACK
+        background: ORANGE_GRADIENT_PRIMARY
     }}>
         <ContainerImage icon={props.icon} />
         <ContainerTitle title={props.title} />
