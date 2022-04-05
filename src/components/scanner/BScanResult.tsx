@@ -26,7 +26,7 @@ export default function BScanResult() {
         cancelLoad()
         openDialog({
             content: <Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <label style={{ padding: '8px', color: SECONDARY_WHITE,fontWeight:'600' }}>{'נסיעה לא מאושרת'}</label>
+                <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{'נסיעה לא מאושרת'}</label>
                 <ErrorOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#bd3333' }} />
             </Stack>
         })
@@ -37,7 +37,7 @@ export default function BScanResult() {
         cancelLoad()
         openDialog({
             content: <Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <label style={{ padding: '8px', color: SECONDARY_WHITE,fontWeight:'600'}}>{'נסיעה מאושרת'}</label>
+                <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{'נסיעה מאושרת'}</label>
                 <label style={{ padding: '8px', color: SECONDARY_WHITE }}>{'מספר נוסעים: '}<b>{confirmation.amount}</b></label>
                 <CheckCircleOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#4BB543' }} />
             </Stack>

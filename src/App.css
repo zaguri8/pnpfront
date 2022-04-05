@@ -18,6 +18,10 @@
   }
 }
 
+.mandatory {
+  border:1px solid #bd3333;
+}
+
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: white;
   font-weight: 500;

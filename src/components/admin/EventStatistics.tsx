@@ -616,6 +616,8 @@ export default function EventStatistics() {
     const [requests, setRequests] = useState<PNPRideRequest[] | null>(null)
     useEffect(() => {
         let unsub3: Unsubscribe | null = null
+        let unsub2: Unsubscribe | null = null
+        let unsub: Unsubscribe | null = null
         if (event) {
             doLoad()
             unsub3 = firebase.realTime.getAllTransactionsForEvent(event.eventId, (stats) => {
@@ -625,14 +627,14 @@ export default function EventStatistics() {
                 console.log(e)
                 cancelLoad()
             })
+
+
+            unsub = event ? firebase.realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
+
+            unsub2 = event ? firebase.realTime.getPublicRidesByEventId(event.eventId, (e) => {
+                setRides(e)
+            }) : null
         }
-
-        const unsub = event ? firebase.realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
-
-        const unsub2 = event ? firebase.realTime.getPublicRidesByEventId(event.eventId, (e) => {
-            setRides(e)
-        }) : null
-
         return () => { unsub && unsub(); unsub2 && unsub2(); unsub3 && unsub3() }
     }, [])
 

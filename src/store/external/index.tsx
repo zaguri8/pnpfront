@@ -263,6 +263,17 @@ export class Realtime {
     }
 
 
+    addListenerToUsers(consume: (users: PNPUser[]) => void, error: (e: Error) => void) {
+        return onValue(this.users, (userSnaps) => {
+            const users: PNPUser[] = []
+            userSnaps.forEach(snap => {
+                users.push(userFromDict(snap))
+            })
+            consume(users)
+        }, error)
+    }
+
+
     async getAllUsersByIds(ids: string[]): Promise<PNPUser[] | null> {
         return await get(this.users)
             .then(snap => {
@@ -395,18 +406,20 @@ export class Realtime {
 */
 
 
-    addListenerToPublicEvents = (consume: (o: { [type: string]: PNPEvent[] }) => void) => {
+    addListenerToPublicEvents = (consume: (o: { [type: string]: PNPEvent[] }) => void, includeWaiting: boolean) => {
         return onValue(child(this.allEvents, 'public'), snap => {
             const hashTable: { [type: string]: PNPEvent[] } = {}
 
             let p: any = null;
             snap.forEach((type) => {
                 p = type.key!
-                type.forEach(event => {
-                    if (!p || !hashTable[p])
-                        hashTable[p] = [eventFromDict(event)]
-                    else hashTable[p].push(eventFromDict(event))
-                })
+                if (includeWaiting || p !== 'waiting') {
+                    type.forEach(event => {
+                        if (!p || !hashTable[p])
+                            hashTable[p] = [eventFromDict(event)]
+                        else hashTable[p].push(eventFromDict(event))
+                    })
+                }
             })
             consume(hashTable)
         })
@@ -470,7 +483,7 @@ export class Realtime {
         return await remove(child(child(child(this.allEvents, 'public'), getEventType(event)), event.eventId))
             .catch((e) => { this.createError('removeEvent', e) })
             .then(async () => {
-                return await remove(child(child(this.rides, 'ridesForEvents'), event.eventId))
+                return await remove(child(child(child(this.rides, 'public'), 'ridesForEvents'), event.eventId))
                     .catch(e => { this.createError('removeEvent', e) })
             })
     }
@@ -616,22 +629,22 @@ export class Realtime {
     addListenerToPublicAndWaitingEvents(consumePublicEvents: (waiting: PNPEvent[]) => void, consumeWaitingEvents: (o: PNPEvent[]) => void) {
 
         return onValue(child(this.allEvents, 'public'), snap => {
-            const culture = snap.child('culture')
-            const clubs = snap.child('clubs')
-            const waiting = snap.child('waiting')
-            const ret: PNPEvent[] = []
-            const ret2: PNPEvent[] = []
-            clubs.forEach(ev => {
-                ret.push(eventFromDict(ev))
+            const approvedEvents: PNPEvent[] = []
+            const waitingEvents: PNPEvent[] = []
+            snap.forEach((type) => {
+                if (type.key! !== 'waiting') {
+                    type.forEach(event => {
+                        approvedEvents.push(eventFromDict(event))
+                    })
+                } else {
+                    type.forEach(event => {
+                        waitingEvents.push(eventFromDict(event))
+                    })
+                }
+
             })
-            culture.forEach(ev => {
-                ret.push(eventFromDict(ev))
-            })
-            waiting.forEach(ev => {
-                ret2.push(eventFromDict(ev))
-            })
-            consumePublicEvents(ret)
-            consumeWaitingEvents(ret2)
+            consumePublicEvents(approvedEvents)
+            consumeWaitingEvents(waitingEvents)
         })
 
         /*
@@ -760,7 +773,7 @@ export class Realtime {
                 ret.push(publicRideFromDict(ride))
             })
             consume(ret)
-        })
+        }, (e) => { console.log(e) })
     }
 
     /**

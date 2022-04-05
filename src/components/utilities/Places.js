@@ -3,19 +3,20 @@ import { useState } from "react";
 import PlacesAutocomplete from 'react-places-autocomplete'
 import { useGoogleState } from "../../context/GoogleMaps";
 import { v4 } from 'uuid'
+import '../../App.css'
 import { SIDE } from "../../settings/strings";
 import { useLanguage } from "../../context/Language";
 
 import { makeStyles } from "@mui/styles";
-import { PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
-export default function Places({ placeHolder, style, fixed, id, className, types, handleAddressSelect, value }) {
+import { PRIMARY_BLACK, SECONDARY_WHITE, SECONDARY_BLACK, DARK_BLACK, ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
+export default function Places({ placeHolder, style, fixed, id, className, types, handleAddressSelect, value, ...extras }) {
     const [address, setAddress] = useState('')
     const handleChange = (value) => {
         setAddress(value)
         handleAddressSelect(value)
     }
     const { google } = useGoogleState()
-    const [cId, setCId] = useState(v4())
+
     const handleSelect = (value) => {
         setAddress(value)
         handleAddressSelect(value)
@@ -23,7 +24,7 @@ export default function Places({ placeHolder, style, fixed, id, className, types
     const useStyles = makeStyles(() => ({
         root: {
             "& .MuiOutlinedInput-root": {
-                color: PRIMARY_BLACK,
+                color: style.color ? style.color : PRIMARY_BLACK,
                 background: (style && style.background) ? style.background : SECONDARY_WHITE,
                 borderRadius: '32px'
             }
@@ -33,8 +34,8 @@ export default function Places({ placeHolder, style, fixed, id, className, types
     const classes = useStyles()
 
     const { lang } = useLanguage()
-    return (<ListItem style={style} id={id} className={className}>
-        <FormControl style={style}>
+    return (<ListItem style={{...style,...{background:'none',border:'none'}}} id={id} className={className}>
+        <FormControl style={{...style,...{background:'none',border:'none'}}}>
             {google && <PlacesAutocomplete
                 onError={(err) => { }}
                 searchOptions={{
@@ -56,13 +57,17 @@ export default function Places({ placeHolder, style, fixed, id, className, types
                             display: 'flex',
                             margin: '0px',
                             flexDirection: 'column'
-                        }, ...style
+                        }, ...style,...{background:'none'}
                     }}>
                         <TextField
                             variant='outlined'
-                            id={cId}
+                            id={(extras && extras.id) ? extras.id : v4()}
                             className={classes.root}
-                            sx={{ ...{ direction: SIDE(lang), maxHeight: '50px' }, ...style }}
+                            sx={{
+                                ...{
+                                    direction: SIDE(lang), maxHeight: '50px',
+                                }, ...style,...{background:'none'}
+                            }}
                             {...getInputProps({
                                 placeholder: placeHolder
                             })}
@@ -70,19 +75,28 @@ export default function Places({ placeHolder, style, fixed, id, className, types
 
                         <List dir={SIDE(lang)} style={{
                             position: 'relative',
-                            zIndex: '9999',
+                            display: suggestions.length < 1 ? 'none' : 'inline',
+                            padding: '.1px',
+                            borderBottomLeftRadius: '8px',
+                            borderBottomRightRadius: '8px',
                             overflow: 'scroll',
-                            width: '100%',
+                            background: DARK_BLACK,
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
+                            alignSelft: 'center',
+                            width: '90%',
                             minWidth: fixed ? '300px' : 'fit-content'
                         }}>
 
                             {suggestions.map((suggestion, index) => {
-                                const style = suggestion.active
-                                    ? { backgroundColor: "gray", textAlign: 'right', cursor: "pointer", color: 'white', fontSize: '14px' }
-                                    : { backgroundColor: "white", cursor: "pointer", textAlign: 'right', fontSize: '14px' };
+                                const suggestionStyle = suggestion.active
+                                    ? {
+                                        background: ORANGE_GRADIENT_PRIMARY, boxShadow: '0px 4px 2px -2px gray', textAlign: 'right', cursor: "pointer", color: SECONDARY_WHITE, fontSize: '14px', border: '.1px solid white'
+                                    }
+                                    : { backgroundColor: SECONDARY_WHITE, cursor: "pointer", color: PRIMARY_BLACK, textAlign: 'right', fontSize: '14px', border: '.1px solid whitesmoke' };
 
                                 return (
-                                    <ListItem key={suggestion + index}{...getSuggestionItemProps(suggestion, { style })}>
+                                    <ListItem key={suggestion + index}{...getSuggestionItemProps(suggestion, { style: suggestionStyle })}>
                                         {suggestion.description}
                                     </ListItem>)
                             })}

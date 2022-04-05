@@ -8,6 +8,7 @@ import { FirebaseContextProvider } from './context/Firebase';
 import { LoadingContextProvider } from './context/Loading';
 import { GoogleMapsContextProvider } from './context/GoogleMaps';
 import { LanguageContextProvider } from './context/Language';
+import { ScanningContextProvider } from './context/ScannerContext';
 
 
 ReactDOM.render(
@@ -16,7 +17,9 @@ ReactDOM.render(
       <GoogleMapsContextProvider>
         <LoadingContextProvider>
           <FirebaseContextProvider>
-            <App />
+            <ScanningContextProvider>
+              <App />
+            </ScanningContextProvider>
           </FirebaseContextProvider>
         </LoadingContextProvider>
       </GoogleMapsContextProvider>

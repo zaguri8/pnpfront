@@ -164,3 +164,11 @@ export const ABOUT_CONTENT = (lang) => lang === 'heb' ? `הפלטפורמה של
 אנחנו שואפים לשינוי חברתי ולמציאות טובה יותר בתחומים אלו.` : `Our platform is the first of its kind in Israel and is a breakthrough in the field of transportation and transportation.
 Our vision is that each person will be able to reach their next destination, in a more convenient, safe and efficient way. Even on weekends.
 We strive for social change and a better reality in these areas.`
+
+export const BARCODE_MESSAGE_HEB = 'החזק את המכשיר שלך מעל הקוד כך שהוא נראה בבירור על המסך של הטלפון החכם שלך. כאשר אתה מחזיק כראוי את הטלפון החכם שלך מעל קוד, הטלפון סורק את הקוד באופן אוטומטי. '
+export const BARCODE_MESSAGE_ENG = `Hold your device visible above the code so it's clearly on your smartphone's screen. When you properly hold your smartphone over code, The code is scanned automatically. `
+export const BARCODE_MESSAGE_ARAB = "اجعل جهازك مرئيًا فوق الرمز بحيث يكون واضحًا على شاشة هاتفك الذكي. عندما تمسك هاتفك الذكي بشكل صحيح فوق الرمز. يتم فحص الرمز تلقائيًا. "
+
+
+export const BARCODE_MESSAGE = (lang) => lang === 'עברית' ? BARCODE_MESSAGE_HEB : lang === 'عربيه' ? BARCODE_MESSAGE_ARAB : BARCODE_MESSAGE_ENG
+export const CLOSE_SCANNER = (lang) => lang === 'עברית' ? 'סגור סורק' : lang === 'عربيه' ? 'أغلق الماسح' : 'Close Scanner'

@@ -92,17 +92,23 @@ export default function CreateRide() {
     const useStyles = makeStyles(() => ({
         root: {
             "& .MuiOutlinedInput-root": {
-                background: SECONDARY_WHITE,
+                background: 'none',
                 borderRadius: '32px',
                 padding: '0px',
-                border: '.1px solid white',
-                color: PRIMARY_BLACK, ...{
+                border: '.8px solid white',
+                color: SECONDARY_WHITE, ...{
                     '& input[type=number]': {
                         '-moz-appearance': 'textfield'
                     },
                     '& input[type=number]::-webkit-outer-spin-button': {
                         '-webkit-appearance': 'none',
                         margin: 0
+                    },
+                    '& input[type=time]::-webkit-calendar-picker-indicator': {
+                        filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
+                    },
+                    '& input[type=date]::-webkit-calendar-picker-indicator': {
+                        filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
                     },
                     '& input[type=number]::-webkit-inner-spin-button': {
                         '-webkit-appearance': 'none',
@@ -121,17 +127,33 @@ export default function CreateRide() {
 
 
     function createRide() {
+
+        function isAllFieldsValid() {
+            let allFieldValids = true
+            mandatory && Object.entries(mandatory).forEach(entry => {
+                if (!entry[1] || entry[1].length < 1) {
+                    $("#arm_2" + entry[0]).css({ 'boxSizing': 'padding-box', 'border': '2px solid red', 'borderRadius': '32px' })
+                    allFieldValids = false
+                }
+            })
+            return allFieldValids
+        }
+        const valid = isAllFieldsValid()
+
+        if (!valid || !termsOfUser) {
+            return
+        }
         const inflate = () => {
             const entries = Object.entries(ride)
             const elms: any[] = []
             entries.forEach(entry => {
-                elms.push(<Stack  spacing={1} direction={'row'}>
+                elms.push(<Stack spacing={1} direction={'row'}>
                     <span>
                         {entry[0]}
                     </span>
                     <Spacer offset={1} />
                     <span>
-                        { entry[1]}
+                        {entry[1]}
                     </span>)</Stack>)
             })
             return <Stack spacing={1}>{elms}</Stack>
@@ -146,18 +168,38 @@ export default function CreateRide() {
                 alert('אירעתה שגיאה בשליחת הבקשה להסעה, אנא נסא שוב מאוחר יותר')
             })
     }
+    const [mandatory, setMandatory] = useState<{ [id: number]: string }>({
+        0: '',
+        1: '',
+        2: '',
+        3: '',
+        4: '',
+        5: '',
+        6: '',
+        7: '',
+        8: '',
+        9: '',
+    })
+
     const [confirmation, setConfirmation] = useState<JSX.Element | undefined>()
     return <PageHolder>
         <SectionTitle style={{}} title={CREATE_RIDE(lang)} />
-        <InnerPageHolder >
+        <InnerPageHolder style={{ background: 'none', border: '.1px solid gray' }}>
             {!confirmation ? <Stack spacing={2} style={{ width: '100%' }}>
                 <FormControl>
                     <label style={labelStyle}>{STARTING_POINT_SINGLE(lang)}</label>
                     <RideFormItem
+                        id={`arm_2${0}`}
                         type={'text'}
                         value={transformNull(ride.rideStartingPoint)}
-                        placeSelectedHandler={updateRideStartingPoint}
-                        style={{}}
+                        placeSelectedHandler={(place) => {
+                            setMandatory({ ...mandatory, ...{ 0: place } })
+                            $(`#arm_2${0}`).css('border', 'none')
+                            updateRideStartingPoint(place)
+                        }
+                        }
+                        style={{ border: '.1px solid whitesmoke' }}
+                        bgColorInput={'none'}
                         elem={FormElementType.place}
                         text={STARTING_POINT_SINGLE(lang)} />
                 </FormControl>
@@ -165,9 +207,15 @@ export default function CreateRide() {
                     <label style={labelStyle}>{DESTINATION_POINT(lang)}</label>
                     <RideFormItem
                         type={'text'}
+                        id={`arm_2${1}`}
+                        style={{ border: '.1px solid whitesmoke' }}
                         value={transformNull(ride.rideDestination)}
-                        style={{}}
-                        placeSelectedHandler={updateRideDestination}
+                        bgColorInput={'none'}
+                        placeSelectedHandler={(place) => {
+                            setMandatory({ ...mandatory, ...{ 1: place } })
+                            $(`#arm_2${1}`).css('border', 'none')
+                            updateRideDestination(place)
+                        }}
                         elem={FormElementType.place}
                         text={DESTINATION_POINT(lang)} />
                 </FormControl>
@@ -179,13 +227,20 @@ export default function CreateRide() {
                     <label style={labelStyle}>{RIDE_DATE(lang)}</label>
                     <TextField
                         value={unReverseDate(ride.date)}
+                        id={`arm_2${2}`}
                         classes={{ root: classes.root }}
                         InputLabelProps={{
                             shrink: true,
                             style: { color: SECONDARY_WHITE }
                         }}
                         type='date'
-                        onChange={(e) => e && updateRideDate(e.target.value)}
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                setMandatory({ ...mandatory, ...{ 2: e.target.value } })
+                                $(`#arm_2${2}`).css('border', 'none')
+                                updateRideDate(e.target.value)
+                            }
+                        }}
                         required />
                 </FormControl>
                 <FormControl style={{ width: '80%', alignSelf: 'center' }}>
@@ -193,8 +248,15 @@ export default function CreateRide() {
                     <label style={labelStyle}>{LEAVE_HOUR(lang)}</label>
                     <TextField
                         value={ride.rideTime}
-                        onChange={(e) => e && updateRideTime(e.target.value)}
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                setMandatory({ ...mandatory, ...{ 3: e.target.value } })
+                                $(`#arm_2${3}`).css('border', 'none')
+                                updateRideTime(e.target.value)
+                            }
+                        }}
                         classes={classes}
+                        id={`arm_2${3}`}
                         InputLabelProps={{
                             shrink: true,
                             style: { color: SECONDARY_WHITE }
@@ -208,7 +270,15 @@ export default function CreateRide() {
                     <label style={labelStyle}>{RETURN_HOUR(lang)}</label>
                     <TextField
                         value={ride.backTime}
-                        onChange={(e) => e && updateBackTime(e.target.value)}
+                        id={`arm_2${4}`}
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                setMandatory({ ...mandatory, ...{ 4: e.target.value } })
+                                $(`#arm_2${4}`).css('border', 'none')
+                                updateBackTime(e.target.value)
+                            }
+
+                        }}
                         classes={classes}
                         InputLabelProps={{
                             shrink: true,
@@ -222,11 +292,20 @@ export default function CreateRide() {
                     <label style={labelStyle}>{PASSENGERS(lang)}</label>
                     <RideFormItem
                         type={'number'}
+                        id={`arm_2${5}`}
                         value={transformNull(ride.passengers)}
-                        action={(e: ChangeEvent) => { e.target && updateRidePassengers($(e.target).val()) }}
+                        action={(e: ChangeEvent) => {
+                            if (e.target) {
+                                const val = $(e.target).val() as string
+                                setMandatory({ ...mandatory, ...{ 5: val } })
+                                $(`#arm_2${5}`).css('border', 'none')
+                                updateRidePassengers(val)
+                            }
+
+                        }}
                         inputProps={{ inputMode: 'numeric', min: 1, max: 250 }}
                         style={{}}
-
+                        bgColorInput={'none'}
                         elem={FormElementType.input}
                         text={PASSENGERS(lang)} />
                 </FormControl>
@@ -235,8 +314,18 @@ export default function CreateRide() {
                     <label style={labelStyle}>{COMMENTS(lang)}</label>
                     <RideFormItem
                         type={'text'}
+                        bgColorInput={'none'}
+                        id={`arm_2${6}`}
                         value={transformNull(ride.comments)}
-                        action={(e: ChangeEvent) => { e.target && updateRideComments($(e.target).val()) }}
+                        action={(e: ChangeEvent) => {
+                            if (e.target) {
+                                const val = $(e.target).val() as string
+                                setMandatory({ ...mandatory, ...{ 6: val } })
+                                $(`#arm_2${6}`).css('border', 'none')
+                                updateRideComments(val)
+                            }
+
+                        }}
                         style={{}}
                         elem={FormElementType.input}
                         text={COMMENTS(lang)} />
@@ -247,7 +336,7 @@ export default function CreateRide() {
                             <Button
 
                                 onClick={() => { createRide() }}
-                                sx={{ ...submitButton(false), ... { padding: '8px', width: '90%', marginTop: '16px' } }} variant="outlined" disabled={!isValidPrivateRide(ride) || !termsOfUser} >{CREATE_RIDE(lang)}</Button>
+                                sx={{ ...submitButton(false), ... { padding: '8px', width: '90%', marginTop: '16px' } }} variant="outlined" >{CREATE_RIDE(lang)}</Button>
                         </span>
                     </HtmlTooltip>
                 </FormControl>

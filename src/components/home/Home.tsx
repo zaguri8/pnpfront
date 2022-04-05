@@ -20,10 +20,9 @@ import { v4 } from "uuid"
 export default function Home() {
     const { user, firebase } = useFirebase()
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
-    const [data, setdata] = useState<string>()
 
     useEffect(() => {
-        const unsubEvents = firebase.realTime.addListenerToPublicEvents(setPnpEvents)
+        const unsubEvents = firebase.realTime.addListenerToPublicEvents(setPnpEvents, false)
         return () => unsubEvents()
     }, [])
     const { lang } = useLanguage()
@@ -37,7 +36,7 @@ export default function Home() {
         {pnpEvents && Object.entries(pnpEvents).map((k) => <Gallery
             key={v4()}
             events={k[1]}
-            header={lang === 'heb' ? getEventTypeFromString(k[0]) : k[0].slice(0,1).toUpperCase() + k[0].substring(1)} />)}
+            header={lang === 'heb' ? getEventTypeFromString(k[0]) : k[0].slice(0, 1).toUpperCase() + k[0].substring(1)} />)}
         <Spacer offset={4} />
         <SectionTitle withBg style={{
             padding: '32px',

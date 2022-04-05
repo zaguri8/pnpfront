@@ -23,8 +23,6 @@ export function PaymentForm({ product }) {
     const { closeDialog } = useLoading()
     const nav = useNavigate()
     const [ticketAmount, setTicketAmount] = useState(1)
-    const [nameOnCard, setCreditCardNameHolder] = useState("")
-    const [totalPrice, setTotalPrice] = useState(0)
     const { firebase, appUser, user } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
     const [paymentLink, setPaymentLink] = useState()
@@ -138,11 +136,9 @@ export function PaymentForm({ product }) {
                         <AddIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
                             const newAmountAdded = ticketAmount + 1 <= 10 ? ticketAmount + 1 : 10
                             setTicketAmount(newAmountAdded)
-                            setTotalPrice(newAmountAdded * Number(product.price))
                         }} /><RemoveIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
                             const newAmountRemoved = ticketAmount - 1 >= 1 ? ticketAmount - 1 : 1
                             setTicketAmount(newAmountRemoved)
-                            setTotalPrice(newAmountRemoved * Number(product.price))
                         }
                         } /></div>
                     <span style={{ color: SECONDARY_WHITE }}>{`${AMOUNT_OF_TICKETS(lang)} ${ticketAmount}`}</span>

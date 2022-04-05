@@ -4,7 +4,7 @@ import $ from 'jquery'
 import { useLayoutEffect } from "react";
 import { FormElementType } from "./RideFormItem";
 import { useState } from "react";
-import { DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { useLoading } from "../../context/Loading";
 
 import { COMMENTS, CONTINUE, CREATE_RIDE, DESTINATION_POINT, PASSENGERS, SIDE, STARTING_POINT_SINGLE } from "../../settings/strings";
@@ -15,8 +15,8 @@ function FormHeader() {
     const { lang } = useLanguage()
     return (<h4 id='form_header' style={{
         margin: '0px',
-        fontSize: lang === 'heb' ?  '18px' : '16px',
-        maxHeight:lang ==='heb' ? 'inherit' : '10px',
+        fontSize: lang === 'heb' ? '18px' : '16px',
+        maxHeight: lang === 'heb' ? 'inherit' : '10px',
         fontWeight: '600',
         maxWidth: '50px',
         padding: '8px',
@@ -32,8 +32,8 @@ export function RideFormPreview() {
     const formstyle = {
         overflow: 'hidden',
         justifyContent: 'center',
-        position:'relative',
-        marginTop:'0px',
+        position: 'relative',
+        marginTop: '0px',
         alignItems: 'center',
         background: PRIMARY_BLACK,
         display: 'flex',
@@ -123,6 +123,7 @@ export function RideFormPreview() {
                 <RideFormItem
                     placeSelectedHandler={updateRideDestination}
                     id='form_item_1' style={{}} elem={FormElementType.place} text={DESTINATION_POINT(lang)} type={'text'} />
+                <br />
                 <RideFormItem
                     placeSelectedHandler={updateRideStartingPoint}
                     id='form_item_2' style={{}} elem={FormElementType.place} text={STARTING_POINT_SINGLE(lang)} type={'text'} />
@@ -136,18 +137,23 @@ export function RideFormPreview() {
             }}>
 
                 <RideFormItem
+                    bgColorInput={SECONDARY_WHITE}
                     action={(e) => { updateRidePassengers($(e.target).val()) }}
-                    id='form_item_3' style={{ width: '50%' }} elem={FormElementType.input} text={PASSENGERS(lang)} type={'text'} />
-                <RideFormItem action={(e) => {
-                    updateRideComments($(e.target).val())
-                }} id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={COMMENTS(lang)} type='text' />
+                    id='form_item_3'
+                    style={{ width: '50%' }} elem={FormElementType.input} text={PASSENGERS(lang)} type={'number'} />
+
+                <RideFormItem
+                    bgColorInput={SECONDARY_WHITE}
+                    action={(e) => {
+                        updateRideComments($(e.target).val())
+                    }} id='form_item_4' style={{ width: '50%' }} elem={FormElementType.input} text={COMMENTS(lang)} type='text' />
             </div>
 
             <div>
 
                 <RideFormItem actionButton={() => {
                     nav('/createride', { state: ride })
-                }} id='form_item_5' style={{textTransform:'none', fontWeight: 'bold', fontSize: '22px', width: '50%', borderRadius: '8px', background: DARKER_BLACK_SELECTED, border: '1px solid white', color: 'white' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
+                }} id='form_item_5' style={{ textTransform: 'none', fontWeight: 'bold', fontSize: '22px', width: '50%', borderRadius: '8px', background: DARKER_BLACK_SELECTED, border: '1px solid white', color: 'white' }} elem={FormElementType.button} text={CONTINUE(lang)} type={'text'} />
             </div>
         </div>
     </div>

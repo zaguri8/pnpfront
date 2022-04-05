@@ -56,7 +56,6 @@ export default function Login() {
     const [user, setUser] = useState({ u: '', p: '' })
     function login(e) {
         e.preventDefault()
-
         doLoad()
         signInWithEmailAndPassword(firebase.auth, user.u, user.p)
             .then(() => {

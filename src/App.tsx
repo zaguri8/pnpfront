@@ -6,6 +6,7 @@ import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, List, ListItem, Button } from '@mui/material';
 import { useLoading } from './context/Loading';
+import Profile from './components/auth/Profile'
 import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
 import AppMenu from './components/AppMenu';
 import { Routes, Route, useNavigate } from 'react-router';
@@ -33,6 +34,11 @@ import SearchRide from './components/search/SearchRide';
 import BScanner from './components/scanner/BScanner.js';
 import BScanResult from './components/scanner/BScanResult';
 import ForgotPass from './components/auth/ForgotPass';
+import { useScanner } from './context/ScannerContext';
+import { QrReader } from 'react-qr-reader';
+import Scanner from './components/scanner/Scanner';
+import AdminEventPanel from './components/admin/AdminEventPanel';
+import UserStatistics from './components/admin/UserStatistics';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -155,75 +161,78 @@ function App() {
     }
   }, [])
 
-  const { isAuthenticated, appUser } = useFirebase()
+  const { isAuthenticated, appUser, user } = useFirebase()
 
 
   const NoPerms = () => (<div style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div>)
 
-  return (
-    <div>
-      {<AppMenu menuToggle={toggleMenu} />}
-      <div className="App">
+  return (<div>
+    <Scanner />
+    <AppMenu menuToggle={toggleMenu} />
+    <div className="App">
 
-        {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflowY: 'stretch', overflowX: 'hidden', background: PRIMARY_BLACK }} open={dialogContext.isDialogOpened}>
-          {dialogContext.dialogTitle && <div
-            style={
-              {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }
+      {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflowY: 'stretch', overflowX: 'hidden', background: PRIMARY_BLACK }} open={dialogContext.isDialogOpened}>
+        {dialogContext.dialogTitle && <div
+          style={
+            {
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
             }
-          >{dialogContext.dialogTitle}</div>}
-          <List id='dialog' sx={{
-            overflowX: 'hidden',
-            background: PRIMARY_BLACK,
-            maxHeight: '800px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}>
-            {dialogContext.content.content}
-          </List>
-          <ListItem style={{ marginTop: '0px', paddingTop: '0px', color: SECONDARY_WHITE, background: PRIMARY_BLACK, textDecoration: 'underline', }}>
-            <Button
-              onClick={() => {
-                dialogContext.closeDialog()
-              }}
-              style={{ width: '100%', color: 'white', backgroundImage: DARK_BLACK, fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} >{CLOSE(lang)}</Button>
-          </ListItem>
-        </Dialog>
-          : null}
-        <ImageHeader />
-        <ToolBar menuToggle={() => toggleMenu()} />
-        <LoadingIndicator loading={dialogContext.isLoading} />
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/home' element={<Home />} />
-          <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
-          <Route path='/createevent' element={!isAuthenticated ? <Login /> : <CreateEvent />} />
-          <Route path='/createride' element={!isAuthenticated ? <Login /> : <CreateRide />} />
-          <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
-          <Route path='/event/:id' element={<EventPage />} />
-          <Route path='termsOfService' element={<TermsOfService />} />
+          }
+        >{dialogContext.dialogTitle}</div>}
+        <List id='dialog' sx={{
+          overflowX: 'hidden',
+          background: PRIMARY_BLACK,
+          maxHeight: '800px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}>
+          {dialogContext.content.content}
+        </List>
+        <ListItem style={{ marginTop: '0px', paddingTop: '0px', color: SECONDARY_WHITE, background: PRIMARY_BLACK, textDecoration: 'underline', }}>
+          <Button
+            onClick={() => {
+              dialogContext.closeDialog()
+            }}
+            style={{ width: '100%', color: 'white', backgroundImage: DARK_BLACK, fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} >{CLOSE(lang)}</Button>
+        </ListItem>
+      </Dialog>
+        : null}
+      <ImageHeader />
+      <ToolBar menuToggle={() => toggleMenu()} />
+      <LoadingIndicator loading={dialogContext.isLoading} />
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/home' element={<Home />} />
+        <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
+        <Route path='/createevent' element={!isAuthenticated ? <Login /> : <CreateEvent />} />
+        <Route path='/createride' element={!isAuthenticated ? <Login /> : <CreateRide />} />
+        <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
+        <Route path='/event/:id' element={<EventPage />} />
+        <Route path='termsOfService' element={<TermsOfService />} />
 
 
-          <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
-          <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />
-          <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />
-          <Route path='/payment/success' element={<PaymentSuccess />} />
-          <Route path='/invitation/:id' element={<InvitationPage />} />
-          <Route path='/forgotPass' element={isAuthenticated ? <Navigate to={'/'} /> : <ForgotPass />} />
-          <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
-          <Route path='/adminpanel/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventStatistics />} />
-          <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
-          <Route path='/myaccount/transactions' element={!isAuthenticated ? <Login /> : <MyPayments />} />
-          <Route path='/*' element={<UNKNOWN lang={lang}></UNKNOWN>}></Route>
-        </Routes>
-        <WhatsApp />
-      </div>
+        <Route path='/myaccount/profile' element={<Profile />} />
+        <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
+        <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />
+        <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />
+        <Route path='/payment/success' element={<PaymentSuccess />} />
+        <Route path='/invitation/:id' element={<InvitationPage />} />
+        <Route path='/forgotPass' element={isAuthenticated ? <Navigate to={'/'} /> : <ForgotPass />} />
+        <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
+        <Route path='/adminpanel/specificevent' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminEventPanel />} />
+        <Route path='/adminpanel/users' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <UserStatistics />} />
+        <Route path='/adminpanel/specificevent/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventStatistics />} />
+        <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
+        <Route path='/myaccount/transactions' element={!isAuthenticated ? <Login /> : <MyPayments />} />
+        <Route path='/*' element={<UNKNOWN lang={lang}></UNKNOWN>}></Route>
+      </Routes>
+      <WhatsApp />
     </div>
+  </div>
   );
 }
 

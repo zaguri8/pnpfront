@@ -20,7 +20,7 @@ const auth = getAuth(app)
 const storage = getStorage(app)
 
 export interface IFirebaseContext {
-  user: User | null;
+  user: User | undefined | null;
   appUser: PNPUser | null;
   error: Error | null;
   setUser: (user: User | null) => void;
@@ -30,13 +30,13 @@ const FirebaseContext = React.createContext<IFirebaseContext | null>(null);
 export const FirebaseContextProvider = (props: object) => {
 
 
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null | undefined>()
   const [appUser, setAppUser] = useState<PNPUser | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
-  const { cancelLoad } = useLoading()
+  const { cancelLoad, doLoad } = useLoading()
   useEffect(() => {
-
+    doLoad()
     const unsubscribe = auth.onAuthStateChanged((user) => {
       let unsub: Unsubscribe | null = null
       if (user) {

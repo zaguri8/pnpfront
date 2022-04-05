@@ -22,6 +22,8 @@ export const submitButton = (margin) => {
     }
 }
 
+export const innerShadow =  'rgba(0, 0, 0, 0.35) 0px -50px 36px -28px inset'
+
 export const flex = (direction, align, justify) => {
     return {
         display: 'flex',

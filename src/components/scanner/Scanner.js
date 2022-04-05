@@ -1,0 +1,94 @@
+import { MenuItem, Select, Stack } from "@mui/material"
+import { useState } from "react"
+import { QrReader } from "react-qr-reader"
+import { useNavigate } from "react-router"
+import { useFirebase } from "../../context/Firebase"
+import { useScanner } from "../../context/ScannerContext"
+import { SECONDARY_WHITE } from "../../settings/colors"
+import { BARCODE_MESSAGE, CLOSE_SCANNER } from "../../settings/strings"
+
+export default function Scanner() {
+    const { appUser } = useFirebase()
+    const nav = useNavigate()
+    const { isScanning, closeScanner, faceMode } = useScanner()
+    const [selectedLanguage, setLanguage] = useState('עברית')
+    const updateScanResult = (res) => {
+        if (res) {
+            try {
+                const n = Number(res.text)
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res.text })
+            } catch (e) {
+                alert('ברקוד לא תקין')
+            }
+        }
+    }
+    const fullscreen = {
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        position: 'fixed',
+        zIndex: '9999',
+        maxHeight: '100%',
+        margin: '0px',
+        top: '0px',
+        background: 'black',
+        display: 'flex',
+        flexDirection: 'column'
+    }
+    return isScanning && appUser && appUser.producer ? <div style={fullscreen} >
+
+        <QrReader
+            scanDelay={0}
+            videoStyle={{
+                margin: '0px',
+                padding: '0px',
+                width: '100%',
+                top: '0px',
+                maxHeight: '100%',
+                matchMedia: false,
+                borderRadius: '8px'
+            }}
+            containerStyle={{ margin: '16px', maxHeight: '100%', border: '1px solid white', borderRadius: '8px' }}
+
+            videoContainerStyle={{ maxHeight: '100%' }}
+            constraints={{ audio: false, facingMode: { exact: faceMode }, aspectRatio: 1, frameRate: 60 }}
+            onResult={(result, error) => {
+                if (!!result) {
+                    closeScanner()
+                    updateScanResult(result)
+                }
+            }} />
+
+        <Stack >
+            <p
+                dir={'rtl'}
+
+                style={{ fontSize: '14px', fontWeight: '600', color: SECONDARY_WHITE, textAlign: 'center', marginLeft: '64px', marginRight: '64px' }}
+            >{BARCODE_MESSAGE(selectedLanguage)}</p>
+
+            <select
+                value={selectedLanguage}
+                open={(x) => alert(x)}
+                onChange={(val) => {
+                    setLanguage(val.target.value)
+                }}
+                style={{
+                    background: SECONDARY_WHITE,
+                    width: '25%',
+                    padding: '8px',
+                    textAlign: 'center',
+                    alignSelf: 'center',
+                    margin: '16px'
+                }}>
+                <option style={{ color: 'black' }} value={'عربيه'} >{'عربيه'}</option>
+                <option value={'עברית'} >{'עברית'}</option>
+            </select>
+        </Stack>
+
+        <button
+            style={{ marginLeft: '32px', marginRight: '32px' }}
+            onClick={() => {
+                closeScanner()
+            }}
+        >{CLOSE_SCANNER(selectedLanguage)}</button></div> : null
+}
