@@ -36,6 +36,8 @@ export function ToolBar(props: ToolbarProps) {
                 minWidth: 'fit-content',
                 marginRight: '4px'
             }} id='create_event' text={CREATE_EVENT(lang)} action={() => { nav('/createevent') }} />
+           
+           
             <ToolbarItem id='login' style={{ color: PRIMARY_WHITE }} text={user === null ? TOOLBAR_LOGIN(lang) : MY_ACCOUNT(lang)} action={() => {
                 user === null ? nav('/login') : nav('/myaccount')
             }} />

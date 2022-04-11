@@ -2,7 +2,7 @@ import { InputLabel, List, Button, Checkbox, Stack } from '@mui/material'
 import axios from 'axios'
 import { useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
-import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, RIDE_INFO, TERMS_OF_USE, TOS } from '../../settings/strings'
+import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, RIDE_INFO, SAME_SPOT, TERMS_OF_USE, TOS } from '../../settings/strings'
 import { submitButton } from '../../settings/styles'
 import { useFirebase } from '../../context/Firebase'
 import AddIcon from '@mui/icons-material/Add';
@@ -67,7 +67,7 @@ export function PaymentForm({ product }) {
             amount: ticketAmount,
             eventId: product.eventId,
             rideId: product.rideId,
-            startPoint:product.startPoint,
+            startPoint: product.startPoint,
             twoWay: product.twoWay,
             direction: product.direction
         }
@@ -83,7 +83,6 @@ export function PaymentForm({ product }) {
                     cancelLoad()
                 }
             }).catch(e => {
-                console.log(e)
             })
 
     }
@@ -112,7 +111,7 @@ export function PaymentForm({ product }) {
                                     {(lang === 'heb' ? 'נקודת חזרה' : 'Back point: ')}
                                 </label>
                                     <div>
-                                        <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{(lang == 'heb' ? 'במקום בו האוטובוס הוריד בהלוך' : 'Same spot where the bus stopped on arrival')}</label> </div> </div> : ''}
+                                        <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{SAME_SPOT(lang)}</label> </div> </div> : ''}
                             </Stack>
                             <Stack >
                                 {(product.twoWay || product.direction === '2') && <div><label style={{ fontWeight: 'bold' }}>

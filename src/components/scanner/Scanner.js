@@ -4,14 +4,16 @@ import { QrReader } from "react-qr-reader"
 import { useNavigate } from "react-router"
 import { useFirebase } from "../../context/Firebase"
 import { useScanner } from "../../context/ScannerContext"
+import { useLoading } from '../../context/Loading'
 import { SECONDARY_WHITE } from "../../settings/colors"
 import { BARCODE_MESSAGE, CLOSE_SCANNER } from "../../settings/strings"
 
 export default function Scanner() {
     const { appUser } = useFirebase()
     const nav = useNavigate()
-    const { isScanning, closeScanner, faceMode } = useScanner()
-    const [selectedLanguage, setLanguage] = useState('עברית')
+    const { isScanning, closeScanner, faceMode, scannerLanguage, setScannerLanguage } = useScanner()
+
+    const { openDialog } = useLoading()
     const updateScanResult = (res) => {
         if (res) {
             try {
@@ -54,8 +56,13 @@ export default function Scanner() {
             constraints={{ audio: false, facingMode: { exact: faceMode }, aspectRatio: 1, frameRate: 60 }}
             onResult={(result, error) => {
                 if (!!result) {
-                    closeScanner()
                     updateScanResult(result)
+                    closeScanner()
+                } else if (error) {
+                    if (error.name === 'OverconstrainedError') {
+                        openDialog({ content: <span style={{ padding: '12px', color: SECONDARY_WHITE }}>{scannerLanguage === 'עברית' ? 'מכשירך אינו תומך בסורק זה' : 'جهازك لا يدعم هذا الماسح'}</span> })
+                        closeScanner()
+                    }
                 }
             }} />
 
@@ -64,13 +71,11 @@ export default function Scanner() {
                 dir={'rtl'}
 
                 style={{ fontSize: '14px', fontWeight: '600', color: SECONDARY_WHITE, textAlign: 'center', marginLeft: '64px', marginRight: '64px' }}
-            >{BARCODE_MESSAGE(selectedLanguage)}</p>
-
+            >{BARCODE_MESSAGE(scannerLanguage)}</p>
             <select
-                value={selectedLanguage}
-                open={(x) => alert(x)}
+                value={scannerLanguage}
                 onChange={(val) => {
-                    setLanguage(val.target.value)
+                    setScannerLanguage(val.target.value)
                 }}
                 style={{
                     background: SECONDARY_WHITE,
@@ -80,7 +85,7 @@ export default function Scanner() {
                     alignSelf: 'center',
                     margin: '16px'
                 }}>
-                <option style={{ color: 'black' }} value={'عربيه'} >{'عربيه'}</option>
+                <option style={{ color: 'black' }} value={'بالعربية'} >{'بالعربية'}</option>
                 <option value={'עברית'} >{'עברית'}</option>
             </select>
         </Stack>
@@ -90,5 +95,5 @@ export default function Scanner() {
             onClick={() => {
                 closeScanner()
             }}
-        >{CLOSE_SCANNER(selectedLanguage)}</button></div> : null
+        >{CLOSE_SCANNER(scannerLanguage)}</button></div> : null
 }

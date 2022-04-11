@@ -5,14 +5,22 @@ import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECO
 import { PageHolder } from "../utilities/Holders";
 import { useScanner } from '../../context/ScannerContext'
 import Spacer from "../utilities/Spacer";
+import { Stack } from "@mui/material";
 function BScanner() {
     const location = useLocation()
-    const { openScanner, isScanning, faceMode, setFaceMode } = useScanner()
-
+    const { openScanner, isScanning, faceMode, setFaceMode, scannerLanguage, setScannerLanguage } = useScanner()
     useEffect(() => {
         if (!location.state)
-            openScanner()
+            openScanner(scannerLanguage)
     }, [])
+    const selectionStyle = {
+        background: SECONDARY_WHITE,
+        width: '50%',
+        padding: '8px',
+        textAlign: 'center',
+        alignSelf: 'center',
+        margin: '16px'
+    }
     return <div style={{
         padding: '16px',
         borderRadius: '32px',
@@ -31,29 +39,42 @@ function BScanner() {
         {!isScanning ? <button
             style={{ background: DARK_BLACK }}
             onClick={() => {
-                openScanner()
-            }}>{'פתח סורק'}</button> : <button
+                openScanner(scannerLanguage)
+            }}>{scannerLanguage === 'עברית' ? 'פתח מצלמה' : `افتح الكاميرا`}</button> : <button
                 style={{ background: '#bd3333' }}
                 onClick={() => {
                 }}
-            >{'סגור סורק'}</button>}
+            >{scannerLanguage === 'עברית' ? 'סגור סורק' : `اغلق الكاميرا`}</button>}
         <br />
         <br />
-        <select style={{ padding: '4px', margin: '4px', fontSize: '16px' }}
-            value={faceMode}
-            onChange={(e) => {
-                setFaceMode(e.target.value)
-            }}>
-            <option
 
-                value={'user'}>
-                {'מצלמה קדמית'}
-            </option>
-            <option value={'environment'}>
-                {'מצלמה אחורית'}
-            </option>
-        </select>
-        <br />
+        <Stack>
+            <label style={{ color: SECONDARY_WHITE }}>{'כיוון מצלמה / الكاميرا'}</label>
+            <select style={selectionStyle}
+                value={faceMode}
+                onChange={(e) => {
+                    setFaceMode(e.target.value)
+                }}>
+                <option
+
+                    value={'user'}>
+                    {scannerLanguage === 'עברית' ? 'מצלמה קדמית' : `كاميرا أمامية`}
+                </option>
+                <option value={'environment'}>
+                    {scannerLanguage === 'עברית' ? 'מצלמה אחורית' : `كاميرا الرؤية الخلفية`}
+                </option>
+            </select>
+            <label style={{ color: SECONDARY_WHITE }}>{'שפה / لغة'}</label>
+            <select
+                value={scannerLanguage}
+                onChange={(val) => {
+                    setScannerLanguage(val.target.value)
+                }}
+                style={selectionStyle}>
+                <option style={{ color: 'black' }} value={'بالعربية'} >{'بالعربية'}</option>
+                <option value={'עברית'} >{'עברית'}</option>
+            </select>
+        </Stack>
         {/* {useScan && <QrReader
             scanDelay={0}
             
@@ -68,7 +89,7 @@ function BScanner() {
                 }
             }}
         />} */}
-        <span style={{ color: SECONDARY_WHITE, fontSize: '12px' }}>{'סורק זה דורש מצלמה של טלפון חכם'}</span>
+        <span style={{ color: SECONDARY_WHITE, fontSize: '12px' }}>{scannerLanguage === 'עברית' ? 'סורק זה דורש מצלמה של טלפון חכם' : `يتطلب هذا الماسح كاميرا هاتف ذكي`}</span>
         <br />
 
         <br />

@@ -37,8 +37,12 @@ export const useLoading = () => {
         $('.dim').css('display', 'block')
         loadingContext!.setLoading(true)
     }
-    const cancelLoad = () => {
-        $('.dim').css('display', 'none')
+    const cancelLoad = (keepDim?: boolean) => {
+        if (!keepDim) {
+            $('.dim').css('display', 'none')
+        }else {
+            $('.dim').css('display', 'block')
+        }
         loadingContext!.setLoading(false)
     }
     const openDialog = (content: any) => {

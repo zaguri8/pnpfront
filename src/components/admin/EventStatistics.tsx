@@ -7,7 +7,7 @@ import { useLanguage } from "../../context/Language";
 import $ from 'jquery'
 import { CSVLink } from "react-csv";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import { SIDE } from "../../settings/strings";
+import { SAME_SPOT, SIDE } from "../../settings/strings";
 import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPUser } from "../../store/external/types";
 import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 
@@ -59,12 +59,12 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
 
                             {<Button
                                 onClick={() => {
-                                    openDialogWithTitle(<div><h3 style={
+                                    openDialogWithTitle(<div style={{ background: ORANGE_GRADIENT_PRIMARY }}><h3 style={
                                         {
                                             fontWeight: '14px',
                                             textAlign: 'center'
                                         }
-                                    }>{`עריכת הסעה לאירוע ${props.event.eventName}`}</h3>
+                                    }>{`עריכת הסעה לאירוע: ${props.event.eventName}`}</h3>
                                         <h4 style={
                                             {
                                                 fontWeight: '12px',
@@ -120,6 +120,7 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
 const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) => {
 
     const { cancelLoad, doLoad, closeDialog } = useLoading()
+    const { lang } = useLanguage()
     const { firebase } = useFirebase()
     const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : {
         rideId: "null",
@@ -137,7 +138,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
             rideMaxPassengers: '54',
             twoWay: true,
             rideDirection: '2',
-            exactBackPoint: props.event.eventName,
+            exactBackPoint: SAME_SPOT(lang),
             exactStartPoint: ''
         }
     })
@@ -208,6 +209,12 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
 
 
 
+    const changeRidePassengerLimit = (max: string) => {
+        setRide({
+            ...ride,
+            extras: { ...ride.extras, rideMaxPassengers: max }
+        })
+    }
 
 
 
@@ -264,7 +271,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
         }
 
     }
-    return <Stack spacing={2} style={{ padding: '4px' }}>
+    return <Stack spacing={2} style={{ padding: '16px', minWidth: '250px' }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}><label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית'}</label>
             <Checkbox
                 style={{ width: 'fit-content', alignSelf: 'center' }}
@@ -326,7 +333,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                 classes={{ root: classes.root }}
 
                 style={{ color: SECONDARY_WHITE }}
-                placeholder={props.ride ? props.ride.extras.exactBackPoint : 'נקודת חזרה מדויקת'}
+                placeholder={props.ride ? props.ride.extras.exactBackPoint : ride.extras.twoWay && ride.extras.exactBackPoint ? ride.extras.exactBackPoint : 'נקודת חזרה מדויקת'}
                 onChange={(e) => changeRideExactBackPoint(e.target.value)}
             />
         </Stack>}
@@ -373,7 +380,23 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
             name='time'
             onChange={(e) => changeRideBackTime(e.target.value)}
         />
-        <Button sx={{ ...submitButton(false), ...{ width: '100%' } }}
+
+        <label style={{ color: SECONDARY_WHITE }}> {'הגבל מספר מקומות'}</label>
+        <TextField
+            classes={{ root: classes.root }}
+            InputLabelProps={{
+                style: { color: SECONDARY_WHITE },
+            }}
+            required
+            type='number'
+            inputProps={{ inputMode: 'numeric', min: 0, max: 250 }}
+            style={{ color: SECONDARY_WHITE }}
+
+            placeholder={props.ride && props.ride.extras.rideMaxPassengers ? props.ride.extras.rideMaxPassengers : 'הכנס מספר מקומות'}
+            name='number of'
+            onChange={(e) => changeRidePassengerLimit(e.target.value)}
+        />
+        <Button sx={{ ...submitButton(false), ...{ width: '100%', maxHeight: '50px' } }}
             onClick={() => createNewRide()}
         >{props.ride ? 'ערוך הסעה' : 'הוסף הסעה'}</Button>
     </Stack>
@@ -624,7 +647,6 @@ export default function EventStatistics() {
                 setStatistics(stats)
                 cancelLoad()
             }, (e) => {
-                console.log(e)
                 cancelLoad()
             })
 

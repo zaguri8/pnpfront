@@ -9,6 +9,7 @@ import { LoadingContextProvider } from './context/Loading';
 import { GoogleMapsContextProvider } from './context/GoogleMaps';
 import { LanguageContextProvider } from './context/Language';
 import { ScanningContextProvider } from './context/ScannerContext';
+import { CookieContextProvider } from './context/CookieContext';
 
 
 ReactDOM.render(
@@ -18,7 +19,9 @@ ReactDOM.render(
         <LoadingContextProvider>
           <FirebaseContextProvider>
             <ScanningContextProvider>
-              <App />
+              <CookieContextProvider>
+                <App />
+              </CookieContextProvider>
             </ScanningContextProvider>
           </FirebaseContextProvider>
         </LoadingContextProvider>

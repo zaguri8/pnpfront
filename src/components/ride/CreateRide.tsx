@@ -22,6 +22,7 @@ import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE } from "../../s
 import { makeStyles } from "@mui/styles"
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions"
 import Spacer from "../utilities/Spacer"
+import { getCurrentDate } from "../../utilities"
 
 
 
@@ -44,7 +45,7 @@ export default function CreateRide() {
         backTime: 'null',
         rideTime: '00:00',
         passengers: 'null',
-        date: dateStringFromDate(new Date()),
+        date: dateStringFromDate(getCurrentDate()),
         comments: 'null'
     })
 
@@ -174,17 +175,13 @@ export default function CreateRide() {
         2: '',
         3: '',
         4: '',
-        5: '',
-        6: '',
-        7: '',
-        8: '',
-        9: '',
+        5: ''
     })
 
     const [confirmation, setConfirmation] = useState<JSX.Element | undefined>()
     return <PageHolder>
         <SectionTitle style={{}} title={CREATE_RIDE(lang)} />
-        <InnerPageHolder style={{ background: 'none', border: '.1px solid gray' }}>
+        <InnerPageHolder style={{ background: 'none', border: '.8px solid gray' }}>
             {!confirmation ? <Stack spacing={2} style={{ width: '100%' }}>
                 <FormControl>
                     <label style={labelStyle}>{STARTING_POINT_SINGLE(lang)}</label>
@@ -315,13 +312,10 @@ export default function CreateRide() {
                     <RideFormItem
                         type={'text'}
                         bgColorInput={'none'}
-                        id={`arm_2${6}`}
                         value={transformNull(ride.comments)}
                         action={(e: ChangeEvent) => {
                             if (e.target) {
                                 const val = $(e.target).val() as string
-                                setMandatory({ ...mandatory, ...{ 6: val } })
-                                $(`#arm_2${6}`).css('border', 'none')
                                 updateRideComments(val)
                             }
 
@@ -336,7 +330,7 @@ export default function CreateRide() {
                             <Button
 
                                 onClick={() => { createRide() }}
-                                sx={{ ...submitButton(false), ... { padding: '8px', width: '90%', marginTop: '16px' } }} variant="outlined" >{CREATE_RIDE(lang)}</Button>
+                                sx={{ ...submitButton(false), ... { padding: '8px', width: '90%', marginTop: '16px',textTransform:'none' } }} variant="outlined" >{CREATE_RIDE(lang)}</Button>
                         </span>
                     </HtmlTooltip>
                 </FormControl>

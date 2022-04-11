@@ -9,6 +9,7 @@ import SectionTitle from "../SectionTitle";
 import $ from 'jquery'
 import { useEffect, useState } from "react";
 import Places from "../utilities/Places";
+
 import { PNPEvent, PNPEventAgeRange, PNPEventAttention } from '../../store/external/types'
 import { makeStyles } from "@mui/styles";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -28,6 +29,8 @@ import Spacer from "../utilities/Spacer";
 import { useNavigate } from "react-router";
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
 import { v4 } from "uuid";
+import { getEventType, getEventTypeFromString } from "../../store/external/converters";
+import { getCurrentDate } from "../../utilities";
 
 export default function CreateEvent() {
     const { lang } = useLanguage()
@@ -51,6 +54,8 @@ export default function CreateEvent() {
     const [selectedEventType, setSelectedEventType] = useState<string>(eventTypes[0])
 
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
+
+
     const [image, setImage] = useState<string>('')
     const [pnpEvent, setPnpEvent] = useState<PNPEvent>({
         eventName: 'null',
@@ -58,10 +63,10 @@ export default function CreateEvent() {
         eventId: 'null',
         eventCanAddRides: true,
         eventProducerId: user ? user.uid : 'null',
-        eventDate: dateStringFromDate(new Date()),
-        eventType: selectedEventType ?? 'null',
+        eventDate: dateStringFromDate(getCurrentDate()),
+        eventType: 'clubs',
         eventDetails: 'null',
-        eventPrice: 'null',
+        eventPrice: '50',
         eventHours: { startHour: 'null', endHour: 'null' },
         eventAgeRange: { minAge: 'null', maxAge: 'null' },
         expectedNumberOfPeople: 'null',
@@ -125,10 +130,10 @@ export default function CreateEvent() {
                         '-webkit-appearance': 'none',
                         margin: 0
                     },
-                    '& input[type=time]::-webkit-calendar-picker-indicator':  {
+                    '& input[type=time]::-webkit-calendar-picker-indicator': {
                         filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
                     },
-                    '& input[type=date]::-webkit-calendar-picker-indicator':  {
+                    '& input[type=date]::-webkit-calendar-picker-indicator': {
                         filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
                     },
                     '& input[type=number]::-webkit-inner-spin-button': {
@@ -147,14 +152,13 @@ export default function CreateEvent() {
     const [mandatory, setMandatory] = useState<{ [id: number]: string }>({
         0: '',
         1: '',
-        2: '',
         3: '',
         4: '',
         5: '',
         6: '',
         7: '',
         8: '',
-        9: '',
+        9: 'clubs',
     })
 
     const submitCreateEvent = () => {
@@ -165,7 +169,6 @@ export default function CreateEvent() {
                 if (!entry[1] || entry[1].length < 1) {
                     $("#arm" + entry[0]).css({ 'boxSizing': 'padding-box', 'border': '2px solid red', 'borderRadius': '32px' })
                     allFieldValids = false
-                    console.log("#arm" + entry[0])
                 }
             })
             return allFieldValids
@@ -175,7 +178,7 @@ export default function CreateEvent() {
         if (!valid || !termsOfUser) {
             return
         }
-        const dialogTitle = lang === 'heb' ? `תודה, ${appUser?.name ?? ''} הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר האישור האירוע יופיע בדף הבית תחת אותה קטגוריה.` : `Thanks, ${appUser?.name ?? ''} Event creation request accepted.and will be Approved by management shortly. The certificate of approval will appear on the home page under the same category.`
+        const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר האישור האירוע יופיע בדף הבית תחת אותה קטגוריה.` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. The certificate of approval will appear on the home page under the same category.`
         if (imageBuffer) {
             doLoad()
             firebase.realTime.createEvent(pnpEvent,
@@ -184,7 +187,7 @@ export default function CreateEvent() {
                     cancelLoad()
                     nav('/')
                     openDialog({
-                        content: <div>
+                        content: <div style={{ color: SECONDARY_WHITE }}>
                             {dialogTitle}
                             <Spacer offset={1} />
                         </div>
@@ -217,7 +220,7 @@ export default function CreateEvent() {
 
     return (<PageHolder>
         <SectionTitle title={CREATE_EVENT_TITLE(lang)} style={{}} />
-        <InnerPageHolder style = {{background:'none',border:'.1px solid gray'}}>
+        <InnerPageHolder style={{ background: 'none', border: '.8px solid gray' }}>
 
             <Stack spacing={3} style={{ width: '100%' }} >
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
@@ -264,7 +267,7 @@ export default function CreateEvent() {
                         placeholder={EVENT_TITLE(lang)}
                         onChange={(event) => {
                             (event.target.value as string && setMandatory({ ...mandatory, ...{ 0: event.target.value } }))
-                            
+
                             setPnpEvent({ ...pnpEvent, ...{ eventName: event.target.value } })
 
                             $(`#arm${0}`).css('border', 'none')
@@ -295,26 +298,7 @@ export default function CreateEvent() {
                         }} />
                 </FormControl>
 
-                <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'הכנס מחיר' : 'Enter price'}</label>
-                    <TextField
-                        id={`arm${2}`}
-                        className={classes.root}
-                        placeholder={lang === 'heb' ? 'הכנס מחיר' : 'Price'}
-                        onChange={(event) => {
-                            (event.target.value as string && setMandatory({ ...mandatory, ...{ 2: event.target.value } }))
-                            setPnpEvent({ ...pnpEvent, ...{ eventPrice: event.target.value } })
-                            $(`#arm${2}`).css('border', 'none')
-                        }}
-                        dir='rtl'
-                        type='number'
-                        sx={{
-
-                            direction: SIDE(lang)
-                        }} />
-                </FormControl>
-
-                <FormControl style={{ width: '100%', alignSelf: 'center' }}>
+                {appUser && appUser.admin && <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'שימו לב 1 (אופציונלי)' : 'Attention 1 (Optional)'}</label>
                     <TextField
 
@@ -327,9 +311,9 @@ export default function CreateEvent() {
 
                             direction: SIDE(lang)
                         }} />
-                </FormControl>
+                </FormControl>}
 
-                <FormControl style={{ width: '100%', alignSelf: 'center' }}>
+                {appUser && appUser.admin && <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'שימו לב 2 (אופציונלי)' : 'Attention 2 (Optional)'}</label>
                     <TextField
                         className={classes.root}
@@ -341,7 +325,7 @@ export default function CreateEvent() {
 
                             direction: SIDE(lang)
                         }} />
-                </FormControl>
+                </FormControl>}
 
 
                 <FormControl style={{ width: '100%', alignSelf: 'center', direction: SIDE(lang) }}>
@@ -390,11 +374,12 @@ export default function CreateEvent() {
                             (address as string && setMandatory({ ...mandatory, ...{ 5: address } }))
                             updateEventAddress(address)
                             $(`#arm${5}`).css('border', 'none')
-                        }} types={['address']} className={''} id={{}} fixed style={{ width: '100%',border:'.8px solid white',borderRadius:'32px', color: SECONDARY_WHITE,background:'none' }} placeHolder={EVENT_ADDRESS(lang)} />
+                        }} types={['address']} className={''} id={{}} fixed style={{ width: '100%', border: '.8px solid white', borderRadius: '32px', color: SECONDARY_WHITE, background: 'none' }} placeHolder={EVENT_ADDRESS(lang)} />
 
                 </FormControl>
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_DATE(lang)}</label>
+
                     <TextField
                         id={`arm${6}`}
                         value={unReverseDate(pnpEvent.eventDate)}
@@ -462,17 +447,17 @@ export default function CreateEvent() {
                         labelId="create_event_type_select"
 
                         id={`arm${9}`}
-                        value={selectedEventType}
-                        style={{ background: DARK_BLACK,fontFamily:'Open Sans Hebrew', borderRadius: '32px', color: SECONDARY_WHITE }}
+                        value={getEventTypeFromString(pnpEvent.eventType!)}
+                        style={{ background: DARK_BLACK, fontFamily: 'Open Sans Hebrew', borderRadius: '32px', color: SECONDARY_WHITE }}
                         onChange={(e) => {
                             (e.target.value as string && setMandatory({ ...mandatory, ...{ 9: e.target.value } }))
-                            setPnpEvent({ ...pnpEvent, ...{ eventType: e.target.value } })
+                            setPnpEvent({ ...pnpEvent, ...{ eventType: getEventType({ ...pnpEvent, ...{ eventType: e.target.value } }) } })
                             setSelectedEventType(e.target.value)
                             $(`#arm${9}`).css('border', 'none')
                         }}
                     >
 
-                        {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style = {{fontFamily:'Open Sans Hebrew'}} value={type}>{type}</MenuItem>)}
+                        {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</MenuItem>)}
                     </Select>
                 </FormControl>
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
@@ -490,7 +475,7 @@ export default function CreateEvent() {
                     <span>
                         <Button
                             onClick={submitCreateEvent}
-                            sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px' } }}> {CREATE_EVENT(lang)}</Button>
+                            sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {CREATE_EVENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
             </Stack>

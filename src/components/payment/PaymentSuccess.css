@@ -1,15 +1,18 @@
 .payment_details_holder label {
     margin:0px;
-    padding:0px;
     color:black;
-    color:orange;
+
+    padding: 2px;
+    text-align: center;
+    color:rgb(255, 153, 0);
     font-weight: bold;
-    font-size: 14px;
+    font-size: 20px;
 }
 .payment_details_holder span {
-    font-size: 12px;
+    font-size: 16px;
+    padding: 2px;
     color:whitesmoke;
-    max-width: 200px;
+    text-align: center;
 }
 @keyframes changeY {
     from {

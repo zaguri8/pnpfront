@@ -2,10 +2,11 @@ import './SayNoMoreItem.css'
 import { useLanguage } from "../../context/Language"
 import { NO_MORE_ITEM_1, NO_MORE_ITEM_2, NO_MORE_ITEM_3, NO_MORE_ITEM_4, NO_MORE_ITEM_5 } from "../../settings/strings"
 import SayNoMoreItem, { SayNoMoreItemProps } from "./SayNoMoreItem"
+import { CSSProperties } from 'react'
 export default function SayNoMoreContainer() {
 
 
-  
+
     const { lang } = useLanguage()
     const sayNoMoreItems: SayNoMoreItemProps[] = [
         { icon: 'no', content: NO_MORE_ITEM_1(lang) },

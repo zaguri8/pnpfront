@@ -5,7 +5,7 @@ export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language
 export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
 export const CREATE_RIDE = (lang) => lang === 'heb' ? 'צור הסעה' : 'Create a ride'
 export const NO_RIDES = (lang) => lang === 'heb' ? 'לאירוע זה תרם קיימות הסעות, לחץ כאן על מנת ליצור ביקוש להסעה' : 'This event currently has no rides, make a request to create a ride'
-export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על הכפתור ופתח ביקוש' : 'Your city is missing? lets open a request for a ride'
+export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על כפתור הפלוס ופתח ביקוש' : 'Your city is missing? open a request for a ride by clicking the the plus button'
 export const RIDE_DATE = (lang) => lang === 'heb' ? 'תאריך הסעה' : 'Ride Date'
 export const CHOOSE_RIDE = (lang) => lang === 'heb' ? 'בחר הסעה' : 'Pick a ride'
 export const COMMENTS = (lang) => lang === 'heb' ? 'הערות' : 'Comments'
@@ -50,7 +50,9 @@ export const MENU_ITEM_2 = (lang) => MY_ACCOUNT(lang)
 export const MENU_ITEM_3 = (lang) => lang === 'heb' ? "היסטוריית נסיעות וברקודים" : 'Ride history'
 export const MENU_ITEM_4 = (lang) => lang === 'heb' ? "חדש ב Pick n Pull" : 'New at Pick n Pull'
 export const MENU_ITEM_5 = (lang) => lang === 'heb' ? "סגור" : 'Close'
+export const MENU_ITEM_6 = (lang) => lang === 'heb' ? 'איך זה עובד?' : "How does it work"
 
+export const MENU_ITEM_7 = (lang) => lang === 'heb' ? 'דף הבית' : "Home page"
 export const MY_ACCOUNT_ITEM_1 = (lang) => lang === 'heb' ? 'מטבעות שצברתי' : 'Coins ive earned'
 export const MY_ACCOUNT_ITEM_2 = (lang) => lang === 'heb' ? 'קופונים והטבות' : 'Coupons & Discounts'
 export const MY_ACCOUNT_ITEM_3 = (lang) => lang === 'heb' ? 'היסטוריית נסיעות' : 'Rides history'
@@ -70,6 +72,7 @@ export const LAST_NAME = (lang) => lang === 'heb' ? 'שם משפחה' : 'Last na
 export const BIRTH_DATE = (lang) => lang === 'heb' ? 'תאריך לידה' : 'Birth date'
 export const PHONE_NUMBER = (lang) => lang === 'heb' ? 'מספר טלפון' : 'Phone number'
 
+export const SAME_SPOT = (lang) => lang == 'heb' ? 'במקום בו האוטובוס הוריד בהלוך' : 'Same spot where the bus stopped on arrival'
 export const PICK = (lang) => lang === 'heb' ? 'בחר' : 'Confirm'
 export const PICKED = (lang) => lang === 'heb' ? 'בחירה: ' : 'Selected: '
 export const PICK_FAVORITE_EVENTS = (lang) => lang === 'heb' ? 'מהם סוגי האירועים האהובים עלייך ?' : 'What are your favorite type of events ? '
@@ -88,7 +91,7 @@ export const START_DATE = (lang) => lang === 'heb' ? 'מועד התחלה: ' : '
 export const ADDRESS = (lang) => lang === 'heb' ? 'כתובת: ' : 'Address: '
 export const TICKET_PRICE = (lang) => lang === 'heb' ? 'מחיר כרטיס' : 'Ticket Price'
 export const EVENT_DETAILS = (lang) => lang === 'heb' ? 'פרטי אירוע: ' : 'Event Details: '
-export const ORDER = (lang) => lang === 'heb' ? 'הזמן כרטיסים' : 'Order tickets'
+export const ORDER = (lang) => lang === 'heb' ? 'הזמן כרטיסים' : 'Order Tickets'
 export const CURRENCY = (lang) => lang === 'heb' ? `ש"ח` : 'NIS'
 export const AGES = (lang) => lang === 'heb' ? 'גילאים' : 'Ages'
 export const CLOSE = (lang) => lang === 'heb' ? 'סגור' : 'Close'
@@ -165,10 +168,11 @@ export const ABOUT_CONTENT = (lang) => lang === 'heb' ? `הפלטפורמה של
 Our vision is that each person will be able to reach their next destination, in a more convenient, safe and efficient way. Even on weekends.
 We strive for social change and a better reality in these areas.`
 
-export const BARCODE_MESSAGE_HEB = 'החזק את המכשיר שלך מעל הקוד כך שהוא נראה בבירור על המסך של הטלפון החכם שלך. כאשר אתה מחזיק כראוי את הטלפון החכם שלך מעל קוד, הטלפון סורק את הקוד באופן אוטומטי. '
+export const BARCODE_MESSAGE_HEB = 'החזק את המכשיר שלך עם מצלמה פתוחה מעל הברקוד, ותוכל לראות אישור או סירוב ואת כמות האנשים שמורשים לעלות.'
 export const BARCODE_MESSAGE_ENG = `Hold your device visible above the code so it's clearly on your smartphone's screen. When you properly hold your smartphone over code, The code is scanned automatically. `
-export const BARCODE_MESSAGE_ARAB = "اجعل جهازك مرئيًا فوق الرمز بحيث يكون واضحًا على شاشة هاتفك الذكي. عندما تمسك هاتفك الذكي بشكل صحيح فوق الرمز. يتم فحص الرمز تلقائيًا. "
+export const BARCODE_MESSAGE_ARAB = `افتح كاميرا هاتفك الذكي ( الجوال ) ووجهها الى الرمز ( الباركود) لتشاهد " تصريح " او " رفض " ، وما هو عدد الاشخاص المصرحين لركوب السيارة .`
 
 
-export const BARCODE_MESSAGE = (lang) => lang === 'עברית' ? BARCODE_MESSAGE_HEB : lang === 'عربيه' ? BARCODE_MESSAGE_ARAB : BARCODE_MESSAGE_ENG
-export const CLOSE_SCANNER = (lang) => lang === 'עברית' ? 'סגור סורק' : lang === 'عربيه' ? 'أغلق الماسح' : 'Close Scanner'
+export const BARCODE_MESSAGE = (lang) => lang === 'עברית' ? BARCODE_MESSAGE_HEB : BARCODE_MESSAGE_ARAB
+export const CLOSE_SCANNER = (lang) => lang === 'עברית' ? 'סגור סורק' : `'اغلق الكاميرا .'`
+export const CREATE_RIDE_INFO = (lang) => lang === 'heb' ? 'רוצים ליצור הסעה פרטית גדולה לכל החברים? הזינו את הפרטים הנדרשים ובעמוד הבא תקבלו מחיר אטרקטיבי לתשלום. לאחר מכן תוכלו לשלוח לינק אישור הגעה להסעה לכל הנוסעים.' : 'Want to create a great private ride for all your friends? Enter the big details in the following fields and on the next page you will get an attractive price to pay. Then send a link confirming arrival to the shuttle to all passengers.' 

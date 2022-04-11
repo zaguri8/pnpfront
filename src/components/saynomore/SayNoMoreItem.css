@@ -1,6 +1,9 @@
 #say_no_more_container {
     display: flex;
+    width:100%;
     overflow: scroll;
+    padding-top: 32px;
+    padding-bottom: 32px;
     position: relative;
     flex-direction: row;
 }
@@ -10,7 +13,7 @@
         border:.1px solid gray;
         color: whitesmoke;
         background-color: rgb(51, 61, 108);
-        margin:4px;
+        margin:8px;
         padding: 32px;
         border-radius: 32px;
         width: 16.6%;

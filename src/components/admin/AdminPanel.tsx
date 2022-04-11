@@ -26,7 +26,7 @@ export default function AdminPanel() {
                 if (entry[0] === 'waiting') {
                     entry[1].forEach(waitingEvent => {
                         if (!newHash[waitingEvent.eventType!]) {
-                            newHash[waitingEvent.eventType!].waiting = [waitingEvent]
+                            newHash[waitingEvent.eventType!] = { waiting: [waitingEvent], events: [] }
                         } else {
                             newHash[waitingEvent.eventType!].waiting.push(waitingEvent)
                         }
@@ -39,7 +39,6 @@ export default function AdminPanel() {
                     }
                 }
             })
-            console.log(newHash)
             setPublicEvents(newHash)
             cancelLoad()
         }, true)
@@ -79,13 +78,13 @@ export default function AdminPanel() {
             </table>
 
         </InnerPageHolder>
-
+        <SectionTitle title={'ניהול משתמשים'} style={{ background: 'none' }} />
         <InnerPageHolder>
             <Button
                 style={{ backgroundImage: DARKER_BLACK_SELECTED, minWidth: '110px' }}
                 onClick={() => { nav('/adminpanel/users') }}
-                sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' } }}>
-                {'ניהול משתמשים'}
+                sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
+                {'עבור לניהול משתמשים'}
             </Button>
         </InnerPageHolder>
     </PageHolder>

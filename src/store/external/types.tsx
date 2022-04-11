@@ -15,7 +15,7 @@ export type PNPEventAgeRange = {
 export type PNPTransactionConfirmation = {
     eventId: string
     rideId: string
-    amount:string
+    amount: string
     twoWay: boolean
     ridesLeft: number
     confirmationVoucher: string
@@ -91,7 +91,6 @@ export type PNPUser = {
     birthDate: string
     producer: boolean
 }
-
 export type PNPEvent = {
     eventName: string
     eventLocation: string

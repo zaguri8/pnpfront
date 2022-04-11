@@ -1,6 +1,6 @@
 import { Input, FormControl, InputLabel, Stack, Checkbox } from "@mui/material"
-import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE, TERMS_OF_USE } from '../../settings/strings'
-import { useState } from "react"
+import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_ACCOUNT, PASSWORD, PHONE_NUMBER, PICKED, REGISTER_OK, REGISTER_TITLE, TERMS_OF_USE, FULL_NAME } from '../../settings/strings'
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
 import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
@@ -18,20 +18,25 @@ import { createUserWithEmailAndPassword } from "firebase/auth"
 import { DatePicker } from "@mui/lab"
 import { useLoading } from "../../context/Loading"
 import { useLocation } from "react-router"
-import FavoriteEventsDialog from "../utilities/PNPDialog"
+import FavoriteEventsDialog, { events } from "../utilities/PNPDialog"
 import { useLanguage } from "../../context/Language"
 import { submitButton } from "../../settings/styles"
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions"
 import { Welcome } from "./Welcome"
+import { useCookies } from "../../context/CookieContext"
+import { PNPPage } from "../../cookies/types"
 
 
 export default function Register() {
 
 
     const nav = useNavigate()
-    const { firebase } = useFirebase()
+    const { firebase, appUser } = useFirebase()
     const location = useLocation()
     const { doLoad, cancelLoad } = useLoading()
+
+    const { isCacheValid, cacheDone } = useCookies()
+
     const useStyles = makeStyles(theme => ({
         labelRoot: {
             right: '-64px'
@@ -68,23 +73,20 @@ export default function Register() {
     const { lang } = useLanguage()
     const [user, setUser] = useState({
         phone: '',
-        firstname: '',
-        lastname: '',
+        fullName: '',
         email: '',
         password: '',
         birthDate: dateStringFromDate(new Date()),
-        selectedFavoriteEvents: ''
+        selectedFavoriteEvents: events('heb')
     })
 
     function updateUserPhone(phone) {
         setUser({ ...user, ...{ phone: phone } })
     }
-    function updateFirstName(name) {
-        setUser({ ...user, ...{ firstname: name } })
+    function updateFullName(name) {
+        setUser({ ...user, ...{ fullName: name } })
     }
-    function updateLastName(name) {
-        setUser({ ...user, ...{ lastname: name } })
-    }
+
     function updateEmail(email) {
         setUser({ ...user, ...{ email: email } })
     }
@@ -98,10 +100,13 @@ export default function Register() {
     function updateSelectedFavoriteEvents(favs) {
         setUser({ ...user, ...{ selectedFavoriteEvents: favs } })
     }
+
+
+    const [finishedRegister, setFinishedRegister] = useState(false)
     const { openDialog } = useLoading()
     function register(e) {
 
-        function validate(phone, firstname, lastname, selectedFavoriteEvents) {
+        function validate(phone, fullName) {
             let errors = []
 
 
@@ -118,39 +123,47 @@ export default function Register() {
                 || phone.length !== 10) {
                 errors.push(lang === 'heb' ? 'יש להזין מס טלפון תקין' : `Invalid phone number ${phone}`)
             }
-            if ((selectedFavoriteEvents.length < 1
-                || selectedFavoriteEvents.length === 1) && selectedFavoriteEvents[0].length === 0) {
-                errors.push(lang === 'heb' ? 'יש לבחור לפחות סוג אחד של אירועים על מנת להירשם' : 'Invalid favorite events, please pick atleast 1')
-            }
-            if (firstname.length < 2) {
-                errors.push(lang === 'heb' ? 'יש להזין שם פרטי תקין' : `Invalid firstname ${firstname}`)
-            }
-            if (lastname.length < 2) {
-                errors.push(lang === 'heb' ? 'יש להזין שם משפחה תקין' : `Invalid last name ${lastname}`)
+            // if ((selectedFavoriteEvents.length < 1
+            //     || selectedFavoriteEvents.length === 1) && selectedFavoriteEvents[0].length === 0) {
+            //     errors.push(lang === 'heb' ? 'יש לבחור לפחות סוג אחד של אירועים על מנת להירשם' : 'Invalid favorite events, please pick atleast 1')
+            // }
+            if (fullName.length < 2) {
+                errors.push(lang === 'heb' ? 'יש להזין שם מלא תקין' : `Invalid fullname ${fullName}`)
             }
             if (!termsOfUse) {
                 errors.push('יש לאשר את תנאי השימוש')
             }
             return errors
         }
-        const selectedEvents = $('#selected_favorite_events').text().replace(`${PICKED(lang)}`, "").replaceAll(' 🎉 ', ',').split(',')
-        const validationErrors = validate(user.phone, user.firstname, user.lastname, selectedEvents)
+        // const selectedEvents = $('#selected_favorite_events').text().replace(`${PICKED(lang)}`, "").replaceAll(' 🎉 ', ',').split(',')
+        const validationErrors = validate(user.phone, user.fullName)
         if (validationErrors.length > 0) {
             alert(validationErrors.join('\n'))
             return
         }
         doLoad()
 
+        isCacheValid(PNPPage.register)
+            .then(valid => {
+                if (valid) {
+                    if (!finishedRegister) {
+                        firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
+                        cacheDone(PNPPage.register)
+                    }
+                }
+            })
+
         createUserWithEmailAndPassword(firebase.auth, user.email, user.password)
             .then(() => {
+
                 firebase.realTime.addUser({
-                    name: user.firstname + " " + user.lastname,
+                    name: user.fullName,
                     email: user.email,
                     customerId: '',
                     admin: false,
                     phone: user.phone,
                     birthDate: user.birthDate,
-                    favoriteEvents: selectedEvents,
+                    favoriteEvents: events('heb'),
                     coins: 0,
                     producer: false
                 }).then(result => {
@@ -166,6 +179,8 @@ export default function Register() {
                     firebase.realTime.createError('Register error', err)
                     cancelLoad()
                 })
+
+
             }).catch(err => {
                 if (err.message.includes('auth/email-already-in-use')) {
                     alert('האימייל שהזנת קיים כבר במערכת')
@@ -182,6 +197,21 @@ export default function Register() {
     const handleTermsOfUseChange = (e) => {
         setTermsOfUse(e.target.checked)
     }
+
+    useEffect(() => {
+        return () => {
+            isCacheValid(PNPPage.register)
+                .then(valid => {
+                    if (valid) {
+                        firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
+                        cacheDone(PNPPage.register)
+                    }else {
+                        console.log('bye')
+                    }
+                })
+        }
+    }, [])
+
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder>
@@ -200,24 +230,12 @@ export default function Register() {
                 }} />
                 <Stack spacing={3} style={{ width: '80%' }}>
                     <FormControl>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{FIRST_NAME(lang)}</label>
+                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{FULL_NAME(lang)}</label>
                         <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
                             classes={{ root: classes.root }}
-                            placeholder={FIRST_NAME(lang)}
-                            onChange={(e) => { updateFirstName(e.target.value) }}
+                            placeholder={FULL_NAME(lang)}
+                            onChange={(e) => { updateFullName(e.target.value) }}
                             id="first_name_input" aria-describedby="first_name_helper_text" />
-
-                    </FormControl>
-                    <FormControl>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{LAST_NAME(lang)}</label>
-                        <TextField
-                            placeholder={LAST_NAME(lang)}
-                            onChange={(e) => { updateLastName(e.target.value) }}
-                            classes={{ root: classes.root }}
-                            type="text"
-                            name="last-name"
-                            autoComplete="last-name"
-                            sx={{ direction: SIDE(lang), color: SECONDARY_BLACK }} id="last_name_input" aria-describedby="last_name_helper_text" />
 
                     </FormControl>
                     <FormControl>
@@ -256,7 +274,7 @@ export default function Register() {
                             name="new-password"
                             sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
                     </FormControl>
-
+                    {/* 
                     <FormControl style={{ width: '80%', alignSelf: 'center' }}>
                         <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{BIRTH_DATE(lang)}</label>
                         <TextField
@@ -271,14 +289,14 @@ export default function Register() {
                             type='date'
                             onChange={(e) => { updateBirthDate(e.target.value) }}
                             required />
-                    </FormControl>
-                    <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
+                    </FormControl> */}
+                    {/* <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
                     <FavoriteEventsDialog />
-
+ */}
 
                     <Button title={REGISTER_OK(lang)}
                         type={'button'}
-                        style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '16px' } }}
+                        style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '24px' } }}
                         variant="outlined"
                         onClick={register} />
 
@@ -288,7 +306,7 @@ export default function Register() {
                     <Stack >
 
 
-                        <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
+                        <label style={{ fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                         <Checkbox
                             style={{ width: 'fit-content', alignSelf: 'center', background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
                             onChange={handleTermsOfUseChange}

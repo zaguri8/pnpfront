@@ -1,12 +1,14 @@
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
 import SectionTitle from "../SectionTitle"
 import { RideFormPreview } from "../ride/RideFormPreview"
-import { Gallery } from "../Gallery"
+import { Gallery } from "../gallery/Gallery"
 import WhyUsContainer from "../whyus/WhyUsContainer"
 import { useFirebase } from "../../context/Firebase"
 import { useEffect, useRef } from "react"
 import React from 'react'
 import { useState } from "react"
+
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { PNPEvent } from "../../store/external/types"
 import { ABOUT, CLUBS, CULTURE, SCHEDULED_EVENTS, TOS, WHY_US_TITLE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
@@ -25,14 +27,31 @@ export default function Home() {
         const unsubEvents = firebase.realTime.addListenerToPublicEvents(setPnpEvents, false)
         return () => unsubEvents()
     }, [])
+
+
+    function ArrowScrollUp() {
+
+        return <div
+            id='arrow_scroll_up'
+            onClick={(e) => {
+                window.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: "smooth"
+                })
+            }}
+            style={{ border: '1px solid whitesmoke',borderRadius:'12px', cursor: 'pointer', zIndex: '10000', display: 'none', position: 'fixed', right: '8px', bottom: '50%' }}>
+            <KeyboardArrowUpIcon style={{ width: '32px', height: '32px', color: 'whitesmoke' }} />
+        </div>
+    }
     const { lang } = useLanguage()
 
     return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
         <RideFormPreview />
         {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
 
+        <ArrowScrollUp />
 
-        <SectionTitle style={{ paddingBottom: '0px' }} title={SCHEDULED_EVENTS(lang)} />
         {pnpEvents && Object.entries(pnpEvents).map((k) => <Gallery
             key={v4()}
             events={k[1]}
@@ -40,15 +59,13 @@ export default function Home() {
         <Spacer offset={4} />
         <SectionTitle withBg style={{
             padding: '32px',
-            fontWeight: '100',
+            fontWeight: 'bold',
             marginTop: '0px',
             fontStyle: 'italic',
-            border: '.1px solid gray',
             color: PRIMARY_WHITE,
             width: '80%',
-            borderRadius: '16px',
             paddingRight: '45px',
-            background: ORANGE_GRADIENT_PRIMARY,
+            background: 'none',
             alignSelf: 'center',
             fontSize: '38px'
         }} title={'We Say No More!'} />

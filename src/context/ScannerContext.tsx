@@ -7,16 +7,20 @@ const ScannerContext = createContext<IScanningContext | null>(null)
 export type IScanningContext = {
     openScanner: boolean;
     faceMode: 'environment' | 'user';
+    scannerLanguage: string,
+    setScannerLanguage: (lang: string) => void,
     setFaceMode: (faceMode: 'environment' | 'user') => void;
     setOpenScanner: (open: boolean) => void;
 }
 export const ScanningContextProvider = (props: object) => {
     const [openScanner, setOpenScanner] = useState(false)
-    const [scanContent, setScanContent] = useState(false)
+    const [scannerLanguage, setScannerLanguage] = useState('עברית')
     const [faceMode, setFaceMode] = useState<'environment' | 'user'>('environment')
     return <ScannerContext.Provider value={{
         setOpenScanner,
         setFaceMode,
+        setScannerLanguage,
+        scannerLanguage,
         faceMode,
         openScanner
     }} {...props} />
@@ -28,9 +32,13 @@ export const useScanner = () => {
         $('.dim').css('display', 'none')
         scanningContext!.setOpenScanner(false)
     }
-    const openScanner = () => {
+    const openScanner = (language: string) => {
         $('.dim').css('display', 'inherit')
         scanningContext!.setOpenScanner(true)
+        scanningContext!.setScannerLanguage(language)
+    }
+    const setScannerLanguage = (lang: string) => {
+        scanningContext!.setScannerLanguage(lang)
     }
 
     return {
@@ -38,6 +46,8 @@ export const useScanner = () => {
         setFaceMode: (mode: 'environment' | 'user') => scanningContext?.setFaceMode(mode),
         faceMode: scanningContext?.faceMode,
         openScanner: openScanner,
+        setScannerLanguage: (lang: string) => setScannerLanguage(lang),
+        scannerLanguage: scanningContext?.scannerLanguage,
         closeScanner: closeScanner
     }
 }

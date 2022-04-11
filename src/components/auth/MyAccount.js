@@ -15,6 +15,8 @@ import { useEffect } from "react"
 import { useFirebase } from "../../context/Firebase"
 
 import { useNavigate } from 'react-router'
+import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
+import Spacer from "../utilities/Spacer"
 function MyAccountItem({ title, icon, navTo }) {
     const nav = useNavigate()
     return (<Button onClick={() => nav(navTo)} className='my_account_item' sx={{
@@ -66,11 +68,11 @@ export default function MyAccount() {
 
         return () => { window.removeEventListener('resize', resize) }
     }, [])
-    return (<PageHolder >
+    return (<PageHolder>
 
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
 
-        <InnerPageHolder  >
+        <InnerPageHolder style = {{background:'rgb(40,38,55,1)'}} >
             <div dir={SIDE(lang)} id='my_account_grid' style={{
                 display: 'grid',
                 gridTemplateRows: '1fr 1fr',

@@ -54,7 +54,7 @@ export default function EventPage() {
                     product={{
                         name: `${event.eventName}`,
                         desc: event.eventDetails,
-                        startPoint:ride ? ride.rideStartingPoint : selectedEventRide ? selectedEventRide.rideStartingPoint : '',
+                        startPoint: ride ? ride.rideStartingPoint : selectedEventRide ? selectedEventRide.rideStartingPoint : '',
                         rideTime: ride ? ride.rideTime : selectedEventRide ? selectedEventRide.rideTime : '',
                         backTime: ride ? ride.backTime : selectedEventRide ? selectedEventRide.backTime : '',
                         exactStartPoint: ride && ride.extras.exactStartPoint ? ride.extras.exactStartPoint : selectedEventRide && selectedEventRide.extras.exactStartPoint ? selectedEventRide?.extras.exactStartPoint : null,
@@ -145,6 +145,7 @@ export default function EventPage() {
     }, [])
 
 
+   
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <PageHolder >
             <List id='ride_start_point_list' style={{ alignItems: 'center', width: '95%' }}>
@@ -160,7 +161,7 @@ export default function EventPage() {
                 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
 
-                        <Accordion style={{ background: PRIMARY_BLACK, margin: '0px', borderTopLeftRadius: '0px', borderTopRightRadius: '0px' }} expanded={true}>
+                        <Accordion  style={{ background: PRIMARY_BLACK, margin: '0px', borderTopLeftRadius: '0px', borderTopRightRadius: '0px' }} expanded={true}>
                             <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
                                 <p style={{
                                     textAlign: 'center',
@@ -204,19 +205,21 @@ export default function EventPage() {
                                 {!isLoading && eventRides.length > 0 ? <Stack
                                     style={{ width: '100%', rowGap: '8px' }}>
                                     {eventRides.map(ride => {
-                                        return <MenuItem disabled={ride.extras
-                                            && ride.extras.isRidePassengersLimited
-                                            && Number(ride.passengers) >= Number(ride.extras.rideMaxPassengers)} onClick={() => {
-                                                handleSelectEventRide(ride)
-                                            }} style={{
-                                                background: selectedEventRide === ride ? DARK_BLACK : 'white',
-                                                width: '100%',
-                                                color: selectedEventRide === ride ? 'white' : 'black',
-                                                border: '.1px solid gray',
-                                                borderRadius: '4px',
-                                                padding: '8px',
-                                                display: 'flex',
-                                            }} key={ride.rideId + ride.rideStartingPoint} value={ride.rideId}>
+                                        return <div><MenuItem
+
+                                            disabled={ride.extras
+                                                && ride.extras.isRidePassengersLimited
+                                                && Number(ride.passengers) >= Number(ride.extras.rideMaxPassengers)} onClick={() => {
+                                                    handleSelectEventRide(ride)
+                                                }} style={{
+                                                    background: selectedEventRide === ride ? DARK_BLACK : 'white',
+                                                    width: '100%',
+                                                    color: selectedEventRide === ride ? 'white' : 'black',
+                                                    border: '.1px solid gray',
+                                                    borderRadius: '4px',
+                                                    padding: '8px',
+                                                    display: 'flex',
+                                                }} key={ride.rideId + ride.rideStartingPoint} value={ride.rideId}>
                                             <div style={{
                                                 display: 'flex',
                                                 width: '100%',
@@ -226,7 +229,7 @@ export default function EventPage() {
 
                                             </div>
                                             <span>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
-                                        </MenuItem>
+                                        </MenuItem> {ride.extras.isRidePassengersLimited && <div style={{ direction: SIDE(lang), marginLeft: '2px', padding: '2px', textAlign: 'left', color: SECONDARY_WHITE, fontSize: '12px' }}>{Number(ride.extras.rideMaxPassengers) - Number(ride.passengers) + (lang === 'heb' ? ' מקומות נותרים' : ' Tickets Available')}</div>}</div>
                                     })}
                                     <div style={{
                                         display: event.eventCanAddRides ? 'flex' : 'none',
@@ -234,9 +237,10 @@ export default function EventPage() {
                                         flexDirection: 'column'
                                     }}> <AddCircleOutlineIcon
                                             onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
-                                            color="inherit" style={{
+                                            color={'inherit'} style={{
                                                 cursor: 'pointer',
                                                 width: '50px',
+                                                color: SECONDARY_WHITE,
                                                 height: '50px',
                                                 alignSelf: 'center'
                                             }} />
@@ -258,7 +262,7 @@ export default function EventPage() {
                                         <Button onClick={() => openRequestPaymentDialog()}
                                             id="request_event_order"
                                             aria-haspopup disabled={selectedEventRide === null}
-                                            sx={{ ...submitButton(true), ...{ maxWidth: '250px' } }}> {ORDER(lang)}</Button>
+                                            sx={{ ...submitButton(true), ...{ maxWidth: '250px', textTransform: 'none' } }}> {ORDER(lang)}</Button>
                                     </span>
                                 </HtmlTooltip>
                             </AccordionDetails>
@@ -298,21 +302,25 @@ export default function EventPage() {
                             marginBottom: '0px',
                             textAlign: 'right'
                         }}>{ADDRESS(lang)}<span>{event.eventLocation}</span></p>
-                        <Accordion style={{ backgroundImage: DARK_BLACK, margin: '0px' }} expanded={expanded === true} onChange={() => handleSeeMoreToggle()}>
-                            <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+                        <div style={{display:'flex',borderRadius:'16px',flexDirection:'column',justifyContent:'center',alignItems:'center', backgroundImage: DARK_BLACK, margin: '0px' }}>
+                            <div  aria-controls="panel1d-content" id="panel1d-header">
                                 <p style={{
+                                    alignSelf:'center',
                                     textAlign: 'right',
+                                    fontWeight:'bold',
+                                    padding:'16px',
+                                    fontSize:'22px',
                                     color: PRIMARY_WHITE,
                                     margin: '0px'
                                 }}>
-                                    {expanded ? HIDE_EXTRA_DETAILS(lang) : SHOW_EXTRA_DETAILS(lang)}</p>
-                            </AccordionSummary>
-                            <AccordionDetails>
+                                    {lang === 'heb' ?  'פרטי אירוע' : 'Event Details'}</p>
+                            </div>
+                            <div>
                                 <HTMLFromText
-                                    style={{ color: PRIMARY_WHITE }}
+                                    style={{ color: PRIMARY_WHITE,padding:'16px' }}
                                     text={event.eventDetails} />
-                            </AccordionDetails>
-                        </Accordion>
+                            </div>
+                        </div>
 
 
                     </div>

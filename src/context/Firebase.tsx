@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react"
-import Store from "../store/external";
+import Store, { Realtime } from "../store/external";
 import { getAuth, Unsubscribe } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase, onValue } from "firebase/database";
@@ -7,9 +7,10 @@ import { initializeApp } from 'firebase/app'
 import firebase from 'firebase/compat/app'
 import { User } from "firebase/auth";
 import React from "react";
+import { PNPPage, PNPPageStats } from "../cookies/types";
 import { PNPUser } from "../store/external/types";
 import 'firebase/compat/app'
-import { getStorage, uploadBytes, ref as storageRef } from "firebase/storage";
+import { getStorage, uploadBytes, ref as storageRef, getDownloadURL } from "firebase/storage";
 import { ref, child } from "firebase/database";
 import { userFromDict } from "../store/external/converters";
 import { firebaseConfig } from '../settings/config'
@@ -33,7 +34,6 @@ export const FirebaseContextProvider = (props: object) => {
   const [user, setUser] = useState<User | null | undefined>()
   const [appUser, setAppUser] = useState<PNPUser | null>(null)
   const [error, setError] = useState<Error | null>(null)
-
   const { cancelLoad, doLoad } = useLoading()
   useEffect(() => {
     doLoad()
@@ -73,7 +73,16 @@ export const useFirebase = () => {
     },
     freeDbRef: getDatabase(app),
     isAuthenticated: firebaseContext?.user != null,
-    uploadUserImage: async (imageBlob: ArrayBuffer) => { if (firebaseContext?.user?.uid) return await uploadBytes(storageRef(storage, '/UserImages/' + (firebaseContext!.user!.uid ? firebaseContext!.user!.uid : '')), imageBlob) },
+    uploadUserImage: async (imageBlob: ArrayBuffer) => {
+      if (firebaseContext?.user?.uid) {
+        const ref = storageRef(storage, '/UserImages/' + (firebaseContext!.user!.uid ? firebaseContext!.user!.uid : ''))
+        return await uploadBytes(ref, imageBlob)
+          .then(async () => {
+            return await getDownloadURL(ref)
+              .then(url => Realtime.updateCurrentUser({ ...firebaseContext.appUser, ...{ image: url } }, auth, getDatabase(app)))
+          })
+      }
+    },
     uploadEventImage: async (eventId: string, imageBlob: ArrayBuffer) => await uploadBytes(storageRef(storage, 'EventImages/' + eventId), imageBlob)
   }
 }

@@ -161,6 +161,7 @@ const AdminEventPanel = () => {
                                         firebase.realTime.approveEvent(event.eventId)
                                             .then(() => {
                                                 alert('אירוע אושר בהצלחה')
+                                                nav('/adminpanel')
                                                 cancelLoad()
                                             }).catch(() => {
                                                 alert('קרתה שגיאה בעת אישור האירוע, אנא פנא אל מתכנת האתר')

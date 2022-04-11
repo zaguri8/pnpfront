@@ -34,15 +34,15 @@ export default function Places({ placeHolder, style, fixed, id, className, types
     const classes = useStyles()
 
     const { lang } = useLanguage()
-    return (<ListItem style={{...style,...{background:'none',border:'none'}}} id={id} className={className}>
-        <FormControl style={{...style,...{background:'none',border:'none'}}}>
+    return (<ListItem style={{ ...style, ...{ background: 'none', border: 'none' } }} id={id} className={className}>
+        <FormControl style={{ ...style, ...{ background: 'none', border: 'none' } }}>
             {google && <PlacesAutocomplete
                 onError={(err) => { }}
                 searchOptions={{
                     location: new google.maps.LatLng(31.046051, 34.851612),
                     radius: 526,
                     componentRestrictions: { country: 'il' },
-                    types: types
+                    types: ["geocode"]
                 }}
                 value={address != undefined && address != null && address.length > 0 ? address : value != undefined && value != null ? value : ''}
                 onChange={handleChange}
@@ -57,7 +57,7 @@ export default function Places({ placeHolder, style, fixed, id, className, types
                             display: 'flex',
                             margin: '0px',
                             flexDirection: 'column'
-                        }, ...style,...{background:'none'}
+                        }, ...style, ...{ background: 'none' }
                     }}>
                         <TextField
                             variant='outlined'
@@ -66,7 +66,7 @@ export default function Places({ placeHolder, style, fixed, id, className, types
                             sx={{
                                 ...{
                                     direction: SIDE(lang), maxHeight: '50px',
-                                }, ...style,...{background:'none'}
+                                }, ...style, ...{ background: 'none' }
                             }}
                             {...getInputProps({
                                 placeholder: placeHolder

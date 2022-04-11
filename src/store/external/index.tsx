@@ -2,6 +2,7 @@ import { Auth } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
+import { PNPPage } from '../../cookies/types'
 import { DocumentData } from 'firebase/firestore'
 import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
 import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, ref, remove, set, update } from 'firebase/database'
@@ -28,10 +29,6 @@ export type ExternalStoreActions = {
 
 }
 
-type PNPEventsList = {
-    clubs: PNPEvent[]
-}
-
 function CreateRealTimeDatabase(auth: Auth, db: Database, storage: FirebaseStorage) {
 
     return new Realtime(auth, db, storage)
@@ -43,11 +40,13 @@ export class Realtime {
     private users: DatabaseReference
     private auth: Auth
     private storage: FirebaseStorage
+    private statistics: DatabaseReference
     private transactions: DatabaseReference
     private transactionConfirmations: DatabaseReference
     constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
         this.allEvents = ref(db, '/events')
         this.rides = ref(db, "/rides")
+        this.statistics = ref(db, '/statistics')
         this.users = ref(db, '/users')
         this.errs = ref(db, '/errors')
         this.transactionConfirmations = ref(db, '/transactionConfirmations')
@@ -601,11 +600,9 @@ export class Realtime {
    * @returns new reference callback
    */
     createEvent = async (event: PNPEvent, blob: ArrayBuffer): Promise<object | void> => {
-
-        const type = getEventType(event)
         const newRef = push(child(child(this.allEvents, 'public'), 'waiting'))
         event.eventId = newRef.key!
-        return await uploadBytes(storageRef(this.storage, 'EventImages/' + type + "/" + event.eventId), blob)
+        return await uploadBytes(storageRef(this.storage, 'EventImages/' + event.eventType + "/" + event.eventId), blob)
             .then(async snap => {
                 return await getDownloadURL(snap.ref)
                     .then(async url => {
@@ -646,24 +643,26 @@ export class Realtime {
             consumePublicEvents(approvedEvents)
             consumeWaitingEvents(waitingEvents)
         })
-
-        /*
-         addListenerToPublicEvents = (consume: (o: PNPEvent[]) => void) => {
-        return onValue(child(this.allEvents, 'public'), snap => {
-            const culture = snap.child('culture')
-            const clubs = snap.child('clubs')
-            const ret: PNPEvent[] = []
-            clubs.forEach(ev => {
-                ret.push(eventFromDict(ev))
-            })
-            culture.forEach(ev => {
-                ret.push(eventFromDict(ev))
-            })
-            consume(ret)
-        })
     }
 
-        */
+
+    addBrowsingStat(page: PNPPage, stat: 'leaveNoAttendance' | 'leaveWithAttendance') {
+        const pageValue = page.valueOf()
+        try {
+            get(child(child(this.statistics, pageValue), stat))
+                .then(snapshot => {
+                    switch (stat) {
+                        case 'leaveNoAttendance':
+                            const val = snapshot.val()
+                            update(child(this.statistics, pageValue), { leaveNoAttendance: val ? (val + 1) : 1 })
+                            break;
+                        case 'leaveWithAttendance':
+                            update(child(this.statistics, pageValue), { leaveWithAttendance: val ? (val + 1) : 1 })
+                            break;
+                    }
+                })
+        } catch (e) { }
+
     }
 
     approveEvent = async (eventId: string) => {
@@ -673,7 +672,7 @@ export class Realtime {
                 remove(eventRef)
                     .then(async () => {
                         const event = eventFromDict(snap)
-                        return await set(child(child(child(this.allEvents, 'public'), getEventType(event)), eventId), event)
+                        return await set(child(child(child(this.allEvents, 'public'), event.eventType!), eventId), event)
                     }).catch(e => {
                         this.createError('approveEvent', e)
                     })

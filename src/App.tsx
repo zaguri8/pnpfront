@@ -5,7 +5,7 @@ import $ from 'jquery'
 import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, List, ListItem, Button } from '@mui/material';
-import { useLoading } from './context/Loading';
+import { ILoadingContext, useLoading } from './context/Loading';
 import Profile from './components/auth/Profile'
 import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
 import AppMenu from './components/AppMenu';
@@ -13,7 +13,7 @@ import { Routes, Route, useNavigate } from 'react-router';
 import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
 
-import { DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE, TOOLBAR_COLOR } from './settings/colors';
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE, TOOLBAR_COLOR } from './settings/colors';
 import Home from './components/home/Home';
 import { useFirebase } from './context/Firebase';
 import Login from './components/auth/Login';
@@ -63,6 +63,55 @@ function UNKNOWN(props: { lang: string }) {
 }
 
 
+
+function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
+
+
+  return (<Dialog dir={SIDE(props.lang)} sx={{
+    textAlign: 'center',
+    overflowY: 'stretch',
+    overflowX: 'hidden',
+    background: PRIMARY_BLACK
+  }} open={props.dialogContext.isDialogOpened}>
+    {props.dialogContext.dialogTitle && <div style={{
+      display: 'flex',
+      color: SECONDARY_WHITE,
+      background: ORANGE_GRADIENT_PRIMARY,
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>{props.dialogContext.dialogTitle}</div>}
+    <List id='dialog' sx={{
+      overflowX: 'hidden',
+      background: PRIMARY_BLACK,
+      maxHeight: '800px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
+      {props.dialogContext.content.content}
+    </List>
+    <ListItem style={{
+      marginTop: '0px',
+      paddingTop: '8px',
+      color: SECONDARY_WHITE,
+      background: PRIMARY_BLACK,
+      textDecoration: 'underline'
+    }}>
+      <Button onClick={() => {
+        props.dialogContext.closeDialog();
+      }} style={{
+        width: '100%',
+        color: 'white',
+        backgroundImage: ORANGE_GRADIENT_PRIMARY,
+        fontFamily: 'Open Sans Hebrew',
+        fontSize: '18px'
+      }}>{CLOSE(props.lang)}</Button>
+    </ListItem>
+  </Dialog>);
+}
+
+
 function App() {
   const [canToggle, setCanToggle] = useState(true)
   const dialogContext = useLoading()
@@ -104,7 +153,6 @@ function App() {
     }
   }
 
-  const [scrollingScript, setScrollingScript] = useState(false)
   const [resizingScript, setResizingScript] = useState(false)
   useEffect(() => {
     const d = document.createElement('div')
@@ -138,12 +186,11 @@ function App() {
         $('#toolbar').css('padding', '4')
         $('#toolbar').stop().css({ 'position': 'sticky', 'boxShadow': 'rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px', 'background': PRIMARY_BLACK, 'backgroundImage': 'none', 'transition': 'all .2s' })
         $('#toolbar').css('top', '0')
-
-
+        $('#arrow_scroll_up').css('display', 'inherit')
       } else {
         $('#toolbar').css('padding', '0')
         $('#toolbar').stop().css({ 'position': 'relative', 'boxShadow': 'none', 'background': TOOLBAR_COLOR, 'transition': 'all .2s' })
-
+        $('#arrow_scroll_up').css('display', 'none')
       }
     }
     onResize()
@@ -161,7 +208,7 @@ function App() {
     }
   }, [])
 
-  const { isAuthenticated, appUser, user } = useFirebase()
+  const { isAuthenticated, appUser } = useFirebase()
 
 
   const NoPerms = () => (<div style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div>)
@@ -171,35 +218,7 @@ function App() {
     <AppMenu menuToggle={toggleMenu} />
     <div className="App">
 
-      {dialogContext.content ? <Dialog dir={SIDE(lang)} sx={{ textAlign: 'center', overflowY: 'stretch', overflowX: 'hidden', background: PRIMARY_BLACK }} open={dialogContext.isDialogOpened}>
-        {dialogContext.dialogTitle && <div
-          style={
-            {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }
-          }
-        >{dialogContext.dialogTitle}</div>}
-        <List id='dialog' sx={{
-          overflowX: 'hidden',
-          background: PRIMARY_BLACK,
-          maxHeight: '800px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}>
-          {dialogContext.content.content}
-        </List>
-        <ListItem style={{ marginTop: '0px', paddingTop: '0px', color: SECONDARY_WHITE, background: PRIMARY_BLACK, textDecoration: 'underline', }}>
-          <Button
-            onClick={() => {
-              dialogContext.closeDialog()
-            }}
-            style={{ width: '100%', color: 'white', backgroundImage: DARK_BLACK, fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} >{CLOSE(lang)}</Button>
-        </ListItem>
-      </Dialog>
+      {dialogContext.content ? <PNPDialogComponent lang={lang} dialogContext={dialogContext} />
         : null}
       <ImageHeader />
       <ToolBar menuToggle={() => toggleMenu()} />
