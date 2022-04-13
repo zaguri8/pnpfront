@@ -49,7 +49,7 @@ export default function WhyUsItem(props: WhyUsItemProps) {
         marginBottom: '16px',
         margin: '8px',
         borderRadius: '12px',
-        background: ORANGE_GRADIENT_PRIMARY
+        background: 'linear-gradient(#414345,#232526)'
     }}>
         <ContainerImage icon={props.icon} />
         <ContainerTitle title={props.title} />

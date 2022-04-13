@@ -39,6 +39,7 @@ import { QrReader } from 'react-qr-reader';
 import Scanner from './components/scanner/Scanner';
 import AdminEventPanel from './components/admin/AdminEventPanel';
 import UserStatistics from './components/admin/UserStatistics';
+import Charts from './components/admin/Charts';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -233,7 +234,7 @@ function App() {
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='termsOfService' element={<TermsOfService />} />
 
-
+        <Route path='/adminpanel/pagestats' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <Charts />} />
         <Route path='/myaccount/profile' element={<Profile />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
         <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />

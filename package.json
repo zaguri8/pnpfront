@@ -48,6 +48,7 @@
     "react-firebase-hooks": "^5.0.2",
     "react-firebaseui": "^6.0.0",
     "react-google-autocomplete": "^2.6.1",
+    "react-google-charts": "^4.0.0",
     "react-google-maps-loader": "^4.3.0",
     "react-hook-form": "^3.11.4-beta.2",
     "react-loader-spinner": "^5.1.3",

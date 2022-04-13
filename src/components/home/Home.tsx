@@ -75,7 +75,7 @@ export default function Home() {
         <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} />
         <WhyUsContainer />
         <SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
-        <InnerPageHolder style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: '16px', width: '50%', background: ORANGE_GRADIENT_PRIMARY }}>
+        <InnerPageHolder style={{ marginLeft: 'auto', marginRight: 'auto', marginBottom: '16px', width: '50%', background: 'linear-gradient(15deg,#c31432,#240b36)' }}>
 
 
             <About />

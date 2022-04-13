@@ -1,4 +1,5 @@
 import { v4 } from "uuid"
+import { SECONDARY_WHITE } from "../../settings/colors"
 import './SayNoMoreItem.css'
 export type SayNoMoreItemProps = {
     icon: string,
@@ -18,7 +19,7 @@ export default function SayNoMoreItem(props: SayNoMoreItemProps) {
         }}><b style={{
 
             fontStyle: 'italic',
-            color: "#ff6a3c",
+            color: SECONDARY_WHITE,
             fontSize: '26px'
         }}>{nMore + " "}</b><br /> {props.content}</p>
 

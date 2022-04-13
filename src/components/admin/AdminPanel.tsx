@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import { v4 } from "uuid"
 import { useFirebase } from "../../context/Firebase"
 import { useLoading } from "../../context/Loading"
+import { PNPPage } from "../../cookies/types"
 import { DARKER_BLACK_SELECTED, SECONDARY_WHITE } from "../../settings/colors"
 import { getEventTypeFromString } from "../../store/external/converters"
 import { PNPEvent } from "../../store/external/types"
@@ -85,6 +86,16 @@ export default function AdminPanel() {
                 onClick={() => { nav('/adminpanel/users') }}
                 sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
                 {'עבור לניהול משתמשים'}
+            </Button>
+        </InnerPageHolder>
+
+        <SectionTitle title={'נתוני כניסה'} style={{ background: 'none' }} />
+        <InnerPageHolder>
+            <Button
+                style={{ background: '#bd3333', minWidth: '110px' }}
+                onClick={() => { nav('/adminpanel/pagestats', { state: { page: PNPPage.register } }) }}
+                sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
+                {'דף הרשמה'}
             </Button>
         </InnerPageHolder>
     </PageHolder>

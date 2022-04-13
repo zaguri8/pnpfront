@@ -50,6 +50,8 @@ export const CookieContextProvider = (props: object) => {
     }
 
     const isCacheValid = async (page: string) => {
+        if (typeof (Storage) === 'undefined')
+            return false
         const existing = cookies
         if (existing) {
             for (var p of existing) {

@@ -14,7 +14,7 @@ import { useLanguage } from "../../context/Language";
 import { AMOUNT_OF_TICKETS, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
 import { useLocation, useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import HTMLFromText from '../utilities/HtmlFromText'
 export function PaymentForm({ product }) {
 
@@ -119,7 +119,7 @@ export function PaymentForm({ product }) {
                                 </label>
                                     <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.rideTime}</label> </div></div>}
                                 {(product.twoWay || product.direction === '1') && <div><label style={{ fontWeight: 'bold' }}>
-                                    {(lang === 'heb' ? 'שעת חזרה' : 'Ride time: ')}
+                                    {(lang === 'heb' ? 'שעת חזרה' : 'Back time: ')}
                                 </label>
                                     <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.backTime}</label> </div></div>}
                             </Stack>
@@ -143,11 +143,12 @@ export function PaymentForm({ product }) {
                     <span style={{ color: SECONDARY_WHITE }}>{`${AMOUNT_OF_TICKETS(lang)} ${ticketAmount}`}</span>
                 </span>
                 <label style={{ fontSize: '24px', padding: '4px', fontWeight: '100', color: SECONDARY_WHITE }}>{TOTAL_TO_PAY(lang, Number(product.price) * ticketAmount)}</label>
-                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
+                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={product.soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (!termsOfUser ? ACCEPT_TERMS_REQUEST(lang) : CONTINUE_TO_SECURE_PAYMENT(lang))} arrow>
                     <span>
                         <Button onClick={requestPayment}
-                            sx={{ ...submitButton(false), ... { margin: '0px', padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
-                            disabled={!termsOfUser} >{CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
+
+                            sx={{ ...submitButton(false), ... { margin: '0px',background:product.soldOut ? SECONDARY_BLACK : DARKER_BLACK_SELECTED, padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
+                            disabled={!termsOfUser || product.soldOut} >{product.soldOut ? (lang ==='heb' ? 'כרטיסים אזלו' : 'SOLD OUT') : CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
 

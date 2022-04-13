@@ -665,6 +665,14 @@ export class Realtime {
 
     }
 
+    addListenerToBrowsingStat(page: PNPPage, consume: (data: { leaveNoAttendance: number, leaveWithAttendance: number }) => void) {
+        return onValue(child(this.statistics, page), (snap) => {
+            const withAttendace = snap.child('leaveNoAttendance').val()
+            const noAttendance = snap.child('leaveWithAttendance').val()
+            consume({ leaveNoAttendance: noAttendance, leaveWithAttendance: withAttendace })
+        })
+    }
+
     approveEvent = async (eventId: string) => {
         const eventRef = child(child(child(this.allEvents, 'public'), 'waiting'), eventId)
         get(eventRef)
@@ -773,6 +781,11 @@ export class Realtime {
             })
             consume(ret)
         }, (e) => { console.log(e) })
+    }
+
+    getPublicRideById = async (eventId: string, rideId: string) => {
+        return await get(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId))
+            .then(snap => publicRideFromDict(snap))
     }
 
     /**
