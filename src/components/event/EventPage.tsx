@@ -1,9 +1,10 @@
 import { AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion, Button } from "@mui/material"
-import { useEffect, useLayoutEffect, useState } from "react"
+import React, { useEffect, useLayoutEffect, useState } from "react"
 import { useParams } from "react-router"
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import $ from 'jquery'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import sold_out from '../../assets/images/sold_out.png'
 import { PageHolder } from "../utilities/Holders";
 import { useFirebase } from "../../context/Firebase"
 import { ADDRESS, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT } from "../../settings/strings"
@@ -43,10 +44,10 @@ export default function EventPage() {
     }
 
     const openRequestPaymentDialog = (ride?: PNPPublicRide) => {
-        if (!user || !appUser) {
-            nav('/login', { state: { cachedLocation: location.pathname } })
-            return
-        }
+        // if (!user || !appUser) {
+        //     nav('/login', { state: { cachedLocation: location.pathname } })
+        //     return
+        // }
 
         if (event) {
             openDialog({
@@ -155,15 +156,15 @@ export default function EventPage() {
         return Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)
     }
 
-    const soldOutLabel = (ride: PNPPublicRide) => {
+    const SoldOutLabel = ({ ride }: { ride: PNPPublicRide }) => {
         const left = ridesLeft(ride)
         const showLeft = ride.extras.isRidePassengersLimited && left <= 15
         const soldOut = left === 0
-        const labelText = soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (showLeft ? left + (lang === 'heb' ? ' מקומות נותרים' : ' Tickets Available') : (lang === 'heb' ? 'כרטיסים זמינים' : 'Tickets Available'))
+        const labelText = soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (showLeft ? left + (lang === 'heb' ?  (' כרטיסים' + (left <= 10  ? ' אחרונים' : ' זמינים')) : ' Tickets Available') : (lang === 'heb' ? 'כרטיסים זמינים' : 'Tickets Available'))
         return (<div style={{
             direction: 'rtl',
             textAlign: 'end',
-            color: soldOut ? 'red' : SECONDARY_WHITE,
+            color: (showLeft&&!soldOut) ? '#EE1229' : soldOut ? 'gray' : SECONDARY_WHITE,
             marginLeft: '2px',
             fontWeight: 'bold',
             padding: '2px',
@@ -171,6 +172,50 @@ export default function EventPage() {
         }}>{labelText}</div>)
     }
 
+
+    const RideRow = ({ ride }: { ride: PNPPublicRide }) => {
+
+
+        const isSoldOut = soldOut(ride)
+        return (<MenuItem
+            onClick={() => {
+                handleSelectEventRide(ride)
+            }} style={{
+
+                backgroundColor: (selectedEventRide !== ride) ? 'white' : isSoldOut ? 'orange' : ' none',
+                width: '100%',
+                backgroundPosition: isSoldOut && selectedEventRide !== ride ? '50% center' : 'center center',
+                backgroundRepeat: 'no-repeat',
+                backgroundImage: selectedEventRide === ride ? DARK_BLACK : isSoldOut ? `url(${sold_out})` : 'none',
+                backgroundSize: (isSoldOut && (selectedEventRide !== ride)) ? '125px 50px' : '100%',
+                color: (selectedEventRide === ride ? 'white' : 'black'),
+                border: '.1px solid gray',
+                borderRadius: '4px',
+                padding: '8px',
+                display: 'flex',
+            }} value={ride.rideId}>
+            <div style={{
+                display: 'flex',
+                width: '100%',
+                columnGap: '8px'
+            }}>
+                <DirectionsBusIcon /> <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
+
+            </div>
+            <span>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
+        </MenuItem>)
+    }
+
+    const RidesList = () => {
+        return <React.Fragment>
+            {(eventRides.map(ride => {
+                return <div key={ride.rideId + ride.rideStartingPoint}>
+                    <RideRow ride={ride} />
+                    <SoldOutLabel ride={ride} />
+                </div>
+            }))}
+        </React.Fragment>
+    }
 
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <PageHolder >
@@ -229,38 +274,15 @@ export default function EventPage() {
                                 </div>
 
                                 {eventRides.find(e => e.extras.isRidePassengersLimited) && <Stack>
-                                   
+
                                     <label dir={SIDE(lang)} style={{ border: '.1px solid whitesmoke', borderBottomLeftRadius: '4px', fontWeight: 'bold', borderBottomRightRadius: '4px', fontSize: '14px', background: `none`, padding: '16px', color: SECONDARY_WHITE, textAlign: 'center' }}>{lang === 'heb' ? 'מספר המקומות מוגבל ל50 הרוכשים הראשונים בכל הסעה' : 'Places are limited to the first 50 buyers from each city'}</label>
 
                                 </Stack>}
-                                
-                                <div style={{ color: PRIMARY_WHITE, padding: '8px' }}>{STARTING_POINT(lang)}</div>
+
+                                <div style={{ color: PRIMARY_WHITE, padding: '12px' }}>{STARTING_POINT(lang)}</div>
                                 {!isLoading && eventRides.length > 0 ? <Stack
                                     style={{ width: '100%', rowGap: '8px' }}>
-                                    {eventRides.map(ride => {
-                                        return <div key={ride.rideId + ride.rideStartingPoint}><MenuItem
-                                            onClick={() => {
-                                                handleSelectEventRide(ride)
-                                            }} style={{
-                                                background: (selectedEventRide === ride ? DARK_BLACK : 'white'),
-                                                width: '100%',
-                                                color: (selectedEventRide === ride ? 'white' : 'black'),
-                                                border: '.1px solid gray',
-                                                borderRadius: '4px',
-                                                padding: '8px',
-                                                display: 'flex',
-                                            }} value={ride.rideId}>
-                                            <div style={{
-                                                display: 'flex',
-                                                width: '100%',
-                                                columnGap: '8px'
-                                            }}>
-                                                <DirectionsBusIcon /> <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
-
-                                            </div>
-                                            <span>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
-                                        </MenuItem> {soldOutLabel(ride)}</div>
-                                    })}
+                                    <RidesList />
                                     <div style={{
                                         display: event.eventCanAddRides ? 'flex' : 'none',
                                         rowGap: '8px',
@@ -349,7 +371,7 @@ export default function EventPage() {
                             </div>
                             <div>
                                 <HTMLFromText
-                                    style={{direction:'rtl', color: PRIMARY_WHITE, padding: '16px' }}
+                                    style={{ direction: 'rtl', color: PRIMARY_WHITE, padding: '16px' }}
                                     text={event.eventDetails} />
                             </div>
                         </div>

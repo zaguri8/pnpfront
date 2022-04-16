@@ -109,9 +109,9 @@ export class Realtime {
         }, onError)
     }
 
-    getAllTransactionsForEvent(eid: string, consume: (transactions: { rideStartPoint: string, uid: string, amount: string }[]) => void, onError: (e: Error) => void) {
+    getAllTransactionsForEvent(eid: string, consume: (transactions: { rideStartPoint: string, uid: string, extraPeople: { fullName: string, phoneNumber: string }[], amount: string }[]) => void, onError: (e: Error) => void) {
         return onValue(this.transactions, (snap) => {
-            const allTransactions: { rideStartPoint: string, uid: string, amount: string }[] = []
+            const allTransactions: { rideStartPoint: string, extraPeople: { fullName: string, phoneNumber: string }[], uid: string, amount: string }[] = []
             let nextRef: DataSnapshot | null = null
             snap.forEach(user => {
                 user.forEach(transaction => {
@@ -121,6 +121,7 @@ export class Realtime {
                         allTransactions.push({
                             rideStartPoint: nextRef!.child('startPoint').val(),
                             uid: user.key!,
+                            extraPeople: nextRef!.child('extraPeople').val(),
                             amount: transaction.child('amount').val()
                         })
                     }
@@ -273,18 +274,21 @@ export class Realtime {
     }
 
 
-    async getAllUsersByIds(ids: string[]): Promise<PNPUser[] | null> {
+    async getAllUsersByIds(ids_and_extraPeople: { uid: string, extraPeople: { fullName: string, phoneNumber: string }[] }[]): Promise<{ user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] | null> {
         return await get(this.users)
             .then(snap => {
-                const total: PNPUser[] = []
+                const total: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] = []
                 const check: any = {}
-                for (const id of ids) {
-                    check[id] = true
+                for (const id_and_p of ids_and_extraPeople) {
+                    check[id_and_p.uid] = { exists: true, extraPeople: id_and_p.extraPeople }
                 }
-
                 snap.forEach(userSnap => {
-                    if (check[userSnap.child('customerId').val()]) {
-                        total.push(userFromDict(userSnap))
+                    var uid = userSnap.child('customerId').val()
+                    if (check[uid]) {
+                        total.push({
+                            user: userFromDict(userSnap),
+                            extraPeople: check[uid].extraPeople
+                        })
                     }
                 })
                 return total
@@ -667,9 +671,9 @@ export class Realtime {
 
     addListenerToBrowsingStat(page: PNPPage, consume: (data: { leaveNoAttendance: number, leaveWithAttendance: number }) => void) {
         return onValue(child(this.statistics, page), (snap) => {
-            const withAttendace = snap.child('leaveNoAttendance').val()
-            const noAttendance = snap.child('leaveWithAttendance').val()
-            consume({ leaveNoAttendance: noAttendance, leaveWithAttendance: withAttendace })
+            const withAttendnace = snap.child('leaveWithAttendance').val()
+            const noAttendance = snap.child('leaveNoAttendance').val()
+            consume({ leaveNoAttendance: noAttendance, leaveWithAttendance: withAttendnace })
         })
     }
 

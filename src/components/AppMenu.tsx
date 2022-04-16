@@ -100,6 +100,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
 
 
     const { lang } = useLanguage()
+    const { openUnderConstruction } = useLoading()
 
     const nav = useNavigate()
     const clickedItem = (indexPath: number) => {
@@ -114,6 +115,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
                     nav('/myaccount/transactions')
                     break;
                 case 3:
+                    openUnderConstruction(lang)
                     break;
                 case 4:
                     nav('/register')
@@ -122,6 +124,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
                     nav('/login')
                     break;
                 case 6:
+                    openUnderConstruction(lang)
                     break;
                 case 7:
                     nav('/')
@@ -151,7 +154,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
         <ToolbarItem text={MENU_ITEM_4(lang)} bold={true} action={() => clickedItem(3)} line={true} style={{ width: '80%', marginTop: '4px', marginBottom: '8px', borderRadius: '8px' }} />
         <ToolbarItem text={MENU_ITEM_6(lang)} bold={true} action={() => clickedItem(6)} line={true} style={{ width: '80%', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', borderRadius: '8px' }} />
         <ToolbarItem text={MENU_ITEM_7(lang)}
-        icon={<HomeIcon style = {{padding:'4px'}} />} bold={true} action={() => clickedItem(7)} line={true} style={{ width: '80%', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: 'none' }} />
+            icon={<HomeIcon style={{ padding: '4px' }} />} bold={true} action={() => clickedItem(7)} line={true} style={{ width: '80%', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: 'none' }} />
 
     </div>
 }

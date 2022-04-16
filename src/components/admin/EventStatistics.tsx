@@ -19,7 +19,7 @@ import { isValidPublicRide } from "../../store/validators";
 import { submitButton } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { makeStyles } from "@mui/styles";
 
@@ -101,7 +101,7 @@ const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
                                                 margin: '16px',
                                                 minWidth: '100px',
                                                 fontSize: '18px',
-                                                background: '#bd3333',
+                                                background: ORANGE_RED_GRADIENT_BUTTON,
                                                 color: SECONDARY_WHITE
                                             }}>{'מחק'}</button></div>, title: `מחיקת הסעה לאירוע`
                                     })
@@ -501,44 +501,71 @@ enum AdminScreens {
 }
 
 type RideStatistics = {
-    amount: string,
-    uid: string,
+    amount: string
+    uid: string
+    extraPeople: { fullName: string, phoneNumber: string }[]
     rideStartPoint: string
 }
 
 
 
 const EventRideStatistics = (props: { statistics: RideStatistics[] }) => {
-    const [objectsFromStatistics, setObjectsFromStatistics] = useState<{ [rideStartingPoint: string]: { amount: number, users: string[] } }>()
+    const [objectsFromStatistics, setObjectsFromStatistics] = useState<{ [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: { fullName: string, phoneNumber: string }[] }[] } }>()
 
     const { doLoad, openDialog, openDialogWithTitle, cancelLoad } = useLoading()
     const { firebase } = useFirebase()
+    useEffect(() => {
+        let t = total
+        const hash: { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: { fullName: string, phoneNumber: string }[] }[] } } = {}
+        props.statistics.forEach(stat => {
+            if (!hash[stat.rideStartPoint]) {
+                hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
+            } else {
+                hash[stat.rideStartPoint].amount += Number(stat.amount)
+                hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
+            }
+            t += Number(stat.amount)
+        })
+        setTotal(t)
+        setObjectsFromStatistics(hash)
+    }, [])
 
-    function CustomerCardContainer(props: { users: PNPUser[] }) {
+    function CustomerCardContainer(props: { data: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] }) {
 
-        const CustomerCard = (props: { user: PNPUser }) => {
+        const CustomerCard = (props: { customerData: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] } }) => {
+            const labelTitleStyle = {
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: SECONDARY_WHITE
+            }
+            const labelTitleStyleSecond = {
+                fontSize: '12px',
+                fontWeight: 'bold',
+                color: SECONDARY_WHITE
+            }
+            const labelSmallStyle = {
+                color: SECONDARY_WHITE,
+                fontSize: '10px'
+            }
+            
             return <div style={{
                 padding: '8px',
                 margin: '8px'
             }}>
-                <div style={{
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    color: SECONDARY_WHITE
-                }}>{'מספר טלפון'}</div>
-                <div style={{
-                    color: SECONDARY_WHITE,
-                    fontSize: '10px'
-                }}>{props.user.phone}</div>
-                <div style={{
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    color: SECONDARY_WHITE
-                }}>{'שם מלא'}</div>
-                <div style={{
-                    color: SECONDARY_WHITE,
-                    fontSize: '10px'
-                }}>{props.user.name}</div>
+
+                <div style={labelTitleStyle}>{'שם הקונה'}</div>
+                <div style={labelSmallStyle}>{props.customerData.user.name}</div>
+                <div style={labelTitleStyle}>{'מספר טלפון הקונה'}</div>
+                <div style={labelSmallStyle}>{props.customerData.user.phone}</div>
+
+                {props.customerData.extraPeople && props.customerData.extraPeople.length > 0 && <div>
+                    <label style={{ ...labelTitleStyle, ...{ textDecoration: 'underline' } }}>{'נוסעים נוספים: '}</label>
+                    {props.customerData.extraPeople.map((extra, i) => <Stack key={extra.fullName + extra.phoneNumber + i}>
+                        <label style={labelTitleStyleSecond}>{'נוסע מספר ' + (i + 2)}</label>
+                        <label style={labelSmallStyle}>{'שם: ' + extra.fullName}</label>
+                        <label style={labelSmallStyle}>{'טלפון: ' + extra.phoneNumber}</label>
+                    </Stack>)}
+                </div>}
                 <hr />
             </div>
         }
@@ -549,15 +576,15 @@ const EventRideStatistics = (props: { statistics: RideStatistics[] }) => {
             overflowY: 'scroll',
             padding: '8px',
             maxHeight: '400px'
-        }}>{props.users.map((user: PNPUser) => <CustomerCard key={v4()} user={user} />)}</div>);
+        }}>{props.data.map((data: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }) => <CustomerCard key={v4()} customerData={data} />)}</div>);
     }
 
 
-    const fetchUsersWithIds = async (ride: string, ids: string[]) => {
+    const fetchUsersWithIds = async (ride: string, ids_and_extraPeople: { uid: string, extraPeople: { fullName: string, phoneNumber: string }[] }[]) => {
         doLoad()
-        await firebase.realTime.getAllUsersByIds(ids)
-            .then((users: PNPUser[] | null) => {
-                if (users && users.length > 0) {
+        await firebase.realTime.getAllUsersByIds(ids_and_extraPeople)
+            .then((data: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] | null) => {
+                if (data && data.length > 0) {
                     cancelLoad()
                     openDialogWithTitle(<h3 style={
                         {
@@ -567,7 +594,7 @@ const EventRideStatistics = (props: { statistics: RideStatistics[] }) => {
                         }
                     }>{ride}</h3>)
                     openDialog({
-                        content: <CustomerCardContainer users={users} />,
+                        content: <CustomerCardContainer data={data} />,
                         title: ride
                     })
                 } else {
@@ -578,21 +605,7 @@ const EventRideStatistics = (props: { statistics: RideStatistics[] }) => {
 
     const [total, setTotal] = useState(0)
 
-    useEffect(() => {
-        let t = total
-        const hash: { [rideStartingPoint: string]: { amount: number, users: string[] } } = {}
-        props.statistics.forEach(stat => {
-            if (!hash[stat.rideStartPoint]) {
-                hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [stat.uid] }
-            } else {
-                hash[stat.rideStartPoint].amount += Number(stat.amount)
-                hash[stat.rideStartPoint].users.push(stat.uid)
-            }
-            t += Number(stat.amount)
-        })
-        setTotal(t)
-        setObjectsFromStatistics(hash)
-    }, [])
+
 
     return <div >  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
         {objectsFromStatistics ? <div> {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ`} : <b>{total}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
@@ -754,7 +767,7 @@ export default function EventStatistics() {
                 <CSVLink filename={event.eventName} style={{ ...buttonStyle, ...{ padding: '8px', background: ORANGE_GRADIENT_PRIMARY } }} dir='rtl' data={[event]}>{'ייצא לקובץ CSV'}</CSVLink>
 
                 <Button
-                    style={{ fontFamily: 'Open Sans Hebrew', background: '#bd3333', fontWeight: 'bold', color: SECONDARY_WHITE }}
+                    style={{ fontFamily: 'Open Sans Hebrew', background: ORANGE_RED_GRADIENT_BUTTON, fontWeight: 'bold', color: SECONDARY_WHITE }}
                     onClick={() => {
                         openDialog({
                             content: <div>
@@ -764,7 +777,7 @@ export default function EventStatistics() {
                                 <Spacer offset={1} />
                                 <Button
                                     onClick={deleteEvent}
-                                    style={{ padding: '8px', margin: '8px', color: SECONDARY_WHITE, width: '50%', background: '#bd3333', fontSize: '14px' }}>
+                                    style={{ padding: '8px', margin: '8px', color: SECONDARY_WHITE, width: '50%', background: ORANGE_RED_GRADIENT_BUTTON, fontSize: '14px' }}>
                                     {'כן, מחק אירוע סופית'}
                                 </Button>
                             </div>

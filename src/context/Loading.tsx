@@ -2,6 +2,7 @@ import { createContext } from "react"
 import { useContext } from "react"
 import { useState } from "react"
 import $ from 'jquery'
+import { SECONDARY_WHITE } from "../settings/colors"
 const LoadingContext = createContext<ILoadingContext | null>(null)
 
 export type ILoadingContext = {
@@ -40,7 +41,7 @@ export const useLoading = () => {
     const cancelLoad = (keepDim?: boolean) => {
         if (!keepDim) {
             $('.dim').css('display', 'none')
-        }else {
+        } else {
             $('.dim').css('display', 'block')
         }
         loadingContext!.setLoading(false)
@@ -52,6 +53,10 @@ export const useLoading = () => {
     const setDialogTitle = (content: any) => {
         loadingContext!.setDialogTitle(content)
     }
+
+    const openUnderConstruction = (lang: string) => {
+        alert(lang === 'heb' ? 'תחום זה בבנייה , ויחזור לזמינות בקרוב' : 'This area is under construction and will be available shortly')
+    }
     const closeDialog = () => {
         loadingContext!.setDialogContent(null)
         loadingContext!.setOpenDialog(false)
@@ -62,6 +67,7 @@ export const useLoading = () => {
         doLoad: doLoad,
         cancelLoad: cancelLoad,
         openDialog: (content: any) => openDialog(content),
+        openUnderConstruction: (lang: string) => openUnderConstruction(lang),
         openDialogWithTitle: (title: any) => setDialogTitle(title),
         isDialogOpened: loadingContext!.openDialog,
         dialogTitle: loadingContext!.dialogtitle,
