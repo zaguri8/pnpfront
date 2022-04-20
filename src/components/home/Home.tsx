@@ -48,10 +48,7 @@ export default function Home() {
 
     return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
         <RideFormPreview />
-        {/*TODO : Custom QR Code  <QRCode value="https://www.nadavsolutions.com/pnp/#/home" />  */}
-
         <ArrowScrollUp />
-
         {pnpEvents && Object.entries(pnpEvents).map((k) => <Gallery
             key={v4()}
             events={k[1]}

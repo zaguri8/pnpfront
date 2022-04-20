@@ -453,6 +453,37 @@ export class Realtime {
             .catch((e) => { this.createError('updateClubEvent', e) })
     }
 
+    updateEvent = async (eventId: string, event: any, blob?: ArrayBuffer, eventOldType?: string) => {
+
+
+        const uploadEvent = async () => {
+            if (eventOldType !== event.eventType) {
+                // remove the event from old type route
+                await remove(child(child(child(this.allEvents, 'public'), eventOldType ?? event.eventType), eventId))
+                    .catch((e) => { this.createError('updateClubEvent', e) })
+                // add the event to new type route
+                return await set(child(child(child(this.allEvents, 'public'), event.eventType), eventId), event)
+                    .catch((e) => { this.createError('updateClubEvent', e) })
+            }
+            // update same route
+            return await update(child(child(child(this.allEvents, 'public'), eventOldType ?? event.eventType), eventId), event)
+                .catch((e) => { this.createError('updateClubEvent', e) })
+        }
+        
+        if (blob) {
+            return await uploadBytes(storageRef(this.storage, 'EventImages/' + event.eventType + "/" + event.eventId), blob)
+                .then(async snap => {
+                    return await getDownloadURL(snap.ref)
+                        .then(async url => {
+                            event.eventImageURL = url
+                            return uploadEvent();
+                        })
+                })
+        } else uploadEvent()
+
+
+    }
+
     /**
      * removeRideRequestByUser&EventIds
      * @param eventId eventId to be for ride request to be removed from

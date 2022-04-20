@@ -100,9 +100,9 @@ export function RideFormPreview() {
             // $('#form_item_5').css('width', '35%')
             // $('#form_item_2').css('width', '100%')
             // $('#form_header').css('maxWidth', '100%')
-            $('#form_item_5').css('width','100%')
+            $('#form_item_5').css({'width':'100%'})
         } else {
-            $('#form_item_5').css('width','50%')
+            $('#form_item_5').css('width','80%')
             // $('#ride_form').css('padding', '32px')
             // $('#dest_start_input').css('flexDirection', 'row')
             // $('#dest_start_input').css('width', 'auto')

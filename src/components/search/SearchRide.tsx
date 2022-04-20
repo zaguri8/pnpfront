@@ -9,6 +9,7 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useFirebase } from '../../context/Firebase'
 import { useLocation, useNavigate } from 'react-router'
 
+import React from 'react'
 import { v4 } from 'uuid'
 import { DESTINATION_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
@@ -44,15 +45,34 @@ export default function SearchRide() {
 
     function Results() {
         const filterFunction = () => {
+            const isValid = (ride: PNPPublicRide) => !ride.extras.rideStatus || ride.extras.rideStatus !== 'sold-out'
             if (searchQuery && secondQuery) {
                 return rides!.filter(ride => ride.rideDestination.includes(searchQuery) &&
-                    ride.rideStartingPoint.includes(secondQuery))
+                    ride.rideStartingPoint.includes(secondQuery) && isValid(ride))
             } else if (searchQuery) {
-                return rides!.filter(ride => ride.rideDestination.includes(searchQuery))
+                return rides!.filter(ride => ride.rideDestination.includes(searchQuery) && isValid(ride))
             } else if (secondQuery) {
-                return rides!.filter(ride => ride.rideStartingPoint.includes(secondQuery))
+                return rides!.filter(ride => ride.rideStartingPoint.includes(secondQuery) && isValid(ride))
             }
             return []
+        }
+        const ridesLeft = (ride: PNPPublicRide) => {
+            return Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)
+        }
+        const SoldOutLabel = ({ ride }: { ride: PNPPublicRide }) => {
+            const left = ridesLeft(ride)
+            const showLeft = ride.extras.rideStatus === 'running-out'
+            const soldOut = ride.extras.rideStatus === 'sold-out'
+            const labelText = soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (showLeft ? left + (lang === 'heb' ? (' כרטיסים' + (left <= 10 ? ' אחרונים' : ' זמינים')) : ' Tickets Available') : (lang === 'heb' ? 'כרטיסים זמינים' : 'Tickets Available'))
+            return (<div className={'sold_out_item_label'} style={{
+                direction: 'rtl',
+                textAlign: 'end',
+                color: (showLeft && !soldOut) ? '#EE1229' : soldOut ? 'gray' : SECONDARY_WHITE,
+                margin: '0px',
+                fontWeight: 'bold',
+                padding: '0px',
+                fontSize: '12px'
+            }}>{labelText}</div>)
         }
         return (<Stack spacing={2}>
             {function filter() {
@@ -63,17 +83,12 @@ export default function SearchRide() {
                 if (filter.length < 1) {
                     return <span style={{ fontSize: '12px', color: PRIMARY_WHITE }} dir={SIDE(lang)}>{lang === 'heb' ? 'אין תוצאות..' : 'Search something..'}</span>
                 } else {
-                    return filter.map(ride => <MenuItem
-                        key={ride.rideDestination + ride.rideId + ride.ridePrice}
-                        disabled={ride.extras
-                            && ride.extras.isRidePassengersLimited
-                            && Number(ride.passengers) >= Number(ride.extras.rideMaxPassengers)} onClick={() => {
-                                handleOpenRide(ride)
-                            }}
+                    return filter.map(ride => <React.Fragment key={ride.rideDestination + ride.rideId + ride.ridePrice}><MenuItem
                         onMouseEnter={e => {
                             e.currentTarget.style.background = DARK_BLACK
                             e.currentTarget.style.color = 'white'
                         }}
+                        onClick={() => handleOpenRide(ride)}
                         onMouseLeave={e => {
                             e.currentTarget.style.background = SECONDARY_WHITE
                             e.currentTarget.style.color = 'black'
@@ -97,11 +112,17 @@ export default function SearchRide() {
                                 {ride.rideStartingPoint + " :  " + ride.rideDestination}</span>
                         </div>
                         {window.outerWidth > 400 && <span style={{ paddingLeft: '32px', fontSize: '10px' }}>{ride.rideTime}</span>}
-                    </MenuItem>)
+
+
+                    </MenuItem>
+
+                        <SoldOutLabel ride={ride} />
+                    </React.Fragment>)
                 }
+
             }()}
 
-        </Stack>)
+        </Stack >)
     }
 
     const onSearchQuery = (query: string) => {
@@ -113,7 +134,7 @@ export default function SearchRide() {
     return <PageHolder>
         <SectionTitle title={lang === 'heb' ? 'חיפוש הסעה' : 'Ride Search'} style={{ fontSize: '32px' }} />
         <Spacer offset={3} />
-        <Stack direction="row" spacing={3} style ={{marginLeft:'8px',marginRight:'8px',width:'90%',maxWidth:'100%'}}>
+        <Stack direction="row" spacing={3} style={{ marginLeft: '8px', marginRight: '8px', width: '90%', maxWidth: '100%' }}>
 
             <Stack style={{ width: '50%' }}>
 

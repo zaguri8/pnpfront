@@ -3,6 +3,7 @@ import axios from 'axios'
 import { makeStyles } from '@mui/styles'
 import $ from 'jquery'
 import './Payment.css'
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import React, { useEffect, useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
 import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, FULL_NAME, PHONE_NUMBER, RIDE_INFO, SAME_SPOT, TERMS_OF_USE, TOS } from '../../settings/strings'
@@ -36,6 +37,7 @@ export function PaymentForm({ product }) {
             nav('/login', { cachedLocation: location.pathname })
             return
         }
+       
         if (extraPeople.length > 0) {
             for (var p of extraPeople)
                 if (p.fullName.length < 1) {
@@ -92,6 +94,7 @@ export function PaymentForm({ product }) {
 
         const send = {
             customer: customer,
+            credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" },
             product: payProduct
         }
         axios.post('https://nadavsolutions.com/gserver/paymentLink', send)
@@ -143,6 +146,10 @@ export function PaymentForm({ product }) {
             <span style={{ padding: '8px', display: 'flex', flexDirection: 'column', rowGap: '8px', alignItems: 'center', justifyContent: 'center', columnGap: '8px' }}>
                 <div style={{ background: 'none', display: 'flex', alignItems: 'center', columnGap: '4px' }}>
                     <AddIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
+                        if (ticketAmount + 1 > product.ticketsLeft) {
+                            alert(lang === 'heb' ? ('לא נשארו מספיק כרטיסים, ישנם ' + product.ticketsLeft + ' כרטיסים נותרים') : ('There are not enough tickets left, there are ' + product.ticketsLeft + ' available tickets'))
+                            return
+                        }
                         const newAmountAdded = ticketAmount + 1 <= 10 ? ticketAmount + 1 : 10
                         setTicketAmount(newAmountAdded)
                         const new_p = { id: newAmountAdded, fullName: '', phoneNumber: '' }
@@ -244,27 +251,42 @@ export function PaymentForm({ product }) {
 
         const cardStyle = {
             transition: 'all .1s',
-            width: '100%',
             border: '1px solid black',
+            alignSelf: 'center',
             borderRadius: '8px',
             background: SECONDARY_WHITE,
-            marginTop: pNum === 0 ? '4px' : '16px',
+            marginTop: pNum === 2 ? '4px' : '16px',
             paddingTop: '16px',
             paddingBottom: '16px',
             textAlignment: 'center'
         }
 
 
+        function deleteIndex() {
+            extraPeople.splice(pNum - 2, 1)
+            setExtraPeople(extraPeople)
+            setTicketAmount(ticketAmount - 1)
+        }
+
         return (<Stack id={`pCard_num_${pNum}`} style={cardStyle}>
 
             <Stack justifyContent='center' alignItems={'center'} spacing={1}>
-                <label style={{ fontWeight: 'bold' }}>{lang === 'heb' ? 'נוסע ' + (pNum + 2) : 'Passenger ' + (pNum + 2)}</label>
+                <RemoveCircleIcon
+                    onClick={deleteIndex}
+                    style={{ padding: '8px', color: '#bd3333', cursor: 'pointer' }} />
+                <Stack direction={'row'} justifyContent={'center'} >
+
+                    <label style={{ textAlign: 'start', alignSelf: 'center', fontWeight: 'bold' }}>{lang === 'heb' ? 'נוסע ' + (pNum) : 'Passenger ' + (pNum)}</label>
+
+                </Stack>
                 {(function fields() {
-                    const corresponding_person = extraPeople[pNum]
+                    const corresponding_person = extraPeople[pNum - 2]
                     return (<React.Fragment><TextField
-                        onChange={(e) => { onChangeFName(e.target.value) }} classes={{ root: classes.root }} placeholder={corresponding_person && corresponding_person.fullName ? corresponding_person.fullName : FULL_NAME(lang)} />
+                        disabled={corresponding_person.fullName.length > 0}
+                        onChange={(e) => { onChangeFName(e.target.value) }} classes={{ root: classes.root }} placeholder={corresponding_person.fullName ? corresponding_person.fullName : FULL_NAME(lang)} />
                         <TextField
-                            onChange={(e) => { onChangePNum(e.target.value) }} classes={{ root: classes.root }} name='phone' type='number' placeholder={corresponding_person && corresponding_person.phoneNumber ? corresponding_person.phoneNumber : PHONE_NUMBER(lang)} />
+                            disabled={corresponding_person.phoneNumber.length > 0}
+                            onChange={(e) => { onChangePNum(e.target.value) }} classes={{ root: classes.root }} name='phone' type='number' placeholder={corresponding_person.phoneNumber ? corresponding_person.phoneNumber : PHONE_NUMBER(lang)} />
                     </React.Fragment>
                     )
                 })()}
@@ -273,20 +295,23 @@ export function PaymentForm({ product }) {
         </Stack>)
     }
     const AdditionalPeople = React.memo(() => {
+
+
         const populate = () => {
             const A = []
             for (var i = 2; i <= ticketAmount; i++) {
+                const perm = i
                 A.push(<PeopleCard
                     onChangeFName={(fullName) => {
-                        extraPeople[i - 3 < 0 ? 0 : i - 3].fullName = fullName
+                        extraPeople[perm - 2].fullName = fullName
                         setExtraPeople(extraPeople)
                     }}
                     onChangePNum={(phoneNumber) => {
-                        extraPeople[i - 3 < 0 ? 0 : i - 3].phoneNumber = phoneNumber
+                        extraPeople[perm - 2].phoneNumber = phoneNumber
                         setExtraPeople(extraPeople)
                     }}
-                    key={`pCard_num_${i - 2}`}
-                    pNum={i - 2} />)
+                    key={`pCard_num_${perm - 2}`}
+                    pNum={perm} />)
             }
             return A.length > 0 ? A : null
         }

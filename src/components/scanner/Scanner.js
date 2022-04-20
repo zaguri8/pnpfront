@@ -59,7 +59,7 @@ export default function Scanner() {
                     updateScanResult(result)
                     closeScanner()
                 } else if (error) {
-                    if (error.name === 'OverconstrainedError') {
+                    if (error.name === 'OverconstrainedError' || error.name === 'NotFoundError') {
                         openDialog({ content: <span style={{ padding: '12px', color: SECONDARY_WHITE }}>{scannerLanguage === 'עברית' ? 'מכשירך אינו תומך בסורק זה' : 'جهازك لا يدعم هذا الماسح'}</span> })
                         closeScanner()
                     }

@@ -50,9 +50,6 @@ export default function CreateEvent() {
         "אירועי ילדים"
     ]
 
-
-    const [selectedEventType, setSelectedEventType] = useState<string>(eventTypes[0])
-
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
 
 
@@ -452,7 +449,6 @@ export default function CreateEvent() {
                         onChange={(e) => {
                             (e.target.value as string && setMandatory({ ...mandatory, ...{ 9: e.target.value } }))
                             setPnpEvent({ ...pnpEvent, ...{ eventType: getEventType({ ...pnpEvent, ...{ eventType: e.target.value } }) } })
-                            setSelectedEventType(e.target.value)
                             $(`#arm${9}`).css('border', 'none')
                         }}
                     >
