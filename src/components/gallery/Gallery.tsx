@@ -1,10 +1,11 @@
 import { CSSProperties, useEffect } from "react"
 import { v4 } from "uuid"
-import { PRIMARY_WHITE } from "../../settings/colors";
+import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { useNavigate } from 'react-router'
 import $ from 'jquery'
 import { PNPEvent } from "../../store/external/types";
 import { useLanguage } from "../../context/Language";
+import pin from '../../assets/images/pin-location.png'
 import './Gallery.css'
 export type GalleryProps = {
     header: string
@@ -17,19 +18,30 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
     return (<div style={{
         margin: '0px',
         marginTop: 'auto',
-        background: 'white',
+        background: SECONDARY_WHITE,
         textAlign: 'start',
-        marginBottom: '8px',
         display: 'flex',
         height: '26%',
+        color: PRIMARY_BLACK,
         flexDirection: 'column',
-        color: 'black',
+        paddingBottom: '6px',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
     }}><h4 style={{ margin: '0px', padding: '6px', paddingBottom: '0px', paddingTop: '2px' }} >{props.event.eventName}</h4>
-        <span style={{ fontSize: '10px', background: 'white', margin: '0px', paddingBottom: '1px', paddingTop: '0px', marginRight: '8px' }} >{props.event.eventLocation}</span>
-        <hr style={{ width: '98%', borderWidth: '.1px', borderColor: 'white', margin: '0px' }} />
-        <span dir={'ltr'} style={{ fontSize: '12px', fontWeight: '600', padding: '1px', marginLeft: '8px', marginTop: '0px', color: 'gray' }}>{props.event.eventDate}</span></div>);
+        <span style={{display:'flex',alignItems:'center', fontSize: '10px', background: 'none', margin: '0px', paddingBottom: '1px', paddingTop: '0px', marginRight: '8px' }} >
+
+            <img src={pin} style={{paddingLeft:'2px', width: '12.5px', height: '12.5px' }} />
+
+            {props.event.eventLocation}
+
+        </span>
+        <span dir={'ltr'} style={{
+            fontSize: '10px',
+            fontWeight: '600',
+            padding: '1px',
+            marginLeft: '8px',
+            marginTop: '0px', color: BLACK_ROYAL
+        }}>{props.event.eventDate}</span></div>);
 }
 
 
@@ -99,12 +111,14 @@ export function Gallery(props: GalleryProps) {
                             ...cardStyle, ...{
                                 display: 'flex',
                                 flexDirection: 'column',
+                                boxShadow: 'rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px',
                                 cursor: 'pointer',
+                                backgroundClip: 'border-box',
                                 backgroundColor: 'white',
                                 background: `url('${pnpEvent.eventImageURL}') `,
-                                backgroundSize: '100% 75%',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center center',
                                 backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'top center'
                             }
                         }}
                         className="gallery_img"

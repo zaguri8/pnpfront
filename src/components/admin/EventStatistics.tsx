@@ -8,7 +8,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import { whatsappIcon } from '../../assets/images.js'
 import { useLanguage } from "../../context/Language";
 import $ from 'jquery'
-import { CSVLink } from "react-csv";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { SAME_SPOT, SIDE } from "../../settings/strings";
 import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPUser } from "../../store/external/types";
@@ -22,7 +21,7 @@ import { isValidPublicRide } from "../../store/validators";
 import { submitButton } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { makeStyles } from "@mui/styles";
 import AddUpdateEventRide from "./AddUpdateEventRide";
@@ -241,13 +240,22 @@ export default function EventStatistics() {
             let t = total
             const hash: { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } } = {}
             props.statistics.forEach(stat => {
-                if (!hash[stat.rideStartPoint]) {
-                    hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
-                } else {
-                    hash[stat.rideStartPoint].amount += Number(stat.amount)
-                    hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
+                if (stat) {
+                    if (!hash[stat.rideStartPoint]) {
+                        hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
+                    } else {
+                        hash[stat.rideStartPoint].amount += Number(stat.amount)
+                        let exists = hash[stat.rideStartPoint].users.findIndex(uid => uid.uid === stat.uid)
+                        if (exists != -1) {
+                            t--;
+                            if (stat.extraPeople)
+                                hash[stat.rideStartPoint].users[exists].extraPeople.push(...stat.extraPeople)
+                            hash[stat.rideStartPoint].amount--;
+                        } else
+                            hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
+                    }
+                    t += Number(stat.amount)
                 }
-                t += (Number(stat.amount) + (stat.extraPeople ? Number(stat.extraPeople.length) : 0))
             })
             setTotal(t)
             setObjectsFromStatistics(hash)
@@ -274,8 +282,7 @@ export default function EventStatistics() {
                 }
 
                 return <div style={{
-                    padding: '8px',
-                    margin: '8px'
+                    padding: '8px'
                 }}>
 
                     <div style={labelTitleStyle}>{'שם הקונה'}</div>
@@ -305,9 +312,9 @@ export default function EventStatistics() {
         }
 
 
-        const fetchUsersWithIds = async (ride: string, ids_and_extraPeople: { uid: string, extraPeople: PNPRideExtraPassenger[] }[]) => {
+        const fetchUsersWithIds = async (ride: string, rideUsers: { uid: string, extraPeople: PNPRideExtraPassenger[] }[]) => {
             doLoad()
-            await firebase.realTime.getAllUsersByIds(ids_and_extraPeople)
+            firebase.realTime.getAllUsersByIds(rideUsers)
                 .then((data) => {
                     if (data && data.length > 0) {
                         cancelLoad()
@@ -336,7 +343,7 @@ export default function EventStatistics() {
                     {Object.entries(objectsFromStatistics).map((each, index: number) => <div key={each[0] + index} style={{ padding: '4px', margin: '4px', maxWidth: '200px', fontSize: '12px', fontWeight: 'bold' }}>
                         {each[0]}
                         <div style={{ fontWeight: '500', padding: '4px' }}>
-                            {each[1].amount + each[1].users.map(e => (e.extraPeople ? e.extraPeople.length : 0)).reduce((p: number, c: number) => p + c)}
+                            {each[1].amount}
                         </div>
                         <button onClick={() => fetchUsersWithIds(each[0], each[1].users)} style={{ margin: '4px', fontSize: '12px', padding: '4px', border: 'none', background: DARKER_BLACK_SELECTED, color: SECONDARY_WHITE }}>
                             {'הצג משתמשים'}
@@ -486,10 +493,56 @@ export default function EventStatistics() {
                 : <Requests requests={props.requests} eventId={props.event.eventId} />
     }
 
-    return (event ? <PageHolder>
+    const csvData = async () => {
+        if (objectsFromStatistics && event) {
+            const all = Object.keys(objectsFromStatistics).map((city) => {
+                return {
+                    fetchUsers: async () => await firebase.realTime.getAllUsersByIds(objectsFromStatistics[city].users),
+                    cityName: city
+                }
+            })
+            if (all) {
+                openDialog({
+                    content: <label dir={'rtl'} style={{ padding: '8px', color: SECONDARY_WHITE }}>
+                        {'ברגעים הקרובים תתחיל הורדת הנתונים למכשירך, לכל עיר משתייך קובץ csv מתאים'}
+                    </label>
+                })
+                all.forEach(async (cityD) => {
+                    const rows = [
+                        ["שם", "טלפון"],
+                    ];
+                    await cityD.fetchUsers().then(users => {
+                        if (users) {
+                            users.forEach(data => {
+                                rows.push([data.user.name, data.user.phone]);
+                                if (data.extraPeople) {
+                                    data.extraPeople.forEach(extra => {
+                                        rows.push([extra.fullName, extra.phoneNumber])
+                                    })
+                                }
+                            })
+                            let csvContent = "data:text/csv;charset=utf-8,";
+                            rows.forEach(function (rowArray) {
+                                let row = rowArray.join(",");
+                                csvContent += row + "\r\n";
+                            });
+                            var downloadLink = document.createElement("a");
+                            var encodedUri = encodeURI(csvContent);
+                            downloadLink.href = encodedUri;
+                            downloadLink.download = event.eventName + "_" + cityD.cityName + ".csv";
+                            document.body.appendChild(downloadLink);
+                            downloadLink.click();
+                            document.body.removeChild(downloadLink);
+                        }
+                    })
+                })
+            }
+        }
+    }
+    return (event ? <PageHolder style={{ background: BLACK_ELEGANT }}>
         <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
         <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
-        <InnerPageHolder style={{ overflowY: 'hidden', overflowX: 'hidden' }} >
+        <InnerPageHolder style={{ overflowY: 'hidden', overflowX: 'hidden', background: BLACK_ROYAL }} >
             <Stack spacing={3} style={{ width: '75%' }}>
 
 
@@ -575,7 +628,18 @@ export default function EventStatistics() {
                 rides={rides ?? []}
                 event={event}
                 showingComponent={showingComponent} />}
-            <CSVLink filename={event.eventName} style={{ ...buttonStyle, ...{ padding: '8px', width: '50%', background: 'linear-gradient(#282c34,black)' } }} dir='rtl' data={[event]}>{'ייצא לקובץ CSV'}</CSVLink>
+            <Button
+                dir={'rtl'}
+                style={{
+                    ...buttonStyle, ...{
+                        padding: '8px',
+                        width: '50%',
+                        background: 'linear-gradient(#282c34,black)'
+                    }
+                }}
+                onClick={() => {
+                    csvData()
+                }}>{'ייצא לקובץ CSV'}</Button>
 
         </InnerPageHolder>
     </PageHolder> : <div>{'לא קיים לאירוע זה דף ניהול'}</div>)

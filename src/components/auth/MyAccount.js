@@ -55,12 +55,12 @@ export default function MyAccount() {
         function resize() {
             const currentWidth = window.innerWidth
             if (currentWidth > 720) {
-                $('.my_account_item').css('width', '150px')
-                $('.my_account_item_text').css('width', '50%')
+                $('.my_account_item').css({ 'width': '150px', height: '135px', transition: '.3125s linear' })
+                $('.my_account_item_text').css({ 'width': '100%', transition: '.5s linear' })
 
             } else {
-                $('.my_account_item').css('width', '100px')
-                $('.my_account_item_text').css('width', '100%')
+                $('.my_account_item').css({ 'width': '100px', height: '100px', transition: '.3125s linear' })
+                $('.my_account_item_text').css({ 'width': '100%', transition: '.5s linear' })
             }
         }
         window.addEventListener('resize', resize)
@@ -72,7 +72,7 @@ export default function MyAccount() {
 
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
 
-        <InnerPageHolder style = {{background:'rgb(40,38,55,1)'}} >
+        <InnerPageHolder style={{ background: 'rgb(40,38,55,1)' }} >
             <div dir={SIDE(lang)} id='my_account_grid' style={{
                 display: 'grid',
                 gridTemplateRows: '1fr 1fr',

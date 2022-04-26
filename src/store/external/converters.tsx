@@ -136,6 +136,9 @@ export function getEventType(event: PNPEvent) {
         case "פסטיבלים":
             type = 'fetivals'
             break
+        case "אירועים פרטיים":
+            type = 'private events'
+            break
         case "חתונות":
             type = 'weddings'
             break
@@ -153,11 +156,48 @@ export function getEventType(event: PNPEvent) {
     return type
 }
 
+export function getEventTypePriority(e: string) {
+    let priority = 0
+    switch (e) {
+        case "concerts":
+            priority = 4
+            break
+        case "private events":
+            priority = 8
+            break
+        case "clubs":
+            priority = 0
+            break
+        case "football":
+            priority = 3
+            break
+        case "fetivals":
+            priority = 2
+            break
+        case "bars":
+            priority = 1
+            break
+        case "weddings":
+            priority = 7
+            break
+        case "sports":
+            priority = 5
+            break
+        case "children":
+            priority = 6
+            break
+    }
+
+    return priority
+}
 export function getEventTypeFromString(t: string) {
     let type = 'clubs'
     switch (t) {
         case "concerts":
             type = 'הופעות'
+            break
+        case "private events":
+            type = 'אירועים פרטיים'
             break
         case "clubs":
             type = 'מסיבות ומועדונים'

@@ -154,7 +154,7 @@ export const CVV = (lang) => lang === 'heb' ? 'שלוש ספרות בגב כרט
 export const TOTAL_TO_PAY = (lang, price) => lang === 'heb' ? `סה"כ לתשלום: ${price} ש"ח` : `Total: ${price} ILS`
 
 
-export const RIDE_INFO = (lang) => lang === 'heb' ? 'מספר המקומות מוגבל ל50 הרוכשים הראשונים. ההסעות הינן דו כיווניות - הלוך חזור.ברכישת הכרטיס תקבלו ברקוד שיופיע בהיסטוריית הנסיעות, אותו תראו בעליה לאוטובוס.' : 'The number of places is limited to the first 50 buyers. The shuttles are two-way - round trip. When purchasing the ticket, you will receive confirmation of an email that will also appear in the travel history, which you will see when boarding the bus.'
+export const RIDE_INFO = (lang) => lang === 'heb' ? 'ברכישת הכרטיס תקבלו ברקוד שיופיע בהיסטוריית הנסיעות, אותו תראו בעליה לאוטובוס.' : 'When purchasing the ticket, you will receive confirmation of an email that will also appear in the travel history, which you will see when boarding the bus.'
 
 
 export const TRANSACTION_DETAILS = (lang) => lang === 'heb' ? 'קבלה עבור רכישה' : 'Receipt Details'

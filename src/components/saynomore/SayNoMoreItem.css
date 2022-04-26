@@ -12,7 +12,9 @@
         min-width: 120px;
         border:.1px solid gray;
         color: whitesmoke;
-        background-image: linear-gradient(15deg,#c31432,#240b36);
+        background-image: linear-gradient(-45deg,#141E30,#243B55);
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px;
+          
         margin:8px;
         padding: 32px;
         border-radius: 32px;

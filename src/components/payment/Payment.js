@@ -3,7 +3,7 @@ import axios from 'axios'
 import { makeStyles } from '@mui/styles'
 import $ from 'jquery'
 import './Payment.css'
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import React, { useEffect, useState } from 'react'
 import { HtmlTooltip } from '../utilities/HtmlTooltip'
 import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, FULL_NAME, PHONE_NUMBER, RIDE_INFO, SAME_SPOT, TERMS_OF_USE, TOS } from '../../settings/strings'
@@ -18,7 +18,7 @@ import { useLanguage } from "../../context/Language";
 import { AMOUNT_OF_TICKETS, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../settings/strings'
 import { useLocation, useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import HTMLFromText from '../utilities/HtmlFromText'
 import { isValidPhoneNumber } from '../../utilities';
 export function PaymentForm({ product }) {
@@ -37,7 +37,7 @@ export function PaymentForm({ product }) {
             nav('/login', { cachedLocation: location.pathname })
             return
         }
-       
+
         if (extraPeople.length > 0) {
             for (var p of extraPeople)
                 if (p.fullName.length < 1) {
@@ -99,6 +99,7 @@ export function PaymentForm({ product }) {
         }
         axios.post('https://nadavsolutions.com/gserver/paymentLink', send)
             .then(res => {
+                console.log(res)
                 if (res.data.data) {
                     setPaymentLink(res.data.data.payment_page_link)
                     cancelLoad()
@@ -142,10 +143,12 @@ export function PaymentForm({ product }) {
     }
 
     const AddRemoveButton = () => {
+        let labelStyle = { fontSize: '22px', color: SECONDARY_WHITE }
         return (
-            <span style={{ padding: '8px', display: 'flex', flexDirection: 'column', rowGap: '8px', alignItems: 'center', justifyContent: 'center', columnGap: '8px' }}>
+            <span style={{ padding: '8px', display: 'flex', flexDirection: 'column', rowGap: '4px', alignItems: 'center', justifyContent: 'center', columnGap: '8px' }}>
+                <span style={labelStyle}>{`${AMOUNT_OF_TICKETS(lang)}`}</span>
                 <div style={{ background: 'none', display: 'flex', alignItems: 'center', columnGap: '4px' }}>
-                    <AddIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
+                    <AddIcon sx={{ cursor: 'pointer', height: '30px', width: '30px', background: DARK_BLACK, color: 'white' }} onClick={() => {
                         if (ticketAmount + 1 > product.ticketsLeft) {
                             alert(lang === 'heb' ? ('לא נשארו מספיק כרטיסים, ישנם ' + product.ticketsLeft + ' כרטיסים נותרים') : ('There are not enough tickets left, there are ' + product.ticketsLeft + ' available tickets'))
                             return
@@ -155,21 +158,24 @@ export function PaymentForm({ product }) {
                         const new_p = { id: newAmountAdded, fullName: '', phoneNumber: '' }
                         extraPeople.push(new_p)
                         setExtraPeople(extraPeople)
-                    }} /><RemoveIcon sx={{ cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
+                    }} />
+
+                    <span style={{ ...labelStyle, ...{ padding: '8px', fontSize: '24px' } }}>{ticketAmount}</span>
+                    <RemoveIcon sx={{ height: '30px', width: '30px', cursor: 'pointer', background: DARK_BLACK, color: 'white' }} onClick={() => {
                         const newAmountRemoved = ticketAmount - 1 >= 1 ? ticketAmount - 1 : 1
                         setTicketAmount(newAmountRemoved)
                         extraPeople.splice(newAmountRemoved - 1, 1)
                         setExtraPeople(extraPeople)
                     }
                     } /></div>
-                <span style={{ color: SECONDARY_WHITE }}>{`${AMOUNT_OF_TICKETS(lang)} ${ticketAmount}`}</span>
+
             </span>
 
         )
     }
 
     const PaymentMethodsImages = () => {
-        return (<Stack direction={'row'} spacing={2}>
+        return (<Stack direction={'row'} alignSelf={'center'} style = {{marginTop:'16px'}}  spacing={2}>
             <img style={{ marginLeft: '4px', width: '50px', height: '24px', alignSelf: 'center', background: SECONDARY_WHITE, marginBottom: '0px' }} src={credit_cards} />
 
             <img style={{ marginRight: '4px', borderRadius: '8px', width: '32px', height: '32px', alignSelf: 'center', background: SECONDARY_WHITE, marginBottom: '0px' }} src={bit} />
@@ -188,7 +194,6 @@ export function PaymentForm({ product }) {
                 <RideStartDest />
                 <hr style={{ borderWidth: '.1px', borderColor: 'gray' }} />
             </div>
-            <PaymentMethodsImages />
         </div>)
     }
     const TotalToPay = () => {
@@ -198,10 +203,10 @@ export function PaymentForm({ product }) {
 
     const SubmitButtonPayment = () => {
         return (<HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={product.soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : CONTINUE_TO_SECURE_PAYMENT(lang)} arrow>
-            <span>
+            <span style={{ width: '90%' }}>
                 <Button onClick={requestPayment}
 
-                    sx={{ ...submitButton(false), ... { margin: '0px', background: product.soldOut ? SECONDARY_BLACK : DARKER_BLACK_SELECTED, padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
+                    sx={{ ...submitButton(false), ... { margin: '0px',textTransform:'none', background: product.soldOut ? SECONDARY_BLACK : DARKER_BLACK_SELECTED, padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
                     disabled={product.soldOut} >{product.soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'SOLD OUT') : CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
             </span>
         </HtmlTooltip>
@@ -210,6 +215,7 @@ export function PaymentForm({ product }) {
 
     const textStyle = {
         root: {
+
             "& .MuiOutlinedInput-root": {
                 background: 'none',
                 borderRadius: '32px',
@@ -217,14 +223,18 @@ export function PaymentForm({ product }) {
                 maxHeight: '35px',
                 padding: '0px',
                 border: '.8px solid white',
-                color: PRIMARY_BLACK, ...{
+                color: 'white', ...{
                     '& input[type=number]': {
                         '-moz-appearance': 'textfield'
+                    },
+                    '& input[type="text"]:disabled': {
+                        'color': 'white'
                     },
                     '& input[type=number]::-webkit-outer-spin-button': {
                         '-webkit-appearance': 'none',
                         margin: 0
                     },
+
                     '& input[type=time]::-webkit-calendar-picker-indicator': {
                         filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
                     },
@@ -251,10 +261,12 @@ export function PaymentForm({ product }) {
 
         const cardStyle = {
             transition: 'all .1s',
-            border: '1px solid black',
             alignSelf: 'center',
+
             borderRadius: '8px',
-            background: SECONDARY_WHITE,
+            background: PRIMARY_BLACK,
+            marginBottom: pNum === ticketAmount - 1 ?  '16px' : '0px',
+            color: 'white',
             marginTop: pNum === 2 ? '4px' : '16px',
             paddingTop: '16px',
             paddingBottom: '16px',
@@ -271,9 +283,8 @@ export function PaymentForm({ product }) {
         return (<Stack id={`pCard_num_${pNum}`} style={cardStyle}>
 
             <Stack justifyContent='center' alignItems={'center'} spacing={1}>
-                <RemoveCircleIcon
-                    onClick={deleteIndex}
-                    style={{ padding: '8px', color: '#bd3333', cursor: 'pointer' }} />
+
+                <img src="https://i.ibb.co/cyyqtkM/pngaaa-com-263515.png" style={{ height: '50px', width: 'fit-content',maxWidth:'75px', marginLeft: '16px' }} />
                 <Stack direction={'row'} justifyContent={'center'} >
 
                     <label style={{ textAlign: 'start', alignSelf: 'center', fontWeight: 'bold' }}>{lang === 'heb' ? 'נוסע ' + (pNum) : 'Passenger ' + (pNum)}</label>
@@ -281,12 +292,21 @@ export function PaymentForm({ product }) {
                 </Stack>
                 {(function fields() {
                     const corresponding_person = extraPeople[pNum - 2]
+                    const isFullNameFilled = corresponding_person.fullName.length > 0
+                    const isPhoneFilled = corresponding_person.phoneNumber.length > 0
                     return (<React.Fragment><TextField
-                        disabled={corresponding_person.fullName.length > 0}
+                        disabled={isFullNameFilled}
+                        sx={isFullNameFilled ? { background: 'white', borderRadius: '16px' } : null}
                         onChange={(e) => { onChangeFName(e.target.value) }} classes={{ root: classes.root }} placeholder={corresponding_person.fullName ? corresponding_person.fullName : FULL_NAME(lang)} />
                         <TextField
-                            disabled={corresponding_person.phoneNumber.length > 0}
-                            onChange={(e) => { onChangePNum(e.target.value) }} classes={{ root: classes.root }} name='phone' type='number' placeholder={corresponding_person.phoneNumber ? corresponding_person.phoneNumber : PHONE_NUMBER(lang)} />
+                            disabled={isPhoneFilled}
+                            onChange={(e) => { onChangePNum(e.target.value) }}
+                            sx={isPhoneFilled ? { background: 'white', borderRadius: '16px' } : null}
+                            classes={{ root: classes.root }} name='phone' type='number' placeholder={corresponding_person.phoneNumber ? corresponding_person.phoneNumber : PHONE_NUMBER(lang)} />
+                        <HighlightOffIcon
+                            onClick={deleteIndex}
+                            style={{ paddingLeft: '8px', height: '30px', width: '30px', color: '#bd3333', cursor: 'pointer' }} />
+
                     </React.Fragment>
                     )
                 })()}
@@ -316,9 +336,9 @@ export function PaymentForm({ product }) {
             return A.length > 0 ? A : null
         }
 
-        return <div style={{ padding: '4px' }}>
+        return <div >
             {extraPeople.length > 0 && <hr style={{ borderWidth: '.1px' }} />}
-            {extraPeople.length > 0 && <label style={{ color: SECONDARY_WHITE, marginBottom: '0px' }}>{lang === 'heb' ? 'מלא את פרטיי הנוסעים הנוספים' : 'Fill in all extra passengers information'}</label>}
+            {extraPeople.length > 0 && <label style={{ color: SECONDARY_WHITE, marginBottom: '0px', textAlign: 'right' }}>{lang === 'heb' ? 'מלא את פרטיי הנוסעים הנוספים' : 'Fill in all extra passengers information'}</label>}
             {populate()}
         </div>
     })
@@ -326,13 +346,14 @@ export function PaymentForm({ product }) {
 
     const getElement = () => {
         return paymentLink ? <iframe style={{ minHeight: '500px', minWidth: '300px', maxWidth: '95%', maxHeight: '90%' }} src={paymentLink} /> : (
-            <div>
+            <div >
                 <RideInfo />
                 <AddRemoveButton />
                 <TotalToPay />
                 <AdditionalPeople />
                 <SubmitButtonPayment />
                 <Stack  >
+                <PaymentMethodsImages />
                     <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                     <input
                         type="checkbox"

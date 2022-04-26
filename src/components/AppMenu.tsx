@@ -3,6 +3,7 @@ import { HELLO, MENU_ITEM_1, MENU_ITEM_6, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4,
 import { flex } from '../settings/styles.js';
 import ToolbarItem from './toolbar/ToolbarItem';
 import HomeIcon from '@mui/icons-material/Home';
+import { useLocation } from 'react-router'
 import { useFirebase } from '../context/Firebase';
 import { useLanguage } from '../context/Language.js';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -101,7 +102,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
 
     const { lang } = useLanguage()
     const { openUnderConstruction } = useLoading()
-
+    const location = useLocation()
     const nav = useNavigate()
     const clickedItem = (indexPath: number) => {
         props.menuToggle(() => {
@@ -109,25 +110,35 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
                 case 0:
                     break;
                 case 1:
-                    nav('/myaccount')
+                    if (location.pathname === '/myaccount')
+                        return
+                    else nav('/myaccount')
                     break;
                 case 2:
-                    nav('/myaccount/transactions')
+                    if (location.pathname === '/myaccount/transactions')
+                        return
+                    else nav('/myaccount/transactions')
                     break;
                 case 3:
                     openUnderConstruction(lang)
                     break;
                 case 4:
-                    nav('/register')
+                    if (location.pathname === '/register')
+                        return
+                    else nav('/register')
                     break;
                 case 5:
-                    nav('/login')
+                    if (location.pathname === '/login')
+                        return
+                    else nav('/login')
                     break;
                 case 6:
                     openUnderConstruction(lang)
                     break;
                 case 7:
-                    nav('/')
+                    if (location.pathname === '/')
+                        return
+                    else nav('/')
             }
         })
 

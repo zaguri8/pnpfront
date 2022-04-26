@@ -10,3 +10,6 @@ export const ORANGE_GRADIENT_PRIMARY = 'linear-gradient(rgb(82, 90, 128),rgb(66,
 
 
 export const ORANGE_RED_GRADIENT_BUTTON = "linear-gradient(#e52d27,#b31217)"
+export const BLACK_ELEGANT = "linear-gradient(#282c34,black)"
+export const BLACK_ROYAL = "linear-gradient(#243B55,#141E30)"
+export const RED_ROYAL = "linear-gradient(#ef473a,#cb2d3e)"

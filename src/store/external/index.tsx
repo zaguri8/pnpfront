@@ -5,7 +5,7 @@ import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
 import { DocumentData } from 'firebase/firestore'
 import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
-import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, ref, remove, set, update } from 'firebase/database'
+import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, query, ref, remove, set, update } from 'firebase/database'
 import {
     Firestore,
     QuerySnapshot,
@@ -14,6 +14,8 @@ import {
 import { createNewCustomer } from '../payments'
 import { TransactionSuccess } from '../payments/types'
 import { transactionSuccessFromDict } from '../payments/converters'
+import { getCurrentDate } from '../../utilities'
+import { dateStringFromDate } from '../../components/utilities/functions'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -105,6 +107,27 @@ export class Realtime {
                 transactions.push(transactionSuccessFromDict(transactionSnap))
             })
 
+            let spl, spl2;
+            transactions.sort((e1: TransactionSuccess, e2: TransactionSuccess) => {
+                spl = dateStringFromDate(new Date(e1.date)).split('/');
+                spl2 = dateStringFromDate(new Date(e2.date)).split('/');
+                if (Number(spl[2]) > Number(spl2[2])) {
+                    return -1;
+                } else if (Number(spl2[2]) > Number(spl[2]))
+                    return 1;
+
+                if (Number(spl[1]) > Number(spl2[1])) {
+                    return -1;
+                } else if (Number(spl2[1]) > Number(spl[1]))
+                    return 1;
+
+                if (Number(spl[0]) > Number(spl2[0])) {
+                    return -1;
+                } else if (Number(spl2[2]) > Number(spl[2]))
+                    return 1;
+                return 0;
+            })
+
             consume(transactions)
         }, onError)
     }
@@ -116,8 +139,7 @@ export class Realtime {
             snap.forEach(user => {
                 user.forEach(transaction => {
                     nextRef = transaction.child('more_info')
-                    if (nextRef.exists()
-                        && nextRef!.child('eventId').val() === eid) {
+                    if (nextRef.exists() && nextRef!.child('eventId').val() === eid) {
                         allTransactions.push({
                             rideStartPoint: nextRef!.child('startPoint').val(),
                             uid: user.key!,
@@ -278,16 +300,21 @@ export class Realtime {
         return await get(this.users)
             .then(snap => {
                 const total: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] = []
-                const check: any = {}
+                const extraPeople: any = {}
                 for (const id_and_p of ids_and_extraPeople) {
-                    check[id_and_p.uid] = { exists: true, extraPeople: id_and_p.extraPeople }
+                    if (!extraPeople[id_and_p.uid]) {
+                        extraPeople[id_and_p.uid] = id_and_p.extraPeople
+                    } else {
+                        if (!extraPeople[id_and_p.uid].includes(id_and_p.extraPeople[id_and_p.extraPeople.length - 1]))
+                            extraPeople[id_and_p.uid].push(...id_and_p.extraPeople)
+                    }
                 }
                 snap.forEach(userSnap => {
                     var uid = userSnap.child('customerId').val()
-                    if (check[uid]) {
+                    if (extraPeople[uid] || extraPeople[uid] === null) { // checks if has extraPeople or single
                         total.push({
                             user: userFromDict(userSnap),
-                            extraPeople: check[uid].extraPeople
+                            extraPeople: extraPeople[uid]
                         })
                     }
                 })
@@ -318,6 +345,19 @@ export class Realtime {
         ride.eventId = eventId
         const newRef = push(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId))
         ride.rideId = newRef.key!
+
+        if (ride.extras.isRidePassengersLimited) {
+            let newStatus: 'on-going' | 'sold-out' | 'running-out';
+            let ticketsLeft = Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)
+            if (ticketsLeft <= 0) {
+                newStatus = 'sold-out'
+            } else if (ticketsLeft <= 15) {
+                newStatus = 'running-out'
+            } else {
+                newStatus = 'on-going'
+            }
+            ride.extras.rideStatus = newStatus;
+        }
         return await set(newRef, ride).catch((e) => { this.createError('addPublicRide', e) })
     }
 
@@ -374,6 +414,7 @@ export class Realtime {
                 ret.push(eventFromDict(ev))
             })
 
+            const today = new Date();
             ret.sort((a, b) => {
                 const x = a.eventDate.split('/')
                 const y = b.eventDate.split('/')
@@ -424,6 +465,28 @@ export class Realtime {
                     })
                 }
             })
+
+            let spl, spl2;
+            for (var k of Object.keys(hashTable))
+                hashTable[k].sort((e1: PNPEvent, e2: PNPEvent) => {
+                    spl = e1.eventDate.split('/');
+                    spl2 = e2.eventDate.split('/');
+                    if (Number(spl[2]) > Number(spl2[2])) {
+                        return -1;
+                    } else if (Number(spl2[2]) > Number(spl[2]))
+                        return 1;
+
+                    if (Number(spl[1]) > Number(spl2[1])) {
+                        return -1;
+                    } else if (Number(spl2[1]) > Number(spl[1]))
+                        return 1;
+
+                    if (Number(spl[0]) > Number(spl2[0])) {
+                        return -1;
+                    } else if (Number(spl2[2]) > Number(spl[2]))
+                        return 1;
+                    return 0;
+                })
             consume(hashTable)
         })
     }
@@ -454,8 +517,6 @@ export class Realtime {
     }
 
     updateEvent = async (eventId: string, event: any, blob?: ArrayBuffer, eventOldType?: string) => {
-
-
         const uploadEvent = async () => {
             if (eventOldType !== event.eventType) {
                 // remove the event from old type route
@@ -469,8 +530,9 @@ export class Realtime {
             return await update(child(child(child(this.allEvents, 'public'), eventOldType ?? event.eventType), eventId), event)
                 .catch((e) => { this.createError('updateClubEvent', e) })
         }
-        
+
         if (blob) {
+            console.log("Blob")
             return await uploadBytes(storageRef(this.storage, 'EventImages/' + event.eventType + "/" + event.eventId), blob)
                 .then(async snap => {
                     return await getDownloadURL(snap.ref)
@@ -479,8 +541,7 @@ export class Realtime {
                             return uploadEvent();
                         })
                 })
-        } else uploadEvent()
-
+        } else return await uploadEvent()
 
     }
 
@@ -514,7 +575,7 @@ export class Realtime {
     }
 
     removeEvent = async (event: PNPEvent) => {
-        return await remove(child(child(child(this.allEvents, 'public'), getEventType(event)), event.eventId))
+        return await remove(child(child(child(this.allEvents, 'public'), event.eventType), event.eventId))
             .catch((e) => { this.createError('removeEvent', e) })
             .then(async () => {
                 return await remove(child(child(child(this.rides, 'public'), 'ridesForEvents'), event.eventId))
@@ -569,8 +630,22 @@ export class Realtime {
  * @param ride ride values to be updated
  * @returns update callback
  */
-    updatePublicRide = async (eventId: string, rideId: string, ride: object) => {
-        return await update(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId), ride)
+    updatePublicRide = async (eventId: string, rideId: string, ride: any) => {
+
+        if (ride.extras.isRidePassengersLimited) {
+            let newStatus: 'on-going' | 'sold-out' | 'running-out';
+            let ticketsLeft = Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)
+            if (ticketsLeft <= 0) {
+                newStatus = 'sold-out'
+            } else if (ticketsLeft <= 15) {
+                newStatus = 'running-out'
+            } else {
+                newStatus = 'on-going'
+            }
+            ride.extras.rideStatus = newStatus;
+        }
+        return await update(child(child(child(child(this.rides, 'public'),
+            'ridesForEvents'), eventId), rideId), ride)
     }
     /**
       * updateCurrentUser
@@ -593,10 +668,10 @@ export class Realtime {
     }
 
     /**
- * removeCultureEvent
- * @param eventId eventid to be removed
- * @returns remove callback
- */
+    * removeCultureEvent
+    * @param eventId eventid to be removed
+    * @returns remove callback
+    */
     removeCultureEvent = async (eventId: string) => {
         return await remove(child(child(child(this.allEvents, 'public'), 'culture'), eventId))
             .catch((e) => { this.createError('removeCultureEvent', e) })
@@ -628,12 +703,12 @@ export class Realtime {
 
 
     /**
-   * createEvent
-   * @param event event to be added
-   * @param blob : image blob for event *required
-   * @param uploadEventImage
-   * @returns new reference callback
-   */
+    * createEvent
+    * @param event event to be added
+    * @param blob : image blob for event *required
+    * @param uploadEventImage
+    * @returns new reference callback
+    */
     createEvent = async (event: PNPEvent, blob: ArrayBuffer): Promise<object | void> => {
         const newRef = push(child(child(this.allEvents, 'public'), 'waiting'))
         event.eventId = newRef.key!

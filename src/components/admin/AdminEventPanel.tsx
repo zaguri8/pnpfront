@@ -1,7 +1,7 @@
 
 import { PNPEvent } from "../../store/external/types"
 import { Button, Stack } from '@mui/material'
-import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK } from "../../settings/colors"
+import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL } from "../../settings/colors"
 import { useNavigate } from "react-router"
 import HTMLFromText from '../utilities/HtmlFromText'
 import { v4 } from 'uuid'
@@ -17,9 +17,9 @@ const AdminEventPanel = () => {
     const { firebase } = useFirebase()
 
     const nav = useNavigate()
-    return <PageHolder>
+    return <PageHolder style={{ background: BLACK_ELEGANT }}>
         <SectionTitle title={'ניהול אירועים'} style={{ background: 'none' }} />
-        <InnerPageHolder >
+        <InnerPageHolder style={{ background: BLACK_ROYAL }} >
 
             <table dir={'rtl'} >
 
@@ -49,7 +49,7 @@ const AdminEventPanel = () => {
         </InnerPageHolder>
 
         <SectionTitle title={'אירועים ממתינים'} style={{ background: 'none' }} />
-        <InnerPageHolder >
+        <InnerPageHolder style={{ background: BLACK_ROYAL }} >
 
             {location.state && (location.state as any).waitingEvents && (location.state as any).waitingEvents.length > 0 ? <table dir={'rtl'}>
 

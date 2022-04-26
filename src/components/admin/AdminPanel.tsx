@@ -5,11 +5,13 @@ import { v4 } from "uuid"
 import { useFirebase } from "../../context/Firebase"
 import { useLoading } from "../../context/Loading"
 import { PNPPage } from "../../cookies/types"
-import { DARKER_BLACK_SELECTED, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors"
 import { getEventTypeFromString } from "../../store/external/converters"
 import { PNPEvent } from "../../store/external/types"
 import SectionTitle from "../SectionTitle"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
+import PNPChart from "./PNPChart"
+
 
 export default function AdminPanel() {
     const [publicEvents, setPublicEvents] = useState<{ [type: string]: { waiting: PNPEvent[], events: PNPEvent[] } }>()
@@ -47,9 +49,9 @@ export default function AdminPanel() {
         return () => unsub()
     }, [])
 
-    return <PageHolder>
+    return <PageHolder style={{ background: BLACK_ELEGANT,overflowX:'hidden'  }} >
         <SectionTitle title={'פאנל ניהול'} style={{ background: 'none' }} />
-        <InnerPageHolder >
+        <InnerPageHolder style={{ background: BLACK_ROYAL,overflowX:'hidden'  }} >
 
 
             <table dir={'rtl'} >
@@ -80,23 +82,24 @@ export default function AdminPanel() {
 
         </InnerPageHolder>
         <SectionTitle title={'ניהול משתמשים'} style={{ background: 'none' }} />
-        <InnerPageHolder>
+        <InnerPageHolder style={{ background: BLACK_ROYAL }}>
             <Button
-                style={{ backgroundImage: DARKER_BLACK_SELECTED, minWidth: '110px' }}
+                style={{ backgroundImage: RED_ROYAL , minWidth: '110px' }}
                 onClick={() => { nav('/adminpanel/users') }}
-                sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
+                sx={{ ... { width: 'fit-content', fontSize: '14px', maxHeight: '40px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
                 {'עבור לניהול משתמשים'}
             </Button>
         </InnerPageHolder>
 
         <SectionTitle title={'נתוני כניסה'} style={{ background: 'none' }} />
-        <InnerPageHolder>
-            <Button
-                style={{ background: '#bd3333', minWidth: '110px' }}
-                onClick={() => { nav('/adminpanel/pagestats', { state: { page: PNPPage.register } }) }}
-                sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
-                {'דף הרשמה'}
-            </Button>
+        <InnerPageHolder style={{ background: BLACK_ROYAL,overflowX:'hidden'  }}>
+            <label style={
+                {
+                    color: SECONDARY_WHITE
+                }
+            }>{'דף הרשמה'}</label>
+
+            <PNPChart page={PNPPage.register} />
         </InnerPageHolder>
     </PageHolder>
 

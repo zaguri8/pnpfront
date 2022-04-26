@@ -9,7 +9,7 @@ import { ILoadingContext, useLoading } from './context/Loading';
 import Profile from './components/auth/Profile'
 import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
 import AppMenu from './components/AppMenu';
-import { Routes, Route, useNavigate } from 'react-router';
+import { Routes, Route, useNavigate, useLocation } from 'react-router';
 import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
 
@@ -39,17 +39,21 @@ import { QrReader } from 'react-qr-reader';
 import Scanner from './components/scanner/Scanner';
 import AdminEventPanel from './components/admin/AdminEventPanel';
 import UserStatistics from './components/admin/UserStatistics';
-import Charts from './components/admin/Charts';
+import MyCoins from './components/auth/MyCoins';
 
 function ImageHeader() {
   const nav = useNavigate()
-
+  const location = useLocation()
   return (<div className='App-header' style={{
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
   }}>
-    <img onClick={() => nav('/')} id='image-header' alt='' src={logo_white} style={{
+    <img onClick={() => {
+      if (location.pathname === '/')
+        return
+      else nav('/')
+    }} id='image-header' alt='' src={logo_white} style={{
       cursor: 'pointer',
       height: '100px',
       padding: '8px'
@@ -228,13 +232,14 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/home' element={<Home />} />
         <Route path='/myaccount' element={!isAuthenticated ? <Login /> : <MyAccount />} />
+
+        <Route path='/myaccount/coins' element={!isAuthenticated ? <Login /> : <MyCoins />} />
         <Route path='/createevent' element={!isAuthenticated ? <Login /> : <CreateEvent />} />
         <Route path='/createride' element={!isAuthenticated ? <Login /> : <CreateRide />} />
         <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='termsOfService' element={<TermsOfService />} />
 
-        <Route path='/adminpanel/pagestats' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <Charts />} />
         <Route path='/myaccount/profile' element={<Profile />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
         <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />

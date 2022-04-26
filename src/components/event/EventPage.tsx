@@ -14,7 +14,7 @@ import { PaymentForm } from "../payment/Payment";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE, DARKER_BLACK_SELECTED } from "../../settings/colors";
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE, DARKER_BLACK_SELECTED, RED_ROYAL } from "../../settings/colors";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { useNavigate, useLocation } from 'react-router'
 import { PNPPublicRide } from "../../store/external/types";
@@ -244,7 +244,7 @@ export default function EventPage() {
 
                                 {eventRides.find(e => e.extras.isRidePassengersLimited) && <Stack>
 
-                                    <label dir={SIDE(lang)} style={{ border: '.1px solid whitesmoke', borderBottomLeftRadius: '4px', fontWeight: 'bold', borderBottomRightRadius: '4px', fontSize: '14px', backgroundPosition: '0px 20px', background: `black`, padding: '16px', color: SECONDARY_WHITE, textAlign: 'center' }}>{lang === 'heb' ? 'מספר המקומות מוגבל ל50 הרוכשים הראשונים בכל הסעה' : 'Places are limited to the first 50 buyers from each city'}</label>
+                                    <label dir={SIDE(lang)} style={{ border: '.1px solid whitesmoke', borderBottomLeftRadius: '4px', fontWeight: 'bold', borderBottomRightRadius: '4px', fontSize: '14px', backgroundPosition: '0px 20px', background: RED_ROYAL, padding: '16px', color: SECONDARY_WHITE, textAlign: 'center' }}>{lang === 'heb' ? 'מספר המקומות מוגבל ל50 הרוכשים הראשונים בכל הסעה' : 'Places are limited to the first 50 buyers from each city'}</label>
 
                                 </Stack>}
 

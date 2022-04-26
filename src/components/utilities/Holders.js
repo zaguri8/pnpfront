@@ -4,7 +4,7 @@ export const PageHolder = ({ children, style = {} }) => {
     return <div style={{
         ...{
             width: '100%',
-            marginBottom: '120px',
+            paddingBottom: '120px',
             height: '100%',
             display: 'flex',
             justifyContent: 'center',

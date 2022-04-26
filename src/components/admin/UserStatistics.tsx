@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useFirebase } from "../../context/Firebase"
 import { useLoading } from "../../context/Loading"
-import { PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ELEGANT, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { PNPUser } from "../../store/external/types"
 import SectionTitle from "../SectionTitle"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
@@ -31,7 +31,7 @@ export default function UserStatistics() {
         return () => unsub()
     }, [])
 
-    return <PageHolder style={{ padding: '0px',scroll:'hidden'}}>
+    return <PageHolder style={{ padding: '0px',scroll:'hidden',background:BLACK_ELEGANT}}>
         <SectionTitle style={{}} title={'ניהול משתמשים - בטא'} />
         <label style=  {{color:SECONDARY_WHITE,padding:'16px'}}>{'מציג: ' + numOfShowing + " משתמשים"}</label>
         <select onChange={(e) => setNumOfShowing(Number(e.target.value))}>

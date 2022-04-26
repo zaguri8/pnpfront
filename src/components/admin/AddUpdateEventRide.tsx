@@ -149,7 +149,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                         alert('אירעתה שגיאה בעריכת ההסעה, אנא יידע את המתכנת')
                     })
             } else {
-
+           
                 firebase.realTime.addPublicRide(ride.eventId, ride)
                     .then(() => {
                         cancelLoad()

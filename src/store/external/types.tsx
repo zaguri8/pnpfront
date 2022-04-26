@@ -99,7 +99,7 @@ export type PNPEvent = {
     eventDate: string
     eventCanAddRides: boolean
     eventDetails: string
-    eventType?: string
+    eventType: string
     eventPrice: string
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange

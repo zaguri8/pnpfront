@@ -453,7 +453,7 @@ export default function CreateEvent() {
                         }}
                     >
 
-                        {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</MenuItem>)}
+                        {(appUser && appUser.admin ? eventTypes.concat(['חתונות', 'אירועים פרטיים']) : eventTypes).map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</MenuItem>)}
                     </Select>
                 </FormControl>
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>

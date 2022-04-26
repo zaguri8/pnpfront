@@ -12,7 +12,7 @@ import { getCurrentDate } from "../../utilities";
 import { Editor, EditorState } from "react-draft-wysiwyg";
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from "draft-js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { submitButton } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
 import { CONTINUE_TO_CREATE, CREATE_EVENT, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_NUMBER_PPL, EVENT_START, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
@@ -69,7 +69,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                 .then(() => {
                     // update succeed
                     cancelLoad()
-                    nav('/adminpanal')
+                    nav('/adminpanel')
                     openDialog({
                         content: <div>
                             <label style={{ color: SECONDARY_WHITE, padding: '16px' }}>
@@ -78,8 +78,9 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                         </div>
                     })
 
-                }).catch(() => {
+                }).catch((e) => {
                     alert('אירעתה שגיאה בעת יצירת/עריכת האירוע, אנא פנא למתכנת האתר')
+                    console.log(e)
                     cancelLoad()
                 })
         } else {
@@ -93,6 +94,9 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     const [endDate, setEndDate] = useState<string>(props.event ? props.event.eventHours.endHour : '00:00')
 
 
+    useEffect(() => {
+        console.log(pnpEvent.eventType!)
+    })
 
     const useStyles = makeStyles(() => ({
         root: {
@@ -139,7 +143,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
 
 
     const updateEventHours = (type: 'end' | 'start', event: string | undefined | null) => {
-        const dict = type === 'end' ? { startHour: event as string } : { endHour: event as string }
+        const dict = type === 'end' ? { endHour: event as string } : { startHour: event as string }
         type === 'end' ? setEndDate(event as string) : setStartDate(event as string)
         event && setPnpEvent({
             ...pnpEvent, ...{
@@ -193,7 +197,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     }
 
                 }} type="file" id="files_create_event" style={{ display: 'none' }} />
-                <img id='menu_event_create_image' alt='' src={props.event ? props.event.eventImageURL : image ? image : event_placeholder} style={{
+                <img id='menu_event_create_image' alt='' src={image ? image : props.event ? props.event.eventImageURL : event_placeholder} style={{
 
                     alignSelf: 'center',
                     minHeight: '150px',
@@ -232,7 +236,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                 <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_NUMBER_PPL(lang)}</label>
                 <TextField
                     className={classes.root}
-                    placeholder={props.event ? props.event.expectedNumberOfPeople : EVENT_NUMBER_PPL(lang)}
+                    placeholder={props.event ? props.event.expectedNumberOfPeople + "" : EVENT_NUMBER_PPL(lang)}
                     onChange={(event) => {
                         setPnpEvent({ ...pnpEvent, ...{ expectedNumberOfPeople: event.target.value } })
                     }}
@@ -279,7 +283,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     <label style={{ padding: '4px', color: SECONDARY_WHITE, direction: SIDE(lang) }}>{lang === 'heb' ? `גיל מינ' ` : 'Min age'}</label>
                     <TextField
                         className={classes.root}
-                        placeholder={props.event ? props.event.eventAgeRange.minAge : lang === 'heb' ? `גיל מינ' ` : 'Min age'}
+                        placeholder={props.event ? props.event.eventAgeRange.minAge + "" : lang === 'heb' ? `גיל מינ' ` : 'Min age'}
                         onChange={(event) => {
                             setPnpEvent({ ...pnpEvent, ...{ eventAgeRange: { ...pnpEvent.eventAgeRange, ...{ minAge: event.target.value } } } })
                         }}
@@ -292,7 +296,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     <label style={{ padding: '4px', color: SECONDARY_WHITE, direction: SIDE(lang) }}>{lang === 'heb' ? `גיל מקס' ` : 'Max age'}</label>
                     <TextField
                         className={classes.root}
-                        placeholder={props.event ? props.event.eventAgeRange.maxAge : lang === 'heb' ? `גיל מקס' ` : 'Max age'}
+                        placeholder={props.event ? props.event.eventAgeRange.maxAge + "" : lang === 'heb' ? `גיל מקס' ` : 'Max age'}
 
                         onChange={(event) => {
                             setPnpEvent({ ...pnpEvent, ...{ eventAgeRange: { ...pnpEvent.eventAgeRange, ...{ maxAge: event.target.value } } } })
