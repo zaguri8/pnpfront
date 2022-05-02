@@ -124,8 +124,19 @@ export type PNPPrivateEvent = {
     eventImageURL?: string
 }
 
+export type UserDateSpecificStatistics = {
+    date: string
+    numberOfUserAttended: number
+}
+
+export type UserEnterStatistics = {
+    stats: UserDateSpecificStatistics[]
+}
+
 export type PNPRideConfirmation = {
     userId: string
+    userName: string
+    phoneNumber: string
     rideId: string
     eventId: string
     passengers?: string

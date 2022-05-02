@@ -1,27 +1,36 @@
 
 import { PNPEvent } from "../../store/external/types"
 import { Button, Stack } from '@mui/material'
-import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL } from "../../settings/colors"
+import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, RED_ROYAL } from "../../settings/colors"
 import { useNavigate } from "react-router"
 import HTMLFromText from '../utilities/HtmlFromText'
 import { v4 } from 'uuid'
 import SectionTitle from '../SectionTitle'
 import { useLocation } from 'react-router-dom'
+import { PNPPrivateEvent } from '../../store/external/types'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
-const AdminEventPanel = () => {
+import { useEffect, useState } from "react"
+import Spacer from "../utilities/Spacer"
+const ManageInvitations = () => {
 
-    const location = useLocation()
+
     const { openDialog, doLoad, cancelLoad } = useLoading()
     const { firebase } = useFirebase()
 
+    const [privateEvents, setPrivateEvents] = useState<{ [type: string]: PNPPrivateEvent[] }>()
     const nav = useNavigate()
+
+    useEffect(() => {
+        const unsub = firebase.realTime.addListenerToPrivateEvents(setPrivateEvents, true)
+        return () => { unsub() }
+    }, [])
     return <PageHolder style={{ background: BLACK_ELEGANT }}>
-        <SectionTitle title={'ניהול אירועים'} style={{ background: 'none' }} />
+        <SectionTitle title={'ניהול אירועים עם הזמנות'} style={{ background: 'none' }} />
         <InnerPageHolder style={{ background: BLACK_ROYAL }} >
 
-            <table dir={'rtl'} >
+            <table dir={'rtl'}>
 
                 <thead>
                     <tr>
@@ -35,13 +44,13 @@ const AdminEventPanel = () => {
                 </thead>
 
                 <tbody>
-                    {location.state && (location.state as any).events && (location.state as { waitingEvents: PNPEvent[], events: PNPEvent[] }).events.map((event: PNPEvent) => <tr key={v4()} style={{ margin: '8px' }}>
-                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '12px', margin: '4px', color: SECONDARY_WHITE }}>{event.eventName}</div></th>
+                    {privateEvents && privateEvents['approved'] && privateEvents['approved'].map((event: PNPPrivateEvent) => <tr key={v4()} style={{ margin: '8px' }}>
+                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '12px', margin: '4px', color: SECONDARY_WHITE }}>{event.eventTitle}</div></th>
                         <th style={{ width: '50%' }}><Button
                             style={{ backgroundImage: DARKER_BLACK_SELECTED, minWidth: '110px' }}
-                            onClick={() => { nav('/adminpanel/specificevent/eventstatistics', { state: event }) }}
+                            onClick={() => { nav('/adminpanel/invitations/specificinvitation', { state: event }) }}
                             sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' } }}>
-                            {'עבור לניהול אירוע'}
+                            {'עבור לניהול הזמנה'}
                         </Button></th>
                     </tr>)}
                 </tbody>
@@ -51,7 +60,7 @@ const AdminEventPanel = () => {
         <SectionTitle title={'אירועים ממתינים'} style={{ background: 'none' }} />
         <InnerPageHolder style={{ background: BLACK_ROYAL }} >
 
-            {location.state && (location.state as any).waitingEvents && (location.state as any).waitingEvents.length > 0 ? <table dir={'rtl'}>
+            {privateEvents && privateEvents['waiting'] && privateEvents['waiting'].length > 0 ? <table dir={'rtl'}>
 
                 <thead>
                     <tr>
@@ -65,9 +74,10 @@ const AdminEventPanel = () => {
                 </thead>
 
                 <tbody>
-                    {location.state && (location.state as any).waitingEvents && (location.state as { waitingEvents: PNPEvent[], events: PNPEvent[] }).waitingEvents.map(event => <tr key={v4()} style={{ margin: '8px' }}>
-                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '12px', margin: '4px', color: SECONDARY_WHITE }}>{event.eventName}</div></th>
-                        <th style={{ width: '50%' }}>
+                    {privateEvents && privateEvents['waiting'] && privateEvents['waiting'].length > 0 ? privateEvents['waiting'].map(event => <tr
+                        key={v4()}>
+                        <th style={{ width: '50%', background: SECONDARY_BLACK }}>  <div style={{ fontSize: '12px', color: SECONDARY_WHITE }}>{event.eventTitle}</div><br /></th>
+                        <th style={{ width: '50%', background: SECONDARY_BLACK }}>
                             <Stack>
                                 <Button
                                     onClick={() => {
@@ -79,7 +89,7 @@ const AdminEventPanel = () => {
 
                                                     <Stack>
                                                         <label style={{ fontWeight: 'bold' }}>{'שם אירוע'}</label>
-                                                        <span>{event.eventName}</span>
+                                                        <span>{event.eventTitle}</span>
                                                     </Stack>
 
                                                     <Stack>
@@ -105,40 +115,6 @@ const AdminEventPanel = () => {
                                                         <span>{event.eventLocation}</span>
                                                     </Stack>
 
-                                                    <Stack>
-                                                        <label style={{ fontWeight: 'bold' }}>{'כמות אנשים צפויה'}</label>
-                                                        <span>{event.expectedNumberOfPeople}</span>
-                                                    </Stack>
-
-                                                    <Stack>
-                                                        <label style={{ fontWeight: 'bold' }}>{'גיל מינ'}</label>
-                                                        <span>{event.eventAgeRange.minAge}</span>
-                                                    </Stack>
-
-                                                    <Stack>
-                                                        <label style={{ fontWeight: 'bold' }}>{'גיל מקס'}</label>
-                                                        <span>{event.eventAgeRange.maxAge}</span>
-                                                    </Stack>
-
-                                                    <Stack>
-                                                        <label style={{ fontWeight: 'bold' }}>{'סוג אירוע'}</label>
-                                                        <span>{event.eventType}</span>
-                                                    </Stack>
-
-                                                    {event.eventAttention &&
-                                                        <Stack>
-                                                            {event.eventAttention.eventAttention1 && <Stack>
-                                                                <label style={{ fontWeight: 'bold' }}>{'שימו לב 1'}</label>
-                                                                <span>{event.eventAttention.eventAttention1}</span>
-                                                            </Stack>}
-
-                                                            {event.eventAttention.eventAttention2 && <Stack>
-                                                                <label style={{ fontWeight: 'bold' }}>{'שימו לב 2'}</label>
-                                                                <span>{event.eventAttention.eventAttention2}</span>
-                                                            </Stack>}
-                                                        </Stack>}
-
-
                                                     <Stack style={{ width: '100%' }}>
                                                         <label style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{'פרטים'}</label>
                                                         <div style={{ overflow: 'scroll', boxSizing: 'border-box' }}>
@@ -151,16 +127,16 @@ const AdminEventPanel = () => {
                                             </InnerPageHolder>
                                         })
                                     }}
-                                    style={{ width: '100px', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' }}>
+                                    style={{ fontSize: '14px', margin: '4px', width: '100px', padding: '4px', color: 'white', background: '#007AFF' }}>
                                     {'פרטי אירוע'}
                                 </Button>
                                 <Button
-                                    style={{ width: '100px', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
+                                    style={{ fontSize: '14px', width: '100px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
                                     onClick={() => {
                                         doLoad()
-                                        firebase.realTime.approveEvent(event.eventId)
+                                        firebase.realTime.approvePrivateEvent(event.eventId)
                                             .then(() => {
-                                                alert('אירוע אושר בהצלחה')
+                                                alert('האירוע אושר בהצלחה')
                                                 nav('/adminpanel')
                                                 cancelLoad()
                                             }).catch(() => {
@@ -171,12 +147,13 @@ const AdminEventPanel = () => {
                                 >
                                     {'אשר אירוע'}
                                 </Button>
+                                <Spacer offset={1} />
                             </Stack>
                         </th>
-                    </tr>)}
+                    </tr>) : null}
                 </tbody>
             </table> : <span style={{ color: SECONDARY_WHITE }}>{'אין אירועים ממתינים'}</span>}
         </InnerPageHolder>
     </PageHolder>
 }
-export default AdminEventPanel
+export default ManageInvitations

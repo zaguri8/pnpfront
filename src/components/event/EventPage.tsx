@@ -275,7 +275,7 @@ export default function EventPage() {
                                     fontFamily: 'Open Sans Hebrew',
                                     width: '100%',
                                     alignSelf: 'center'
-                                }}>{lang === 'heb' ? `לאירוע זה תרם קיימות הסעות, לחץ` : 'This event has no rides, click'} <b
+                                }}>{lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'} <b
                                     onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
                                     style={{
                                         paddingLeft: lang === 'heb' ? '4px' : '0px',

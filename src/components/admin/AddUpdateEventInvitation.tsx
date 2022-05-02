@@ -1,4 +1,4 @@
-import { PNPEvent } from "../../store/external/types";
+import { PNPEvent, PNPPrivateEvent } from "../../store/external/types";
 import { useFirebase } from "../../context/Firebase";
 import { useLoading } from "../../context/Loading";
 
@@ -14,7 +14,7 @@ import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from "draft-js";
 import { useEffect, useState } from "react";
 import { submitButton } from "../../settings/styles";
-import { isValidEvent } from "../../store/validators";
+import { isValidEvent, isValidPrivateEvent } from "../../store/validators";
 import { CONTINUE_TO_CREATE, CREATE_EVENT, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_NUMBER_PPL, EVENT_START, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
@@ -23,38 +23,22 @@ import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router";
 
-const AddUpdateEvent = (props: { event?: PNPEvent }) => {
+const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
     const [editorState, setEditorState] = useState<EditorState | undefined>()
     const { user } = useFirebase();
-    const eventTypes = [
-        "מסיבות ומועדונים",
-        "משחקי כדורגל",
-        "הופעות",
-        "פסטיבלים",
-        "ברים",
-        "ספורט כללי",
-        "אירועי ילדים"
-    ]
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
 
 
     const [image, setImage] = useState<string>('')
-    const [pnpEvent, setPnpEvent] = useState<PNPEvent>((props.event ?? {
-        eventName: 'null',
+    const [pnpEvent, setPnpEvent] = useState<PNPPrivateEvent>((props.event ?? {
+        eventTitle: 'null',
         eventLocation: 'null',
         eventId: 'null',
-        eventCanAddRides: true,
-        eventProducerId: user ? user.uid : 'null',
         eventDate: dateStringFromDate(getCurrentDate()),
-        eventType: 'clubs',
         eventDetails: 'null',
-        eventPrice: '50',
         eventHours: { startHour: 'null', endHour: 'null' },
-        eventAgeRange: { minAge: 'null', maxAge: 'null' },
-        expectedNumberOfPeople: 'null',
         eventImageURL: 'null'
     }))
-    const oldEventType = props.event?.eventType
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
     const { firebase } = useFirebase()
     const nav = useNavigate()
@@ -62,10 +46,10 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
         const dialogTitle = props.event ? 'ערכת אירוע בהצלחה! השינויים כבר ייכנסו לתוקף!' : 'הוספת אירוע בהצלחה ! בקרוב האירוע יופיע בדף הבית';
 
         if ((props.event && props.event.eventImageURL) || imageBuffer
-            && isValidEvent(pnpEvent)) {
+            && isValidPrivateEvent(pnpEvent)) {
             doLoad()
-            firebase.realTime.updateEvent(pnpEvent.eventId,
-                pnpEvent, imageBuffer, oldEventType)
+            firebase.realTime.updatePrivateEvent(pnpEvent.eventId,
+                pnpEvent, imageBuffer)
                 .then(() => {
                     // update succeed
                     cancelLoad()
@@ -155,14 +139,6 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
         setPnpEvent({ ...pnpEvent, ...{ eventLocation: address } })
     }
 
-    const updateEventAttention1 = (attention: string) => {
-        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention1: attention, eventAttention2: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention2 : '' } } })
-    }
-
-    const updateEventAttention2 = (attention: string) => {
-        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention2: attention, eventAttention1: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention1 : '' } } })
-    }
-
     const updateEventDate = (event: string | undefined | null) => {
         if (event as string) {
             const split = reverseDate(event)
@@ -217,7 +193,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                 <TextField
 
                     className={classes.root}
-                    placeholder={props.event ? props.event.eventName : EVENT_TITLE(lang)}
+                    placeholder={props.event ? props.event.eventTitle : EVENT_TITLE(lang)}
                     onChange={(event) => {
                         setPnpEvent({ ...pnpEvent, ...{ eventName: event.target.value } })
 
@@ -229,85 +205,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     }} />
             </FormControl>
 
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_NUMBER_PPL(lang)}</label>
-                <TextField
-                    className={classes.root}
-                    placeholder={props.event ? props.event.expectedNumberOfPeople + "" : EVENT_NUMBER_PPL(lang)}
-                    onChange={(event) => {
-                        setPnpEvent({ ...pnpEvent, ...{ expectedNumberOfPeople: event.target.value } })
-                    }}
-                    dir='rtl'
-                    type='number'
-                    sx={{
 
-                        direction: SIDE(lang)
-                    }} />
-            </FormControl>
-
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'שימו לב 1 (אופציונלי)' : 'Attention 1 (Optional)'}</label>
-                <TextField
-
-                    className={classes.root}
-                    placeholder={props.event && props.event.eventAttention && props.event.eventAttention.eventAttention1 ? props.event.eventAttention?.eventAttention1 : lang === 'heb' ? 'הכנס שימו לב 1' : 'Enter Attention 1 (Optional)'}
-                    onChange={(event) => { updateEventAttention1(event.target.value) }}
-                    dir='rtl'
-                    type='number'
-                    sx={{
-
-                        direction: SIDE(lang)
-                    }} />
-            </FormControl>
-
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'שימו לב 2 (אופציונלי)' : 'Attention 2 (Optional)'}</label>
-                <TextField
-                    className={classes.root}
-                    placeholder={props.event && props.event.eventAttention && props.event.eventAttention.eventAttention1 ? props.event.eventAttention.eventAttention1 : lang === 'heb' ? 'הכנס שימו לב 2' : 'Enter Attention 2 (Optional)'}
-                    onChange={(event) => { updateEventAttention2(event.target.value) }}
-                    dir='rtl'
-                    type='number'
-                    sx={{
-
-                        direction: SIDE(lang)
-                    }} />
-            </FormControl>
-
-
-            <FormControl style={{ width: '100%', alignSelf: 'center', direction: SIDE(lang) }}>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE, direction: SIDE(lang) }}>{lang === 'heb' ? `גיל מינ' ` : 'Min age'}</label>
-                    <TextField
-                        className={classes.root}
-                        placeholder={props.event ? props.event.eventAgeRange.minAge + "" : lang === 'heb' ? `גיל מינ' ` : 'Min age'}
-                        onChange={(event) => {
-                            setPnpEvent({ ...pnpEvent, ...{ eventAgeRange: { ...pnpEvent.eventAgeRange, ...{ minAge: event.target.value } } } })
-                        }}
-                        dir='rtl'
-                        type='number'
-                        sx={{
-
-                            direction: SIDE(lang)
-                        }} />
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE, direction: SIDE(lang) }}>{lang === 'heb' ? `גיל מקס' ` : 'Max age'}</label>
-                    <TextField
-                        className={classes.root}
-                        placeholder={props.event ? props.event.eventAgeRange.maxAge + "" : lang === 'heb' ? `גיל מקס' ` : 'Max age'}
-
-                        onChange={(event) => {
-                            setPnpEvent({ ...pnpEvent, ...{ eventAgeRange: { ...pnpEvent.eventAgeRange, ...{ maxAge: event.target.value } } } })
-                        }}
-                        dir='rtl'
-                        type='number'
-                        sx={{
-
-                            direction: SIDE(lang)
-                        }} />
-
-                </div>
-
-            </FormControl>
             <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                 <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_ADDRESS(lang)}</label>
                 <Places value={''}
@@ -367,25 +265,6 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     }}
                     required />
             </FormControl>
-
-            <FormControl style={{ width: '100%', alignSelf: 'center' }} fullWidth>
-
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}
-                    id="create_event_type_select">{EVENT_TYPE(lang)}</label>
-                <Select
-                    labelId="create_event_type_select"
-
-                    value={getEventTypeFromString(pnpEvent.eventType!)}
-                    style={{ background: DARK_BLACK, fontFamily: 'Open Sans Hebrew', borderRadius: '32px', color: SECONDARY_WHITE }}
-                    onChange={(e) => {
-                        setPnpEvent({ ...pnpEvent, ...{ eventType: getEventType({ ...pnpEvent, ...{ eventType: e.target.value } }) } })
-
-                    }}
-                >
-
-                    {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</MenuItem>)}
-                </Select>
-            </FormControl>
             <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                 <Editor
                     editorStyle={{ background: SECONDARY_WHITE, minHeight: '200px', maxWidth: '100%' }}
@@ -398,7 +277,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     onEditorStateChange={onEditorStateChanged}
                 />
             </FormControl>
-            <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
+            <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidPrivateEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
                 <span>
                     <Button
                         onClick={submitUpdateEvent}
@@ -408,4 +287,4 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
         </Stack>
     </Stack>)
 }
-export default AddUpdateEvent
+export default AddUpdateEventInvitation

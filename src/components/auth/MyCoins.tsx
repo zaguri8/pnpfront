@@ -3,6 +3,7 @@ import { useFirebase } from "../../context/Firebase";
 import { useLanguage } from "../../context/Language";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { MY_COINS, SIDE } from "../../settings/strings";
+import { elegantShadow } from "../../settings/styles";
 import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 
 export default function MyCoins() {
@@ -10,7 +11,7 @@ export default function MyCoins() {
 
 
     const textStyle = {
-        fontSize: '20px',
+        fontSize: '32px',
         color: SECONDARY_WHITE,
         fontWeight: 'bold',
         fontFamily: 'Open Sans Hebrew'
@@ -30,7 +31,7 @@ export default function MyCoins() {
         height: '10px',
         color: SECONDARY_WHITE,
         transition: '.1s linear',
-        transform: 'translateX(50%) translateY(50%)'
+        transform: 'translateX(60%) translateY(50%)'
     }
     const coinWrapper = {
         width: '20px',
@@ -41,15 +42,15 @@ export default function MyCoins() {
     }
 
     const coinWrapper2 = {
-        background: PRIMARY_BLACK,
+        background: DARKER_BLACK_SELECTED,
         width: '40px',
         height: '40px',
 
-        transform: 'translateX(25%) translateY(25%)',
+        transform: 'translateX(25.5%) translateY(30%)',
         borderRadius: '20px'
     }
     const coinWrapper3 = {
-        background: 'whitesmoke',
+        background: BLACK_ELEGANT,
         width: '60px',
         border: '1px solid whitesmoke',
         height: '60px',
@@ -59,7 +60,9 @@ export default function MyCoins() {
 
     const coinWrapper4 = {
         background: '#282c34',
+        boxShadow: elegantShadow(),
         width: '80px',
+
         border: '1px solid white',
         height: '80px',
         borderRadius: '40px'
@@ -82,13 +85,16 @@ export default function MyCoins() {
 
         margin: '16px',
     }
+    const coinTextStyle = {
+        fontSize: '24px'
+    }
 
     const { lang } = useLanguage()
 
     const { appUser } = useFirebase()
 
     return <PageHolder>
-        <InnerPageHolder style={{ background: BLACK_ROYAL }}>
+        <InnerPageHolder style={{ background: 'none', border: 'none' }}>
 
 
             <Stack alignItems={'center'} style={coinStackStyleOuter}>
@@ -111,7 +117,9 @@ export default function MyCoins() {
                                     >
 
 
-                                        <Typography color='white'>
+                                        <Typography
+                                            style={coinTextStyle}
+                                            color='white'>
                                             {appUser && appUser.coins}
                                         </Typography>
                                     </div>
@@ -121,7 +129,6 @@ export default function MyCoins() {
                     </div>
                 </Stack>
 
-                <div style={{ transform: planeRotation, background: 'black', width: '100px', height: '500px' }}></div>
             </Stack>
         </InnerPageHolder>
     </PageHolder>

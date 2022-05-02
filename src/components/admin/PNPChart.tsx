@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useFirebase } from "../../context/Firebase";
 import SectionTitle from '../SectionTitle'
+import { dateStringFromDate, hyphenToMinus } from '../utilities/functions'
+import { getCurrentDate } from '../../utilities'
 import { InnerPageHolder } from '../utilities/Holders'
 import { useLocation } from 'react-router'
 import { Unsubscribe } from 'firebase/database'
 import { PNPPage } from '../../cookies/types'
-export default function PNPChart(props: { page: PNPPage }) {
+export default function PNPChart(props: { page: PNPPage, date: string }) {
     const { firebase } = useFirebase()
     const [chartData, setChartData] = useState<any[]>()
     useEffect(() => {
         let unsub: Unsubscribe | null = null
         if (props.page) {
-            unsub = firebase.realTime.addListenerToBrowsingStat(props.page, (d) => {
+            unsub = firebase.realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
                 setChartData([
                     ["נכנסו ונרשמו", "נכנסו וייצאו"],
                     ["נכנסו ונרשמו", d.leaveWithAttendance],
@@ -20,7 +22,7 @@ export default function PNPChart(props: { page: PNPPage }) {
             })
         }
         return () => { unsub && unsub() }
-    }, [])
+    }, [props.date])
 
     return chartData ? <Chart
         chartType="PieChart"

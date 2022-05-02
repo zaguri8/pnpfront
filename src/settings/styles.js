@@ -46,18 +46,21 @@ export const boxShadow = () => {
         boxShadow: `rgba(0, 0, 0, 0.3) 0px 2px 38px, rgba(0, 0, 0, 0.22) 0px 2px 12px`
     }
 }
+export const elegantShadow = () => {
+    return 'rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px'
+}
 
 
 
 export const muiTextRootInput = "& .MuiOutlinedInput-root"
-export const textFieldStyle = {
+export const textFieldStyle = (color, anyOtherAttributes) => ({
     root: {
         "& .MuiOutlinedInput-root": {
             background: 'none',
             borderRadius: '32px',
             padding: '0px',
             border: '.8px solid white',
-            color: SECONDARY_WHITE, ...{
+            color: color, ...{
                 '& input[type=number]': {
                     '-moz-appearance': 'textfield'
                 },
@@ -75,10 +78,10 @@ export const textFieldStyle = {
                     '-webkit-appearance': 'none',
                     margin: 0
                 }
-            }
+            }, ...anyOtherAttributes
         }
     }, noBorder: {
         border: "1px solid red",
         outline: 'none'
     }
-}
+})

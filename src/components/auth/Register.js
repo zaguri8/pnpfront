@@ -3,7 +3,7 @@ import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
-import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
@@ -26,7 +26,7 @@ import { Welcome } from "./Welcome"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
 
-
+let finishRegister = false
 export default function Register() {
 
 
@@ -102,7 +102,7 @@ export default function Register() {
     }
 
 
-    const [finishedRegister, setFinishedRegister] = useState(false)
+
     const { openDialog } = useLoading()
     function register(e) {
 
@@ -142,20 +142,9 @@ export default function Register() {
             return
         }
         doLoad()
-
-        isCacheValid(PNPPage.register)
-            .then(valid => {
-                if (valid) {
-                    if (!finishedRegister) {
-                        firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
-                        cacheDone(PNPPage.register)
-                    }
-                }
-            })
-
         createUserWithEmailAndPassword(firebase.auth, user.email, user.password)
             .then(() => {
-
+                finishRegister = true;
                 firebase.realTime.addUser({
                     name: user.fullName,
                     email: user.email,
@@ -168,6 +157,13 @@ export default function Register() {
                     producer: false
                 }).then(result => {
                     cancelLoad()
+                    isCacheValid(PNPPage.register)
+                        .then(valid => {
+                            if (valid) {
+                                firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
+                                cacheDone(PNPPage.register)
+                            }
+                        })
                     if (location.state && location.state.cachedLocation) {
                         nav(location.state.cachedLocation)
                     } else {
@@ -200,21 +196,20 @@ export default function Register() {
 
     useEffect(() => {
         return () => {
-            isCacheValid(PNPPage.register)
-                .then(valid => {
-                    if (valid) {
-                        firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
-                        cacheDone(PNPPage.register)
-                    }else {
-                        console.log('bye')
-                    }
-                })
+            if (!finishRegister)
+                isCacheValid(PNPPage.register)
+                    .then(valid => {
+                        if (valid) {
+                            firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
+                            cacheDone(PNPPage.register)
+                        }
+                    })
         }
     }, [])
 
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
-        <InnerPageHolder>
+        <InnerPageHolder style={{ background: BLACK_ROYAL }}>
             <div style={{
                 display: 'flex',
                 justifyContent: 'center',

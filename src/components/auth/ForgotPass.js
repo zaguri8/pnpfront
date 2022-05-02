@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useFirebase } from "../../context/Firebase";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
-import { PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { BLACK_ROYAL, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { submitButton } from "../../settings/styles";
 import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 
@@ -46,7 +46,7 @@ export default function ForgotPass() {
     const { doLoad, cancelLoad } = useLoading()
 
     return <PageHolder>
-        <InnerPageHolder>
+        <InnerPageHolder style = {{background:BLACK_ROYAL}}>
             <TextField
                 type='email'
                 classes={{ root: classes.root }}

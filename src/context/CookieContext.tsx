@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { PNPPage, PNPPageStats } from "../cookies/types";
 import { asyncLocalStorage } from '../cookies/index'
+import { PNPRideConfirmation } from '../store/external/types';
 
 interface ICookieContext {
     setCookies: (cookies: PNPPageStats[]) => void
@@ -114,6 +115,25 @@ export const useCookies = () => {
         isCacheValid: (page: PNPPage) => cookieContext?.isCacheValid ? cookieContext!.isCacheValid(page) : false,
         cacheDone: (page: PNPPage) => {
             cookieContext?.cacheDone(page)
+        },
+        saveInvitationConfirmation: async (invConfirmation: PNPRideConfirmation) => {
+            await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEventInvitationsConfirmations').then(data => {
+                if (data) {
+                    data.push(invConfirmation)
+                    asyncLocalStorage.setItem('pnpEventInvitationsConfirmations', data)
+                    return true;
+                } else {
+                    asyncLocalStorage.setItem('pnpEventInvitationsConfirmations', [invConfirmation])
+                    return true;
+                }
+            })
+        },
+        getInvitationConfirmation: async (eventId: string) => {
+            return await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEventInvitationsConfirmations').then(data => {
+                if (data) {
+                    return data.find(conf => conf.eventId === eventId)
+                } else return undefined
+            })
         }
     }
 }

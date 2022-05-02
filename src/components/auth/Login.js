@@ -10,7 +10,7 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
 import { useLanguage } from "../../context/Language"
 import { useLocation } from "react-router"
-import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { submitButton } from "../../settings/styles"
 import { useLoading } from "../../context/Loading"
 import { useState } from "react"
@@ -85,7 +85,7 @@ export default function Login() {
     }}>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <div style={{
-            background: ORANGE_GRADIENT_PRIMARY,
+            background: BLACK_ROYAL,
             width: '50%',
             maxWidth: '500px',
             marginTop: '32px',

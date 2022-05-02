@@ -56,6 +56,8 @@ export const rideConfirmationFromDict: (snap: DataSnapshot) => PNPRideConfirmati
     return {
         userId: snap.child('userId').val(),
         eventId: snap.child('eventId').val(),
+        phoneNumber: snap.child('phoneNumber').val(),
+        userName: snap.child('userName').val(),
         confirmationTitle: snap.child('confirmationTitle').val(),
         rideId: snap.child('rideId').val(),
         passengers: snap.child('passengers').val(),

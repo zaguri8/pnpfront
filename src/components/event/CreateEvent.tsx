@@ -175,7 +175,7 @@ export default function CreateEvent() {
         if (!valid || !termsOfUser) {
             return
         }
-        const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר האישור האירוע יופיע בדף הבית תחת אותה קטגוריה.` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. The certificate of approval will appear on the home page under the same category.`
+        const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר האישור האירוע יופיע בדף הבית תחת אותה קטגוריה.` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. One the event is approvedm, will appear on the home page under the same category.`
         if (imageBuffer) {
             doLoad()
             firebase.realTime.createEvent(pnpEvent,
@@ -232,8 +232,6 @@ export default function CreateEvent() {
                                 .catch(() => {
                                     alert('אירעתה בעיה בבחירת התמונה אנא פנא לצוות האתר')
                                 })
-
-                            $('#menu_event_create_image').css('borderRadius', '75px')
                         }
 
                     }} type="file" id="files_create_event" style={{ display: 'none' }} />
@@ -371,7 +369,7 @@ export default function CreateEvent() {
                             (address as string && setMandatory({ ...mandatory, ...{ 5: address } }))
                             updateEventAddress(address)
                             $(`#arm${5}`).css('border', 'none')
-                        }} types={['address']} className={''} id={{}} fixed style={{ width: '100%', border: '.8px solid white', borderRadius: '32px', color: SECONDARY_WHITE, background: 'none' }} placeHolder={EVENT_ADDRESS(lang)} />
+                        }} types={['address']} className={''} id={{}} fixed={false} style={{ width: '100%', borderRadius: '32px', color: SECONDARY_WHITE, background: 'none' }} placeHolder={EVENT_ADDRESS(lang)} />
 
                 </FormControl>
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>

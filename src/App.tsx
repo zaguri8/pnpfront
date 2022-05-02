@@ -40,6 +40,9 @@ import Scanner from './components/scanner/Scanner';
 import AdminEventPanel from './components/admin/AdminEventPanel';
 import UserStatistics from './components/admin/UserStatistics';
 import MyCoins from './components/auth/MyCoins';
+import PrivateEventConstruction from './components/event/PrivateEventConstruction';
+import InvitationStatistics from './components/admin/InvitationStatistics';
+import ManageInvitations from './components/admin/ManageInvitations';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -235,6 +238,7 @@ function App() {
 
         <Route path='/myaccount/coins' element={!isAuthenticated ? <Login /> : <MyCoins />} />
         <Route path='/createevent' element={!isAuthenticated ? <Login /> : <CreateEvent />} />
+        <Route path='/createprivateevent' element={!isAuthenticated ? <Login /> : <PrivateEventConstruction />} />
         <Route path='/createride' element={!isAuthenticated ? <Login /> : <CreateRide />} />
         <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
@@ -248,6 +252,8 @@ function App() {
         <Route path='/invitation/:id' element={<InvitationPage />} />
         <Route path='/forgotPass' element={isAuthenticated ? <Navigate to={'/'} /> : <ForgotPass />} />
         <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
+        <Route path='/adminpanel/invitations' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <ManageInvitations />} />
+        <Route path='/adminpanel/invitations/specificinvitation' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <InvitationStatistics />} />
         <Route path='/adminpanel/specificevent' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminEventPanel />} />
         <Route path='/adminpanel/users' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <UserStatistics />} />
         <Route path='/adminpanel/specificevent/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventStatistics />} />

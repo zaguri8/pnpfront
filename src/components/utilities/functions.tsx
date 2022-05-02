@@ -6,6 +6,10 @@ export const reverseDate = (date: any) => {
         .join('/')
     return split
 }
+export const hyphenToMinus = (date: string) => {
+
+    return date.replaceAll('/', '-')
+}
 
 export const unReverseDate = (date: any) => {
     const split = (date as string)

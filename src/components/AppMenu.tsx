@@ -10,7 +10,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router';
 import { useLoading } from '../context/Loading';
-import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE } from '../settings/colors.js';
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE } from '../settings/colors.js';
 import { Stack } from '@mui/material';
 import Spacer from './utilities/Spacer';
 function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
@@ -22,11 +22,11 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
     const nav = useNavigate()
     return (<div style={{
         display: 'flex',
-        backgroundImage: user != null ? 'none' : 'inherit',
         borderRadius: user ? '8px' : 'inherit',
         boxShadow: user ? 'rgba(0, 0, 0, 0.35) 0px -50px 120px -28px inset' : 'inherit',
         border: user ? '1px solid white' : 'inherit',
         width: user ? '80%' : 'auto',
+        background: user ? DARK_BLACK : 'none',
         margin: user ? '16px' : 'inherit',
         flexDirection: 'column',
         paddingTop: '16px',
@@ -55,7 +55,7 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
                     color: SECONDARY_WHITE,
                     cursor: 'pointer'
                 }}>{TOOLBAR_LOGIN(lang)}</span>
-            </div> : <Stack direction={'row'} justifyContent={'center'} style={{ width: '100%' }}>
+            </div> : <Stack direction={'row'} paddingLeft='16px' paddingRight='16px' style={{ width: '100%' }}>
                 <Stack >{appUser!.image ? <img style={{ marginLeft: '8px', borderRadius: '38px', objectFit: 'cover', border: '1px solid whitesmoke', width: '76px', height: '76px' }} src={appUser!.image}></img> : <AccountCircleIcon style={{ marginLeft: '8px', width: '75px', height: '75px' }} />}
                     <Stack alignItems={'center'}>
 
@@ -63,11 +63,10 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
                         <label
                             dir={lang === 'heb' ? 'ltr' : 'rtl'}
                             htmlFor="files"
-                            style={{ textAlign: 'center', cursor: 'pointer', columnGap: '2px', display: 'flex', padding: '2px', justifyContent: 'center', marginLeft: '8px', fontSize: '10px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'ערוך תמונה' : 'Edit image'}<EditIcon style={{ width: '12px', height: '12px' }} /></label>
+                            style={{ textAlign: 'center', cursor: 'pointer', columnGap: '2px', display: 'flex', fontWeight: 'bold', padding: '2px', justifyContent: 'center', marginLeft: '8px', fontSize: '10px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'ערוך תמונה' : 'Edit image'}<EditIcon style={{ width: '12px', height: '12px' }} /></label>
                         <input
                             onChange={async (e) => {
                                 if (e.target.value) {
-
                                     if (e.target.files) {
                                         doLoad()
                                         await e.target.files[0].arrayBuffer()
@@ -88,7 +87,7 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
                 </Stack>
                 <Stack style={{ marginTop: '16px' }}>
                     <span style={{ fontSize: '14px', color: 'white' }}>{`${HELLO(lang)}`}</span>
-                    <span style={{ fontSize: '14px', color: 'white' }}>{`${appUser?.name}`}</span>
+                    {appUser && <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'white' }}>{`${appUser.name.split(' ').length > 1 ? appUser.name.split(' ')[0] : appUser?.name}`}</span>}
                 </Stack>
             </Stack>}
         </div>

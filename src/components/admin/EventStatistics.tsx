@@ -18,7 +18,7 @@ import axios from "axios";
 import { useLoading } from "../../context/Loading";
 import { v4 } from "uuid";
 import { isValidPublicRide } from "../../store/validators";
-import { submitButton } from "../../settings/styles";
+import { elegantShadow, submitButton } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
@@ -72,7 +72,7 @@ export default function EventStatistics() {
     const { lang } = useLanguage()
     const { openDialog, closeDialog, doLoad, cancelLoad, openDialogWithTitle } = useLoading()
     const [requests, setRequests] = useState<PNPRideRequest[] | null>(null)
-    const [sortedRequests, setSortedRequests] = useState<{ [startPoint: string]: PNPRideRequest[] } | undefined>()
+    const [sortedRequests, setSortedRequests] = useState<{ startPoint: string, rideRequests: PNPRideRequest[] }[]>()
 
     useEffect(() => {
         let unsub3: Unsubscribe | null = null
@@ -337,9 +337,9 @@ export default function EventStatistics() {
 
 
 
-        return <div >  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
-            {objectsFromStatistics ? <div> {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ נוסעים`} : <b>{total}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
-                {objectsFromStatistics && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: `repeat(${Math.floor(props.statistics.length / 2)},1fr)` }}>
+        return <div>  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
+            {objectsFromStatistics ? <div > {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ נוסעים`} : <b>{total}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
+                {objectsFromStatistics && <div style={{ display: 'grid', minWidth: '320px', height: 'fit-content', gridTemplateColumns: '1fr 1fr' }}>
                     {Object.entries(objectsFromStatistics).map((each, index: number) => <div key={each[0] + index} style={{ padding: '4px', margin: '4px', maxWidth: '200px', fontSize: '12px', fontWeight: 'bold' }}>
                         {each[0]}
                         <div style={{ fontWeight: '500', padding: '4px' }}>
@@ -370,13 +370,36 @@ export default function EventStatistics() {
                         return
                     let hashedCity;
                     const transform = Array.from(new Set(props.requests).values()).reduce((prev, cur) => {
-                        hashedCity = cities.find(city => cur.startingPoint.includes(city)) ?? cur.startingPoint;
+                        hashedCity = cities.find(city => cur.startingPoint.includes(city))?.replaceAll('ישראל', '').replaceAll(', Israel','') ?? cur.startingPoint.replaceAll('ישראל', '').replaceAll(', Israel','');
                         if (!prev[hashedCity])
                             prev[hashedCity] = [cur];
                         else prev[hashedCity].push(cur);
                         return prev;
                     }, {} as { [startPoint: string]: PNPRideRequest[] })
-                    setSortedRequests(transform)
+
+                    const merge = () => {
+                        let newArray: { startPoint: string, rideRequests: PNPRideRequest[] }[] = []
+                        Object.entries(transform).forEach(entry => {
+
+                            let key = entry[0]
+                            let matches = Object.keys(transform).find(other => (other.includes(key) || key.includes(other)) && key != other)
+                            let newDict: { startPoint: string, rideRequests: PNPRideRequest[] };
+                            if (matches) {
+                                let shorter = key.length < matches.length
+                                if (shorter) {
+                                    newDict = { startPoint: key.replace(',', ' '), rideRequests: entry[1].concat(transform[matches]) }
+                                } else {
+                                    newDict = { startPoint: matches.replace(',', ' '), rideRequests: transform[matches].concat(entry[1]) }
+                                }
+                            } else {
+                                newDict = { startPoint: entry[0], rideRequests: entry[1] }
+                            }
+                            if (!newArray.find(x => x.startPoint === newDict.startPoint))
+                                newArray.push(newDict)
+                        })
+                        return newArray;
+                    }
+                    setSortedRequests(merge())
                     cancelLoad()
                 }).catch(e => {
                     alert('אירעתה בעיה במיון הבקשות, אנא פנא למתכנת' + e)
@@ -394,7 +417,7 @@ export default function EventStatistics() {
 
             return (<div style={{ overflowX: 'hidden', marginTop: props.index === 0 ? '8px' : '2px', marginLeft: 'auto', marginRight: 'auto', alignSelf: 'center', maxWidth: '90%', display: 'flex', color: PRIMARY_BLACK, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
 
-                <Accordion sx={{ flexGrow: '1', overflowY: 'scroll', margin: '8px', background: 'whitesmoke' }}
+                <Accordion sx={{ flexGrow: '1', ...{ boxShadow: elegantShadow() }, overflowY: 'scroll', margin: '8px', background: 'whitesmoke' }}
                     expanded={expand[h(props.request)]} onClick={() => {
                         setExpand({
                             ...expand,
@@ -404,13 +427,20 @@ export default function EventStatistics() {
 
                     }}>
                     <AccordionSummary dir={'rtl'} aria-controls="panel1d-content" id="panel1d-header">
-                        <p style={{
-                            textAlign: 'right',
-                            color: PRIMARY_BLACK,
-                            margin: '0px',
-                            fontSize: '12px'
-                        }}>
-                            {expand[h(props.request)] ? 'הסתר ביקוש ' + " של " + props.request.fullName : 'ביקוש ' + " של " + props.request.fullName}</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+
+
+                            <p style={{
+                                textAlign: 'right',
+                                fontWeight: 'bold',
+                                color: PRIMARY_BLACK,
+                                margin: '0px',
+                                fontSize: '12px'
+                            }}>
+                                {expand[h(props.request)] ? 'הסתר ביקוש ' + " של " + props.request.fullName : 'ביקוש ' + " של " + props.request.fullName}</p>
+
+                            <span style={{ display: expand[h(props.request)] ? 'none' : 'inherit', marginLeft: '64px' }}>{props.request.passengers} נוסעים</span>
+                        </div>
                     </AccordionSummary>
                     <AccordionDetails>
 
@@ -450,7 +480,21 @@ export default function EventStatistics() {
                 </Accordion>{!expand[h(props.request)] && <RemoveCircleIcon sx={{ flexGrow: '0', color: '#bd3333', cursor: 'pointer' }} onClick={() => {
                     openDialog({
                         content: <div style={{ padding: '10px', color: SECONDARY_WHITE }}> {`האם תרצה להסיר ביקוש זה (אישור, אי רלוונטיות)`} <br /><br />{`ביקוש מעת`} <b>{`${props.request.fullName}`}</b><br /><button
-                            onClick={() => { firebase.realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
+                            onClick={() => {
+                                delete expand[props.request.eventId]
+                                if (requests)
+                                    for (let i = 0; i < requests.length; i++) {
+                                        let req = requests[i]
+                                        if (req.requestUserId === props.request.requestUserId
+                                            && req.eventId === props.request.eventId
+                                            && req.startingPoint === props.request.startingPoint) {
+                                            requests.splice(i, 1)
+                                            setRequests(requests)
+                                            break
+                                        }
+                                    }
+                                firebase.realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() })
+                            }}
                             style={{
                                 padding: '4px',
                                 margin: '16px',
@@ -468,6 +512,7 @@ export default function EventStatistics() {
         function populateCategory(category: string, requests: PNPRideRequest[]) {
             return <List key={category} sx={{ overflowY: 'scroll', maxHeight: '400px' }}>
                 <label style={{
+                    direction: SIDE(lang),
                     color: SECONDARY_WHITE,
                     textDecorationThickness: '.5px',
                     textDecoration: 'underline',
@@ -481,7 +526,7 @@ export default function EventStatistics() {
         return (sortedRequests ? <div>
             <h1 style={{ color: SECONDARY_WHITE }}>{'בקשות להסעה'}</h1>
             <List sx={{ maxHeight: '400px', overflowY: 'scroll' }}>
-                {Object.entries(sortedRequests).map((v) => populateCategory(v[0], v[1]))}
+                {Array.from(sortedRequests).map((v) => populateCategory(v.startPoint, v.rideRequests))}
             </List></div> : <h4 style={{ color: SECONDARY_WHITE }}>{'אין בקשות לאירוע זה'}</h4>)
     }
 

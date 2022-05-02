@@ -40,7 +40,7 @@ export default function ToolbarItem(props: {
                 textAlign: 'center',
                 borderRadius: '8px',
                 border:props.line ? '.1px solid whitesmoke' : 'none',
-                background: props.image ? 'none' : props.line ? 'rgb(40,38,55,1)' :  'rgba(0,0,0,0.0)',
+                background: props.image ? 'none' : props.line ? 'rgba(0,0,0,0.3)' :  'rgba(0,0,0,0.0)',
                 color: PRIMARY_WHITE,
                 maxHeight: 'inherit'
             },

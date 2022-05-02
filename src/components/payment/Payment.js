@@ -99,7 +99,6 @@ export function PaymentForm({ product }) {
         }
         axios.post('https://nadavsolutions.com/gserver/paymentLink', send)
             .then(res => {
-                console.log(res)
                 if (res.data.data) {
                     setPaymentLink(res.data.data.payment_page_link)
                     cancelLoad()

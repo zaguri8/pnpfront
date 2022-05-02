@@ -20,12 +20,25 @@ import Spacer from "../utilities/Spacer"
 import { getEventType, getEventTypeFromString, getEventTypePriority } from "../../store/external/converters"
 import { v4 } from "uuid"
 import { dateStringFromDate } from "../utilities/functions"
+import { useCookies } from "../../context/CookieContext"
+import { PNPPage } from "../../cookies/types"
 export default function Home() {
     const { user, firebase } = useFirebase()
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
+    const { isCacheValid, cacheDone } = useCookies()
 
     useEffect(() => {
         const unsubEvents = firebase.realTime.addListenerToPublicEvents(setPnpEvents, false)
+        let validToCache = isCacheValid(PNPPage.home)
+        if (validToCache instanceof Promise) {
+            (validToCache as Promise<boolean>).then((valid) => {
+                if (valid) {
+                    firebase.realTime.addUserStatistic(PNPPage.home)
+                    cacheDone(PNPPage.home)
+                }
+            })
+        }
+
         return () => unsubEvents()
     }, [])
 

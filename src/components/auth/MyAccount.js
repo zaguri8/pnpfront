@@ -1,4 +1,4 @@
-import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_ACCOUNT_ITEM_3, MY_ACCOUNT_ITEM_4, SIDE } from "../../settings/strings"
+import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_ACCOUNT_ITEM_3, MY_ACCOUNT_ITEM_4, MY_COINS, SIDE } from "../../settings/strings"
 import SectionTitle from "../SectionTitle"
 import spoil from '../../assets/images/myaccount/spoil-black.png'
 import settings from '../../assets/images/myaccount/settings.png'
@@ -7,23 +7,28 @@ import ridehistory from '../../assets/images/myaccount/historyRides.png'
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import '../saynomore/SayNoMoreItem.css'
 import { useLanguage } from "../../context/Language"
-import { Button } from "@mui/material"
+import { Button, Stack } from "@mui/material"
+import bus from '../../assets/images/bus.png'
 import $ from 'jquery'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY } from "../../settings/colors"
+import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useFirebase } from "../../context/Firebase"
 
 import { useNavigate } from 'react-router'
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
 import Spacer from "../utilities/Spacer"
-function MyAccountItem({ title, icon, navTo }) {
+import { useLoading } from "../../context/Loading"
+import MyCoins from "./MyCoins"
+function MyAccountItem({ title, icon, navTo, underCons }) {
     const nav = useNavigate()
-    return (<Button onClick={() => nav(navTo)} className='my_account_item' sx={{
+    const { openUnderConstruction } = useLoading()
+    const {lang} = useLanguage()
+    return (<Button onClick={() => underCons ? openUnderConstruction(lang) : nav(navTo)} className='my_account_item' sx={{
         backgroundImage: DARK_BLACK,
         borderRadius: '12.5px',
         height: '100px',
-        boxShadow: 'rgba(100, 100, 111, 0.2) 0px 2px 5px 0px',
+        boxShadow: ' rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px',
         fontFamily: 'Open Sans Hebrew',
         lineHeight: 'normal',
         width: '100px',
@@ -50,17 +55,20 @@ function MyAccountItem({ title, icon, navTo }) {
 
 export default function MyAccount() {
     const { lang } = useLanguage()
-    const { signOut } = useFirebase()
+    const { signOut, appUser } = useFirebase()
+    const { openDialog, closeDialog } = useLoading()
     useEffect(() => {
         function resize() {
             const currentWidth = window.innerWidth
             if (currentWidth > 720) {
-                $('.my_account_item').css({ 'width': '150px', height: '135px', transition: '.3125s linear' })
+                $('.my_account_item').css({ 'width': '125px', height: '110px', transition: '.3125s linear' })
                 $('.my_account_item_text').css({ 'width': '100%', transition: '.5s linear' })
+                setBgSpace('1000px center')
 
             } else {
                 $('.my_account_item').css({ 'width': '100px', height: '100px', transition: '.3125s linear' })
                 $('.my_account_item_text').css({ 'width': '100%', transition: '.5s linear' })
+                setBgSpace('300px center')
             }
         }
         window.addEventListener('resize', resize)
@@ -68,11 +76,31 @@ export default function MyAccount() {
 
         return () => { window.removeEventListener('resize', resize) }
     }, [])
-    return (<PageHolder>
+    const nav = useNavigate()
+    const logOutStyle = (width, any = {}) => ({
+        color: 'white',
+        margin: '16px',
+        width: width,
+        fontSize: '16px',
+        background: RED_ROYAL,
+        fontFamily: 'Open Sans Hebrew', ...any
+    })
+    const [bgSpace, setBgSpace] = useState('200px center')
+    return (<PageHolder style={{
+
+        backgroundImage: `url(${bus})`,
+        backgroundSize: 'contain',
+        transition: '.5s linear',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: bgSpace,
+    }}>
 
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
+        <InnerPageHolder style={{
 
-        <InnerPageHolder style={{ background: 'rgb(40,38,55,1)' }} >
+            background: 'none',
+            border: 'none'
+        }} >
             <div dir={SIDE(lang)} id='my_account_grid' style={{
                 display: 'grid',
                 gridTemplateRows: '1fr 1fr',
@@ -81,22 +109,42 @@ export default function MyAccount() {
                 gap: '4vw 6vw'
             }}>
 
-                <MyAccountItem navTo={'/'} icon={coins} title={MY_ACCOUNT_ITEM_1(lang)} />
-                <MyAccountItem navTo={'/'} icon={'https://img.icons8.com/ios/50/000000/gift--v1.png'} title={MY_ACCOUNT_ITEM_2(lang)} />
+                <MyAccountItem underCons={true} navTo={'/'} icon={coins} title={MY_ACCOUNT_ITEM_1(lang)} />
+                <MyAccountItem underCons={true} navTo={'/'} icon={'https://img.icons8.com/ios/50/000000/gift--v1.png'} title={MY_ACCOUNT_ITEM_2(lang)} />
 
 
 
                 <MyAccountItem navTo={'/myaccount/transactions'} icon={ridehistory} title={MY_ACCOUNT_ITEM_3(lang)} />
-                <MyAccountItem navTo={'/'} icon={settings} title={MY_ACCOUNT_ITEM_4(lang)} />
+                <MyAccountItem underCons={true} navTo={'/'} icon={settings} title={MY_ACCOUNT_ITEM_4(lang)} />
 
             </div>
         </InnerPageHolder>
 
-        <Button onClick={() => signOut()} style={{
-            color: 'white',
-            margin: '16px',
-            fontSize: '16px',
-            fontFamily: 'Open Sans Hebrew'
-        }}>{LOGOUT(lang)}</Button>
+        <Button onClick={() => {
+            openDialog({
+                content: <Stack>
+                    <span
+                        dir={SIDE(lang)}
+                        style={{
+                            padding: '8px',
+                            color: SECONDARY_WHITE
+                        }}>{lang === 'heb' ? 'האם ברצונך להתנתק מחשבון זה ' : 'Would you like to log out of this account : '}</span>
+                    <span
+                        dir={SIDE(lang)}
+                        style={{
+                            padding: '8px',
+                            color: SECONDARY_WHITE
+                        }}>{appUser.email}</span>
+                    <Button style={logOutStyle('50%', { alignSelf: 'center' })} onClick={() => {
+                        closeDialog()
+                        alert('התנתקת בהצלחה.')
+                        signOut()
+                        nav('/')
+                    }} >
+                        {LOGOUT(lang)}
+                    </Button>
+                </Stack>
+            })
+        }} style={logOutStyle('fit-content')}>{LOGOUT(lang)}</Button>
     </PageHolder>)
 }

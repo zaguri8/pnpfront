@@ -52,13 +52,13 @@ export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
       && event.eventHours.endHour !== null
       && event.eventHours.startHour !== 'null'
       && event.eventHours.endHour !== 'null')
-    && (event.eventImageURL !== null
-      && event.eventImageURL !== 'null')
     && (event.eventLocation !== null
       && event.eventLocation !== 'null')
     && (event.eventTitle !== null)
     && (event.eventTitle !== 'null')
 }
+
+
 
 export function isValidCoupon(coupon: PNPCoupon) {
   return coupon
@@ -93,6 +93,8 @@ export function isValidPrivateRide(ride: PNPPrivateRide): boolean {
       && ride.rideStartingPoint !== 'null')
 }
 
+
+
 export function isValidPublicRide(ride: PNPPublicRide): boolean {
   return ride !== undefined
     && ride !== null
@@ -111,12 +113,16 @@ export function isValidPublicRide(ride: PNPPublicRide): boolean {
     && (ride.rideTime !== null
       && ride.rideTime !== 'null')
 }
-export function isValidRideConfirmation(ride: PNPRideConfirmation): boolean {
+export function isValidRideConfirmation(ride: PNPRideConfirmation | undefined): boolean {
   return ride !== undefined
     && ride !== null
     && (ride.userId !== null
       && ride.userId !== 'null')
     && (ride.passengers !== null
+      && ride.phoneNumber !== 'null')
+    && (ride.phoneNumber !== null
+      && ride.userName !== 'null')
+    && (ride.userName !== null
       && ride.passengers !== 'null')
     && (ride.date !== null
       && ride.date !== 'null')

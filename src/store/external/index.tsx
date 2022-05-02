@@ -1,5 +1,5 @@
 import { Auth } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation } from './types'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
@@ -144,7 +144,7 @@ export class Realtime {
                             rideStartPoint: nextRef!.child('startPoint').val(),
                             uid: user.key!,
                             extraPeople: nextRef!.child('extraPeople').val(),
-                            amount: transaction.child('amount').val()
+                            amount: nextRef!.child('amount').val()
                         })
                     }
                 })
@@ -256,7 +256,7 @@ export class Realtime {
      * @returns confirmation of event attendance for current user if exists
      */
     getRideConfirmationByEventId(eventId: string, userId: string, consume: ((confirmation: PNPRideConfirmation | null) => void)) {
-        return onValue(child(child(child(this.rides, 'confirmations'), userId), eventId), (snap) => {
+        return onValue(child(child(child(this.rides, 'confirmations'), eventId), userId), (snap) => {
             if (snap.exists()) {
                 consume(rideConfirmationFromDict(snap))
             } else consume(null)
@@ -269,15 +269,11 @@ export class Realtime {
   * @returns confirmation of event attendance for current user if exists
   */
     getAllRideConfirmationByEventId(eventId: string, consume: ((confirmations: PNPRideConfirmation[] | null) => void)) {
-        return onValue(child(this.rides, 'confirmations'), (snap) => {
+        return onValue(child(child(this.rides, 'confirmations'), eventId), (snap) => {
             if (snap.exists()) {
                 const total: PNPRideConfirmation[] = []
-                let relevant;
                 snap.forEach((userConfirmationsSnap) => {
-                    relevant = userConfirmationsSnap.child(eventId)
-                    if (relevant.exists()) {
-                        total.push(rideConfirmationFromDict(relevant))
-                    }
+                    total.push(rideConfirmationFromDict(userConfirmationsSnap))
                 })
                 consume(total)
             } else consume(null)
@@ -294,6 +290,8 @@ export class Realtime {
             consume(users)
         }, error)
     }
+
+
 
 
     async getAllUsersByIds(ids_and_extraPeople: { uid: string, extraPeople: { fullName: string, phoneNumber: string }[] }[]): Promise<{ user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] | null> {
@@ -329,11 +327,8 @@ export class Realtime {
      */
     async addRideConfirmation(confirmation: PNPRideConfirmation): Promise<object | void> {
         if (this.auth.currentUser != null) {
-            return await set(child(child(child(this.rides, 'confirmations'),
-                this.auth.currentUser.uid),
-                confirmation.eventId),
-                confirmation)
-                .catch((e) => { this.createError('addRideConfirmation', e) })
+            let newPath = push(child(child(this.rides, 'confirmations'), confirmation.eventId))
+            return await set(newPath, confirmation)
         }
     }
     /**
@@ -341,9 +336,9 @@ export class Realtime {
        * @param ride a public ride to be added
        * @returns a new reference or error reference
        */
-    addPublicRide = async (eventId: string, ride: PNPPublicRide): Promise<object | void> => {
+    addPublicRide = async (eventId: string, ride: PNPPublicRide, privateEvent: boolean = false): Promise<object | void> => {
         ride.eventId = eventId
-        const newRef = push(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId))
+        const newRef = push(child(child(child(this.rides, privateEvent ? 'private' : 'public'), 'ridesForEvents'), eventId))
         ride.rideId = newRef.key!
 
         if (ride.extras.isRidePassengersLimited) {
@@ -364,6 +359,9 @@ export class Realtime {
     removePublicRide = async (eventId: string, rideId: string): Promise<object | void> => {
         return await remove(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId))
     }
+    removePrivateRide = async (eventId: string, rideId: string): Promise<object | void> => {
+        return await remove(child(child(child(child(this.rides, 'private'), 'ridesForEvents'), eventId), rideId))
+    }
 
 
     /**
@@ -379,6 +377,76 @@ export class Realtime {
                 .catch((e) => { this.createError('addPublicRide', e) })
         }
     }
+
+
+    addPrivateEvent = async (event: PNPPrivateEvent, imageBuffer?: ArrayBuffer): Promise<{ id: string } | void> => {
+        if (this.auth.currentUser) {
+            const p = push(child(child(this.allEvents, 'private'), 'waiting'))
+            event.eventId = p.key!
+            if (imageBuffer) {
+                return await uploadBytes(storageRef(this.storage, 'PrivateEventImages/' + "/" + event.eventId), imageBuffer)
+                    .then(async snap => {
+                        return await getDownloadURL(snap.ref)
+                            .then(async url => {
+                                event.eventImageURL = url
+                                return await set(p, event).then(() => {
+                                    return { id: p.key! }
+                                }).catch((e) => { this.createError('addPrivateEvent', e) })
+                            })
+                    })
+            } else {
+                return await set(p, event).then(() => {
+                    return { id: event.eventId }
+                }).catch((e) => { this.createError('addPrivateEvent', e) })
+            }
+        }
+    }
+
+
+    addListenerToPrivateEvents = (consume: (o: { [type: string]: PNPPrivateEvent[] }) => void, includeWaiting: boolean) => {
+        return onValue(child(this.allEvents, 'private'), snap => {
+            const hashTable: { [type: string]: PNPPrivateEvent[] } = {}
+
+            let p: any = null;
+            snap.forEach((type) => {
+                p = type.key!
+                if (includeWaiting || p !== 'waiting') {
+                    type.forEach(event => {
+                        if (!p || !hashTable[p])
+                            hashTable[p] = [privateEventFromDict(event)]
+                        else hashTable[p].push(privateEventFromDict(event))
+                    })
+                }
+            })
+
+            let spl, spl2;
+            for (var k of Object.keys(hashTable))
+                hashTable[k].sort((e1: PNPPrivateEvent, e2: PNPPrivateEvent) => {
+                    spl = e1.eventDate.split('/');
+                    spl2 = e2.eventDate.split('/');
+                    if (Number(spl[2]) > Number(spl2[2])) {
+                        return -1;
+                    } else if (Number(spl2[2]) > Number(spl[2]))
+                        return 1;
+
+                    if (Number(spl[1]) > Number(spl2[1])) {
+                        return -1;
+                    } else if (Number(spl2[1]) > Number(spl[1]))
+                        return 1;
+
+                    if (Number(spl[0]) > Number(spl2[0])) {
+                        return -1;
+                    } else if (Number(spl2[2]) > Number(spl[2]))
+                        return 1;
+                    return 0;
+                })
+            consume(hashTable)
+        })
+    }
+
+
+
+
 
     /**
     * addListenerToRideRequests
@@ -532,8 +600,26 @@ export class Realtime {
         }
 
         if (blob) {
-            console.log("Blob")
             return await uploadBytes(storageRef(this.storage, 'EventImages/' + event.eventType + "/" + event.eventId), blob)
+                .then(async snap => {
+                    return await getDownloadURL(snap.ref)
+                        .then(async url => {
+                            event.eventImageURL = url
+                            return uploadEvent();
+                        })
+                })
+        } else return await uploadEvent()
+
+    }
+
+    updatePrivateEvent = async (eventId: string, event: any, blob?: ArrayBuffer) => {
+        const uploadEvent = async () => {
+            // update same route
+            return await update(child(child(child(this.allEvents, 'private'), 'approved'), eventId), event)
+                .catch((e) => { this.createError('updatePrivateEvent', e) })
+        }
+        if (blob) {
+            return await uploadBytes(storageRef(this.storage, 'PrivateEventImages/' + "/" + event.eventId), blob)
                 .then(async snap => {
                     return await getDownloadURL(snap.ref)
                         .then(async url => {
@@ -602,15 +688,6 @@ export class Realtime {
             })
     }
 
-    /**
-     * updatePrivateEvent
-     * @param eventId eventId to be updated
-     * @param event event values to be updated
-     * @returns update callback
-     */
-    updatePrivateEvent = async (eventId: string, event: object) => {
-        return await update(child(child(this.allEvents, 'private'), eventId), event)
-    }
 
     /**
      * updatePrivateRide
@@ -630,7 +707,7 @@ export class Realtime {
  * @param ride ride values to be updated
  * @returns update callback
  */
-    updatePublicRide = async (eventId: string, rideId: string, ride: any) => {
+    updatePublicRide = async (eventId: string, rideId: string, ride: any, privateEvent: boolean = false) => {
 
         if (ride.extras.isRidePassengersLimited) {
             let newStatus: 'on-going' | 'sold-out' | 'running-out';
@@ -644,7 +721,7 @@ export class Realtime {
             }
             ride.extras.rideStatus = newStatus;
         }
-        return await update(child(child(child(child(this.rides, 'public'),
+        return await update(child(child(child(child(this.rides, privateEvent ? 'private' : 'public'),
             'ridesForEvents'), eventId), rideId), ride)
     }
     /**
@@ -755,19 +832,46 @@ export class Realtime {
         })
     }
 
+    addUserStatistic(page: PNPPage) {
+        let stat = 'numberOfUsersAttended'
+        const pageValue = page.valueOf()
+        let dateString = dateStringFromDate(getCurrentDate()).replaceAll('/', '-')
+        try {
+            get(child(child(child(this.statistics, pageValue), dateString), stat))
+                .then(snapshot => {
+                    const val = snapshot.val()
+                    update(child(child(this.statistics, pageValue), dateString), { numberOfUsersAttended: val ? (val + 1) : 1 })
+                })
+        } catch (e) { }
+
+    }
+
+    addListenerToUserStatistics(consume: (stats: UserEnterStatistics) => void) {
+        return onValue(child(this.statistics, PNPPage.home), (snap) => {
+            let output: UserEnterStatistics;
+            let all_stats: UserDateSpecificStatistics[] = [];
+            snap.forEach(date => {
+                let actualStringDate = date.key!
+                all_stats.push({ date: actualStringDate, numberOfUserAttended: date.child('numberOfUsersAttended').val() })
+            })
+            output = { stats: all_stats }
+            consume(output)
+        })
+    }
 
     addBrowsingStat(page: PNPPage, stat: 'leaveNoAttendance' | 'leaveWithAttendance') {
         const pageValue = page.valueOf()
+        let dateString = dateStringFromDate(getCurrentDate()).replaceAll('/', '-')
         try {
-            get(child(child(this.statistics, pageValue), stat))
+            get(child(child(child(this.statistics, pageValue), dateString), stat))
                 .then(snapshot => {
+                    const val = snapshot.val()
                     switch (stat) {
                         case 'leaveNoAttendance':
-                            const val = snapshot.val()
-                            update(child(this.statistics, pageValue), { leaveNoAttendance: val ? (val + 1) : 1 })
+                            update(child(child(this.statistics, pageValue), dateString), { leaveNoAttendance: val ? (val + 1) : 1 })
                             break;
                         case 'leaveWithAttendance':
-                            update(child(this.statistics, pageValue), { leaveWithAttendance: val ? (val + 1) : 1 })
+                            update(child(child(this.statistics, pageValue), dateString), { leaveWithAttendance: val ? (val + 1) : 1 })
                             break;
                     }
                 })
@@ -775,8 +879,8 @@ export class Realtime {
 
     }
 
-    addListenerToBrowsingStat(page: PNPPage, consume: (data: { leaveNoAttendance: number, leaveWithAttendance: number }) => void) {
-        return onValue(child(this.statistics, page), (snap) => {
+    addListenerToBrowsingStat(page: PNPPage, date: string, consume: (data: { leaveNoAttendance: number, leaveWithAttendance: number }) => void) {
+        return onValue(child(child(this.statistics, page.valueOf()), date), (snap) => {
             const withAttendnace = snap.child('leaveWithAttendance').val()
             const noAttendance = snap.child('leaveNoAttendance').val()
             consume({ leaveNoAttendance: noAttendance, leaveWithAttendance: withAttendnace })
@@ -796,6 +900,22 @@ export class Realtime {
                     })
             }).catch(e => {
                 this.createError('approveEvent', e)
+            })
+    }
+
+    approvePrivateEvent = async (eventId: string) => {
+        const eventRef = child(child(child(this.allEvents, 'private'), 'waiting'), eventId)
+        get(eventRef)
+            .then(snap => {
+                remove(eventRef)
+                    .then(async () => {
+                        const event = privateEventFromDict(snap)
+                        return await set(child(child(child(this.allEvents, 'private'), 'approved'), eventId), event)
+                    }).catch(e => {
+                        this.createError('approvePrivateEvent', e)
+                    })
+            }).catch(e => {
+                this.createError('approvePrivateEvent', e)
             })
     }
 
@@ -858,7 +978,7 @@ export class Realtime {
      * @returns private event if found
      */
     getPrivateEventById = (id: string, consume: ((event: PNPPrivateEvent) => void)) => {
-        return onValue(child(child(this.allEvents, 'private'), id), (val) => {
+        return onValue(child(child(child(this.allEvents, 'private'), 'approved'), id), (val) => {
             consume(privateEventFromDict(val))
         })
     }
