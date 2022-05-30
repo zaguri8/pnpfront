@@ -87,7 +87,7 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
                 </Stack>
                 <Stack style={{ marginTop: '16px' }}>
                     <span style={{ fontSize: '14px', color: 'white' }}>{`${HELLO(lang)}`}</span>
-                    {appUser && <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'white' }}>{`${appUser.name.split(' ').length > 1 ? appUser.name.split(' ')[0] : appUser?.name}`}</span>}
+                    {appUser && appUser.name &&  <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'white' }}>{`${appUser.name.split(' ').length > 1 ? appUser.name.split(' ')[0] : appUser?.name}`}</span>}
                 </Stack>
             </Stack>}
         </div>

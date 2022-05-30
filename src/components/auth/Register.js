@@ -27,15 +27,15 @@ import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
 
 let finishRegister = false
-export default function Register() {
 
 
-    const nav = useNavigate()
-    const { firebase, appUser } = useFirebase()
-    const location = useLocation()
+export function RegistrationForm({
+    registrationSuccessAction,
+    externalRegistration = false,
+    registerButtonText,
+    style = {} }) {
+    const { firebase } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
-
-    const { isCacheValid, cacheDone } = useCookies()
 
     const useStyles = makeStyles(theme => ({
         labelRoot: {
@@ -100,10 +100,6 @@ export default function Register() {
     function updateSelectedFavoriteEvents(favs) {
         setUser({ ...user, ...{ selectedFavoriteEvents: favs } })
     }
-
-
-
-    const { openDialog } = useLoading()
     function register(e) {
 
         function validate(phone, fullName) {
@@ -157,26 +153,12 @@ export default function Register() {
                     producer: false
                 }).then(result => {
                     cancelLoad()
-                    isCacheValid(PNPPage.register)
-                        .then(valid => {
-                            if (valid) {
-                                firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
-                                cacheDone(PNPPage.register)
-                            }
-                        })
-                    if (location.state && location.state.cachedLocation) {
-                        nav(location.state.cachedLocation)
-                    } else {
-                        nav('/')
-                    }
-                    openDialog({ content: <Welcome /> })
+                    registrationSuccessAction(firebase.auth.currentUser)
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
                     firebase.realTime.createError('Register error', err)
                     cancelLoad()
                 })
-
-
             }).catch(err => {
                 if (err.message.includes('auth/email-already-in-use')) {
                     alert('האימייל שהזנת קיים כבר במערכת')
@@ -194,6 +176,92 @@ export default function Register() {
         setTermsOfUse(e.target.checked)
     }
 
+    return <div style={{
+        ...{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '80%',
+            minWidth: '300px',
+            flexDirection: 'column',
+            alignItems: 'center'
+        }, ...style
+    }}>
+
+        <Stack spacing={3} style={{ width: '80%' }}>
+            <FormControl>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{FULL_NAME(lang)}</label>
+                <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
+                    classes={{ root: classes.root }}
+                    placeholder={FULL_NAME(lang)}
+                    onChange={(e) => { updateFullName(e.target.value) }}
+                    id="first_name_input" aria-describedby="first_name_helper_text" />
+
+            </FormControl>
+            <FormControl>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PHONE_NUMBER(lang)}</label>
+                <TextField
+                    type="tel"
+                    placeholder={PHONE_NUMBER(lang)}
+                    onChange={(e) => { updateUserPhone(e.target.value) }}
+                    name="phone"
+                    classes={{ root: classes.root }}
+                    autoComplete="phone"
+                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
+
+            </FormControl>
+            <FormControl>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EMAIL(lang)}</label>
+                <TextField
+                    autoComplete="username"
+                    type='email'
+                    onChange={(e) => { updateEmail(e.target.value) }}
+                    placeholder={EMAIL(lang)}
+                    name="email"
+                    classes={{ root: classes.root }}
+                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
+
+            </FormControl>
+
+            <FormControl>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PASSWORD(lang)}</label>
+                <TextField
+                    autoComplete="new-password"
+                    type="password"
+                    placeholder={PASSWORD(lang)}
+                    onChange={(e) => { updatePassword(e.target.value) }}
+                    classes={{ root: classes.root }}
+                    name="new-password"
+                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
+            </FormControl>
+
+            <Button title={registerButtonText}
+                type={'button'}
+                style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '24px' } }}
+                variant="outlined"
+                onClick={register} />
+
+            {!externalRegistration && <div>
+                <Link style={{ textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
+            </div>}
+            <Stack >
+
+
+                <label style={{ fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
+                <Checkbox
+                    style={{ width: 'fit-content', alignSelf: 'center', background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
+                    onChange={handleTermsOfUseChange}
+                    name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
+            </Stack>
+
+        </Stack>
+    </div >
+}
+export default function Register() {
+    const nav = useNavigate()
+    const { lang } = useLanguage()
+    const location = useLocation()
+    const { isCacheValid, cacheDone } = useCookies()
+    const { openDialog } = useLoading()
     useEffect(() => {
         return () => {
             if (!finishRegister)
@@ -206,110 +274,32 @@ export default function Register() {
                     })
         }
     }, [])
-
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder style={{ background: BLACK_ROYAL }}>
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                width: '80%',
-                minWidth: '300px',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-                <SectionTitle title={REGISTER_TITLE(lang)} style={{
-                    background: 'none',
-                    marginTop: '0px',
-                    marginBottom: '32px'
+            <SectionTitle title={REGISTER_TITLE(lang)} style={{
+                background: 'none',
+                marginTop: '0px',
+                marginBottom: '32px'
+            }} />
+            <RegistrationForm
+                externalRegistration={false}
+                registerButtonText={REGISTER_OK(lang)}
+                registrationSuccessAction={(user) => {
+                    isCacheValid(PNPPage.register)
+                        .then(valid => {
+                            if (valid) {
+                                firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
+                                cacheDone(PNPPage.register)
+                            }
+                        })
+                    if (location.state && location.state.cachedLocation) {
+                        nav(location.state.cachedLocation)
+                    } else {
+                        nav('/')
+                    }
+                    openDialog({ content: <Welcome /> })
                 }} />
-                <Stack spacing={3} style={{ width: '80%' }}>
-                    <FormControl>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{FULL_NAME(lang)}</label>
-                        <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
-                            classes={{ root: classes.root }}
-                            placeholder={FULL_NAME(lang)}
-                            onChange={(e) => { updateFullName(e.target.value) }}
-                            id="first_name_input" aria-describedby="first_name_helper_text" />
-
-                    </FormControl>
-                    <FormControl>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PHONE_NUMBER(lang)}</label>
-                        <TextField
-                            type="tel"
-                            placeholder={PHONE_NUMBER(lang)}
-                            onChange={(e) => { updateUserPhone(e.target.value) }}
-                            name="phone"
-                            classes={{ root: classes.root }}
-                            autoComplete="phone"
-                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
-
-                    </FormControl>
-                    <FormControl>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EMAIL(lang)}</label>
-                        <TextField
-                            autoComplete="username"
-                            type='email'
-                            onChange={(e) => { updateEmail(e.target.value) }}
-                            placeholder={EMAIL(lang)}
-                            name="email"
-                            classes={{ root: classes.root }}
-                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
-
-                    </FormControl>
-
-                    <FormControl>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PASSWORD(lang)}</label>
-                        <TextField
-                            autoComplete="new-password"
-                            type="password"
-                            placeholder={PASSWORD(lang)}
-                            onChange={(e) => { updatePassword(e.target.value) }}
-                            classes={{ root: classes.root }}
-                            name="new-password"
-                            sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
-                    </FormControl>
-                    {/* 
-                    <FormControl style={{ width: '80%', alignSelf: 'center' }}>
-                        <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{BIRTH_DATE(lang)}</label>
-                        <TextField
-
-                            value={unReverseDate(user.birthDate)}
-                            classes={{ root: classes.root }}
-                            InputLabelProps={{
-                                shrink: true,
-                                style: { color: SECONDARY_WHITE }
-                            }}
-
-                            type='date'
-                            onChange={(e) => { updateBirthDate(e.target.value) }}
-                            required />
-                    </FormControl> */}
-                    {/* <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'עזור לנו להכיר אותך : בחר את סוגי האירועים האהובים עלייך' : 'Help us know you better: Choose your favorite event types'}</label>
-                    <FavoriteEventsDialog />
- */}
-
-                    <Button title={REGISTER_OK(lang)}
-                        type={'button'}
-                        style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '24px' } }}
-                        variant="outlined"
-                        onClick={register} />
-
-                    <div>
-                        <Link style={{ textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/login'}>{ALREADY_REGISTERED(lang)}</Link>
-                    </div>
-                    <Stack >
-
-
-                        <label style={{ fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
-                        <Checkbox
-                            style={{ width: 'fit-content', alignSelf: 'center', background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
-                            onChange={handleTermsOfUseChange}
-                            name={TERMS_OF_USE(lang)} value={TERMS_OF_USE(lang)} />
-                    </Stack>
-
-                </Stack>
-            </div>
         </InnerPageHolder>
     </PageHolder >)
 }

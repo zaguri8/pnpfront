@@ -34,7 +34,7 @@ export function PaymentForm({ product }) {
     const [extraPeople, setExtraPeople] = useState([])
     const requestPayment = () => {
         if (!firebase.auth.currentUser || !appUser) {
-            nav('/login', { cachedLocation: location.pathname })
+            nav('/login', { state: { cachedLocation: location.pathname } })
             return
         }
 
@@ -174,7 +174,7 @@ export function PaymentForm({ product }) {
     }
 
     const PaymentMethodsImages = () => {
-        return (<Stack direction={'row'} alignSelf={'center'} style = {{marginTop:'16px'}}  spacing={2}>
+        return (<Stack direction={'row'} alignSelf={'center'} style={{ marginTop: '16px' }} spacing={2}>
             <img style={{ marginLeft: '4px', width: '50px', height: '24px', alignSelf: 'center', background: SECONDARY_WHITE, marginBottom: '0px' }} src={credit_cards} />
 
             <img style={{ marginRight: '4px', borderRadius: '8px', width: '32px', height: '32px', alignSelf: 'center', background: SECONDARY_WHITE, marginBottom: '0px' }} src={bit} />
@@ -205,7 +205,7 @@ export function PaymentForm({ product }) {
             <span style={{ width: '90%' }}>
                 <Button onClick={requestPayment}
 
-                    sx={{ ...submitButton(false), ... { margin: '0px',textTransform:'none', background: product.soldOut ? SECONDARY_BLACK : DARKER_BLACK_SELECTED, padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
+                    sx={{ ...submitButton(false), ... { margin: '0px', textTransform: 'none', background: product.soldOut ? SECONDARY_BLACK : DARKER_BLACK_SELECTED, padding: '8px', fontSize: '16px', marginTop: '16px', width: lang === 'heb' ? '75%' : '90%' } }}
                     disabled={product.soldOut} >{product.soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'SOLD OUT') : CONTINUE_TO_SECURE_PAYMENT(lang)}</Button>
             </span>
         </HtmlTooltip>
@@ -264,7 +264,7 @@ export function PaymentForm({ product }) {
 
             borderRadius: '8px',
             background: PRIMARY_BLACK,
-            marginBottom: pNum === ticketAmount - 1 ?  '16px' : '0px',
+            marginBottom: pNum === ticketAmount - 1 ? '16px' : '0px',
             color: 'white',
             marginTop: pNum === 2 ? '4px' : '16px',
             paddingTop: '16px',
@@ -283,7 +283,7 @@ export function PaymentForm({ product }) {
 
             <Stack justifyContent='center' alignItems={'center'} spacing={1}>
 
-                <img src="https://i.ibb.co/cyyqtkM/pngaaa-com-263515.png" style={{ height: '50px', width: 'fit-content',maxWidth:'75px', marginLeft: '16px' }} />
+                <img src="https://i.ibb.co/cyyqtkM/pngaaa-com-263515.png" style={{ height: '50px', width: 'fit-content', maxWidth: '75px', marginLeft: '16px' }} />
                 <Stack direction={'row'} justifyContent={'center'} >
 
                     <label style={{ textAlign: 'start', alignSelf: 'center', fontWeight: 'bold' }}>{lang === 'heb' ? 'נוסע ' + (pNum) : 'Passenger ' + (pNum)}</label>
@@ -352,7 +352,7 @@ export function PaymentForm({ product }) {
                 <AdditionalPeople />
                 <SubmitButtonPayment />
                 <Stack  >
-                <PaymentMethodsImages />
+                    <PaymentMethodsImages />
                     <label style={{ paddingTop: '16px', fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                     <input
                         type="checkbox"

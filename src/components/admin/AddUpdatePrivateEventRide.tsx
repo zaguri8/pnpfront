@@ -77,6 +77,13 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
         })
     }
 
+    const changeTwoWayOnly = (twoWay: boolean) => {
+        setRide({
+            ...ride,
+            extras: { ...ride.extras, twoWayOnly: twoWay }
+        })
+    }
+
     const changeRideDirections = (directions: '1' | '2') => {
         setRide({
             ...ride,
@@ -150,12 +157,24 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
 
     }
     return <Stack spacing={2} style={{ padding: '16px', minWidth: '250px' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}><label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית'}</label>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית'}</label>
             <Checkbox
                 style={{ width: 'fit-content', alignSelf: 'center' }}
                 checked={ride.extras.twoWay}
                 onChange={(e) => {
                     changeRideWays(e.target.checked)
+                }}
+                inputProps={{ 'aria-label': 'controlled' }}
+            /></div>
+
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית בלבד'}</label>
+            <Checkbox
+                style={{ width: 'fit-content', alignSelf: 'center' }}
+                checked={ride.extras.twoWayOnly}
+                onChange={(e) => {
+                    changeTwoWayOnly(e.target.checked)
                 }}
                 inputProps={{ 'aria-label': 'controlled' }}
             /></div>

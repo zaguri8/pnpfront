@@ -159,12 +159,16 @@ export default function InvitationStatistics() {
         let unsub2: Unsubscribe | undefined
         let unsub3: Unsubscribe | undefined
         if (privateEvent) {
+            const default_no_arrival = 'אישורי הגעה ללא הסעה'
             unsub = firebase.realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
                 if (confs) {
                     let hash: { [dir: string]: PNPRideConfirmation[] } = {}
                     for (let conf of confs) {
                         if (!conf.rideArrival) {
-                            hash['אישורי הגעה ללא הסעה'].push(conf)
+                            if (!hash[default_no_arrival])
+                                hash[default_no_arrival] = [conf]
+                            else
+                                hash[default_no_arrival].push(conf)
                         } else if (hash[conf.directions]) {
                             hash[conf.directions].push(conf)
                         } else {
@@ -471,7 +475,6 @@ export default function InvitationStatistics() {
 
                                                 {function confirmationsRideArrivalsTable() {
                                                     if (entry[1].length < 1) return null
-                                                    const rideArrivals = entry[1].filter(conf => conf.rideArrival)
                                                     return <React.Fragment>
 
                                                         <TableBody style={{
@@ -481,8 +484,8 @@ export default function InvitationStatistics() {
                                                             minWidth: '280px',
                                                             maxWidth: '300px'
                                                         }} >
-                                                            <h3 style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'אישורי הגעה בהסעות' : 'Ride Arrival confirmations'}</h3>
-                                                            {rideArrivals.map(confirmation =>
+                                    
+                                                            {entry[1].map(confirmation =>
 
                                                                 <HtmlTooltip
                                                                     key={v4()}
@@ -493,7 +496,9 @@ export default function InvitationStatistics() {
 
                                                                     <TableRow
                                                                         onClick={() => {
+                                                                            if( confirmation.rideArrival)
                                                                             openConfirmationUpdateDialog(confirmation)
+                                                                            else alert('לא ניתן לערוך אישור ללא הסעה')
                                                                         }}
                                                                     >
                                                                         <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '50px', textAlign: 'center', fontSize: '12px' } }}>
@@ -504,7 +509,7 @@ export default function InvitationStatistics() {
                                                                         </TableCell>
 
                                                                         <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '50px', textAlign: 'center', fontSize: '12px' } }}>
-                                                                            {confirmation.rideArrival ?   (confirmation.guests > (confirmation.passengers ??1) ?  confirmation.guests : confirmation.passengers) : confirmations.guests}
+                                                                            {confirmation.rideArrival ? confirmation.passengers : confirmation.guests}
                                                                         </TableCell>
                                                                         <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '100px', textAlign: 'center', fontSize: '12px' } }}>
                                                                             {confirmation.phoneNumber}

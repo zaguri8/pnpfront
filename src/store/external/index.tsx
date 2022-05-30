@@ -5,7 +5,7 @@ import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
 import { DocumentData } from 'firebase/firestore'
 import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
-import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, query, ref, remove, set, update } from 'firebase/database'
+import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, query, ref, remove, set, Unsubscribe, update } from 'firebase/database'
 import {
     Firestore,
     QuerySnapshot,
@@ -205,7 +205,7 @@ export class Realtime {
     async updateConfirmation(eventId: string,
         userName: string,
         confirmation: PNPRideConfirmation) {
-       return await get(child(child(this.rides, 'confirmations'), eventId))
+        return await get(child(child(this.rides, 'confirmations'), eventId))
             .then(snap => {
                 snap.forEach(child => {
                     if (child.child('userName').val() === userName) {
@@ -231,6 +231,12 @@ export class Realtime {
                 })
                 error()
             }).catch((e) => this.createError("getUserIdByEmail", e));
+    }
+
+    getUserById(id: string, consume: (u: PNPUser) => void): Unsubscribe {
+        return onValue(child(this.users, id), (snap) => {
+            consume(userFromDict(snap))
+        })
     }
 
 

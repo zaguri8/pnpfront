@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import 'firebase/compat/auth';
 
 import $ from 'jquery'
+import { RegistrationForm } from '../auth/Register';
 import { List, Button, MenuItem, Stack, TextField, Typography, Checkbox } from '@mui/material';
 
 import { useFirebase } from '../../context/Firebase';
-import { PNPPrivateEvent, PNPRideConfirmation, PNPRideDirectionNumber } from '../../store/external/types';
+import { PNPPrivateEvent, PNPRideConfirmation, PNPRideDirectionNumber, PNPUser } from '../../store/external/types';
 import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../../store/validators';
 
 import { PNPPublicRide } from '../../store/external/types';
@@ -24,6 +25,7 @@ import { makeStyles } from '@mui/styles';
 import Spacer from '../utilities/Spacer';
 import { useCookies } from '../../context/CookieContext';
 import { getDefaultConfirmation } from '../../store/external/helpers';
+import { User } from 'firebase/auth';
 function InvitationCard() {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
     const [newConfirmation, setNewConfirmation] = useState<PNPRideConfirmation>()
@@ -96,28 +98,33 @@ function InvitationCard() {
         fontFamily: 'Open Sans Hebrew'
     }
     const nav = useNavigate()
-    async function sendInvitation() {
-        if (!appUser || !user) {
+    async function sendInvitation(userId?: string, u?: PNPUser) {
+        if (!u && (!appUser || !user)) {
             alert('יש להירשם על מנת לאשר הגעה')
-            nav('/login')
+            nav('/login', { state: { cachedLocation: location.pathname } })
             return
         }
-        if (!event || !rides || !selectedEventRide)
+        if (!event || !rides || (!selectedEventRide && newConfirmation?.rideArrival))
             return
 
         let actualConfirmation = event.registrationRequired ? {
             ...newConfirmation,
-            userName: appUser.name,
-            userId: user.uid,
-            phoneNumber: appUser.phone
+            userName: u?.name ?? appUser!.name,
+            userId: userId ?? user!.uid,
+            phoneNumber: u?.phone ?? appUser!.phone
         } as PNPRideConfirmation : newConfirmation
 
+        if (actualConfirmation && !newConfirmation?.rideArrival) {
+            actualConfirmation.directionType = '0'
+            actualConfirmation.directions = '0'
+        }
         if (!isValidRideConfirmation(actualConfirmation)) {
             alert('אנא מלא את פרטייך ובחר הסעה')
+            console.log(actualConfirmation)
             return
         }
         doLoad()
-        if (isValidPublicRide(selectedEventRide.ride!)) {
+        if (!newConfirmation?.rideArrival || (isValidPublicRide(selectedEventRide!.ride!))) {
             await saveInvitationConfirmation(actualConfirmation!)
                 .then(() => {
                     firebase.realTime.addRideConfirmation(actualConfirmation!)
@@ -162,7 +169,7 @@ function InvitationCard() {
                                 style={{ color: SECONDARY_WHITE, fontSize: '12px', marginTop: '48px' }}
                             >{lang === 'heb' ? 'שעת יציאה,שעת חזרה' : 'Ride time,Back time'}</span>
                         </Stack>
-                        <MenuItem
+                        {!ride.extras.twoWayOnly && <MenuItem
                             onClick={() => {
                                 handleSelectEventRide(ride, 1)
                             }} style={{
@@ -181,8 +188,8 @@ function InvitationCard() {
                             }} value={ride.rideId}>
                             <span style={spanStyle}>{lang === 'heb' ? 'הסעה הלוך' : 'Ride to event'}</span>
                             <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime}</span>
-                        </MenuItem>
-                        <MenuItem onClick={() => {
+                        </MenuItem>}
+                        {!ride.extras.twoWayOnly && <MenuItem onClick={() => {
                             handleSelectEventRide(ride, 2)
                         }} style={{
                             background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 2) ? DARK_BLACK : 'white',
@@ -201,7 +208,7 @@ function InvitationCard() {
 
                             <span style={spanStyle}>{lang === 'heb' ? 'הסעה חזור' : 'Ride Back'}</span>
                             <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.backTime}</span>
-                        </MenuItem>
+                        </MenuItem>}
                         <MenuItem onClick={() => {
                             handleSelectEventRide(ride, 3)
                         }} style={{
@@ -277,11 +284,11 @@ function InvitationCard() {
     const eventDoesNotExist = !exists
     const eventIsValid = event != null
     if (confirmation) {
-        return <InnerPageHolder style={{ padding: '0px', maxWidth: '360px', boxShadow: elegantShadow(), marginLeft: 'auto', border: 'none', background: PRIMARY_BLACK, marginRight: 'auto' }}
+        return <InnerPageHolder style={{ padding: '0px', maxWidth: '360px', marginLeft: 'auto', border: 'none', background: PRIMARY_BLACK, marginRight: 'auto' }}
 
         >
             {event && event.eventImageURL ? <img alt='No image for this event'
-                style={{ width: '100%', maxHeight: '700px', borderTopLeftRadius: '4px', borderTopRightRadius: '4px', minWidth: '360px', height: '50%' }}
+                style={{ width: '100%', maxHeight: '720px', borderTopLeftRadius: '4px', borderTopRightRadius: '4px', minWidth: '360px', height: '50%' }}
                 src={event!.eventImageURL} /> : null}
             <div style={{ background: SECONDARY_WHITE, minWidth: '100%', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
 
@@ -289,7 +296,7 @@ function InvitationCard() {
                 <div style={{ fontSize: '18px', minWidth: '360px', width: '100%', color: PRIMARY_BLACK }}>
                     <br />
                     <span dir={SIDE(lang)} style={{ maxWidth: '360px', padding: '8px' }}>
-                        {lang === 'heb' ? `תודה ${confirmation.userName}, קיבלנו את אישור הגעתך להסעה.` : `Thank you ${confirmation.userName}, we got your ride arrival confirmation.`}
+                        {lang === 'heb' ? `תודה ${confirmation.userName}, קיבלנו את אישור הגעתך.` : `Thank you ${confirmation.userName}, we got your ride arrival confirmation.`}
                     </span>
                     <br />
                     <span dir={SIDE(lang)} style={{ maxWidth: '360px', padding: '8px' }}>
@@ -297,10 +304,9 @@ function InvitationCard() {
                     </span>
 
                 </div>
+                <span dir={SIDE(lang)} style={{ display: 'inline-block', padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר אורחים: ' : 'Number of guests: ') + (confirmation.guests ? confirmation.guests : 1)}</span>
+
                 <br />
-
-                <span dir={SIDE(lang)} style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר אורחים: ' : 'Number of guests: ') + (confirmation.guests ? confirmation.guests : 1)}</span>
-
                 {confirmation.rideArrival && <Stack>
                     <span dir={'rtl'} style={{ padding: '4px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{lang === 'heb' ? confirmation.directions.replace(' to ', ' ל - ') : confirmation.directions}</span>
                     <span dir={SIDE(lang)} style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר נוסעים בהסעות: ' : 'Number of ride passengers: ') + (confirmation.passengers ? confirmation.passengers : 1)}</span>
@@ -330,7 +336,7 @@ function InvitationCard() {
                         justifyContent={'center'}
                         direction={'row'}
                         padding={'8px'}>
-                        <label style={{ color: SECONDARY_WHITE }}>{'אני מגיע בהסעות'}</label>
+                        <label style={{ color: SECONDARY_WHITE }}>{'אני מגיע/ה בהסעות'}</label>
                         {newConfirmation && <Checkbox
                             style={{ color: SECONDARY_WHITE }}
                             value={newConfirmation.rideArrival}
@@ -364,7 +370,8 @@ function InvitationCard() {
                         <Spacer offset={1} />
 
                     </List> : confirmation ? <div>{`תודה ${(confirmation as PNPRideConfirmation).userName}, קיבלנו את אישורך `}</div> : null}
-                    <Stack spacing={1} style={{ width: '300px', marginLeft: 'auto', marginRight: 'auto' }}>
+                    <Stack spacing={1}
+                        style={{ width: '300px', marginLeft: 'auto', marginRight: 'auto' }}>
 
                         {!event.registrationRequired && <TextField classes={classes}
                             onChange={(e) => updateConfirmationName(e.target.value)}
@@ -387,18 +394,36 @@ function InvitationCard() {
                             onChange={(e) => updateConfirmationRidePassengers(e.target.value)}
                             placeholder={lang === 'heb' ? 'מספר נוסעים בהסעה' : 'Number of Passenger'} />}
                     </Stack>
-                    <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} arrow title={selectedEventRide === null ? CHOOSE_RIDE(lang) : 'אשר הגעה'}>
-                        <span>
-                            <Button onClick={sendInvitation}
-                                sx={{
-                                    ...submitButton(false),
-                                    ... { textTransform: 'none', margin: '16px', padding: '8px', minWidth: lang === 'heb' ? '200px' : '250px' }
-                                }}
-                                disabled={!newConfirmation?.rideArrival || selectedEventRide !== null}>
-                                {CONFIRM_EVENT_ARRIVAL(lang)}
-                            </Button>
-                        </span>
-                    </HtmlTooltip>
+                    {event.registrationRequired && !appUser
+                        ? <RegistrationForm
+                            externalRegistration
+                            registerButtonText={CONFIRM_EVENT_ARRIVAL(lang)}
+                            style={{
+                                width: 'fit-content',
+                                marginLeft: 'auto',
+                                marginRight: 'auto'
+                            }} registrationSuccessAction={(user: User) => {
+                                doLoad()
+                                let unsub: Unsubscribe | undefined;
+                                unsub = firebase.realTime.getUserById(user.uid, ((u: PNPUser) => {
+                                    if (u && u.name) {
+                                        cancelLoad()
+                                        sendInvitation(user.uid, u)
+                                        unsub && (unsub as Unsubscribe) && unsub()
+                                    }
+                                }))
+                            }} /> : <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} arrow title={selectedEventRide === null ? CHOOSE_RIDE(lang) : 'אשר הגעה'}>
+                            <span>
+                                <Button onClick={() => sendInvitation()}
+                                    sx={{
+                                        ...submitButton(false),
+                                        ... { textTransform: 'none', margin: '16px', padding: '8px', minWidth: lang === 'heb' ? '200px' : '250px' }
+                                    }}
+                                    disabled={newConfirmation?.rideArrival && selectedEventRide === null}>
+                                    {CONFIRM_EVENT_ARRIVAL(lang)}
+                                </Button>
+                            </span>
+                        </HtmlTooltip>}
                 </List>
             </div>
         </PageHolder >

@@ -42,6 +42,7 @@ export type PNPRideExtras = {
     rideMaxPassengers?: string
     rideDirection: '2' | '1'
     twoWay: boolean
+    twoWayOnly:boolean
     exactStartPoint?: string
     exactBackPoint?: string
 }
