@@ -11,7 +11,9 @@ export type ILoadingContext = {
     openDialog: boolean;
     setOpenDialog: (open: boolean) => void;
     setDialogTitle: (title: any) => void;
+    setDialogBottom: (data: any) => void;
     dialogtitle: any;
+    dialogbottom: any;
     dialogContent: any;
     setDialogContent: (content: any) => void
 }
@@ -20,11 +22,14 @@ export const LoadingContextProvider = (props: object) => {
     const [openDialog, setOpenDialog] = useState(false)
     const [dialogContent, setDialogContent] = useState(false)
     const [dialogtitle, setDialogTitle] = useState(null)
+    const [dialogbottom, setDialogBottom] = useState(null)
     return <LoadingContext.Provider value={{
         loading,
         setLoading,
         openDialog,
         dialogtitle,
+        dialogbottom,
+        setDialogBottom,
         setDialogTitle,
         setOpenDialog,
         dialogContent,
@@ -54,6 +59,10 @@ export const useLoading = () => {
         loadingContext!.setDialogTitle(content)
     }
 
+    const setDialogBottom = (content: any) => {
+        loadingContext!.setDialogBottom(content)
+    }
+
     const openUnderConstruction = (lang: string) => {
         alert(lang === 'heb' ? 'תחום זה בבנייה , ויחזור לזמינות בקרוב' : 'This area is under construction and will be available shortly')
     }
@@ -61,6 +70,7 @@ export const useLoading = () => {
         loadingContext!.setDialogContent(null)
         loadingContext!.setOpenDialog(false)
         loadingContext!.setDialogTitle(null)
+        loadingContext!.setDialogBottom(null)
     }
     return {
         isLoading: loadingContext?.loading,
@@ -69,8 +79,10 @@ export const useLoading = () => {
         openDialog: (content: any) => openDialog(content),
         openUnderConstruction: (lang: string) => openUnderConstruction(lang),
         openDialogWithTitle: (title: any) => setDialogTitle(title),
+        openDialogWithBottom: (content: any) => setDialogBottom(content),
         isDialogOpened: loadingContext!.openDialog,
         dialogTitle: loadingContext!.dialogtitle,
+        dialogBottom: loadingContext!.dialogbottom,
         content: loadingContext!.dialogContent,
         closeDialog: closeDialog
     }

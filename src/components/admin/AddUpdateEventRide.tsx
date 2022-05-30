@@ -10,33 +10,18 @@ import { makeStyles } from "@mui/styles"
 import { submitButton } from "../../settings/styles"
 import { SECONDARY_WHITE, PRIMARY_BLACK } from "../../settings/colors"
 import { SAME_SPOT } from "../../settings/strings"
+import { getDefaultPublicRide } from "../../store/external/helpers"
 
 const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) => {
 
+
+
+    // context
     const { cancelLoad, doLoad, closeDialog } = useLoading()
     const { lang } = useLanguage()
     const { firebase } = useFirebase()
-    
-    const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : {
-        rideId: "null",
-        eventId: props.event.eventId,
-        rideDestination: props.event.eventName,
-        rideStartingPoint: "null",
-        rideTime: "00:00",
-        ridePrice: "null",
-        backTime: "04:00",
-        passengers: "0",
-        date: props.event.eventDate,
-        extras: {
-            isRidePassengersLimited: true,
-            rideStatus: 'on-going',
-            rideMaxPassengers: '54',
-            twoWay: true,
-            rideDirection: '2',
-            exactBackPoint: SAME_SPOT(lang),
-            exactStartPoint: ''
-        }
-    })
+
+    const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : getDefaultPublicRide(props.event, lang))
 
     const useStyles = makeStyles(() => (
         {
@@ -149,7 +134,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                         alert('אירעתה שגיאה בעריכת ההסעה, אנא יידע את המתכנת')
                     })
             } else {
-           
+
                 firebase.realTime.addPublicRide(ride.eventId, ride)
                     .then(() => {
                         cancelLoad()
@@ -177,6 +162,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                 }}
                 inputProps={{ 'aria-label': 'controlled' }}
             /></div>
+   
         {!ride.extras.twoWay &&
             <Stack direction='column' spacing={2}>
                 <label style={{ color: SECONDARY_WHITE }}>{'בחר כיוון נסיעה'}</label>
@@ -190,6 +176,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                     <MenuItem value={'1'}>{'חזור בלבד'}</MenuItem>
                     <MenuItem value={'2'}>{'הלוך בלבד'}</MenuItem>
                 </Select></Stack>}
+
         {(ride.extras.twoWay || ride.extras.rideDirection === '2') &&
             <Stack direction='column' spacing={2}>
                 <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת יציאה'}</label>
@@ -216,7 +203,6 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                     placeholder={props.ride ? props.ride.extras.exactStartPoint : 'נקודת יציאה מדויקת'}
                     onChange={(e) => changeRideExactStartPoint(e.target.value)}
                 />
-
             </Stack>}
 
         {(ride.extras.twoWay || ride.extras.rideDirection === '1') && <Stack direction='column' spacing={2}>

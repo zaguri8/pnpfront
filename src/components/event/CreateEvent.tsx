@@ -21,7 +21,7 @@ import { EditorState } from "react-draft-wysiwyg";
 import { event_placeholder } from "../../assets/images";
 import { useFirebase } from "../../context/Firebase";
 import { useLoading } from "../../context/Loading";
-import { submitButton } from "../../settings/styles";
+import { submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
@@ -31,6 +31,7 @@ import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/fun
 import { v4 } from "uuid";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
 import { getCurrentDate } from "../../utilities";
+import { getDefaultPublicEvent } from "../../store/external/helpers";
 
 export default function CreateEvent() {
     const { lang } = useLanguage()
@@ -51,26 +52,8 @@ export default function CreateEvent() {
     ]
 
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
-
-
     const [image, setImage] = useState<string>('')
-    const [pnpEvent, setPnpEvent] = useState<PNPEvent>({
-        eventName: 'null',
-        eventLocation: 'null',
-        eventId: 'null',
-        eventCanAddRides: true,
-        eventProducerId: user ? user.uid : 'null',
-        eventDate: dateStringFromDate(getCurrentDate()),
-        eventType: 'clubs',
-        eventDetails: 'null',
-        eventPrice: '50',
-        eventHours: { startHour: 'null', endHour: 'null' },
-        eventAgeRange: { minAge: 'null', maxAge: 'null' },
-        expectedNumberOfPeople: 'null',
-        eventImageURL: 'null'
-    })
-
-
+    const [pnpEvent, setPnpEvent] = useState<PNPEvent>(getDefaultPublicEvent(user))
     const [startDate, setStartDate] = useState<string>('00:00')
     const [endDate, setEndDate] = useState<string>('00:00')
     const onEditorStateChanged = (state: EditorState) => {
@@ -80,8 +63,6 @@ export default function CreateEvent() {
             setPnpEvent({ ...pnpEvent, ...{ eventDetails: eventDetailsHTML } })
         }
     }
-
-
 
     const updateEventHours = (type: 'end' | 'start', event: string | undefined | null) => {
         const dict = type === 'end' ? { startHour: event as string } : { endHour: event as string }
@@ -94,15 +75,17 @@ export default function CreateEvent() {
             }
         })
     }
+
+
     const updateEventAddress = (address: string) => {
         setPnpEvent({ ...pnpEvent, ...{ eventLocation: address } })
     }
 
     const updateEventAttention1 = (attention: string) => {
-        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention1: attention, eventAttention2: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention2 : '' } } })
+        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention1: attention, eventAttention2: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention2 : 'unset' } } })
     }
     const updateEventAttention2 = (attention: string) => {
-        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention2: attention, eventAttention1: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention1 : '' } } })
+        setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention2: attention, eventAttention1: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention1 : 'unset' } } })
     }
 
     const updateEventDate = (event: string | undefined | null) => {
@@ -112,38 +95,9 @@ export default function CreateEvent() {
             setPnpEvent({ ...pnpEvent, ...{ eventDate: split } })
         }
     }
-    const useStyles = makeStyles(() => ({
-        root: {
-            "& .MuiOutlinedInput-root": {
-                background: 'none',
-                borderRadius: '32px',
-                padding: '0px',
-                border: '.8px solid white',
-                color: SECONDARY_WHITE, ...{
-                    '& input[type=number]': {
-                        '-moz-appearance': 'textfield'
-                    },
-                    '& input[type=number]::-webkit-outer-spin-button': {
-                        '-webkit-appearance': 'none',
-                        margin: 0
-                    },
-                    '& input[type=time]::-webkit-calendar-picker-indicator': {
-                        filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
-                    },
-                    '& input[type=date]::-webkit-calendar-picker-indicator': {
-                        filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
-                    },
-                    '& input[type=number]::-webkit-inner-spin-button': {
-                        '-webkit-appearance': 'none',
-                        margin: 0
-                    }
-                }
-            }
-        }, noBorder: {
-            border: "1px solid red",
-            outline: 'none'
-        }
-    }));
+
+
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE));
 
 
     const [mandatory, setMandatory] = useState<{ [id: number]: string }>({
@@ -301,7 +255,7 @@ export default function CreateEvent() {
                         placeholder={lang === 'heb' ? 'הכנס שימו לב 1' : 'Enter Attention 1 (Optional)'}
                         onChange={(event) => { updateEventAttention1(event.target.value) }}
                         dir='rtl'
-                        type='number'
+                        type='text'
                         sx={{
 
                             direction: SIDE(lang)
@@ -315,7 +269,7 @@ export default function CreateEvent() {
                         placeholder={lang === 'heb' ? 'הכנס שימו לב 2' : 'Enter Attention 2 (Optional)'}
                         onChange={(event) => { updateEventAttention2(event.target.value) }}
                         dir='rtl'
-                        type='number'
+                        type='text'
                         sx={{
 
                             direction: SIDE(lang)

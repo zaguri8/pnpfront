@@ -63,12 +63,12 @@ export default function MyAccount() {
             if (currentWidth > 720) {
                 $('.my_account_item').css({ 'width': '125px', height: '110px', transition: '.3125s linear' })
                 $('.my_account_item_text').css({ 'width': '100%', transition: '.5s linear' })
-                setBgSpace('1000px center')
+                setBgSpace('1000px bottom')
 
             } else {
                 $('.my_account_item').css({ 'width': '100px', height: '100px', transition: '.3125s linear' })
                 $('.my_account_item_text').css({ 'width': '100%', transition: '.5s linear' })
-                setBgSpace('300px center')
+                setBgSpace('300px bottom')
             }
         }
         window.addEventListener('resize', resize)
@@ -85,7 +85,7 @@ export default function MyAccount() {
         background: RED_ROYAL,
         fontFamily: 'Open Sans Hebrew', ...any
     })
-    const [bgSpace, setBgSpace] = useState('200px center')
+    const [bgSpace, setBgSpace] = useState('200px bottom')
     return (<PageHolder style={{
 
         backgroundImage: `url(${bus})`,

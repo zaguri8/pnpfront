@@ -3,6 +3,7 @@ import { v4 } from "uuid"
 import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { useNavigate } from 'react-router'
 import $ from 'jquery'
+import loadingGif from '../../assets/gifs/loading.gif'
 import { PNPEvent } from "../../store/external/types";
 import { useLanguage } from "../../context/Language";
 import pin from '../../assets/images/pin-location.png'
@@ -28,9 +29,9 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
     }}><h4 style={{ margin: '0px', padding: '6px', paddingBottom: '0px', paddingTop: '2px' }} >{props.event.eventName}</h4>
-        <span style={{display:'flex',alignItems:'center', fontSize: '10px', background: 'none', margin: '0px', paddingBottom: '1px', paddingTop: '0px', marginRight: '8px' }} >
+        <span style={{ display: 'flex', alignItems: 'center', fontSize: '10px', background: 'none', margin: '0px', paddingBottom: '1px', paddingTop: '0px', marginRight: '8px' }} >
 
-            <img src={pin} style={{paddingLeft:'2px', width: '12.5px', height: '12.5px' }} />
+            <img src={pin} style={{ paddingLeft: '2px', width: '12.5px', height: '12.5px' }} />
 
             {props.event.eventLocation}
 
@@ -99,11 +100,26 @@ export function Gallery(props: GalleryProps) {
     }
 
 
+    useEffect(() => {
+        setTimeout(() => {
+            $('.loadingDivStyle').css('display', 'none')
+        }, 550)
+    }, [])
 
+
+    const loadingDivStyle = {
+        background: `url('${loadingGif}')`,
+        width: '100%',
+        borderTopLeftRadius:'16px',
+        borderTopRightRadius:'16px',
+        backgroundSize:'cover',
+        height: '100%'
+    }
     return <div>
         {<h2 className='gallery_header' style={headerStyle}>{props.header}</h2>}
         <div id='gallery_container' style={containerStyle}>
             <div className='gallery' style={imageContainer}>
+
                 {props.events.map(pnpEvent => {
 
                     return (<div key={v4()}
@@ -115,7 +131,7 @@ export function Gallery(props: GalleryProps) {
                                 cursor: 'pointer',
                                 backgroundClip: 'border-box',
                                 backgroundColor: 'white',
-                                background: `url('${pnpEvent.eventImageURL}') `,
+                                background:  `url('${pnpEvent.eventImageURL}') `,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'no-repeat',
@@ -123,7 +139,9 @@ export function Gallery(props: GalleryProps) {
                         }}
                         className="gallery_img"
                         onClick={() => handleOpen(pnpEvent)}>
+                        <div className='loadingDivStyle'
 
+                            style={loadingDivStyle} />
                         <GalleryItemTitle event={pnpEvent} />
 
                     </div>)

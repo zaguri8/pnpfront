@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react"
 import { Loader } from '@googlemaps/js-api-loader';
 const GoogleMapsContext = createContext(null)
+
 export const GoogleMapsContextProvider = props => {
     const [google, setGoogle] = useState(null)
     const [error, setError] = useState(null)
@@ -20,6 +21,6 @@ export const GoogleMapsContextProvider = props => {
 export const useGoogleState = () => {
     const googleState = useContext(GoogleMapsContext)
     return {
-        ...googleState
+        google: googleState.google
     }
 }

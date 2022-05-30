@@ -11,15 +11,23 @@ import { makeStyles } from "@mui/styles";
 import { PRIMARY_BLACK, SECONDARY_WHITE, SECONDARY_BLACK, DARK_BLACK, ORANGE_GRADIENT_PRIMARY } from "../../settings/colors";
 export default function Places({ placeHolder, style, fixed, id, className, types, handleAddressSelect, value, ...extras }) {
     const [address, setAddress] = useState('')
+
+    const strip = (str) => {
+        return str.replaceAll(', Israel', '')
+            .replaceAll(', ישראל', '');
+    }
+
     const handleChange = (value) => {
-        setAddress(value)
-        handleAddressSelect(value)
+        let strippedVal = strip(value)
+        setAddress(strippedVal)
+        handleAddressSelect(strippedVal)
     }
     const { google } = useGoogleState()
 
     const handleSelect = (value) => {
-        setAddress(value)
-        handleAddressSelect(value)
+        let strippedVal = strip(value)
+        setAddress(strippedVal)
+        handleAddressSelect(strippedVal)
     }
     const useStyles = makeStyles(() => ({
         root: {
@@ -97,7 +105,7 @@ export default function Places({ placeHolder, style, fixed, id, className, types
 
                                 return (
                                     <ListItem key={suggestion + index}{...getSuggestionItemProps(suggestion, { style: suggestionStyle })}>
-                                        {suggestion.description}
+                                        {strip(suggestion.description)}
                                     </ListItem>)
                             })}
                         </List>

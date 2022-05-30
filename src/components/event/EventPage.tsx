@@ -227,7 +227,7 @@ export default function EventPage() {
                                             color: PRIMARY_WHITE,
                                             float: 'left'
                                         }}>
-                                            {event.eventAttention ? event.eventAttention.eventAttention1 : BOTH_DIRECTIONS(lang)}
+                                            {event.eventAttention?.eventAttention1 === 'unset' ? BOTH_DIRECTIONS(lang) : event.eventAttention?.eventAttention1}
                                         </span>
                                         <span style={{
                                             maxWidth: '200px',
@@ -237,7 +237,7 @@ export default function EventPage() {
                                             color: PRIMARY_WHITE,
                                             float: 'right'
                                         }}>{
-                                                event.eventAttention ? event.eventAttention.eventAttention2 : NO_DELAYS(lang)}
+                                                event.eventAttention?.eventAttention2 === 'unset' ? NO_DELAYS(lang) : event.eventAttention?.eventAttention2}
                                         </span>
                                     </div>
                                 </div>
@@ -289,11 +289,22 @@ export default function EventPage() {
                                         <Button onClick={() => openRequestPaymentDialog()}
                                             id="request_event_order"
                                             aria-haspopup disabled={selectedEventRide === null}
-                                            sx={{ ...submitButton(true), ...{ maxWidth: '250px', textTransform: 'none' } }}> {ORDER(lang)}</Button>
+                                            sx={{
+                                                ...submitButton(true), ...{
+                                                    maxWidth: '250px',
+                                                    textTransform: 'none'
+                                                }
+                                            }}> {ORDER(lang)}</Button>
                                     </span>
                                 </HtmlTooltip>
 
-                                <p style={{ padding: '0px', margin: '0px', fontSize: '12px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'בחר נקודת יציאה ולחץ על הכפתור למעבר למסך הזמנה' : 'Pick your desired start destination and click the button the continue'}</p>
+                                <p style={{
+                                    padding: '0px',
+                                    margin: '0px',
+                                    fontSize: '12px',
+                                    color: SECONDARY_WHITE
+                                }}>
+                                    {lang === 'heb' ? 'בחר נקודת יציאה ולחץ על הכפתור למעבר למסך הזמנה' : 'Pick your desired start destination and click the button the continue'}</p>
                             </AccordionDetails>
                         </Accordion>
                     </div>

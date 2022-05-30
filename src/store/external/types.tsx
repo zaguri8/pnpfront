@@ -104,7 +104,7 @@ export type PNPEvent = {
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange
     expectedNumberOfPeople: string
-    eventAttention?: PNPEventAttention
+    eventAttention: PNPEventAttention
     eventImageURL: string
     eventMobileImageURL?: string
 }
@@ -118,6 +118,10 @@ export type PNPPrivateEvent = {
     eventTitle: string
     eventLocation: string
     eventId: string
+    eventGuests: boolean
+    registrationRequired: boolean
+    eventFullInvitation: boolean
+    eventProducerId: string
     eventDate: string
     eventDetails: string
     eventHours: PNPEventHours
@@ -138,11 +142,21 @@ export type PNPRideConfirmation = {
     userName: string
     phoneNumber: string
     rideId: string
+    rideArrival: boolean
     eventId: string
     passengers?: string
+    guests: string
     confirmationTitle: string
     date: string
     directions: string
+    directionType: string
+}
+
+
+export enum PNPRideDirectionNumber {
+    to_event = 1,
+    back_from_event = 2,
+    both_ways = 3
 }
 
 export enum PNPRideDirection {
@@ -150,6 +164,17 @@ export enum PNPRideDirection {
     second_way = "back from the event",
     both_ways = "to & back from the event"
 }
+
+export const eventTypes = [
+    "מסיבות ומועדונים",
+    "משחקי כדורגל",
+    "הופעות",
+    "פסטיבלים",
+    "ברים",
+    "ספורט כללי",
+    "אירועי ילדים"
+]
+
 
 export type PNPError = {
     errorId: string

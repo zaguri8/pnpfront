@@ -1,7 +1,7 @@
 
 import { PNPEvent } from "../../store/external/types"
 import { Button, Stack } from '@mui/material'
-import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, RED_ROYAL } from "../../settings/colors"
+import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, RED_ROYAL, PRIMARY_BLACK } from "../../settings/colors"
 import { useNavigate } from "react-router"
 import HTMLFromText from '../utilities/HtmlFromText'
 import { v4 } from 'uuid'
@@ -26,31 +26,46 @@ const ManageInvitations = () => {
         const unsub = firebase.realTime.addListenerToPrivateEvents(setPrivateEvents, true)
         return () => { unsub() }
     }, [])
-    return <PageHolder style={{ background: BLACK_ELEGANT }}>
+    return <PageHolder style={{ background: PRIMARY_BLACK }}>
         <SectionTitle title={'ניהול אירועים עם הזמנות'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }} >
+        <InnerPageHolder style={{ background: BLACK_ELEGANT }} >
 
             <table dir={'rtl'}>
 
                 <thead>
                     <tr>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{`שם האירוע`}</div>
+                            <div style={{ color: SECONDARY_WHITE,fontSize:'20px'  }}>{`אירוע`}</div>
                         </th>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{'פעולות'}</div>
+                            <div style={{ color: SECONDARY_WHITE,fontSize:'20px'  }}>{'פעולות'}</div>
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {privateEvents && privateEvents['approved'] && privateEvents['approved'].map((event: PNPPrivateEvent) => <tr key={v4()} style={{ margin: '8px' }}>
-                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '12px', margin: '4px', color: SECONDARY_WHITE }}>{event.eventTitle}</div></th>
+                        <th style={{ width: '50%' }}>  <div style={{
+                            fontSize: '16px',
+                            margin: '4px',
+                            color: SECONDARY_WHITE
+                        }}>{event.eventTitle}
+                        </div></th>
                         <th style={{ width: '50%' }}><Button
-                            style={{ backgroundImage: DARKER_BLACK_SELECTED, minWidth: '110px' }}
+                            style={{ backgroundImage: BLACK_ELEGANT, minWidth: '110px' }}
                             onClick={() => { nav('/adminpanel/invitations/specificinvitation', { state: event }) }}
-                            sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' } }}>
-                            {'עבור לניהול הזמנה'}
+                            sx={{
+                                ... {
+                                    width: 'fit-content',
+                                    fontSize: '14px',
+                                    margin: '4px',
+                                    fontFamily:'Open Sans Hebrew',
+                                    padding: '4px',
+                                    color: 'white',
+                                    background: '#007AFF'
+                                }
+                            }}>
+                            {'עבור לניהול'}
                         </Button></th>
                     </tr>)}
                 </tbody>
@@ -58,17 +73,17 @@ const ManageInvitations = () => {
         </InnerPageHolder>
 
         <SectionTitle title={'אירועים ממתינים'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }} >
+        <InnerPageHolder style={{ background: BLACK_ELEGANT }} >
 
             {privateEvents && privateEvents['waiting'] && privateEvents['waiting'].length > 0 ? <table dir={'rtl'}>
 
                 <thead>
                     <tr>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{`שם האירוע`}</div>
+                            <div style={{ color: SECONDARY_WHITE,fontSize:'20px' }}>{`אירוע`}</div>
                         </th>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{'פעולות'}</div>
+                            <div style={{ color: SECONDARY_WHITE ,fontSize:'20px' }}>{'פעולות'}</div>
                         </th>
                     </tr>
                 </thead>
@@ -76,8 +91,8 @@ const ManageInvitations = () => {
                 <tbody>
                     {privateEvents && privateEvents['waiting'] && privateEvents['waiting'].length > 0 ? privateEvents['waiting'].map(event => <tr
                         key={v4()}>
-                        <th style={{ width: '50%', background: SECONDARY_BLACK }}>  <div style={{ fontSize: '12px', color: SECONDARY_WHITE }}>{event.eventTitle}</div><br /></th>
-                        <th style={{ width: '50%', background: SECONDARY_BLACK }}>
+                        <th style={{ width: '50%',display:'flex',alignItems:'center',justifyContent:'center', background: SECONDARY_WHITE,borderRadius:'8px' }}>  <div style={{ fontSize: '12px', color: PRIMARY_BLACK }}>{event.eventTitle}</div><br /></th>
+                        <th style={{ width: '50%',display:'flex',alignItems:'center',justifyContent:'center', background: SECONDARY_WHITE ,borderRadius:'8px' }}>
                             <Stack>
                                 <Button
                                     onClick={() => {

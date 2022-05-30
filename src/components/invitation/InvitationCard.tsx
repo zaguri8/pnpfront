@@ -1,32 +1,34 @@
 import 'firebaseui/dist/firebaseui.css'
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'firebase/compat/auth';
 
 import $ from 'jquery'
-import { List, Button, MenuItem, Stack, TextField } from '@mui/material';
+import { List, Button, MenuItem, Stack, TextField, Typography, Checkbox } from '@mui/material';
 
 import { useFirebase } from '../../context/Firebase';
-import { PNPPrivateEvent, PNPRideConfirmation } from '../../store/external/types';
+import { PNPPrivateEvent, PNPRideConfirmation, PNPRideDirectionNumber } from '../../store/external/types';
 import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../../store/validators';
 
 import { PNPPublicRide } from '../../store/external/types';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useLoading } from '../../context/Loading';
 import { BETA } from '../../settings/config';
-import { DARK_BLACK, PRIMARY_BLACK, RED_ROYAL, SECONDARY_WHITE } from '../../settings/colors';
-import { InnerPageHolder } from '../utilities/Holders';
-import { CHOOSE_RIDE, CONFIRM_RIDE, FULL_NAME, PHONE_NUMBER, PICK_POINT, PULL_POINT, SIDE } from '../../settings/strings';
+import { DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE } from '../../settings/colors';
+import { InnerPageHolder, PageHolder } from '../utilities/Holders';
+import { CHOOSE_RIDE, CONFIRM_EVENT_ARRIVAL, CONFIRM_RIDE, FULL_NAME, PHONE_NUMBER, SIDE } from '../../settings/strings';
 import { useLanguage } from '../../context/Language';
 import { HtmlTooltip } from '../utilities/HtmlTooltip';
-import { submitButton, textFieldStyle } from '../../settings/styles';
+import { elegantShadow, submitButton, textFieldStyle } from '../../settings/styles';
 import { Unsubscribe } from 'firebase/database';
 import { makeStyles } from '@mui/styles';
 import Spacer from '../utilities/Spacer';
 import { useCookies } from '../../context/CookieContext';
+import { getDefaultConfirmation } from '../../store/external/helpers';
 function InvitationCard() {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
     const [newConfirmation, setNewConfirmation] = useState<PNPRideConfirmation>()
     const { doLoad, cancelLoad } = useLoading()
+    const [rideArrival, setRideArrival] = useState(false)
     const [event, setEvent] = useState<PNPPrivateEvent | null>(null)
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
     const { firebase, appUser, user } = useFirebase()
@@ -36,11 +38,16 @@ function InvitationCard() {
     const useStyles = makeStyles(() => textFieldStyle(PRIMARY_BLACK, { background: SECONDARY_WHITE }))
     const classes = useStyles()
     const { id } = useParams()
-    const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
+    const [selectedEventRide, setSelectedEventRide] = useState<{ ride: PNPPublicRide | null, direction: number } | null>(null)
 
-    const handleSelectEventRide = (eventRide: PNPPublicRide) => {
-        setSelectedEventRide(eventRide)
-        setNewConfirmation({ ...newConfirmation!, directions: eventRide.rideStartingPoint + (lang === 'heb' ? " ל - " : ' to - ') + eventRide.rideDestination })
+    const handleSelectEventRide = (eventRide: PNPPublicRide, direction: number) => {
+        setSelectedEventRide({ ride: eventRide, direction: direction })
+        setNewConfirmation({
+            ...newConfirmation!,
+            directionType: direction + "",
+            rideId: eventRide.rideId,
+            directions: eventRide.rideStartingPoint + (" ל - ") + eventRide.rideDestination
+        })
     }
     useEffect(() => {
         $('.dim').css('display', 'none')
@@ -51,23 +58,13 @@ function InvitationCard() {
 
             if (isValidPrivateEvent(event as PNPPrivateEvent)) {
                 setEvent(event as PNPPrivateEvent)
-                setNewConfirmation({
-                    userId: 'guest',
-                    eventId: event.eventId ?? '',
-                    userName: 'null',
-                    phoneNumber: 'null',
-                    date: event?.eventDate ?? '',
-                    confirmationTitle: event?.eventTitle ?? '',
-                    rideId: 'null',
-                    passengers: 'null',
-                    directions: 'null',
-                })
+                setNewConfirmation(getDefaultConfirmation(event))
                 getInvitationConfirmation(event.eventId).then(conf => {
                     if (conf) {
                         setConfirmation(conf)
                         cancelLoad()
                     } else {
-                        firebase.realTime.getPrivateEventRidesById(id!, (rides) => {
+                        secondUnsub = firebase.realTime.getPrivateEventRidesById(id!, (rides) => {
                             if (rides as PNPPublicRide[]) {
                                 setRides(rides as PNPPublicRide[])
                             }
@@ -89,23 +86,43 @@ function InvitationCard() {
     }, [])
 
 
+    const typographyStyle = {
+        fontFamily: 'Open Sans Hebrew',
+        color: SECONDARY_WHITE,
+        fontWeight: 'bold',
+        fontSize: '20px'
+    }
+    const spanStyle = {
+        fontFamily: 'Open Sans Hebrew'
+    }
     const nav = useNavigate()
-    const location = useLocation()
     async function sendInvitation() {
+        if (!appUser || !user) {
+            alert('יש להירשם על מנת לאשר הגעה')
+            nav('/login')
+            return
+        }
         if (!event || !rides || !selectedEventRide)
             return
 
-        if (appUser === null) {
-            nav('/login', { state: { cachedLocation: location.pathname } })
+        let actualConfirmation = event.registrationRequired ? {
+            ...newConfirmation,
+            userName: appUser.name,
+            userId: user.uid,
+            phoneNumber: appUser.phone
+        } as PNPRideConfirmation : newConfirmation
+
+        if (!isValidRideConfirmation(actualConfirmation)) {
+            alert('אנא מלא את פרטייך ובחר הסעה')
             return
         }
         doLoad()
-        if (isValidPublicRide(selectedEventRide!) && isValidRideConfirmation(newConfirmation)) {
-            await saveInvitationConfirmation(newConfirmation!)
+        if (isValidPublicRide(selectedEventRide.ride!)) {
+            await saveInvitationConfirmation(actualConfirmation!)
                 .then(() => {
-                    firebase.realTime.addRideConfirmation(newConfirmation!)
-                    alert(`תודה ${newConfirmation?.userName}, קיבלנו את אישורך `)
-                    setConfirmation(newConfirmation!)
+                    firebase.realTime.addRideConfirmation(actualConfirmation!)
+                    alert(`תודה ${actualConfirmation?.userName}, קיבלנו את אישורך `)
+                    setConfirmation(actualConfirmation!)
                     cancelLoad()
                 })
         }
@@ -114,144 +131,277 @@ function InvitationCard() {
         setNewConfirmation({ ...newConfirmation!, userName: name })
     }
     const updateConfirmationGuests = (guests: string) => {
-        setNewConfirmation({ ...newConfirmation!, passengers: guests })
+        setNewConfirmation({ ...newConfirmation!, guests: guests })
+    }
+
+    const updateConfirmationRidePassengers = (passengers: string) => {
+        setNewConfirmation({ ...newConfirmation!, passengers: passengers })
     }
     const updateConfirmationPhone = (number: string) => {
         setNewConfirmation({ ...newConfirmation!, phoneNumber: number })
     }
 
-    const EventImage = (props: { e: PNPPrivateEvent | null }) => {
-        return props.e && props.e.eventImageURL ? <img alt='No image for this event'
-            style={{ width: '100%', minWidth: '300px', height: '50%' }}
-            src={props.e!.eventImageURL} /> : null
+
+    function getMenuItems(ride: PNPPublicRide) {
+
+        return <Stack alignSelf={'center'} spacing={1} style={{
+            maxWidth: '600px',
+            width: '100%'
+        }}>
+            {
+
+                ride.extras.twoWay ? (
+                    <React.Fragment
+                        key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}>
+                        <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+                            <span
+                                style={{ fontSize: '18px', textAlign: 'center', color: SECONDARY_WHITE }}
+                            >{lang === 'heb' ? 'בחר הסעה: הלוך/חזור/הלוך וחזור' : 'Choose directions'}</span>
+
+                            <span
+                                style={{ color: SECONDARY_WHITE, fontSize: '12px', marginTop: '48px' }}
+                            >{lang === 'heb' ? 'שעת יציאה,שעת חזרה' : 'Ride time,Back time'}</span>
+                        </Stack>
+                        <MenuItem
+                            onClick={() => {
+                                handleSelectEventRide(ride, 1)
+                            }} style={{
+                                background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 1) ? DARK_BLACK : 'white',
+                                alignSelf: 'center',
+                                justifyContent: 'space-between',
+                                textAlign: 'center',
+                                width: '100%',
+                                flexDirection: 'row',
+                                color: (selectedEventRide?.ride === ride && selectedEventRide.direction === 1) ? 'white' : 'black',
+                                border: '.1px solid gray',
+                                borderRadius: '4px',
+                                marginTop: '8px',
+                                marginBottom: '8px',
+                                display: 'flex',
+                            }} value={ride.rideId}>
+                            <span style={spanStyle}>{lang === 'heb' ? 'הסעה הלוך' : 'Ride to event'}</span>
+                            <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime}</span>
+                        </MenuItem>
+                        <MenuItem onClick={() => {
+                            handleSelectEventRide(ride, 2)
+                        }} style={{
+                            background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 2) ? DARK_BLACK : 'white',
+                            alignSelf: 'center',
+                            justifyContent: 'space-between',
+                            textAlign: 'center',
+                            width: '100%',
+                            flexDirection: 'row',
+                            color: (selectedEventRide?.ride === ride && selectedEventRide.direction === 2) ? 'white' : 'black',
+                            border: '.1px solid gray',
+                            borderRadius: '4px',
+                            marginTop: '8px',
+                            marginBottom: '8px',
+                            display: 'flex',
+                        }} value={ride.rideId}>
+
+                            <span style={spanStyle}>{lang === 'heb' ? 'הסעה חזור' : 'Ride Back'}</span>
+                            <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.backTime}</span>
+                        </MenuItem>
+                        <MenuItem onClick={() => {
+                            handleSelectEventRide(ride, 3)
+                        }} style={{
+                            background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 3) ? DARK_BLACK : 'white',
+                            alignSelf: 'center',
+                            justifyContent: 'space-between',
+                            textAlign: 'center',
+                            width: '100%',
+                            flexDirection: 'row',
+                            color: (selectedEventRide?.ride === ride && selectedEventRide.direction === 3) ? 'white' : 'black',
+                            border: '.1px solid gray',
+                            borderRadius: '4px',
+                            marginTop: '8px',
+                            marginBottom: '8px',
+                            display: 'flex',
+                        }} value={ride.rideId}>
+                            <span style={spanStyle}>{lang === 'heb' ? 'הסעה דו כיוונית (הלוך וחזור) ' : 'Two directions ride'}</span>
+                            <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime + ", " + ride.backTime}</span>
+                        </MenuItem>
+                    </React.Fragment>) : Number(ride.extras.rideDirection) === 1 ? (
+                        <React.Fragment>
+                            <MenuItem
+                                key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}
+
+                                onClick={() => {
+                                    handleSelectEventRide(ride, 2)
+                                }} style={{
+                                    background: selectedEventRide?.ride === ride ? DARK_BLACK : 'white',
+                                    alignSelf: 'center',
+                                    justifyContent: 'space-between',
+                                    textAlign: 'center',
+                                    width: '100%',
+                                    flexDirection: 'row',
+                                    color: selectedEventRide?.ride === ride ? 'white' : 'black',
+                                    border: '.1px solid gray',
+                                    borderRadius: '4px',
+                                    marginTop: '8px',
+                                    marginBottom: '8px',
+                                    display: 'flex',
+                                }} value={ride.rideId}>
+
+                                <span style={spanStyle}>{lang === 'heb' ? 'הסעה חזור' : 'Ride Back'}</span>
+                                <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.backTime}</span>
+                            </MenuItem>
+                        </React.Fragment>) : (<React.Fragment>
+                            <MenuItem
+                                key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}
+
+                                onClick={() => {
+                                    handleSelectEventRide(ride, 1)
+                                }} style={{
+                                    background: selectedEventRide?.ride === ride ? DARK_BLACK : 'white',
+                                    alignSelf: 'center',
+                                    justifyContent: 'space-between',
+                                    textAlign: 'center',
+                                    width: '100%',
+                                    flexDirection: 'row',
+                                    color: selectedEventRide?.ride === ride ? 'white' : 'black',
+                                    border: '.1px solid gray',
+                                    borderRadius: '4px',
+                                    marginTop: '8px',
+                                    marginBottom: '8px',
+                                    display: 'flex',
+                                }} value={ride.rideId}>
+                                <span style={spanStyle}>{lang === 'heb' ? 'הסעה הלוך' : 'Ride to event'}</span>
+                                <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime}</span>
+                            </MenuItem>
+                        </React.Fragment>)
+            }
+        </Stack >
     }
-
-
 
     const eventDoesNotExist = !exists
     const eventIsValid = event != null
     if (confirmation) {
-        return <InnerPageHolder style={{ marginLeft: 'auto', background: RED_ROYAL, marginRight: 'auto' }}
+        return <InnerPageHolder style={{ padding: '0px', maxWidth: '360px', boxShadow: elegantShadow(), marginLeft: 'auto', border: 'none', background: PRIMARY_BLACK, marginRight: 'auto' }}
 
         >
-            <EventImage e={event} />
-            <div style={{ background: SECONDARY_WHITE, minWidth: '300px', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
+            {event && event.eventImageURL ? <img alt='No image for this event'
+                style={{ width: '100%', maxHeight: '700px', borderTopLeftRadius: '4px', borderTopRightRadius: '4px', minWidth: '360px', height: '50%' }}
+                src={event!.eventImageURL} /> : null}
+            <div style={{ background: SECONDARY_WHITE, minWidth: '100%', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}>
 
 
-                <div style={{ fontSize: '18px', color: PRIMARY_BLACK }}>
+                <div style={{ fontSize: '18px', minWidth: '360px', width: '100%', color: PRIMARY_BLACK }}>
                     <br />
-                    <span style={{ maxWidth: '300px', direction: SIDE(lang), padding: '8px' }}>
-                        {`תודה, ${confirmation.userName} , קיבלנו את אישור הגעתך להסעה, נתראה ב ${confirmation.date}`} </span></div>
+                    <span dir={SIDE(lang)} style={{ maxWidth: '360px', padding: '8px' }}>
+                        {lang === 'heb' ? `תודה ${confirmation.userName}, קיבלנו את אישור הגעתך להסעה.` : `Thank you ${confirmation.userName}, we got your ride arrival confirmation.`}
+                    </span>
+                    <br />
+                    <span dir={SIDE(lang)} style={{ maxWidth: '360px', padding: '8px' }}>
+                        {lang === 'heb' ? `נתראה ב ${confirmation.date}` : `See you at ${confirmation.date}`}
+                    </span>
+
+                </div>
                 <br />
-                <Stack>
 
+                <span dir={SIDE(lang)} style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר אורחים: ' : 'Number of guests: ') + (confirmation.guests ? confirmation.guests : 1)}</span>
 
-                    <span style={{ padding: '4px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{lang === 'heb' ? confirmation.directions.replace(' to ', ' ל - ') : confirmation.directions}</span>
-
-                    <span style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר אורחים: ' : 'Number of guests: ') + (confirmation.passengers ? confirmation.passengers : 1)}</span>
-                </Stack>
+                {confirmation.rideArrival && <Stack>
+                    <span dir={'rtl'} style={{ padding: '4px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{lang === 'heb' ? confirmation.directions.replace(' to ', ' ל - ') : confirmation.directions}</span>
+                    <span dir={SIDE(lang)} style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר נוסעים בהסעות: ' : 'Number of ride passengers: ') + (confirmation.passengers ? confirmation.passengers : 1)}</span>
+                </Stack>}
             </div >
         </InnerPageHolder>
 
     } else if (eventDoesNotExist) {
         return <div style={{ padding: '32px' }}>Event Does not exist</div>
     } else if (eventIsValid) {
-        return <List style={{ marginTop: '0px' }}>
-            <EventImage e={event} />
+        return <PageHolder style={{ direction: SIDE(lang), marginTop: '0px' }}>
+
+            {event && event.eventImageURL ? <img alt='No image for this event'
+                style={{ width: '100%', minWidth: '300px', height: '50%' }}
+                src={event!.eventImageURL} /> : null}
+
+            <span style={{ ...spanStyle, fontWeight: 'bold', paddingTop: '8px', color: SECONDARY_WHITE, fontSize: '20px' }}>{event.eventTitle}</span>
+
+            <span style={{ ...spanStyle, padding: '2px', color: SECONDARY_WHITE, fontSize: '16px' }}>{event.eventLocation}</span>
+            <span style={{ ...spanStyle, fontWeight: '100', padding: '2px', color: SECONDARY_WHITE, fontSize: '14px' }}>{event.eventDate}</span>
+
             <div style={{ width: '100%', background: PRIMARY_BLACK }}>
                 <List style={{ width: '85%', background: PRIMARY_BLACK, minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
-                    {rides && rides!.length > 0 && <span style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>
-                        {lang === 'heb' ? ('כל ההסעות יוצאות מ ' + rides![0].rideStartingPoint + " בשעה " + rides![0].rideTime) : 'All the rides leave from ' + rides![0].rideStartingPoint + ' at ' + rides![0].rideStartingPoint}
-                    </span>}
-                    <br />
-                    <span style={{
-                        fontFamily: 'Open Sans Hebrew',
-                        margin: '32px',
-                        color: SECONDARY_WHITE
-                    }}>
-                        {CHOOSE_RIDE(lang)}
-                    </span>
-                    {rides ? <List style={{ width: '100%' }} dir={SIDE(lang)}>
+                    {/* Arriving to rides Check box */}
+                    <Stack
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        direction={'row'}
+                        padding={'8px'}>
+                        <label style={{ color: SECONDARY_WHITE }}>{'אני מגיע בהסעות'}</label>
+                        {newConfirmation && <Checkbox
+                            style={{ color: SECONDARY_WHITE }}
+                            value={newConfirmation.rideArrival}
+                            onChange={(e) => {
+                                let checked = e.target.checked
+                                setNewConfirmation({
+                                    ...newConfirmation,
+                                    rideArrival: checked
+                                })
+                            }} />}
 
-                        {rides.find(ride => ride.extras.twoWay) ? <div style={{ width: '100%', display: 'flex', background: 'black', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                            <span style={{ padding: '8px', marginRight: '32px', fontSize: '14px', color: 'white', textAlign: 'center', width: '50%' }}>{PICK_POINT(lang)}</span>
-                            <span style={{ marginLeft: '32px', padding: '8px', color: 'white', fontSize: '14px', textAlign: 'center', width: '50%' }}>{PULL_POINT(lang)}</span>
-                        </div> : rides.find(ride => ride.extras.rideDirection === '2') ?
-                            <div style={{ width: '75%', display: 'flex', background: 'black', alignItems: 'center', marginLeft: 'auto', marginRight: 'auto', flexDirection: 'row', alignSelf: 'center', justifyContent: 'center' }}>
-                                <span style={{ padding: '8px', color: 'white', fontSize: '14px', textAlign: 'center', width: '50%' }}>{PULL_POINT(lang)}</span>
-                            </div> : <div style={{ width: '75%', marginLeft: 'auto', marginRight: 'auto', display: 'flex', background: 'black', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                                <span style={{ padding: '8px', color: 'white', fontSize: '14px', textAlign: 'center', width: '50%' }}>{PICK_POINT(lang)}</span>
-                            </div>}
+                    </Stack>
+                    {(rides && rides.length > 0 && newConfirmation?.rideArrival) ? <List style={{ width: '100%' }} dir={SIDE(lang)}>
+
+                        <Typography
+                            style={{ ...typographyStyle, ...{ fontSize: '24px' } }} >
+                            {lang === 'heb' ? 'נקודת אסיפה/הורדה' : 'Start Point/Destination'}
+                        </Typography>
+                        <br />
                         {rides!.map(ride => {
-                            return <MenuItem onClick={() => {
-                                handleSelectEventRide(ride)
-                            }} style={{
-                                background: selectedEventRide === ride ? DARK_BLACK : 'white',
-                                alignSelf: 'center',
-                                justifyContent: 'space-between',
-                                textAlign: 'center',
-                                flexDirection: 'row',
-                                color: selectedEventRide === ride ? 'white' : 'black',
-                                border: '.1px solid gray',
-                                borderRadius: '4px',
-                                marginTop: '8px',
-                                marginBottom: '8px',
-                                display: 'flex',
-                            }} key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE} value={ride.rideId}>
-                                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                            return <Stack key={ride.rideId + ride.eventId}>
 
-                                    {
-                                        ride.extras.twoWay ? <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography
+                                    style={typographyStyle} >
+                                    {ride.rideStartingPoint}
+                                </Typography>
+                                {getMenuItems(ride)}
+                            </Stack>
 
-                                            <br />
-                                            <span style={{ padding: '4px', width: '50%', fontSize: '14px', fontFamily: 'Open Sans Hebrew' }}>{` ${ride.rideStartingPoint}`}</span>
-                                            <br />
-                                            <span style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', padding: '4px', width: '50%', fontWeight: 'bold' }}>{` ${ride.rideDestination}`}</span>
-
-                                        </div> : Number(ride.extras.rideDirection) === 2 ? <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-                                            <br />
-                                            <span style={{ padding: '4px', width: '50%', fontSize: '14px', color: 'red', fontFamily: 'Open Sans Hebrew' }}>{lang === 'heb' ? 'הסעה בכיוון חזור בלבד' : 'Ride back only'}</span>
-                                            <br />
-
-                                            <span style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', padding: '4px', width: '50%', fontWeight: 'bold' }}>{` ${ride.rideDestination}`}</span>
-                                        </div> : <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-
-                                            <br />
-                                            <span style={{ padding: '4px', width: '50%', fontSize: '14px', fontFamily: 'Open Sans Hebrew' }}>{` ${ride.rideStartingPoint}`}</span>
-                                            <br />
-                                            <span style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', color: 'red', padding: '4px', width: '50%', fontWeight: 'bold' }}>{lang === 'heb' ? 'הסעה בכיוון הלוך בלבד' : 'Ride to-event only'}</span>
-
-                                        </div>}
-                                </div>
-
-                            </MenuItem>
                         })}
                         <Spacer offset={1} />
-                        <Stack spacing={1} style={{ width: '300px', marginLeft: 'auto', marginRight: 'auto' }}>
 
-                            <TextField classes={classes}
-                                onChange={(e) => updateConfirmationName(e.target.value)}
-                                name='fullname'
-                                placeholder={FULL_NAME(lang)} />
-                            <TextField classes={classes}
-                                name='phone'
-                                type='tel'
-                                onChange={(e) => updateConfirmationPhone(e.target.value)}
-                                placeholder={PHONE_NUMBER(lang)} />
-                            <TextField classes={classes}
-                                type='number'
-                                onChange={(e) => updateConfirmationGuests(e.target.value)}
-                                placeholder={lang === 'heb' ? 'מספר אורחים' : 'Number of guests'} />
-                        </Stack>
-                        <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} arrow title={selectedEventRide === null ? CHOOSE_RIDE(lang) : 'אשר הגעה'}>
-                            <span>
-                                <Button onClick={sendInvitation} sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '16px', padding: '8px', minWidth: lang === 'heb' ? '200px' : '250px' } }} disabled={selectedEventRide === null}>{CONFIRM_RIDE(lang)}</Button>
-                            </span>
-                        </HtmlTooltip>
                     </List> : confirmation ? <div>{`תודה ${(confirmation as PNPRideConfirmation).userName}, קיבלנו את אישורך `}</div> : null}
+                    <Stack spacing={1} style={{ width: '300px', marginLeft: 'auto', marginRight: 'auto' }}>
+
+                        {!event.registrationRequired && <TextField classes={classes}
+                            onChange={(e) => updateConfirmationName(e.target.value)}
+                            name='fullname'
+                            placeholder={FULL_NAME(lang)} />}
+                        {!event.registrationRequired && <TextField classes={classes}
+                            name='phone'
+                            type='tel'
+                            onChange={(e) => updateConfirmationPhone(e.target.value)}
+                            placeholder={PHONE_NUMBER(lang)} />}
+                        {event.eventGuests && <TextField classes={classes}
+                            type='number'
+                            name='number'
+                            onChange={(e) => updateConfirmationGuests(e.target.value)}
+                            placeholder={lang === 'heb' ? 'מספר אורחים' : 'Number of guests'} />}
+
+                        {event.eventGuests && newConfirmation?.rideArrival && <TextField classes={classes}
+                            type='number'
+                            name='number'
+                            onChange={(e) => updateConfirmationRidePassengers(e.target.value)}
+                            placeholder={lang === 'heb' ? 'מספר נוסעים בהסעה' : 'Number of Passenger'} />}
+                    </Stack>
+                    <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} arrow title={selectedEventRide === null ? CHOOSE_RIDE(lang) : 'אשר הגעה'}>
+                        <span>
+                            <Button onClick={sendInvitation}
+                                sx={{
+                                    ...submitButton(false),
+                                    ... { textTransform: 'none', margin: '16px', padding: '8px', minWidth: lang === 'heb' ? '200px' : '250px' }
+                                }}
+                                disabled={!newConfirmation?.rideArrival || selectedEventRide !== null}>
+                                {CONFIRM_EVENT_ARRIVAL(lang)}
+                            </Button>
+                        </span>
+                    </HtmlTooltip>
                 </List>
             </div>
-        </List>
+        </PageHolder >
     } else return null
 }
 

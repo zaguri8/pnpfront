@@ -18,7 +18,7 @@ import axios from "axios";
 import { useLoading } from "../../context/Loading";
 import { v4 } from "uuid";
 import { isValidPublicRide } from "../../store/validators";
-import { elegantShadow, submitButton } from "../../settings/styles";
+import { elegantShadow, submitButton, textFieldStyle } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
@@ -70,7 +70,7 @@ export default function EventStatistics() {
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
     const { firebase } = useFirebase()
     const { lang } = useLanguage()
-    const { openDialog, closeDialog, doLoad, cancelLoad, openDialogWithTitle } = useLoading()
+    const { openDialog, openDialogWithBottom, closeDialog, doLoad, cancelLoad, openDialogWithTitle } = useLoading()
     const [requests, setRequests] = useState<PNPRideRequest[] | null>(null)
     const [sortedRequests, setSortedRequests] = useState<{ startPoint: string, rideRequests: PNPRideRequest[] }[]>()
 
@@ -133,7 +133,9 @@ export default function EventStatistics() {
 
     const buttonStyle = {
         textDecoration: 'none',
+        border: '.1px solid white',
         borderRadius: '16px',
+        fontSize: '16px',
         fontFamily: 'Open Sans Hebrew',
         background: DARK_BLACK,
         color: SECONDARY_WHITE
@@ -232,7 +234,6 @@ export default function EventStatistics() {
         </List>)
     }
     const EventRideStatistics = (props: { statistics: RideStatistics[] }) => {
-
         useEffect(() => {
             if (objectsFromStatistics) { // cached resources
                 return;
@@ -247,10 +248,8 @@ export default function EventStatistics() {
                         hash[stat.rideStartPoint].amount += Number(stat.amount)
                         let exists = hash[stat.rideStartPoint].users.findIndex(uid => uid.uid === stat.uid)
                         if (exists != -1) {
-                            t--;
                             if (stat.extraPeople)
                                 hash[stat.rideStartPoint].users[exists].extraPeople.push(...stat.extraPeople)
-                            hash[stat.rideStartPoint].amount--;
                         } else
                             hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
                     }
@@ -264,21 +263,60 @@ export default function EventStatistics() {
 
 
         function CustomerCardContainer(props: { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[] }) {
+            const [historyProp, setHistoryProp] = useState(props)
+            const searchStyle = {
+                background: 'none',
+                color: SECONDARY_WHITE,
+                border: '.5px solid whitesmoke',
+                textDecoration: 'none',
+                fontSize: '18px',
+                fontFamily: 'Open Sans Hebrew',
+                padding: '16px',
+                borderRadius: '32px'
+            }
+            const search = (query: string) => {
+                if (query.length < 1)
+                    setHistoryProp({
+                        ...historyProp, data: props.data
+                    })
+                else {
+
+                    let transPred = (content: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => {
+                        return content.user.name.includes(query) || (content.extraPeople && content.extraPeople.find(p => p.fullName.includes(query)))
+                    }
+                    let filter = props.data.filter(transaction => transPred(transaction))
+
+                    setHistoryProp({
+                        ...historyProp, data: filter
+                    })
+                }
+            }
+
+            useEffect(() => {
+                openDialogWithBottom(<input placeholder="חפש משתמש"
+
+                    style={searchStyle}
+                    onChange={(e) => {
+                        search(e.target.value)
+                    }}>
+                </input>)
+            }, [])
+
 
             const CustomerCard = (props: { customerData: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] } }) => {
                 const labelTitleStyle = {
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: 'bold',
                     color: SECONDARY_WHITE
                 }
                 const labelTitleStyleSecond = {
-                    fontSize: '12px',
+                    fontSize: '14px',
                     fontWeight: 'bold',
                     color: SECONDARY_WHITE
                 }
                 const labelSmallStyle = {
                     color: SECONDARY_WHITE,
-                    fontSize: '10px'
+                    fontSize: '14px'
                 }
 
                 return <div style={{
@@ -308,7 +346,8 @@ export default function EventStatistics() {
                 overflowY: 'scroll',
                 padding: '8px',
                 maxHeight: '400px'
-            }}>{props.data.map((data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} />)}</div>);
+            }}>{historyProp.data.map((data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} />)}
+            </div>);
         }
 
 
@@ -340,15 +379,34 @@ export default function EventStatistics() {
         return <div>  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
             {objectsFromStatistics ? <div > {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ נוסעים`} : <b>{total}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
                 {objectsFromStatistics && <div style={{ display: 'grid', minWidth: '320px', height: 'fit-content', gridTemplateColumns: '1fr 1fr' }}>
-                    {Object.entries(objectsFromStatistics).map((each, index: number) => <div key={each[0] + index} style={{ padding: '4px', margin: '4px', maxWidth: '200px', fontSize: '12px', fontWeight: 'bold' }}>
-                        {each[0]}
-                        <div style={{ fontWeight: '500', padding: '4px' }}>
-                            {each[1].amount}
-                        </div>
-                        <button onClick={() => fetchUsersWithIds(each[0], each[1].users)} style={{ margin: '4px', fontSize: '12px', padding: '4px', border: 'none', background: DARKER_BLACK_SELECTED, color: SECONDARY_WHITE }}>
-                            {'הצג משתמשים'}
-                        </button>
-                        <hr /></div>)} </div>}
+                    {Object.entries(objectsFromStatistics)
+                        .map((each, index: number) => <div
+                            key={each[0] + index}
+                            style={{
+                                padding: '4px',
+                                margin: '4px',
+                                maxWidth: '200px',
+                                fontSize: '16px',
+                                fontWeight: 'bold'
+                            }}>
+                            {each[0]} {/*   City Title */}
+                            <div style={{
+                                fontWeight: '500',
+                                padding: '4px'
+                            }}>
+                                {each[1].amount}{/*  City Transactions amount */}
+                            </div>
+                            <button onClick={() => fetchUsersWithIds(each[0], each[1].users)}
+                                style={{
+                                    margin: '4px',
+                                    fontSize: '14px',
+                                    padding: '4px', border: 'none',
+                                    background: DARKER_BLACK_SELECTED,
+                                    color: SECONDARY_WHITE
+                                }}>
+                                {'הצג משתמשים'}
+                            </button>
+                            <hr /></div>)} </div>}
             </div>
             </div> : <h4 style={{ color: 'gray' }}>{'אין הזמנות לאירוע זה'}</h4>}
         </div>
@@ -370,7 +428,7 @@ export default function EventStatistics() {
                         return
                     let hashedCity;
                     const transform = Array.from(new Set(props.requests).values()).reduce((prev, cur) => {
-                        hashedCity = cities.find(city => cur.startingPoint.includes(city))?.replaceAll('ישראל', '').replaceAll(', Israel','') ?? cur.startingPoint.replaceAll('ישראל', '').replaceAll(', Israel','');
+                        hashedCity = cities.find(city => cur.startingPoint.includes(city))?.replaceAll('ישראל', '').replaceAll(', Israel', '') ?? cur.startingPoint.replaceAll('ישראל', '').replaceAll(', Israel', '');
                         if (!prev[hashedCity])
                             prev[hashedCity] = [cur];
                         else prev[hashedCity].push(cur);
@@ -584,10 +642,10 @@ export default function EventStatistics() {
             }
         }
     }
-    return (event ? <PageHolder style={{ background: BLACK_ELEGANT }}>
+    return (event ? <PageHolder style={{ background: BLACK_ELEGANT,overflowX:'hidden' }}>
         <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
         <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
-        <InnerPageHolder style={{ overflowY: 'hidden', overflowX: 'hidden', background: BLACK_ROYAL }} >
+        <InnerPageHolder style={{ width: '80%', overflowY: 'hidden', overflowX: 'hidden', background: 'none', border: 'none' }} >
             <Stack spacing={3} style={{ width: '75%' }}>
 
 
@@ -678,7 +736,9 @@ export default function EventStatistics() {
                 style={{
                     ...buttonStyle, ...{
                         padding: '8px',
+                        marginTop: '32px',
                         width: '50%',
+                        minWidth: 'max-content',
                         background: 'linear-gradient(#282c34,black)'
                     }
                 }}

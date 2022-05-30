@@ -6,7 +6,7 @@ import { v4 } from "uuid"
 import { useFirebase } from "../../context/Firebase"
 import { useLoading } from "../../context/Loading"
 import { PNPPage } from "../../cookies/types"
-import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { flex, textFieldStyle } from "../../settings/styles"
 import { getEventTypeFromString } from "../../store/external/converters"
 import { PNPEvent, UserEnterStatistics } from "../../store/external/types"
@@ -91,30 +91,40 @@ export default function AdminPanel() {
         </Stack>
     }
 
-    return <PageHolder style={{ background: BLACK_ELEGANT, overflowX: 'hidden' }} >
+    return <PageHolder style={{ background: PRIMARY_BLACK, overflowX: 'hidden' }} >
         <SectionTitle title={'ניהול קטגוריות'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL, overflowX: 'hidden' }} >
+        <InnerPageHolder style={{ background: BLACK_ELEGANT, borderRadius: '8px', overflowX: 'hidden' }} >
 
             <table dir={'rtl'} >
 
                 <thead>
                     <tr>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{`קטגורייה`}</div>
+                            <div style={{ fontSize: '20px', color: SECONDARY_WHITE }}>{`קטגורייה`}</div>
                         </th>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{'פעולות'}</div>
+                            <div style={{ fontSize: '20px', color: SECONDARY_WHITE }}>{'פעולות'}</div>
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {publicEvents && Object.entries(publicEvents).map(entry => <tr key={v4()} style={{ margin: '8px' }}>
-                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '12px', margin: '4px', color: SECONDARY_WHITE }}>{getEventTypeFromString(entry[0])}</div></th>
+                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '4px', color: SECONDARY_WHITE }}>{getEventTypeFromString(entry[0])}</div></th>
                         <th style={{ width: '50%' }}><Button
-                            style={{ backgroundImage: DARKER_BLACK_SELECTED, minWidth: '110px' }}
+                            style={{ backgroundImage: BLACK_ELEGANT, border: '.1px solid white', minWidth: '110px' }}
                             onClick={() => { nav('/adminpanel/specificevent', { state: { waitingEvents: entry[1].waiting, events: entry[1].events } }) }}
-                            sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' } }}>
+                            sx={{
+                                ... {
+                                    width: 'fit-content',
+                                    fontSize: '14px',
+                                    margin: '4px',
+                                    fontFamily: 'Open Sans Hebrew',
+                                    padding: '4px',
+                                    color: 'white',
+                                    background: '#007AFF'
+                                }
+                            }}>
                             {'ניהול אירועים'}
                         </Button></th>
                     </tr>)}
@@ -124,27 +134,49 @@ export default function AdminPanel() {
         </InnerPageHolder>
 
         <SectionTitle title={'ניהול הזמנות'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }}>
+        <InnerPageHolder style={{ background: BLACK_ELEGANT, borderRadius: '8px' }}>
             <Button
-                style={{ backgroundImage: RED_ROYAL, minWidth: '110px' }}
+                style={{ border: '.1px solid white', fontWeight: 'bold', background: BLACK_ELEGANT, minWidth: '110px' }}
                 onClick={() => { nav('/adminpanel/invitations') }}
-                sx={{ ... { width: 'fit-content', fontSize: '14px', maxHeight: '40px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
+                sx={{
+                    ... {
+                        width: 'fit-content',
+                        fontSize: '14px',
+                        maxHeight: '40px',
+                        margin: '4px',
+                        padding: '12px',
+                        fontFamily:'Open Sans Hebrew',
+                        color: 'white',
+                        background: '#007AFF'
+                    }
+                }}>
                 {'עבור לניהול הזמנות'}
             </Button>
         </InnerPageHolder>
 
         <SectionTitle title={'ניהול משתמשים'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }}>
+        <InnerPageHolder style={{ background: BLACK_ELEGANT, borderRadius: '8px' }}>
             <Button
-                style={{ backgroundImage: RED_ROYAL, minWidth: '110px' }}
+                style={{ border: '.1px solid white', fontWeight: 'bold', background: BLACK_ELEGANT, minWidth: '110px' }}
                 onClick={() => { nav('/adminpanel/users') }}
-                sx={{ ... { width: 'fit-content', fontSize: '14px', maxHeight: '40px', margin: '4px', padding: '12px', color: 'white', background: '#007AFF' } }}>
+                sx={{
+                    ... {
+                        width: 'fit-content',
+                        fontSize: '14px',
+                        maxHeight: '40px',
+                        fontFamily:'Open Sans Hebrew',
+                        margin: '4px',
+                        padding: '12px',
+                        color: 'white',
+                        background: '#007AFF'
+                    }
+                }}>
                 {'עבור לניהול משתמשים'}
             </Button>
         </InnerPageHolder>
 
         <SectionTitle title={'נתוני כניסה'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL, overflowX: 'hidden' }}>
+        <InnerPageHolder style={{ background: 'rgb(0,0,0,0.5)', overflowX: 'hidden' }}>
 
             <label style={
                 {

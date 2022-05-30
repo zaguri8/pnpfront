@@ -25,6 +25,7 @@ export type TransactionSuccess = {
     card_holder_name: string,
     more_info: {
         productName: string,
+        startPoint:string,
         amount: string,
         direction: string,
         eventId: string,

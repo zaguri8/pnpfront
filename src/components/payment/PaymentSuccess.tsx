@@ -2,13 +2,16 @@
 import { Button, Stack } from '@mui/material'
 import { Unsubscribe } from 'firebase/database'
 import $ from 'jquery'
+import waze from '../../assets/images/waze.png'
+import googleMap from '../../assets/images/google-maps.png'
 import React, { useEffect, useState } from 'react'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import { useLocation } from 'react-router-dom'
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import { useFirebase } from '../../context/Firebase'
+import { useNavigate } from 'react-router'
 import { useLanguage } from '../../context/Language'
-import { LOADING, NOTFOUND, RIDE_INFO, SAME_SPOT, SIDE } from '../../settings/strings'
+import { LOADING, NAVIGATION, NOTFOUND, RIDE_INFO, SAME_SPOT, SIDE } from '../../settings/strings'
 import { TransactionSuccess } from '../../store/payments/types'
 import logo from '../../assets/images/logo_white.png'
 import SectionTitle from '../SectionTitle'
@@ -17,12 +20,14 @@ import { TRANSACTION_DETAILS } from '../../settings/strings'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import Spacer from '../utilities/Spacer'
 import { useLoading } from '../../context/Loading'
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
+import { BLACK_ELEGANT, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import { QRCodeSVG } from 'qrcode.react'
 import { floatStyle } from '../WhatsApp'
-import { submitButton } from '../../settings/styles'
+import { boxShadow, submitButton } from '../../settings/styles'
 import { PNPPublicRide } from '../../store/external/types'
 import { isValidPublicRide } from '../../store/validators'
+import MapComponent from '../MapComponent';
+import { useGoogleState } from '../../context/GoogleMaps'
 function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
@@ -36,13 +41,11 @@ export default function PaymentSuccess() {
     const { doLoad, cancelLoad, isLoading, openDialog } = useLoading()
     const [ride, setRide] = useState<PNPPublicRide | undefined>()
     const { lang } = useLanguage()
+    const nav = useNavigate()
     const [transaction, setTransaction] = useState<TransactionSuccess | undefined>()
     useEffect(() => {
-
+        if (!query) { nav('/'); return }
         let unsub: Unsubscribe | null = null;
-
-
-
         if (query.has('customer_uid') && query.has('transaction_uid')) {
             doLoad()
             unsub = firebase.realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
@@ -68,7 +71,7 @@ export default function PaymentSuccess() {
 
     useEffect(() => {
         const handleIndicatorPayment = () => {
-            if (window.scrollY > 100) {
+            if (window.scrollY > 250) {
                 $('#floating_indicator_payment')
                     .css('display', 'none')
             } else {
@@ -147,58 +150,126 @@ export default function PaymentSuccess() {
         </div>
         )
     }
+    const [center, setCenter] = useState<{ lat: number, lng: number } | undefined>()
+    function navFunc(center: { lat: number, lng: number }) {
+        window.open(
+            'https://www.google.com/maps/search/?api=1&query=' + center.lat + ',' + center.lng
+        )
+    }
+    const { google } = useGoogleState()
 
+    function codeAddress(address: string) {
+        if (google && google !== null && google.maps) {
+            let geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ 'address': address }, function (results: any, status: any) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    let lat = results[0].geometry.location.lat()
+                    let lng = results[0].geometry.location.lng()
+                    setCenter({ lat: lat, lng: lng })
+
+                }
+                else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+    }
+    useEffect(() => {
+        if (transaction)
+            codeAddress(transaction.more_info.startPoint)
+    }, [google, transaction])
     const bImportantStyle = {
         color: SECONDARY_WHITE,
         padding: '4px',
+        minWidth: 'max-content',
         borderRadius: '2px',
         border: '.1px solid whitesmoke',
-        background:'black',
+        background: 'black',
         margin: '8px',
         fontWeight: 'bold',
         fontSize: '12px'
     }
 
-    return <PageHolder>
+    return <PageHolder style={{ overflowX: 'hidden' }}>
         {transaction ? <div>
-            <SectionTitle style={{ marginTop: '8px', marginBottom: '0px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
-            <br />
-            <InnerPageHolder style={{ margin: '0px', width: '250px', height: lang === 'heb' ? '375px' : '405px', background: ORANGE_GRADIENT_PRIMARY }}>
-            
+            <SectionTitle style={{ marginTop: '32px', marginBottom: '4px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
+     
+            <InnerPageHolder style={{background:'none',border:'none', margin: '0px', width: '250px', height: lang === 'heb' ? '400px' : '432px' }}>
+                <h3
+                    dir={SIDE(lang)}
+                    style={{ background: 'black', color: 'white', borderRadius: '4px', padding: '4px', margin: '0px' }}
+                >{lang === 'heb' ? 'צלמו מסך למועד ההצגה !' : 'Take a screenshot for the event day !'}</h3>
                 <label dir={SIDE(lang)}
                     style={{
                         ...{
                             color: SECONDARY_WHITE,
-                            display:'flex',
-                            margin:'8px',
-                            flexDirection:'column',
-                            alignItems:'center',
+                            display: 'flex',
+                            margin: '8px',
+                            flexDirection: 'column',
+                            alignItems: 'center',
                             fontSize: '12px'
-                        },... { border: 'none', fontWeight: 'bold' }
+                        }, ... { border: 'none', fontWeight: 'bold' }
                     }}>
-                            <InfoRoundedIcon style={{padding:'2px',borderRadius:'16px', color: 'white' }} />
-                        {lang === 'heb' ? 'שימו לב לשעות היציאה והחזרה - יש להגיע 10 דקות לפני. ההסעה לא תחכה למאחרים.' : 'Pay attention to the departure and return hours - you must arrive 10 minutes before. The shuttle will not wait for the latecomers.'}</label>
-                <QRCodeSVG style={{ width: '171px', height: '171px',margin:'8px' }} value={transaction.approval_num} />
+                    <InfoRoundedIcon style={{ padding: '2px', borderRadius: '16px', color: 'white' }} />
+                    {lang === 'heb' ? 'שימו לב לשעות היציאה והחזרה - יש להגיע 10 דקות לפני. ההסעה לא תחכה למאחרים.' : 'Pay attention to the departure and return hours - you must arrive 10 minutes before. The shuttle will not wait for the latecomers.'}</label>
+                <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
 
                 <span dir={SIDE(lang)}
 
-                    style={bImportantStyle}>{(lang === 'heb' ? 'תוקף ברקוד: ' : 'Barcode expiration: ') + (lang === 'heb' ? (transaction.more_info.twoWay ? 'שני סריקות בלבד (שני כיוונים)' : 'סריקה אחת בלבד (כיוון אחד)') : (transaction.more_info.twoWay ? 'Two scans (Two directions)' : 'One Scan (One direction)'))}</span>
+                    style={bImportantStyle}>{(lang === 'heb' ? 'תוקף ברקוד: ' : 'Barcode expiration: ') + (lang === 'heb' ? (transaction.more_info.twoWay ? 'שני סריקות בלבד (סריקה לכל כיוון)' : 'סריקה אחת בלבד (כיוון אחד)') : (transaction.more_info.twoWay ? 'Two scans (Two directions)' : 'One Scan (One direction)'))}</span>
                 <b><span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, padding: '4px', margin: '4px', fontSize: '14px' }}>{(lang === 'heb' ? 'מספר נוסעים: ' : 'Number of passengers: ') + transaction.more_info.amount}</span></b>
 
-                <span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontSize: '9px', marginTop: '10px' }}>{lang === 'heb' ? `נא לשים לב הברקוד תקף ל${transaction.more_info.twoWay ? 'שני כיוונים' : 'כיוון אחד'} ${!transaction.more_info.twoWay ? 'בלבד' : 'בלבד, סריקה לכל כיוון (הלוך חזור)'}, במידה ורכשת מספר כרטיסים הברקוד הנל מכיל את כולם.` : 'This barcode is not to be hand over, a single scan contains the ride approval for all the passengers above'}</span>
+                <span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontSize: '9px', marginTop: '10px' }}>{lang === 'heb' ? 'במידה ורכשת מספר כרטיסים, הברקוד הנל מכיל את כולם.' : 'If you have purchased more then 1 ticket, the following barcode includes them as-well'}<b>{lang === 'heb' ? ' יש לעלות ביחד.' : 'Boarding together is required'}</b></span>
             </InnerPageHolder>
 
         </div> : null}
-        {transaction && <InnerPageHolder style={{ borderRadius: '0px', padding: '0px', border: 'none', background: 'none' }}>
+        {transaction && <InnerPageHolder style={{ background: 'none', borderRadius: '0px', padding: '0px', border: 'none' }}>
             <Button
 
                 onClick={openRideDetails}
                 style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%', maxWidth: '300px', padding: '0px', margin: '0px' } }}>{lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
         </InnerPageHolder>}
-        <SectionTitle title={TRANSACTION_DETAILS(lang)} style={{}} />
 
+        <SectionTitle title={NAVIGATION(lang)} style={{ paddingBottom: '0px' }} />
+        <InnerPageHolder style={{ background: 'none', border: 'none' }}>
 
-        <InnerPageHolder style={{ direction: SIDE(lang) }}>
+            {center && <MapComponent mapProps={{
+                center: center,
+                zoom: 15,
+                content: null,
+                containerStyle: {
+                    zIndex: 0,
+                    transform: 'translateY(-32px)',
+                    width: '300px',
+                    border: '1px solid white',
+                    height: '300px', ...boxShadow()
+                }
+            }} />}
+            {center && <div style={{ zIndex: 1, border: '.1px solid white', padding: '4px', alignItems: 'center', borderBottomRightRadius: '8px', borderBottomLeftRadius: '8px', width: '293px', justifyContent: 'space-between', display: 'flex', flexDirection: 'row', transform: 'translateY(-156px)' }}>
+                <img
+                    src={waze}
+                    style={{ cursor: 'pointer', height: '30px', width: '30px', margin: '4px', ...boxShadow() }}
+                    alt={'נווט עם וויז'}
+                    onClick={() => {
+                        window.open(`https://waze.com/ul?ll=${center.lat},${center.lng}&navigate=yes`)
+                    }}
+                >
+                </img>
+                <label style={{ color: SECONDARY_WHITE }}>בחר אפליקציית ניווט</label>
+                <img
+                    src={googleMap}
+                    style={{ cursor: 'pointer', height: '25px', width: '20px', margin: '4px', ...boxShadow() }}
+                    alt={'נווט עם גוגל'}
+                    onClick={() => {
+                        navFunc(center)
+                    }}
+                >
+                </img>
+            </div>}
+        </InnerPageHolder>
+
+        <SectionTitle title={TRANSACTION_DETAILS(lang)} style={{transform:'translateY(-176px)'}} />
+        <InnerPageHolder style={{ border: '.5px solid white', background: 'rgb(0,0,0,0.2)',transform:'translateY(-176px)', direction: SIDE(lang) }}>
             {<div id='floating_indicator_payment'>
 
                 <span>{lang === 'heb' ? 'קבלה למטה' : 'Receipt down'}</span>
@@ -245,5 +316,7 @@ export default function PaymentSuccess() {
 
             <img src={logo} style={{ maxWidth: '200px', height: '25px', alignSelf: 'flex-end', marginTop: '32px' }}></img>
         </InnerPageHolder>
+
+       
     </PageHolder>
 }

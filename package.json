@@ -13,6 +13,7 @@
     "@mui/material": "^5.4.2",
     "@mui/styles": "^5.4.1",
     "@nick4fake/react-draft-wysiwyg": "^1.15.1",
+    "@react-google-maps/api": "^2.11.8",
     "@reduxjs/toolkit": "^1.7.2",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",

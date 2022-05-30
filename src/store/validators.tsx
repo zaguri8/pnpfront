@@ -45,8 +45,6 @@ export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
     && event !== null
     && (event.eventDate !== null
       && event.eventDate !== 'null')
-    && (event.eventDetails !== null
-      && event.eventDetails !== 'null')
     && (event.eventHours !== null
       && event.eventHours.startHour !== null
       && event.eventHours.endHour !== null
@@ -118,9 +116,13 @@ export function isValidRideConfirmation(ride: PNPRideConfirmation | undefined): 
     && ride !== null
     && (ride.userId !== null
       && ride.userId !== 'null')
+    && (ride.guests !== null
+      && ride.guests !== 'null')
     && (ride.passengers !== null
       && ride.phoneNumber !== 'null')
     && (ride.phoneNumber !== null
+      && ride.directionType !== 'null')
+    && (ride.directionType !== null
       && ride.userName !== 'null')
     && (ride.userName !== null
       && ride.passengers !== 'null')

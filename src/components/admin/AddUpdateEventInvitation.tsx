@@ -4,7 +4,7 @@ import { useLoading } from "../../context/Loading";
 
 import { event_placeholder } from "../../assets/images";
 import { Stack, TextField, Checkbox, Button, Select, MenuItem, FormControl } from "@mui/material";
-import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE } from "../../settings/colors";
+import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE, RED_ROYAL } from "../../settings/colors";
 
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
 import { getCurrentDate } from "../../utilities";
@@ -12,36 +12,43 @@ import { getCurrentDate } from "../../utilities";
 import { Editor, EditorState } from "react-draft-wysiwyg";
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from "draft-js";
-import { useEffect, useState } from "react";
-import { submitButton } from "../../settings/styles";
+import { CSSProperties, useEffect, useState } from "react";
+import { fullSubmitButton, submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent, isValidPrivateEvent } from "../../store/validators";
-import { CONTINUE_TO_CREATE, CREATE_EVENT, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_NUMBER_PPL, EVENT_START, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
+import { CONTINUE_TO_CREATE, CREATE_EVENT, EVENT_ADDRESS, EVENT_DATE, EVENT_END_2, EVENT_NUMBER_PPL, EVENT_START_2, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
 import Places from "../utilities/Places";
 import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router";
+import { getDefaultPrivateEvent } from "../../store/external/helpers";
 
 const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
+
+    // state
+    const [startDate, setStartDate] = useState<string>(props.event ? props.event.eventHours.startHour : '00:00')
+    const [endDate, setEndDate] = useState<string>(props.event ? props.event.eventHours.endHour : '00:00')
+    const [image, setImage] = useState<string>('')
+    const [pnpEvent, setPnpEvent] = useState<PNPPrivateEvent>((props.event ?? getDefaultPrivateEvent()))
     const [editorState, setEditorState] = useState<EditorState | undefined>()
-    const { user } = useFirebase();
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
 
-
-    const [image, setImage] = useState<string>('')
-    const [pnpEvent, setPnpEvent] = useState<PNPPrivateEvent>((props.event ?? {
-        eventTitle: 'null',
-        eventLocation: 'null',
-        eventId: 'null',
-        eventDate: dateStringFromDate(getCurrentDate()),
-        eventDetails: 'null',
-        eventHours: { startHour: 'null', endHour: 'null' },
-        eventImageURL: 'null'
-    }))
+    // context
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
     const { firebase } = useFirebase()
+    const { user } = useFirebase();
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE));
+    const classes = useStyles()
+    const { lang } = useLanguage()
+
+
+
+    // navigation
     const nav = useNavigate()
+
+
+    // submit event form with modified fields
     function submitUpdateEvent() {
         const dialogTitle = props.event ? 'ערכת אירוע בהצלחה! השינויים כבר ייכנסו לתוקף!' : 'הוספת אירוע בהצלחה ! בקרוב האירוע יופיע בדף הבית';
 
@@ -74,45 +81,8 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
 
     }
 
-    const [startDate, setStartDate] = useState<string>(props.event ? props.event.eventHours.startHour : '00:00')
-    const [endDate, setEndDate] = useState<string>(props.event ? props.event.eventHours.endHour : '00:00')
 
-
-
-    const useStyles = makeStyles(() => ({
-        root: {
-            "& .MuiOutlinedInput-root": {
-                background: 'none',
-                borderRadius: '32px',
-                padding: '0px',
-                border: '.8px solid white',
-                color: SECONDARY_WHITE, ...{
-                    '& input[type=number]': {
-                        '-moz-appearance': 'textfield'
-                    },
-                    '& input[type=number]::-webkit-outer-spin-button': {
-                        '-webkit-appearance': 'none',
-                        margin: 0
-                    },
-                    '& input[type=time]::-webkit-calendar-picker-indicator': {
-                        filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
-                    },
-                    '& input[type=date]::-webkit-calendar-picker-indicator': {
-                        filter: 'invert(200%) sepia(85%) saturate(10%) hue-rotate(356deg) brightness(107%) contrast(117%)'
-                    },
-                    '& input[type=number]::-webkit-inner-spin-button': {
-                        '-webkit-appearance': 'none',
-                        margin: 0
-                    }
-                }
-            }
-        }, noBorder: {
-            border: "1px solid red",
-            outline: 'none'
-        }
-    }));
-
-    const classes = useStyles()
+    // text editor state handler
     const onEditorStateChanged = (state: EditorState) => {
         setEditorState(state)
         if (editorState) {
@@ -139,6 +109,10 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
         setPnpEvent({ ...pnpEvent, ...{ eventLocation: address } })
     }
 
+    const updateEventGuests = (enabledGuests: boolean) => {
+        setPnpEvent({ ...pnpEvent, ...{ eventGuests: enabledGuests } })
+    }
+
     const updateEventDate = (event: string | undefined | null) => {
         if (event as string) {
             const split = reverseDate(event)
@@ -146,14 +120,50 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
         }
     }
 
-    const { lang } = useLanguage()
 
+    // style
+    const tooltipStyle = { fontFamily: 'Open Sans Hebrew', fontSize: '18px' }
+    const formControlStyle = { width: '100%', alignSelf: 'center' }
+    const fitFormControlStyle = { width: 'fit-content', alignSelf: 'center' }
+    const upperStackStyle = { width: '80%', alignSelf: 'center' }
+    const labelStyleSimple = { padding: '8px', color: SECONDARY_WHITE }
+    const directionStyle = { direction: SIDE(lang) }
+    const editorStyle = {
+        background: SECONDARY_WHITE,
+        minHeight: '200px',
+        maxWidth: '100%'
+    }
+    const imageStyle = {
+        alignSelf: 'center',
+        minHeight: '150px',
+        width: '80%',
+        maxWidth: '225px',
+        height: '75px'
+    }
+
+    const labelStyle = {
+        color: PRIMARY_WHITE,
+        padding: '8px',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        alignSelf: 'center',
+        marginTop: '16px',
+        width: 'fit-content',
+        backgroundImage: DARK_BLACK
+    }
+    const placeSearchStyle = {
+        width: '100%',
+        border: '.8px solid white',
+        borderRadius: '32px',
+        color: SECONDARY_WHITE,
+        background: 'none'
+    }
 
     return (<Stack>
 
 
-        <Stack spacing={3} style={{ width: '80%', alignSelf: 'center' }} >
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
+        <Stack spacing={3} style={upperStackStyle} >
+            <FormControl style={formControlStyle}>
                 <input onChange={(event) => {
                     if (event.target.files) {
                         setImage(URL.createObjectURL(event.target.files[0]))
@@ -170,52 +180,43 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                     }
 
                 }} type="file" id="files_create_event" style={{ display: 'none' }} />
-                <img id='menu_event_create_image' alt='' src={image ? image : props.event ? props.event.eventImageURL : event_placeholder} style={{
+                <img id='menu_event_create_image' alt='' src={image ? image : props.event ? props.event.eventImageURL : event_placeholder} style={imageStyle} />
 
-                    alignSelf: 'center',
-                    minHeight: '150px',
-                    width: '80%',
-                    maxWidth: '225px',
-                    height: '75px'
-                }} />          <label style={{
-                    color: PRIMARY_WHITE,
-                    padding: '8px',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    alignSelf: 'center',
-                    marginTop: '16px',
-                    width: 'fit-content',
-                    backgroundImage: DARK_BLACK
-                }} onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}</label>
+                <label
+                    style={labelStyle}
+                    onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}
+                </label>
             </FormControl>
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_TITLE(lang)}</label>
+            <FormControl style={formControlStyle}>
+                <label style={labelStyleSimple}>{EVENT_TITLE(lang)}
+                </label>
                 <TextField
-
                     className={classes.root}
                     placeholder={props.event ? props.event.eventTitle : EVENT_TITLE(lang)}
                     onChange={(event) => {
-                        setPnpEvent({ ...pnpEvent, ...{ eventName: event.target.value } })
+                        setPnpEvent({ ...pnpEvent, ...{ eventTitle: event.target.value } })
 
                     }}
                     dir='rtl'
-                    sx={{
-
-                        direction: SIDE(lang)
-                    }} />
+                    sx={directionStyle} />
             </FormControl>
 
 
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_ADDRESS(lang)}</label>
+            <FormControl style={formControlStyle}>
+                <label style={labelStyleSimple}>{EVENT_ADDRESS(lang)}</label>
                 <Places value={''}
                     handleAddressSelect={(address: string) => {
                         updateEventAddress(address)
-                    }} types={['address']} className={''} id={{}} fixed={false} style={{ width: '100%', border: '.8px solid white', borderRadius: '32px', color: SECONDARY_WHITE, background: 'none' }} placeHolder={props.event ? props.event.eventLocation : EVENT_ADDRESS(lang)} />
+                    }} types={['address']}
+                    className={''}
+                    id={{}}
+                    fixed={false}
+                    style={placeSearchStyle}
+                    placeHolder={props.event ? props.event.eventLocation : EVENT_ADDRESS(lang)} />
 
             </FormControl>
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_DATE(lang)}</label>
+            <FormControl style={formControlStyle}>
+                <label style={labelStyleSimple}>{EVENT_DATE(lang)}</label>
 
                 <TextField
                     value={props.event ? unReverseDate(props.event.eventDate) : unReverseDate(pnpEvent.eventDate)}
@@ -231,9 +232,9 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                     }}
                     required />
             </FormControl>
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
+            <FormControl style={formControlStyle}>
 
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_START(lang)}</label>
+                <label dir={SIDE(lang)} style={labelStyleSimple}>{EVENT_START_2(lang)}</label>
                 <TextField
                     value={startDate}
                     classes={{ root: classes.root }}
@@ -242,15 +243,16 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                         style: { color: SECONDARY_WHITE }
                     }}
 
-                    type='time'
+                    type='text'
                     onChange={(e) => {
                         updateEventHours('start', e.target.value)
                     }}
                     required />
             </FormControl>
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
 
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_END(lang)}</label>
+            <FormControl style={formControlStyle}>
+
+                <label style={labelStyleSimple}>{EVENT_END_2(lang)}</label>
                 <TextField
                     value={endDate}
                     classes={{ root: classes.root }}
@@ -259,15 +261,27 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                         style: { color: SECONDARY_WHITE }
                     }}
 
-                    type='time'
+                    type='text'
                     onChange={(e) => {
                         updateEventHours('end', e.target.value)
                     }}
                     required />
             </FormControl>
-            <FormControl style={{ width: '100%', alignSelf: 'center' }}>
+
+            <FormControl style={fitFormControlStyle}>
+
+                <label style={labelStyleSimple}>{lang === 'heb' ? 'אפשר אורחים' : 'Enable Guests'}</label>
+                <Checkbox
+                    classes={{ root: classes.root }}
+                    style={{padding:'4px',alignSelf:'center',width:'fit-content',background:RED_ROYAL,color:SECONDARY_WHITE}}
+                    onChange={(e) => {
+                        updateEventGuests(e.target.checked)
+                    }}
+                    required />
+            </FormControl>
+            <FormControl style={formControlStyle}>
                 <Editor
-                    editorStyle={{ background: SECONDARY_WHITE, minHeight: '200px', maxWidth: '100%' }}
+                    editorStyle={editorStyle}
                     editorState={editorState}
                     placeholder={'הכנס פרטים אם ברצונך לשנות את הפרטים הנוכחים'}
                     wrapperStyle={{ maxWidth: '100%' }}
@@ -277,11 +291,16 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                     onEditorStateChange={onEditorStateChanged}
                 />
             </FormControl>
-            <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidPrivateEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
+            <HtmlTooltip
+                sx={tooltipStyle}
+                title={!isValidPrivateEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)}
+                arrow>
                 <span>
                     <Button
                         onClick={submitUpdateEvent}
-                        sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}</Button>
+                        sx={fullSubmitButton}>
+                        {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}
+                    </Button>
                 </span>
             </HtmlTooltip>
         </Stack>

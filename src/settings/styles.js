@@ -21,6 +21,7 @@ export const submitButton = (margin) => {
         backgroundImage: DARKER_BLACK_SELECTED
     }
 }
+export const fullSubmitButton = { ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }
 
 export const innerShadow = 'rgba(0, 0, 0, 0.35) 0px -50px 36px -28px inset'
 

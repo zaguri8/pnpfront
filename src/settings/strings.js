@@ -12,12 +12,13 @@ export const CHOOSE_RIDE = (lang) => lang === 'heb' ? 'בחר הסעה' : 'Pick 
 export const COMMENTS = (lang) => lang === 'heb' ? 'הערות' : 'Comments'
 export const LEAVE_HOUR = (lang) => lang === 'heb' ? 'שעת יציאה' : 'Ride hour'
 export const CONFIRM_RIDE = (lang) => lang === 'heb' ? 'אשר הגעה להסעה' : 'Confirm Arrival'
+export const CONFIRM_EVENT_ARRIVAL = (lang) => lang === 'heb' ? 'אשר הגעה' : 'Confirm Arrival'
 export const RETURN_HOUR = (lang) => lang === 'heb' ? 'שעת חזרה' : 'Back hour'
 export const STARTING_POINT = (lang) => lang === 'heb' ? 'כל נקודות היציאה' : 'All starting points'
 export const PAYMENT_FOR_RIDE = (lang) => lang === 'heb' ? `תשלום עבור הסעה` : 'Payment for ride'
 export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת יציאה' : 'Starting point'
-export const PICK_POINT = (lang) => lang === 'heb' ? 'נקודת יציאה - הלוך' : 'Start point - first direction'
-export const PULL_POINT = (lang) => lang === 'heb' ? 'נקודת הורדה - חזור' : 'End point - return direction'
+export const PICK_POINT = (lang) => lang === 'heb' ? 'נקודת יציאה' : 'Start point - first direction'
+export const PULL_POINT = (lang) => lang === 'heb' ? 'יעד' : 'End point - return direction'
 export const CONTINUE_TO_SECURE_PAYMENT = (lang) => lang === 'heb' ? 'עבור למסך תשלום מאובטח' : 'Continue to secure payment'
 export const PAY_COMPLETE = (lang) => lang === 'heb' ? 'בצע תשלום' : 'Pay'
 export const PICK_START_POINT_REQUEST = (lang) => lang === 'heb' ? 'אנא בחר נקודת יציאה' : 'Please select starting point'
@@ -132,6 +133,9 @@ export const EVENT_TITLE = (lang) => lang === 'heb' ? 'כותרת האירוע' 
 export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע' : 'Event address'
 export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע' : 'Event start date'
 export const EVENT_END = (lang) => lang === 'heb' ? 'סיום האירוע' : 'Event end date'
+
+export const EVENT_START_2 = (lang) => lang === 'heb' ? 'תחילת האירוע (מלל חופשי)' : 'Event start date (Free text)'
+export const EVENT_END_2 = (lang) => lang === 'heb' ? 'סיום האירוע (מלל חופשי)' : 'Event end date (Free text)'
 export const EVENT_DATE = (lang) => lang === 'heb' ? 'תאריך האירוע' : 'Event Date'
 export const EVENT_TYPE = (lang) => lang === 'heb' ? 'סוג האירוע' : 'Event type'
 export const EVENT_DESC = (lang) => lang === 'heb' ? 'תיאור האירוע' : 'Event description'
@@ -160,7 +164,7 @@ export const RIDE_INFO = (lang) => lang === 'heb' ? 'ברכישת הכרטיס �
 
 
 export const TRANSACTION_DETAILS = (lang) => lang === 'heb' ? 'קבלה עבור רכישה' : 'Receipt Details'
-
+export const NAVIGATION = (lang) => lang === 'heb' ? 'נווט' : 'Navigation'
 export const TERMS_OF_SERVICE = (lang) => lang === 'heb' ? 'תקנון Pick n Pull' : 'Pick n Pull TOS'
 
 export const ABOUT = (lang) => lang === 'heb' ? 'אודות' : 'About us'

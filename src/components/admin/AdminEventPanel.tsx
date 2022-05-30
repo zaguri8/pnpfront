@@ -1,7 +1,7 @@
 
 import { PNPEvent } from "../../store/external/types"
 import { Button, Stack } from '@mui/material'
-import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL } from "../../settings/colors"
+import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK } from "../../settings/colors"
 import { useNavigate } from "react-router"
 import HTMLFromText from '../utilities/HtmlFromText'
 import { v4 } from 'uuid'
@@ -10,38 +10,40 @@ import { useLocation } from 'react-router-dom'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
+import { CSSProperties } from "react"
 const AdminEventPanel = () => {
 
     const location = useLocation()
     const { openDialog, doLoad, cancelLoad } = useLoading()
     const { firebase } = useFirebase()
 
+    const tableTitleStyle:CSSProperties = { fontSize: '20px', color: SECONDARY_WHITE }
     const nav = useNavigate()
-    return <PageHolder style={{ background: BLACK_ELEGANT }}>
+    return <PageHolder style={{ background: PRIMARY_BLACK }}>
         <SectionTitle title={'ניהול אירועים'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }} >
+        <InnerPageHolder style={{ background: BLACK_ELEGANT }} >
 
             <table dir={'rtl'} >
 
                 <thead>
                     <tr>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{`שם האירוע`}</div>
+                            <div style={tableTitleStyle}>{`שם האירוע`}</div>
                         </th>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE }}>{'פעולות'}</div>
+                            <div style={tableTitleStyle}>{'פעולות'}</div>
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {location.state && (location.state as any).events && (location.state as { waitingEvents: PNPEvent[], events: PNPEvent[] }).events.map((event: PNPEvent) => <tr key={v4()} style={{ margin: '8px' }}>
-                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '12px', margin: '4px', color: SECONDARY_WHITE }}>{event.eventName}</div></th>
+                        <th style={{ width: '50%' }}>  <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '4px', color: SECONDARY_WHITE }}>{event.eventName}</div></th>
                         <th style={{ width: '50%' }}><Button
-                            style={{ backgroundImage: DARKER_BLACK_SELECTED, minWidth: '110px' }}
+                            style={{border:'.1px solid white', backgroundImage: BLACK_ELEGANT, minWidth: 'max-content',paddingLeft:'8px',paddingRight:'8px' }}
                             onClick={() => { nav('/adminpanel/specificevent/eventstatistics', { state: event }) }}
                             sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' } }}>
-                            {'עבור לניהול אירוע'}
+                            {'ניהול אירוע'}
                         </Button></th>
                     </tr>)}
                 </tbody>
@@ -49,7 +51,7 @@ const AdminEventPanel = () => {
         </InnerPageHolder>
 
         <SectionTitle title={'אירועים ממתינים'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }} >
+        <InnerPageHolder style={{ background: BLACK_ELEGANT }} >
 
             {location.state && (location.state as any).waitingEvents && (location.state as any).waitingEvents.length > 0 ? <table dir={'rtl'}>
 

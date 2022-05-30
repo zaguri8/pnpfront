@@ -41,7 +41,7 @@ const FormField = React.memo((props: FormFieldProps) => {
             name={props.name}
             onChange={(e) => { props.onChange(e.target.value) }}
             type={props.type} //   value={unReverseDate(pnpEvent.eventDate)}
-            placeholder={props.placeholder ?? props.title} /> : <TextField
+            placeholder={(props.placeholder && props.placeholder !== 'null') ? props.placeholder : props.title} /> : <TextField
             classes={classes}
             style={props.style}
             name={props.name}
@@ -155,7 +155,7 @@ export default function PrivateEventConstruction() {
 
                 <FormField
                     title={EVENT_TITLE(lang)}
-                    value={privateEvent.eventTitle}
+                    value={(privateEvent.eventTitle && privateEvent.eventTitle !== 'null') ? privateEvent.eventTitle : ""}
                     placeholder={EVENT_TITLE(lang)}
                     style={{ width: '100%', color: PRIMARY_BLACK }}
                     type={'text'}
@@ -176,7 +176,7 @@ export default function PrivateEventConstruction() {
                         background: PRIMARY_BLACK
                     }} placeHolder={EVENT_ADDRESS(lang)} />
 
-
+                
 
 
                 <FormField
@@ -192,7 +192,7 @@ export default function PrivateEventConstruction() {
                     title={EVENT_START(lang)}
                     placeholder={EVENT_START(lang)}
                     value={privateEvent.eventHours.startHour}
-                    type={'time'}
+                    type={'text'}
                     style={{ width: '100%', color: PRIMARY_BLACK }}
                     name={'time'}
                     onChange={updateEventStartHour} />
@@ -203,7 +203,7 @@ export default function PrivateEventConstruction() {
                     value={privateEvent.eventHours.endHour}
                     style={{ width: '100%', color: PRIMARY_BLACK }}
                     placeholder={EVENT_END(lang)}
-                    type={'time'}
+                    type={'text'}
                     name={'time'}
                     onChange={updateEventEndHour} />
 

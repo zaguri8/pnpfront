@@ -1,4 +1,4 @@
-import { Auth } from 'firebase/auth'
+import { Auth, User } from 'firebase/auth'
 import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
@@ -191,6 +191,51 @@ export class Realtime {
         })
     }
 
+
+    // Makes a user responsible of a private event
+    // takes user as parameter and does the changes
+    async makeUserResponsible(userId: string,
+        event: PNPPrivateEvent) {
+        event.eventProducerId = userId
+        return await this.updatePrivateEvent(event.eventId, event)
+    }
+
+    // Edit confirmations functions
+    // NOTES: update_confirmation , delete_confirmation
+    async updateConfirmation(eventId: string,
+        userName: string,
+        confirmation: PNPRideConfirmation) {
+       return await get(child(child(this.rides, 'confirmations'), eventId))
+            .then(snap => {
+                snap.forEach(child => {
+                    if (child.child('userName').val() === userName) {
+                        update(child.ref, confirmation)
+                        return
+                    }
+                })
+            })
+    }
+
+
+
+    async getUserIdByEmail(email: string,
+        consume: ((userId: string) => void),
+        error: (() => void)) {
+        await get(this.users)
+            .then(snap => {
+                snap.forEach(child => {
+                    if (child.child('email').val() === email) {
+                        consume(child.key!)
+                        return
+                    }
+                })
+                error()
+            }).catch((e) => this.createError("getUserIdByEmail", e));
+    }
+
+
+
+
     async addRideRequest(request: PNPRideRequest) {
         if (!this.auth.currentUser)
             return
@@ -280,7 +325,6 @@ export class Realtime {
         })
     }
 
-
     addListenerToUsers(consume: (users: PNPUser[]) => void, error: (e: Error) => void) {
         return onValue(this.users, (userSnaps) => {
             const users: PNPUser[] = []
@@ -326,10 +370,8 @@ export class Realtime {
      * @returns new reference callback
      */
     async addRideConfirmation(confirmation: PNPRideConfirmation): Promise<object | void> {
-        if (this.auth.currentUser != null) {
-            let newPath = push(child(child(this.rides, 'confirmations'), confirmation.eventId))
-            return await set(newPath, confirmation)
-        }
+        let newPath = push(child(child(this.rides, 'confirmations'), confirmation.eventId))
+        return await set(newPath, confirmation)
     }
     /**
        * addPublicRide
@@ -383,6 +425,7 @@ export class Realtime {
         if (this.auth.currentUser) {
             const p = push(child(child(this.allEvents, 'private'), 'waiting'))
             event.eventId = p.key!
+            event.eventProducerId = this.auth.currentUser.uid
             if (imageBuffer) {
                 return await uploadBytes(storageRef(this.storage, 'PrivateEventImages/' + "/" + event.eventId), imageBuffer)
                     .then(async snap => {

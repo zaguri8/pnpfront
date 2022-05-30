@@ -1,10 +1,10 @@
 import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
-import { Dialog, List, ListItem, Button } from '@mui/material';
+import { Dialog, List, ListItem, Button, Stack } from '@mui/material';
 import { ILoadingContext, useLoading } from './context/Loading';
 import Profile from './components/auth/Profile'
 import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
@@ -13,7 +13,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router';
 import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
 
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE, TOOLBAR_COLOR } from './settings/colors';
+import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, RED_ROYAL, SECONDARY_WHITE, TOOLBAR_COLOR } from './settings/colors';
 import Home from './components/home/Home';
 import { useFirebase } from './context/Firebase';
 import Login from './components/auth/Login';
@@ -25,7 +25,7 @@ import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
 import MyPayments from './components/payment/MyPayments';
-import Test from './components/Test';
+import Test from './components/MapComponent';
 import EventStatistics from './components/admin/EventStatistics';
 import AdminPanel from './components/admin/AdminPanel';
 import WhatsApp from './components/WhatsApp';
@@ -43,6 +43,7 @@ import MyCoins from './components/auth/MyCoins';
 import PrivateEventConstruction from './components/event/PrivateEventConstruction';
 import InvitationStatistics from './components/admin/InvitationStatistics';
 import ManageInvitations from './components/admin/ManageInvitations';
+import { useGoogleState } from './context/GoogleMaps';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -84,7 +85,7 @@ function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
     {props.dialogContext.dialogTitle && <div style={{
       display: 'flex',
       color: SECONDARY_WHITE,
-      background: ORANGE_GRADIENT_PRIMARY,
+      background: PRIMARY_BLACK,
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center'
@@ -93,6 +94,8 @@ function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
       overflowX: 'hidden',
       background: PRIMARY_BLACK,
       maxHeight: '800px',
+
+      minWidth: '300px',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center'
@@ -103,18 +106,23 @@ function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
       marginTop: '0px',
       paddingTop: '8px',
       color: SECONDARY_WHITE,
-      background: PRIMARY_BLACK,
-      textDecoration: 'underline'
+      background: PRIMARY_BLACK
     }}>
-      <Button onClick={() => {
-        props.dialogContext.closeDialog();
-      }} style={{
-        width: '100%',
-        color: 'white',
-        backgroundImage: ORANGE_GRADIENT_PRIMARY,
-        fontFamily: 'Open Sans Hebrew',
-        fontSize: '18px'
-      }}>{CLOSE(props.lang)}</Button>
+      <Stack style={{ width: '100%' }} alignItems={'center'} spacing={1}>
+
+        {props.dialogContext.dialogBottom && <React.Fragment>
+          {props.dialogContext.dialogBottom}
+        </React.Fragment>}
+        <Button onClick={() => {
+          props.dialogContext.closeDialog();
+        }} style={{
+          width: '100%',
+          color: 'white',
+          backgroundImage: RED_ROYAL,
+          fontFamily: 'Open Sans Hebrew',
+          fontSize: '18px'
+        }}>{CLOSE(props.lang)}</Button>
+      </Stack>
     </ListItem>
   </Dialog>);
 }
@@ -215,8 +223,7 @@ function App() {
 
     }
   }, [])
-
-  const { isAuthenticated, appUser } = useFirebase()
+  const { isAuthenticated, appUser, user } = useFirebase()
 
 
   const NoPerms = () => (<div style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'אין לך גישות לעמוד זה' : 'You dont have required permissions to view this page'}</div>)
@@ -243,7 +250,6 @@ function App() {
         <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='termsOfService' element={<TermsOfService />} />
-
         <Route path='/myaccount/profile' element={<Profile />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
         <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />
@@ -254,6 +260,7 @@ function App() {
         <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
         <Route path='/adminpanel/invitations' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <ManageInvitations />} />
         <Route path='/adminpanel/invitations/specificinvitation' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <InvitationStatistics />} />
+        <Route path='/producerpanel/invitation/:eventId' element={!user || !appUser ? <NoPerms /> : <InvitationStatistics />} />
         <Route path='/adminpanel/specificevent' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminEventPanel />} />
         <Route path='/adminpanel/users' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <UserStatistics />} />
         <Route path='/adminpanel/specificevent/eventstatistics' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventStatistics />} />

@@ -10,33 +10,14 @@ import { makeStyles } from "@mui/styles"
 import { submitButton } from "../../settings/styles"
 import { SECONDARY_WHITE, PRIMARY_BLACK } from "../../settings/colors"
 import { SAME_SPOT } from "../../settings/strings"
+import { getDefaultPublicRide, getDefaultPublicRide2 } from "../../store/external/helpers"
 
 const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPrivateEvent }) => {
 
     const { cancelLoad, doLoad, closeDialog } = useLoading()
     const { lang } = useLanguage()
     const { firebase } = useFirebase()
-
-    const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : {
-        rideId: "null",
-        eventId: props.event.eventId,
-        rideDestination: props.event.eventTitle,
-        rideStartingPoint: "null",
-        rideTime: "00:00",
-        ridePrice: "0",
-        backTime: "04:00",
-        passengers: "0",
-        date: props.event.eventDate,
-        extras: {
-            isRidePassengersLimited: true,
-            rideStatus: 'on-going',
-            rideMaxPassengers: '54',
-            twoWay: true,
-            rideDirection: '2',
-            exactBackPoint: SAME_SPOT(lang),
-            exactStartPoint: ''
-        }
-    })
+    const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : getDefaultPublicRide2(props.event, lang))
 
     const useStyles = makeStyles(() => (
         {
@@ -101,6 +82,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
             ...ride,
             extras: { ...ride.extras, rideDirection: directions }
         })
+
     }
 
 
@@ -241,7 +223,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                 style: { color: SECONDARY_WHITE },
             }}
             required
-            type='time'
+            type='text'
             style={{ color: SECONDARY_WHITE }}
 
             placeholder={props.ride ? props.ride.rideTime : '00:00'}
@@ -255,7 +237,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                 style: { color: SECONDARY_WHITE },
             }}
             required
-            type='time'
+            type='text'
             style={{ color: SECONDARY_WHITE }}
 
             placeholder={props.ride ? props.ride.backTime : '00:00'}

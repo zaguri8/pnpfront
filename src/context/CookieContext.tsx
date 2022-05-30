@@ -117,19 +117,19 @@ export const useCookies = () => {
             cookieContext?.cacheDone(page)
         },
         saveInvitationConfirmation: async (invConfirmation: PNPRideConfirmation) => {
-            await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEventInvitationsConfirmations').then(data => {
+            await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEIC').then(data => {
                 if (data) {
                     data.push(invConfirmation)
-                    asyncLocalStorage.setItem('pnpEventInvitationsConfirmations', data)
+                    asyncLocalStorage.setItem('pnpEIC', data)
                     return true;
                 } else {
-                    asyncLocalStorage.setItem('pnpEventInvitationsConfirmations', [invConfirmation])
+                    asyncLocalStorage.setItem('pnpEIC', [invConfirmation])
                     return true;
                 }
             })
         },
         getInvitationConfirmation: async (eventId: string) => {
-            return await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEventInvitationsConfirmations').then(data => {
+            return await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEIC').then(data => {
                 if (data) {
                     return data.find(conf => conf.eventId === eventId)
                 } else return undefined
