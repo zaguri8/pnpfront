@@ -50,7 +50,7 @@ export default function SearchRide() {
                 return rides!.filter(ride => ride.rideDestination.includes(searchQuery) &&
                     ride.rideStartingPoint.includes(secondQuery) && isValid(ride))
             } else if (searchQuery) {
-                return rides!.filter(ride => ride.rideDestination.includes(searchQuery) && isValid(ride))
+                return rides!.filter(ride => (ride.rideDestination.includes(searchQuery)) && isValid(ride))
             } else if (secondQuery) {
                 return rides!.filter(ride => ride.rideStartingPoint.includes(secondQuery) && isValid(ride))
             }

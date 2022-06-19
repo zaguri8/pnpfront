@@ -30,7 +30,6 @@ function InvitationCard() {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
     const [newConfirmation, setNewConfirmation] = useState<PNPRideConfirmation>()
     const { doLoad, cancelLoad } = useLoading()
-    const [rideArrival, setRideArrival] = useState(false)
     const [event, setEvent] = useState<PNPPrivateEvent | null>(null)
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
     const { firebase, appUser, user } = useFirebase()
@@ -99,11 +98,7 @@ function InvitationCard() {
     }
     const nav = useNavigate()
     async function sendInvitation(userId?: string, u?: PNPUser) {
-        if (!u && (!appUser || !user)) {
-            alert('יש להירשם על מנת לאשר הגעה')
-            nav('/login', { state: { cachedLocation: location.pathname } })
-            return
-        }
+
         if (!event || !rides || (!selectedEventRide && newConfirmation?.rideArrival))
             return
 
@@ -114,17 +109,38 @@ function InvitationCard() {
             phoneNumber: u?.phone ?? appUser!.phone
         } as PNPRideConfirmation : newConfirmation
 
+        if (actualConfirmation && event.eventWithPassengers && event.eventWithGuests && actualConfirmation.rideArrival) {
+            if (Math.abs(Number(actualConfirmation.passengers) - Number(actualConfirmation.guests)) !== 0) {
+                actualConfirmation.splitGuestPassengers = true
+                if (Number(actualConfirmation.passengers) > Number(actualConfirmation.guests)) {
+                    alert('כמות האורחים צריכה להיות לפחות כמו כמות הנוסעים')
+                    return
+                }
+            }
+        }
         if (actualConfirmation && !newConfirmation?.rideArrival) {
             actualConfirmation.directionType = '0'
             actualConfirmation.directions = '0'
         }
+        if (actualConfirmation && !actualConfirmation.guests
+            || actualConfirmation?.guests === 'null' && !event.eventWithGuests) {
+            actualConfirmation.guests = '1'
+        }
+        if (actualConfirmation && !actualConfirmation?.passengers
+            || actualConfirmation?.passengers === 'null' && !event.eventWithPassengers) {
+            actualConfirmation.passengers = '1'
+        }
+        if (event.eventWithPassengers && !event.eventWithGuests
+            && !actualConfirmation?.rideArrival) {
+            alert('כדי לאשר הגעה יש לסמן הגעה בהסעות ולבחור הסעה')
+            return
+        }
         if (!isValidRideConfirmation(actualConfirmation)) {
             alert('אנא מלא את פרטייך ובחר הסעה')
-            console.log(actualConfirmation)
             return
         }
         doLoad()
-        if (!newConfirmation?.rideArrival || (isValidPublicRide(selectedEventRide!.ride!))) {
+        if (!actualConfirmation?.rideArrival || (isValidPublicRide(selectedEventRide!.ride!))) {
             await saveInvitationConfirmation(actualConfirmation!)
                 .then(() => {
                     firebase.realTime.addRideConfirmation(actualConfirmation!)
@@ -161,10 +177,9 @@ function InvitationCard() {
                     <React.Fragment
                         key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}>
                         <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-                            <span
+                            {!ride.extras.twoWayOnly && <span
                                 style={{ fontSize: '18px', textAlign: 'center', color: SECONDARY_WHITE }}
-                            >{lang === 'heb' ? 'בחר הסעה: הלוך/חזור/הלוך וחזור' : 'Choose directions'}</span>
-
+                            >{lang === 'heb' ? 'בחר הסעה: הלוך/חזור/הלוך וחזור' : 'Choose directions'}</span>}
                             <span
                                 style={{ color: SECONDARY_WHITE, fontSize: '12px', marginTop: '48px' }}
                             >{lang === 'heb' ? 'שעת יציאה,שעת חזרה' : 'Ride time,Back time'}</span>
@@ -382,18 +397,30 @@ function InvitationCard() {
                             type='tel'
                             onChange={(e) => updateConfirmationPhone(e.target.value)}
                             placeholder={PHONE_NUMBER(lang)} />}
-                        {event.eventGuests && <TextField classes={classes}
-                            type='number'
-                            name='number'
-                            onChange={(e) => updateConfirmationGuests(e.target.value)}
-                            placeholder={lang === 'heb' ? 'מספר אורחים' : 'Number of guests'} />}
 
-                        {event.eventGuests && newConfirmation?.rideArrival && <TextField classes={classes}
-                            type='number'
-                            name='number'
-                            onChange={(e) => updateConfirmationRidePassengers(e.target.value)}
-                            placeholder={lang === 'heb' ? 'מספר נוסעים בהסעה' : 'Number of Passenger'} />}
+
+                        {function guestsField() {
+                            if (event.eventWithGuests) {
+                                return (<TextField classes={classes}
+                                    type='number'
+                                    name='number'
+                                    onChange={(e) => updateConfirmationGuests(e.target.value)}
+                                    placeholder={lang === 'heb' ? 'מספר אורחים' : 'Number of guests'} />)
+                            }
+                        }()}
+
+                        {function passengersField() {
+                            if (newConfirmation?.rideArrival && event.eventWithPassengers) {
+                                return (<TextField classes={classes}
+                                    type='number'
+                                    name='number'
+                                    onChange={(e) => updateConfirmationRidePassengers(e.target.value)}
+                                    placeholder={lang === 'heb' ? 'מספר נוסעים בהסעה' : 'Number of Passengers'} />)
+                            }
+                        }()}
                     </Stack>
+
+
                     {event.registrationRequired && !appUser
                         ? <RegistrationForm
                             externalRegistration

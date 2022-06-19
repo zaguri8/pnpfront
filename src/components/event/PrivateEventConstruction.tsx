@@ -6,7 +6,7 @@ import { getDefaultPrivateEvent } from '../../store/external/helpers'
 import { PNPPrivateEvent } from '../../store/external/types'
 import { event_placeholder } from "../../assets/images";
 import { isValidPrivateEvent } from '../../store/validators'
-import { BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import { CREATE_EVENT, CREATE_INVITATION, CREATE_INVITATION_TITLE, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_START, EVENT_TITLE, PICK_IMAGE, SIDE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
 import Places from '../utilities/Places'
@@ -30,11 +30,13 @@ type FormFieldProps = {
 const FormField = React.memo((props: FormFieldProps) => {
     const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE, { background: PRIMARY_BLACK }))
     const classes = useStyles()
+    const { lang } = useLanguage()
     return <Stack alignItems={'center'} justifyContent={'center'} spacing={1}>
         <label
-            style={{ ...props.style, ...{ padding: '4px', fontWeight: 'bold' } }}
+            style={{ ...props.style, ...{ padding: '4px',color:SECONDARY_WHITE, fontWeight: 'bold' } }}
         > {props.title}</label>
         {props.type === 'date' || props.type === 'time' ? <TextField
+            dir={SIDE(lang)}
             classes={classes}
             style={props.style}
             value={props.value}
@@ -43,6 +45,7 @@ const FormField = React.memo((props: FormFieldProps) => {
             type={props.type} //   value={unReverseDate(pnpEvent.eventDate)}
             placeholder={(props.placeholder && props.placeholder !== 'null') ? props.placeholder : props.title} /> : <TextField
             classes={classes}
+            dir={SIDE(lang)}
             style={props.style}
             name={props.name}
             value={props.value}
@@ -118,7 +121,7 @@ export default function PrivateEventConstruction() {
     return <PageHolder style={{ maxWidth: '600px', border: 'none', marginLeft: 'auto', marginRight: 'auto' }}>
 
         <SectionTitle title={CREATE_INVITATION_TITLE(lang)} style={{}} />
-        <InnerPageHolder style={{ border: 'none', background: SECONDARY_WHITE }}>
+        <InnerPageHolder style={{ border: 'none', background: SECONDARY_BLACK }}>
             < Stack style={{ maxWidth: '300px' }} spacing={1}>
 
                 <input onChange={(event) => {
@@ -160,7 +163,7 @@ export default function PrivateEventConstruction() {
                     style={{ width: '100%', color: PRIMARY_BLACK }}
                     type={'text'}
                     onChange={updateEventTitle} />
-                <label dir={SIDE(lang)} style={{ fontWeight: 'bold', color: PRIMARY_BLACK, paddingTop: '4px' }}>{EVENT_ADDRESS(lang)}</label>
+                <label dir={SIDE(lang)} style={{ fontWeight: 'bold', color: SECONDARY_WHITE, paddingTop: '6px' }}>{EVENT_ADDRESS(lang)}</label>
 
                 <Places value={''}
                     handleAddressSelect={updateEventLocation}
@@ -168,15 +171,15 @@ export default function PrivateEventConstruction() {
                     className={''}
                     fixed={false}
                     id={{}}
+                
                     style={{
                         width: '100%',
-                        borderRadius: '32px',
                         marginBottom: '2px',
                         color: SECONDARY_WHITE,
                         background: PRIMARY_BLACK
                     }} placeHolder={EVENT_ADDRESS(lang)} />
 
-                
+
 
 
                 <FormField
@@ -211,7 +214,7 @@ export default function PrivateEventConstruction() {
                 <Spacer offset={1} />
                 <Button
                     onClick={addPrivateEventAction}
-                    style={{ ...submitButton(false), ...{ marginTop: '0px', textTransform: 'none' } }}>{CREATE_INVITATION(lang)}</Button>
+                    style={{ ...submitButton(false), ...{ marginTop: '0px',width:'80%', textTransform: 'none' } }}>{CREATE_INVITATION(lang)}</Button>
             </Stack >
         </InnerPageHolder>
     </PageHolder>

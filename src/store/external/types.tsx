@@ -40,9 +40,9 @@ export type PNPRideExtras = {
     isRidePassengersLimited?: boolean
     rideStatus?: 'on-going' | 'sold-out' | 'running-out'
     rideMaxPassengers?: string
-    rideDirection: '2' | '1'
+    rideDirection: '2' | '1' // 1 - from event, 2 - to event
     twoWay: boolean
-    twoWayOnly:boolean
+    twoWayOnly: boolean
     exactStartPoint?: string
     exactBackPoint?: string
 }
@@ -116,12 +116,12 @@ export type PNPEventAttention = {
 }
 
 export type PNPPrivateEvent = {
+    registrationRequired: boolean
     eventTitle: string
     eventLocation: string
     eventId: string
-    eventGuests: boolean
-    registrationRequired: boolean
-    eventFullInvitation: boolean
+    eventWithGuests: boolean
+    eventWithPassengers: boolean
     eventProducerId: string
     eventDate: string
     eventDetails: string
@@ -147,9 +147,10 @@ export type PNPRideConfirmation = {
     eventId: string
     passengers?: string
     guests: string
+    splitGuestPassengers: boolean //  true -> חלק בהסעות חלק לא
     confirmationTitle: string
     date: string
-    directions: string
+    directions: string // 1 - to event,2 - from event,3 - two way
     directionType: string
 }
 
@@ -166,6 +167,7 @@ export enum PNPRideDirection {
     both_ways = "to & back from the event"
 }
 
+export type PassengersDictionary = { to: number, back: number, twoWay: number, total: number }
 export const eventTypes = [
     "מסיבות ומועדונים",
     "משחקי כדורגל",
@@ -183,4 +185,10 @@ export type PNPError = {
     type: string
     error: string
     extraData?: { [key: string]: any }
+}
+
+
+export type RegisterFormExtras = {
+    requireBirthDate: boolean
+    requireFavoriteEvents: boolean
 }

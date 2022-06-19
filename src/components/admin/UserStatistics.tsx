@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react"
+import { CSSProperties, useEffect, useState } from "react"
 import { useFirebase } from "../../context/Firebase"
 import { useLoading } from "../../context/Loading"
 import { BLACK_ELEGANT, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { PNPUser } from "../../store/external/types"
 import SectionTitle from "../SectionTitle"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
-    const today = new Date()
+const today = new Date()
+import './UserStatistics.css'
 export default function UserStatistics() {
 
 
@@ -13,6 +14,8 @@ export default function UserStatistics() {
     const { firebase } = useFirebase()
 
     const [users, setUsers] = useState<PNPUser[] | undefined>()
+    const [usersCopy, setUsersCopy] = useState<PNPUser[] | undefined>()
+
 
 
     const [numOfShowing, setNumOfShowing] = useState(10)
@@ -20,10 +23,17 @@ export default function UserStatistics() {
 
         doLoad()
         const unsub = firebase.realTime.addListenerToUsers((users) => {
-            setUsers(users.filter(u => {
+            users.forEach(u => {
                 const dist = Number(today.getFullYear()) - Number(u.birthDate.split('/')[2])
-                return dist > 1 && dist < 100
-            }))
+                if (dist <= 1 || dist > 100 || !dist) {
+                    u.birthDate = "אין"
+                } else {
+                    u.birthDate = dist + ""
+                }
+            })
+            users.sort((user1, user2) => user1.birthDate === 'אין' ? 1 : user2.birthDate === 'אין' ? -1 : (Number(user1.birthDate) - Number(user2.birthDate)))
+            setUsers(users)
+            setUsersCopy(users)
             cancelLoad()
         }, (e) => {
             cancelLoad()
@@ -31,40 +41,85 @@ export default function UserStatistics() {
         return () => unsub()
     }, [])
 
-    return <PageHolder style={{ padding: '0px',scroll:'hidden',background:BLACK_ELEGANT}}>
+
+   
+    const determineRowStyle = (index: number) => {
+        const baseStyle = { height: '50px', color: SECONDARY_WHITE }
+        if (index % 2 === 0) {
+            return { ...baseStyle, background: '#bd3333' }
+        }
+        return { ...baseStyle, background: 'black' }
+    }
+
+    const filterUsers = (e: any) => {
+        const val = e.target.value
+        if (!val) {
+            setUsers(usersCopy)
+        } else if (users) {
+            setUsers(users.filter(u => u.name.includes(val)))
+        }
+    }
+
+    const filterUsersByAge = (e: any) => {
+        const val = e.target.value
+        if (!val) {
+            setUsers(usersCopy)
+        } else if (usersCopy) {
+            const age = Number(val)
+            let filter: any = null
+            switch (age) {
+                case 17:
+                    filter = usersCopy.filter(u => {
+                        const bday = Number(u.birthDate)
+                        return bday && bday <= 17
+                    })
+                    break;
+                case 18:
+                    filter = usersCopy.filter(u => {
+                        const bday = Number(u.birthDate)
+                        return bday && bday >= 18 && bday < 21
+                    })
+                    break;
+                case 21:
+                    filter = usersCopy.filter(u => {
+                        const bday = Number(u.birthDate)
+                        return bday && bday >= 21
+                    })
+                    break;
+            }
+            setUsers(filter)
+        }
+    }
+
+    return <PageHolder style={{ padding: '0px', scroll: 'hidden', background: BLACK_ELEGANT }}>
         <SectionTitle style={{}} title={'ניהול משתמשים - בטא'} />
-        <label style=  {{color:SECONDARY_WHITE,padding:'16px'}}>{'מציג: ' + numOfShowing + " משתמשים"}</label>
-        <select onChange={(e) => setNumOfShowing(Number(e.target.value))}>
+        <label style={{ color: SECONDARY_WHITE, padding: '16px' }}>{'סה"כ: ' + users?.length + " משתמשים רשומים"}</label>
+       
+        <InnerPageHolder style={{ maxWidth: '300px', background: 'none', margin: '0px', border: 'none' }}>
+            {users && users.length > 1 ?  <table dir={'rtl'} className='user_table'>
 
-            <option value={10}>
-                10
-            </option>
+                <tbody className='user_body_table'  >{users.map((user, index) => {
+                    return <tr style={determineRowStyle(index)}
+                        key={user.email + user.name}>
+                        <th className="user_fields">{user.name}</th>
+                        <th className='user_fields'>{user.birthDate}</th>
+                        <th className='user_email_field'>{user.email}</th>
+                        <th className="user_fields">{user.phone}</th>
+                    </tr>
+                })}</tbody>
 
-            <option value={50}>
-                50
-            </option>
+            </table> : <span id='user_search_no_results'>וואלה אין תוצאות</span>}
 
-            <option value={100}>
-                100
-            </option>
+            <input onChange={(e) => { filterUsers(e) }} className='user_search_input'
+                placeholder="חפש משתמש לפי שם" />
 
-            <option value={250}>
-                250
-            </option>
+            <span style={{ color: SECONDARY_WHITE }}>סנן לפי גיל</span>
+            <select onChange={(e) => { filterUsersByAge(e) }} className='user_search_input'
+                placeholder="חפש משתמש לפי שם" >
+                <option value='17'>גילאים 17-</option>
+                <option value='18'>גילאים 18-20</option>
+                <option value='21'>גילאים 21+</option>
+            </select>
 
-            <option value={500}>
-                500
-            </option>
-
-            <option value={users?.length ?? 'הכל'}>
-                {'הכל'}
-            </option>
-        </select>
-
-        <p dir = 'rtl' style= {{color:SECONDARY_WHITE,fontWeight:'bold',fontSize:'10px'}}>{'בקרוב: הצג לפי.. סנן לפי.. שלח הודעה ל..'}</p>
-        <InnerPageHolder style={{maxWidth:'300px',background: 'none',margin:'0px',border:'none'}}>
-            {users && <table dir={'rtl'} style={{maxWidth:window.outerWidth < 400 ? '300px':'90%',display:'block',padding: '4px', fontSize: '12px', background: SECONDARY_WHITE, color: PRIMARY_BLACK, overflow: 'scroll' }}><thead><tr><th style={{ fontSize: '14px', textDecoration: 'underline' }}>{'שם'}</th><th style={{ fontSize: '14px', textDecoration: 'underline' }}>{'גיל'}</th><th style={{ fontSize: '14px', textDecoration: 'underline' }}>{'אימייל'}</th><th style={{ fontSize: '14px', textDecoration: 'underline' }}>{'טלפון'}</th></tr></thead><tbody >{users.slice(0, numOfShowing).map(user => {
-                return <tr key={user.email + user.name}><th>{user.name}</th><th>{Number(today.getFullYear()) - Number(user.birthDate.split('/')[2])}</th><th >{user.email}</th><th >{user.phone}</th></tr>
-            })}</tbody></table>}
         </InnerPageHolder></PageHolder>
 }

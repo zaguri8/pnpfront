@@ -1,5 +1,5 @@
 
-import { PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./external/types";
+import { PassengersDictionary, PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./external/types";
 
 export function isValidHttpUrl(string: string): boolean {
   let url;

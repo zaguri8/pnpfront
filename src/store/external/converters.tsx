@@ -1,6 +1,6 @@
 
 import { DataSnapshot } from "firebase/database"
-import { PNPUser, PNPEvent, PNPPrivateRide, PNPTransactionConfirmation, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest } from "./types"
+import { PNPUser, PNPEvent, PNPPrivateRide, PNPTransactionConfirmation, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest, RegisterFormExtras } from "./types"
 
 
 
@@ -41,14 +41,30 @@ export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
     }
 }
 
+export function toDictionary<T>(
+    snap: DataSnapshot): T {
+    let dictionary: any = {}
+    snap.forEach(child => {
+        dictionary[child.key!] = child.val()
+    })
+    return dictionary as T
+}
+
+export const registrationSettingsFromDict: (snap: DataSnapshot) => RegisterFormExtras = (snap) => {
+    return {
+        requireBirthDate: snap.child('requireBirthDate').val(),
+        requireFavoriteEvents: snap.child('requireFavoriteEvents').val(),
+    }
+}
+
 export const privateEventFromDict: (snap: DataSnapshot) => PNPPrivateEvent = (snap) => {
     return {
         eventTitle: snap.child('eventTitle').val(),
         eventId: snap.child('eventId').val(),
         registrationRequired: snap.child('registrationRequired').val(),
-        eventFullInvitation: snap.child('eventFullInvitation').val(),
+        eventWithGuests: snap.child('eventWithGuests').val(),
+        eventWithPassengers: snap.child('eventWithPassengers').val(),
         eventProducerId: snap.child('eventProducerId').val(),
-        eventGuests: snap.child('eventGuests').val(),
         eventDate: snap.child('eventDate').val(),
         eventLocation: snap.child('eventLocation').val(),
         eventDetails: snap.child('eventDetails').val(),
@@ -61,6 +77,7 @@ export const rideConfirmationFromDict: (snap: DataSnapshot) => PNPRideConfirmati
         userId: snap.child('userId').val(),
         eventId: snap.child('eventId').val(),
         phoneNumber: snap.child('phoneNumber').val(),
+        splitGuestPassengers: snap.child('splitGuestPassengers').val(),
         directionType: snap.child('directionType').val(),
         guests: snap.child('guests').val(),
         rideArrival: snap.child('rideArrival').val(),

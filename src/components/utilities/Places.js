@@ -64,6 +64,7 @@ export default function Places({ placeHolder, style, fixed, id, className, types
                         ...{
                             display: 'flex',
                             margin: '0px',
+                            
                             flexDirection: 'column'
                         }, ...style, ...{ background: 'none' }
                     }}>
@@ -99,12 +100,12 @@ export default function Places({ placeHolder, style, fixed, id, className, types
                             {suggestions.map((suggestion, index) => {
                                 const suggestionStyle = suggestion.active
                                     ? {
-                                        background: ORANGE_GRADIENT_PRIMARY, boxShadow: '0px 4px 2px -2px gray', textAlign: 'right', cursor: "pointer", color: SECONDARY_WHITE, fontSize: '14px', border: '.1px solid white'
+                                        background: ORANGE_GRADIENT_PRIMARY, boxShadow: '0px 4px 2px -2px gray', textAlign: 'right', cursor: "pointer", color: SECONDARY_WHITE, fontSize: '14px'
                                     }
-                                    : { backgroundColor: SECONDARY_WHITE, cursor: "pointer", color: PRIMARY_BLACK, textAlign: 'right', fontSize: '14px', border: '.1px solid whitesmoke' };
+                                    : { backgroundColor: SECONDARY_WHITE, cursor: "pointer", color: PRIMARY_BLACK, textAlign: 'right', fontSize: '14px'};
 
                                 return (
-                                    <ListItem key={suggestion + index}{...getSuggestionItemProps(suggestion, { style: suggestionStyle })}>
+                                    <ListItem key={suggestion + index}{...getSuggestionItemProps(suggestion, { style: {...suggestionStyle,borderBottom:'.1px solid black',borderTop:'.1px solid black'} })}>
                                         {strip(suggestion.description)}
                                     </ListItem>)
                             })}

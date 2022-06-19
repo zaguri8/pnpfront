@@ -44,6 +44,7 @@ import PrivateEventConstruction from './components/event/PrivateEventConstructio
 import InvitationStatistics from './components/admin/InvitationStatistics';
 import ManageInvitations from './components/admin/ManageInvitations';
 import { useGoogleState } from './context/GoogleMaps';
+import Edit from './components/admin/Edit/Edit';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -258,6 +259,7 @@ function App() {
         <Route path='/invitation/:id' element={<InvitationPage />} />
         <Route path='/forgotPass' element={isAuthenticated ? <Navigate to={'/'} /> : <ForgotPass />} />
         <Route path='/adminpanel' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <AdminPanel />} />
+        <Route path='/adminpanel/editweb' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <Edit />} />
         <Route path='/adminpanel/invitations' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <ManageInvitations />} />
         <Route path='/adminpanel/invitations/specificinvitation' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <InvitationStatistics />} />
         <Route path='/producerpanel/invitation/:eventId' element={!user || !appUser ? <NoPerms /> : <InvitationStatistics />} />

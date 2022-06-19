@@ -11,7 +11,7 @@ import { PNPPrivateEvent } from '../../store/external/types'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
-import { useEffect, useState } from "react"
+import { CSSProperties, useEffect, useState } from "react"
 import Spacer from "../utilities/Spacer"
 const ManageInvitations = () => {
 
@@ -22,6 +22,19 @@ const ManageInvitations = () => {
     const [privateEvents, setPrivateEvents] = useState<{ [type: string]: PNPPrivateEvent[] }>()
     const nav = useNavigate()
 
+    const rowStyle = {
+        flexDirection: 'row',
+        display: 'flex',
+        columnGap:'16px',
+        marginLeft: 'auto',
+        background:'none',
+        marginRight: 'auto'
+    } as CSSProperties
+
+    const tHeadStyle = {
+        textAlign:'center',
+        alignSel:'center',
+    } as CSSProperties
     useEffect(() => {
         const unsub = firebase.realTime.addListenerToPrivateEvents(setPrivateEvents, true)
         return () => { unsub() }
@@ -35,10 +48,10 @@ const ManageInvitations = () => {
                 <thead>
                     <tr>
                         <th>
-                            <div style={{ color: SECONDARY_WHITE,fontSize:'20px'  }}>{`אירוע`}</div>
+                            <div style={{ color: SECONDARY_WHITE, fontSize: '20px' }}>{`אירוע`}</div>
                         </th>
-                        <th>
-                            <div style={{ color: SECONDARY_WHITE,fontSize:'20px'  }}>{'פעולות'}</div>
+                        <th >
+                            <div style={{ color: SECONDARY_WHITE, fontSize: '20px' }}>{'פעולות'}</div>
                         </th>
                     </tr>
                 </thead>
@@ -59,7 +72,7 @@ const ManageInvitations = () => {
                                     width: 'fit-content',
                                     fontSize: '14px',
                                     margin: '4px',
-                                    fontFamily:'Open Sans Hebrew',
+                                    fontFamily: 'Open Sans Hebrew',
                                     padding: '4px',
                                     color: 'white',
                                     background: '#007AFF'
@@ -77,22 +90,23 @@ const ManageInvitations = () => {
 
             {privateEvents && privateEvents['waiting'] && privateEvents['waiting'].length > 0 ? <table dir={'rtl'}>
 
-                <thead>
-                    <tr>
-                        <th>
-                            <div style={{ color: SECONDARY_WHITE,fontSize:'20px' }}>{`אירוע`}</div>
+                <thead >
+                    <tr  style={rowStyle}>
+                        <th style ={tHeadStyle}>
+                            <div style={{ color: SECONDARY_WHITE, fontSize: '20px' }}>{`אירוע`}</div>
                         </th>
-                        <th>
-                            <div style={{ color: SECONDARY_WHITE ,fontSize:'20px' }}>{'פעולות'}</div>
+                        <th style ={tHeadStyle}>
+                            <div style={{ color: SECONDARY_WHITE, fontSize: '20px' }}>{'פעולות'}</div>
                         </th>
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody style= {{background:'none'}}>
                     {privateEvents && privateEvents['waiting'] && privateEvents['waiting'].length > 0 ? privateEvents['waiting'].map(event => <tr
+                        style={rowStyle}
                         key={v4()}>
-                        <th style={{ width: '50%',display:'flex',alignItems:'center',justifyContent:'center', background: SECONDARY_WHITE,borderRadius:'8px' }}>  <div style={{ fontSize: '12px', color: PRIMARY_BLACK }}>{event.eventTitle}</div><br /></th>
-                        <th style={{ width: '50%',display:'flex',alignItems:'center',justifyContent:'center', background: SECONDARY_WHITE ,borderRadius:'8px' }}>
+                        <th style={{ display: 'flex',color:SECONDARY_WHITE, alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>  <div style={{ fontSize: '12px', color: SECONDARY_WHITE }}>{event.eventTitle}</div><br /></th>
+                        <th style={{ display: 'flex',color:SECONDARY_WHITE, alignItems: 'center', borderRadius: '8px' }}>
                             <Stack>
                                 <Button
                                     onClick={() => {

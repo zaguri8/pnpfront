@@ -1,6 +1,6 @@
 import { Auth, User } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics } from './types'
-import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict } from './converters'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras } from './types'
+import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
 import { DocumentData } from 'firebase/firestore'
@@ -36,6 +36,7 @@ function CreateRealTimeDatabase(auth: Auth, db: Database, storage: FirebaseStora
     return new Realtime(auth, db, storage)
 }
 export class Realtime {
+    private siteSettings: DatabaseReference
     private rides: DatabaseReference
     private allEvents: DatabaseReference
     private errs: DatabaseReference
@@ -46,6 +47,7 @@ export class Realtime {
     private transactions: DatabaseReference
     private transactionConfirmations: DatabaseReference
     constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
+        this.siteSettings = ref(db, '/settings')
         this.allEvents = ref(db, '/events')
         this.rides = ref(db, "/rides")
         this.statistics = ref(db, '/statistics')
@@ -215,9 +217,21 @@ export class Realtime {
                 })
             })
     }
-
-
-
+    async deleteConfirmation(eventId: string,
+        userName: string,
+        confirmation: PNPRideConfirmation) {
+        return await get(child(child(this.rides, 'confirmations'), eventId))
+            .then(snap => {
+                snap.forEach(child => {
+                    if (child.child('userName').val() === userName) {
+                        update(child.ref, confirmation)
+                        remove(child.ref)
+                        return true
+                    }
+                })
+                return false
+            }).catch((e) => this.createError("deleteConfirmation", e));
+    }
     async getUserIdByEmail(email: string,
         consume: ((userId: string) => void),
         error: (() => void)) {
@@ -409,6 +423,13 @@ export class Realtime {
     }
     removePrivateRide = async (eventId: string, rideId: string): Promise<object | void> => {
         return await remove(child(child(child(child(this.rides, 'private'), 'ridesForEvents'), eventId), rideId))
+    }
+
+    async removePrivateEvent(eventId: string) {
+        await remove(child(child(this.allEvents, 'private'), eventId))
+            .catch((e) => { this.createError('removePrivateEvent', e) })
+        return await remove(child(child(child(this.rides, 'private'), 'ridesForEvents'), eventId))
+            .catch((e) => { this.createError('removePrivateEvent', e) })
     }
 
 
@@ -926,6 +947,19 @@ export class Realtime {
                 })
         } catch (e) { }
 
+    }
+
+    async updateWebsiteRegistrationPage(
+        extras: RegisterFormExtras) {
+        let result = await set(child(this.siteSettings, 'home'), extras)
+        return result
+    }
+
+    addListenerToRegistrationPage(consume: (extras: RegisterFormExtras) => void, error?: () => void) {
+        return onValue(child(this.siteSettings, 'home'), (snap) => {
+            let dict = toDictionary<RegisterFormExtras>(snap)
+            consume(dict)
+        },error)
     }
 
     addListenerToBrowsingStat(page: PNPPage, date: string, consume: (data: { leaveNoAttendance: number, leaveWithAttendance: number }) => void) {

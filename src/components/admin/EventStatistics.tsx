@@ -642,109 +642,130 @@ export default function EventStatistics() {
             }
         }
     }
-    return (event ? <PageHolder style={{ background: BLACK_ELEGANT,overflowX:'hidden' }}>
+    return (event ? <PageHolder style={{ background: BLACK_ELEGANT, overflowX: 'hidden' }}>
         <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
         <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
         <InnerPageHolder style={{ width: '80%', overflowY: 'hidden', overflowX: 'hidden', background: 'none', border: 'none' }} >
             <Stack spacing={3} style={{ width: '75%' }}>
 
 
-                <Button
-                    dir={'rtl'}
-                    style={buttonStyle}
+                {function addRideButton() {
+                    return <Button
+                        dir={'rtl'}
+                        style={buttonStyle}
+                        onClick={() => {
 
-                    onClick={() => {
+                            event && openDialog({
+                                content: <div style={{ padding: '16px' }}>
+                                    <h3 style={{
+                                        fontWeight: '14px',
+                                        background: PRIMARY_BLACK,
+                                        color: SECONDARY_WHITE,
+                                        padding: '4px',
+                                        textAlign: 'center'
+                                    }}>{`הוסף הסעה ל ${event.eventName}`}</h3>
+                                    <AddUpdateEventRide event={event} />
+                                </div>
+                            })
+                        }}>
 
-                        event && openDialog({
-                            content: <div style={{ padding: '16px' }}>
-                                <h3 style={{
-                                    fontWeight: '14px',
-                                    background: PRIMARY_BLACK,
-                                    color: SECONDARY_WHITE,
-                                    padding: '4px',
-                                    textAlign: 'center'
-                                }}>{`הוסף הסעה ל ${event.eventName}`}</h3>
-                                <AddUpdateEventRide event={event} />
-                            </div>
-                        })
-                    }}>
+                        {event ? `הוסף הסעה` : ''}
+                    </Button>
+                }()}
 
-                    {event ? `הוסף הסעה` : ''}
-                </Button>
+                {function invitationStatsButton() {
+                    return <Button
+                        style={buttonStyle}
+                        onClick={() => { setShowingComponent(AdminScreens.rideTransactions) }}>
+                        {'סטטיסטיקת הזמנות'}
+                    </Button>
+                }()}
 
-                <Button
-                    style={buttonStyle}
-                    onClick={() => { setShowingComponent(AdminScreens.rideTransactions) }}>
-                    {'סטטיסטיקת הזמנות'}
-                </Button>
+                {function rideManagingButton() {
+                    return <Button
+                        style={buttonStyle}
+                        onClick={() => { setShowingComponent(AdminScreens.ridesOverview) }}>
+                        {'ניהול נסיעות'}
+                    </Button>
+                }()}
 
-                <Button
-                    style={buttonStyle}
-                    onClick={() => { setShowingComponent(AdminScreens.ridesOverview) }}>
-                    {'ניהול נסיעות'}
-                </Button>
-
-                <Button
-                    style={buttonStyle}
-                    onClick={() => { setShowingComponent(AdminScreens.rideRequests) }}>
-                    {'בקשות נסיעה'}
-                </Button>
+                {function rideRequestsButton() {
+                    return <Button
+                        style={buttonStyle}
+                        onClick={() => { setShowingComponent(AdminScreens.rideRequests) }}>
+                        {'בקשות נסיעה'}
+                    </Button>
+                }()}
 
 
 
 
-                <Button
-                    onClick={() => {
-                        openDialog({ content: <AddUpdateEvent event={event} /> })
-                    }}
-                    style={{ ...buttonStyle, ...{ background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
-                    {'עריכת אירוע'}
-                    <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
-                </Button>
+                {function eventEditButton() {
+                    return <Button
+                        onClick={() => {
+                            openDialog({ content: <AddUpdateEvent event={event} /> })
+                        }}
+                        style={{ ...buttonStyle, ...{ background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
+                        {'עריכת אירוע'}
+                        <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
+                    </Button>
+                }()}
 
-                <Button
-                    style={{ borderRadius: '16px', fontFamily: 'Open Sans Hebrew', background: ORANGE_RED_GRADIENT_BUTTON, fontWeight: 'bold', color: SECONDARY_WHITE }}
-                    onClick={() => {
-                        openDialog({
-                            content: <div>
-                                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{'פעולה זו תמחק גם את ההסעות שיש לאירוע זה'}</label>
-                                <Spacer offset={1} />
-                                <label style={{ color: SECONDARY_WHITE }}>{'האם אתה בטוח שברצונך להמשיך?'}</label>
-                                <Spacer offset={1} />
-                                <Button
-                                    onClick={deleteEvent}
-                                    style={{ padding: '8px', margin: '8px', color: SECONDARY_WHITE, width: '50%', background: ORANGE_RED_GRADIENT_BUTTON, fontSize: '14px' }}>
-                                    {'כן, מחק אירוע סופית'}
-                                </Button>
-                            </div>
-                        })
+                {function eventDeleteButton() {
+                    return <Button
+                        style={{ borderRadius: '16px', fontFamily: 'Open Sans Hebrew', background: ORANGE_RED_GRADIENT_BUTTON, fontWeight: 'bold', color: SECONDARY_WHITE }}
+                        onClick={() => {
+                            openDialog({
+                                content: <div>
+                                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{'פעולה זו תמחק גם את ההסעות שיש לאירוע זה'}</label>
+                                    <Spacer offset={1} />
+                                    <label style={{ color: SECONDARY_WHITE }}>{'האם אתה בטוח שברצונך להמשיך?'}</label>
+                                    <Spacer offset={1} />
+                                    <Button
+                                        onClick={deleteEvent}
+                                        style={{ padding: '8px', margin: '8px', color: SECONDARY_WHITE, width: '50%', background: ORANGE_RED_GRADIENT_BUTTON, fontSize: '14px' }}>
+                                        {'כן, מחק אירוע סופית'}
+                                    </Button>
+                                </div>
+                            })
 
-                    }}>
-                    {'מחק אירוע'}
+                        }}>
+                        {'מחק אירוע'}
 
-                    <DeleteForeverIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
-                </Button>
+                        <DeleteForeverIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
+                    </Button>
+                }()}
             </Stack>
-            {statistics && event && <ShowingPanelScreen
-                statistics={statistics}
-                requests={requests ?? []}
-                rides={rides ?? []}
-                event={event}
-                showingComponent={showingComponent} />}
-            <Button
-                dir={'rtl'}
-                style={{
-                    ...buttonStyle, ...{
-                        padding: '8px',
-                        marginTop: '32px',
-                        width: '50%',
-                        minWidth: 'max-content',
-                        background: 'linear-gradient(#282c34,black)'
-                    }
-                }}
-                onClick={() => {
-                    csvData()
-                }}>{'ייצא לקובץ CSV'}</Button>
+
+            {function renderStatisticsPanel() {
+                if (statistics && event)
+                    return (<ShowingPanelScreen
+                        statistics={statistics}
+                        requests={requests ?? []}
+                        rides={rides ?? []}
+                        event={event}
+                        showingComponent={showingComponent} />)
+                else return null
+
+            }()}
+
+
+            {function csvExportButton() {
+                return <Button
+                    dir={'rtl'}
+                    style={{
+                        ...buttonStyle, ...{
+                            padding: '8px',
+                            marginTop: '32px',
+                            width: '50%',
+                            minWidth: 'max-content',
+                            background: 'linear-gradient(#282c34,black)'
+                        }
+                    }}
+                    onClick={() => {
+                        csvData()
+                    }}>{'ייצא לקובץ CSV'}</Button>
+            }()}
 
         </InnerPageHolder>
     </PageHolder> : <div>{'לא קיים לאירוע זה דף ניהול'}</div>)

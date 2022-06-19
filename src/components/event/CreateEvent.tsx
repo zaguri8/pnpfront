@@ -173,7 +173,7 @@ export default function CreateEvent() {
         <SectionTitle title={CREATE_EVENT_TITLE(lang)} style={{}} />
         <InnerPageHolder style={{ background: 'none', border: '.8px solid gray' }}>
 
-            <Stack spacing={3} style={{ width: '100%' }} >
+            <Stack spacing={3} style={{ width: '100%',maxWidth:'300px' }} >
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                     <input onChange={(event) => {
                         if (event.target.files) {
@@ -210,7 +210,7 @@ export default function CreateEvent() {
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_TITLE(lang)}</label>
                     <TextField
-
+                    
                         className={classes.root}
                         id={`arm${0}`}
                         placeholder={EVENT_TITLE(lang)}
@@ -223,7 +223,6 @@ export default function CreateEvent() {
                         }}
                         dir='rtl'
                         sx={{
-
                             direction: SIDE(lang)
                         }} />
                 </FormControl>

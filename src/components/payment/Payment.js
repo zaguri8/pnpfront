@@ -110,16 +110,21 @@ export function PaymentForm({ product }) {
 
 
     const RideStartDest = () => {
+        const hasStartPoint = ((product.twoWay || product.direction === '2') && product.exactStartPoint)
+        const hasBackPoint = ((product.twoWay || product.direction === '1') && product.exactBackPoint)
+
+        const isBackRide = (product.twoWay || product.direction === '1')
+        const isToRide = (product.twoWay || product.direction === '2')
         return (
-            <Stack direction='row'>
-                <Stack  >
-                    {product.exactStartPoint ? <div>
+            <Stack direction='row' alignItems={'center'} justifyContent={'space-around'}>
+                <Stack>
+                    {hasStartPoint ? <div>
                         <label style={{ display: 'block', fontWeight: 'bold' }}>
                             {(lang === 'heb' ? 'נקודת יציאה' : 'Starting point: ')}
                         </label>
 
                         <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.exactStartPoint}</label></div> : null}
-                    {product.exactBackPoint ? <div><label style={{ display: 'block', fontWeight: 'bold' }}>
+                    {hasBackPoint ? <div><label style={{ display: 'block', fontWeight: 'bold' }}>
                         {(lang === 'heb' ? 'נקודת חזרה' : 'Back point: ')}
                     </label>
                         <div>
@@ -128,11 +133,11 @@ export function PaymentForm({ product }) {
 
 
                 <Stack >
-                    {(product.twoWay || product.direction === '2') && <div><label style={{ fontWeight: 'bold' }}>
+                    {isToRide && <div><label style={{ fontWeight: 'bold' }}>
                         {(lang === 'heb' ? 'שעת יציאה' : 'Ride time: ')}
                     </label>
                         <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.rideTime}</label> </div></div>}
-                    {(product.twoWay || product.direction === '1') && <div><label style={{ fontWeight: 'bold' }}>
+                    {isBackRide && <div><label style={{ fontWeight: 'bold' }}>
                         {(lang === 'heb' ? 'שעת חזרה' : 'Back time: ')}
                     </label>
                         <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.backTime}</label> </div></div>}

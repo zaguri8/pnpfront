@@ -1,0 +1,91 @@
+.user_table {
+    width: 360px;
+    display: block;
+
+    max-height: 500px;
+    overflow-y: scroll;
+    border-radius: 4px;
+    font-size: 12px;
+    background: none;
+    position: relative;
+    overscroll-behavior: none;
+    color: black;
+    border: 1px solid white;
+}
+
+.user_email_field {
+    font-size: 8px;
+    max-width: 200px;
+}
+
+#user_search_no_results {
+    color: whitesmoke;
+    margin-bottom: 8px;
+}
+
+.user_fields {
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.user_table_body {
+    overscroll-behavior: none;
+    overflow: scroll;
+}
+
+.user_table_head {
+    position: absolute;
+    transform: translateY(-30px);
+
+    color: white;
+    width: 360px;
+}
+
+
+.user_search_input {
+
+    padding: 8px;
+    border-radius: 8px;
+    color: black;
+    margin: 8px;
+    direction: rtl;
+    width: 350px;
+}
+
+.user_search_input::placeholder {
+    color: black;
+}
+
+@media only screen and (max-width:600px) {
+    .user_fields {
+        padding: 4px;
+        font-size: 10px;
+    }
+}
+
+@media only screen and (min-width:600px) {
+    .user_email_field {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (min-width:400px) {
+
+    .user_table,
+    .user_table_head {
+        width: 90vw;
+
+        max-width: 900px;
+    }
+
+    .user_search_input {
+        width: 50vw;
+    }
+
+}
+
+input,
+select {
+    max-width: 200px;
+}

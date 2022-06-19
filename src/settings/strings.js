@@ -1,6 +1,6 @@
 
-export const CREATE_EVENT = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create'
-export const CREATE_INVITATION = (lang) => lang === 'heb' ? 'צור הזמנה' : 'Create Invitation'
+export const CREATE_EVENT = (lang) => lang === 'heb' ? 'צור/י אירוע' : 'Create'
+export const CREATE_INVITATION = (lang) => lang === 'heb' ? 'צור/י הזמנה' : 'Create Invitation'
 export const TOOLBAR_LOGIN = (lang) => lang === 'heb' ? 'התחברות ' : 'Sign in'
 export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language'
 export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
@@ -36,7 +36,7 @@ export const SHARE_PAYMENT = (lang) => lang === 'heb' ? 'אני רוצה לחל�
 export const I_PAY = (lang) => lang === 'heb' ? 'הכל עלי !' : 'I Pay it all !'
 
 
-export const PICK_IMAGE = (lang, create) => lang === 'heb' ? (create ? 'שנה גרפיקה' : 'בחר תמונה') : 'Select image'
+export const PICK_IMAGE = (lang, create) => lang === 'heb' ? (create ? 'שנה/י גרפיקה' : 'בחר/י תמונה') : 'Select image'
 export const CONTINUE = (lang) => lang === 'heb' ? 'המשך' : 'Continue'
 export const CULTURE = (lang) => lang === 'heb' ? 'תרבות ופנאי' : 'Culture & Leisure'
 export const CLUBS = (lang) => lang === 'heb' ? 'מועדונים' : 'Clubs'
@@ -55,6 +55,7 @@ export const MENU_ITEM_5 = (lang) => lang === 'heb' ? "סגור" : 'Close'
 export const MENU_ITEM_6 = (lang) => lang === 'heb' ? 'איך זה עובד?' : "How does it work"
 
 export const MENU_ITEM_7 = (lang) => lang === 'heb' ? 'דף הבית' : "Home page"
+export const MENU_ITEM_8 = (lang) => lang === 'heb' ? 'מתחתנים איתכם' : 'Marry along with us'
 export const MY_ACCOUNT_ITEM_1 = (lang) => lang === 'heb' ? 'מטבעות שצברתי' : 'Coins ive earned'
 export const MY_ACCOUNT_ITEM_2 = (lang) => lang === 'heb' ? 'קופונים והטבות' : 'Coupons & Discounts'
 export const MY_ACCOUNT_ITEM_3 = (lang) => lang === 'heb' ? 'היסטוריית נסיעות' : 'Rides history'
@@ -126,8 +127,8 @@ export const NO_MORE_ITEM_3 = (lang) => lang === 'heb' ? 'drink & drive' : 'drin
 export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'מוניות יקרות' : 'Expensive cabs'
 export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'מחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'
 
-export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'צור אירוע' : 'Create'
-export const CREATE_INVITATION_TITLE = (lang) => lang === 'heb' ? 'צור הזמנה' : 'Create Invitation'
+export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'צור/י אירוע' : 'Create'
+export const CREATE_INVITATION_TITLE = (lang) => lang === 'heb' ? 'צור/י הזמנה' : 'Create Invitation'
 
 export const EVENT_TITLE = (lang) => lang === 'heb' ? 'כותרת האירוע' : 'Event title'
 export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע' : 'Event address'

@@ -3,6 +3,7 @@ import { ALREADY_REGISTERED, BIRTH_DATE, EMAIL, SIDE, FIRST_NAME, LAST_NAME, MY_
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
+import './Register.css'
 import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
@@ -14,7 +15,6 @@ import { useFirebase } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { TextField } from "@mui/material"
-import { createUserWithEmailAndPassword } from "firebase/auth"
 import { DatePicker } from "@mui/lab"
 import { useLoading } from "../../context/Loading"
 import { useLocation } from "react-router"
@@ -25,6 +25,7 @@ import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/fun
 import { Welcome } from "./Welcome"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
+import { createUserWithEmailAndPassword } from "firebase/auth"
 
 let finishRegister = false
 
@@ -36,6 +37,20 @@ export function RegistrationForm({
     style = {} }) {
     const { firebase } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
+    const [registerSettings, setRegisterSettings] = useState()
+
+    useEffect(() => {
+        doLoad()
+        const unsub = firebase.realTime.addListenerToRegistrationPage((settings) => {
+            cancelLoad()
+            setRegisterSettings(settings)
+        }, (e) => {
+
+            console.log(e)
+            cancelLoad()
+        })
+        return () => unsub()
+    }, [])
 
     const useStyles = makeStyles(theme => ({
         labelRoot: {
@@ -46,13 +61,16 @@ export function RegistrationForm({
             "& .MuiOutlinedInput-root": {
                 background: SECONDARY_WHITE,
                 borderRadius: '32px',
-                minWidth: '275px',
                 alignSelf: 'center',
-                padding: '0px',
+                width:'100%',
+                maxWidth:'245px',
                 border: '.1px solid white',
                 color: PRIMARY_BLACK, ...{
                     '& input[type=number]': {
                         '-moz-appearance': 'textfield'
+                    },
+                    '::placeholder': {
+                        'textAlign': 'center'
                     },
                     '& input[type=number]::-webkit-outer-spin-button': {
                         '-webkit-appearance': 'none',
@@ -71,6 +89,7 @@ export function RegistrationForm({
     }));
 
     const { lang } = useLanguage()
+
     const [user, setUser] = useState({
         phone: '',
         fullName: '',
@@ -100,13 +119,10 @@ export function RegistrationForm({
     function updateSelectedFavoriteEvents(favs) {
         setUser({ ...user, ...{ selectedFavoriteEvents: favs } })
     }
-    function register(e) {
 
+    function register(e) {
         function validate(phone, fullName) {
             let errors = []
-
-
-
             if (!((phone.includes('050')
                 || phone.includes('052')
                 || phone.includes('053')
@@ -119,10 +135,13 @@ export function RegistrationForm({
                 || phone.length !== 10) {
                 errors.push(lang === 'heb' ? 'יש להזין מס טלפון תקין' : `Invalid phone number ${phone}`)
             }
-            // if ((selectedFavoriteEvents.length < 1
-            //     || selectedFavoriteEvents.length === 1) && selectedFavoriteEvents[0].length === 0) {
-            //     errors.push(lang === 'heb' ? 'יש לבחור לפחות סוג אחד של אירועים על מנת להירשם' : 'Invalid favorite events, please pick atleast 1')
-            // }
+            if (registerSettings && registerSettings.requireBirthDate
+                && user.birthDate) {
+                let today = dateStringFromDate(new Date())
+                if (user.birthDate === today) {
+                    errors.push("יש להזין תאריך לידה תקין")
+                }
+            }
             if (fullName.length < 2) {
                 errors.push(lang === 'heb' ? 'יש להזין שם מלא תקין' : `Invalid fullname ${fullName}`)
             }
@@ -234,6 +253,20 @@ export function RegistrationForm({
                     sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
             </FormControl>
 
+            {registerSettings && registerSettings.requireBirthDate && <FormControl>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{BIRTH_DATE(lang)}</label>
+                <TextField
+                    type="date"
+                    placeholder={BIRTH_DATE(lang)}
+                    value={unReverseDate(user.birthDate)}
+                    onChange={(e) => { updateBirthDate(e.target.value) }}
+                    name="date"
+                    classes={{ root: classes.root }}
+                    autoComplete="birthdate"
+                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="birth_date_input" aria-describedby="birth_date_helper_text" />
+
+            </FormControl>}
+
             <Button title={registerButtonText}
                 type={'button'}
                 style={{ ...submitButton(false), ...{ padding: '8px', width: '100%', marginTop: '24px' } }}
@@ -260,6 +293,7 @@ export default function Register() {
     const nav = useNavigate()
     const { lang } = useLanguage()
     const location = useLocation()
+    const { firebase } = useFirebase()
     const { isCacheValid, cacheDone } = useCookies()
     const { openDialog } = useLoading()
     useEffect(() => {

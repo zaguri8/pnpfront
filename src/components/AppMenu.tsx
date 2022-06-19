@@ -1,16 +1,17 @@
 import logo from '../assets/images/logo_white.png';
-import { HELLO, MENU_ITEM_1, MENU_ITEM_6, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, SIDE, TOOLBAR_LOGIN, MENU_ITEM_7 } from '../settings/strings.js';
+import { HELLO, MENU_ITEM_1, MENU_ITEM_6, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, SIDE, TOOLBAR_LOGIN, MENU_ITEM_7, MENU_ITEM_8, CREATE_EVENT } from '../settings/strings.js';
 import { flex } from '../settings/styles.js';
 import ToolbarItem from './toolbar/ToolbarItem';
 import HomeIcon from '@mui/icons-material/Home';
 import { useLocation } from 'react-router'
 import { useFirebase } from '../context/Firebase';
 import { useLanguage } from '../context/Language.js';
+import DiamondIcon from '@mui/icons-material/Diamond';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router';
 import { useLoading } from '../context/Loading';
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_WHITE } from '../settings/colors.js';
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, RED_ROYAL, SECONDARY_WHITE } from '../settings/colors.js';
 import { Stack } from '@mui/material';
 import Spacer from './utilities/Spacer';
 function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
@@ -26,7 +27,7 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
         boxShadow: user ? 'rgba(0, 0, 0, 0.35) 0px -50px 120px -28px inset' : 'inherit',
         border: user ? '1px solid white' : 'inherit',
         width: user ? '80%' : 'auto',
-        background: user ? DARK_BLACK : 'none',
+        background: user ? PRIMARY_BLACK : 'none',
         margin: user ? '16px' : 'inherit',
         flexDirection: 'column',
         paddingTop: '16px',
@@ -87,7 +88,7 @@ function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
                 </Stack>
                 <Stack style={{ marginTop: '16px' }}>
                     <span style={{ fontSize: '14px', color: 'white' }}>{`${HELLO(lang)}`}</span>
-                    {appUser && appUser.name &&  <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'white' }}>{`${appUser.name.split(' ').length > 1 ? appUser.name.split(' ')[0] : appUser?.name}`}</span>}
+                    {appUser && appUser.name && <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'white' }}>{`${appUser.name.split(' ').length > 1 ? appUser.name.split(' ')[0] : appUser?.name}`}</span>}
                 </Stack>
             </Stack>}
         </div>
@@ -138,6 +139,18 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
                     if (location.pathname === '/')
                         return
                     else nav('/')
+                    break;
+                case 8:
+                    if (location.pathname === '/createPrivateEvent')
+                        return
+                    else nav('/createPrivateEvent')
+                    break;
+
+                case 9:
+                    if (location.pathname === '/createEvent')
+                        return
+                    else nav('/createEvent')
+                    break;
             }
         })
 
@@ -163,8 +176,15 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
         <ToolbarItem text={MENU_ITEM_3(lang)} bold={true} action={() => clickedItem(2)} line={true} style={{ width: '80%', marginTop: '4px', marginBottom: '8px', borderRadius: '8px' }} />
         <ToolbarItem text={MENU_ITEM_4(lang)} bold={true} action={() => clickedItem(3)} line={true} style={{ width: '80%', marginTop: '4px', marginBottom: '8px', borderRadius: '8px' }} />
         <ToolbarItem text={MENU_ITEM_6(lang)} bold={true} action={() => clickedItem(6)} line={true} style={{ width: '80%', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', borderRadius: '8px' }} />
+        <ToolbarItem text={MENU_ITEM_8(lang)}
+            icon={<DiamondIcon style={{ padding: '4px' }} />} bold={true} action={() => clickedItem(8)} line={true} style={{ width: '70%', padding: '4px', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: DARKER_BLACK_SELECTED }} />
+
+        <ToolbarItem text={CREATE_EVENT(lang)}
+            bold={true} action={() => clickedItem(9)} line={true} style={{ width: '50%', padding: '8px', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: DARKER_BLACK_SELECTED }} />
+
         <ToolbarItem text={MENU_ITEM_7(lang)}
-            icon={<HomeIcon style={{ padding: '4px' }} />} bold={true} action={() => clickedItem(7)} line={true} style={{ width: '80%', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: 'none' }} />
+            icon={<HomeIcon style={{ padding: '4px' }} />} bold={true} action={() => clickedItem(7)} line={true} style={{ width: '80%', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '0px', background: 'none' }} />
+
 
     </div>
 }
