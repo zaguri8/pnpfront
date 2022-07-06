@@ -4,15 +4,16 @@ import bus from '../../assets/gifs/busanimated.gif'
 import { useLanguage } from '../../context/Language';
 import { LOADING, SIDE } from '../../settings/strings';
 import { useEffect, useState } from 'react';
+import { CircularProgress } from '@mui/material';
 export function LoadingIndicator(props) {
     const { lang } = useLanguage()
 
     return (<div dir={SIDE(lang)} style={{
         display: props.loading ? 'flex' : 'none',
-        background: SECONDARY_WHITE,
+        background: 'none',
         zIndex: '9999',
         padding: '8px',
-        border: '2px solid white',
+        border: 'none',
         flexDirection: 'column',
         borderRadius: '8px',
         position: 'fixed',
@@ -21,8 +22,8 @@ export function LoadingIndicator(props) {
         transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
     }}>
 
-        <img style={{ width: '135px' }} src={bus} />
-
+        {/* <img style={{ width: '135px' }} src={bus} /> */}
+        <CircularProgress  style = {{zIndex:'10010',color:SECONDARY_WHITE}} size ={'70px'} thickness={1} />
         {/*<ThreeDots ariaLabel='loading-indicator' color={'white'} />*/}
     </div>);
 }

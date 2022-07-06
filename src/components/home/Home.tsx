@@ -3,7 +3,9 @@ import SectionTitle from "../SectionTitle"
 import { RideFormPreview } from "../ride/RideFormPreview"
 import { Gallery } from "../gallery/Gallery"
 import WhyUsContainer from "../whyus/WhyUsContainer"
+import './Home.css'
 import { useFirebase } from "../../context/Firebase"
+import SimpleImageSlider from "react-simple-image-slider";
 import { useEffect, useRef } from "react"
 import React from 'react'
 import { useState } from "react"
@@ -22,13 +24,23 @@ import { v4 } from "uuid"
 import { dateStringFromDate } from "../utilities/functions"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
+import ImageSlider from "../imageslider/ImageSlider"
 export default function Home() {
     const { user, firebase } = useFirebase()
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
     const { isCacheValid, cacheDone } = useCookies()
+    const [selectedEventsForSlider, setSelectedEventsForSlider] = useState<PNPEvent[] | undefined>()
 
     useEffect(() => {
-        const unsubEvents = firebase.realTime.addListenerToPublicEvents(setPnpEvents, false)
+        const unsubEvents = firebase.realTime.addListenerToPublicEvents((events) => {
+            const ev = Object.values(events)
+            let filtered: PNPEvent[] = []
+            for (let events of ev)
+                filtered.push(...events.filter(item => item.eventShowsInGallery))
+            
+            setSelectedEventsForSlider(filtered)
+            setPnpEvents(events)
+        }, false)
         let validToCache = isCacheValid(PNPPage.home)
         if (validToCache instanceof Promise) {
             (validToCache as Promise<boolean>).then((valid) => {
@@ -71,8 +83,10 @@ export default function Home() {
             return null;
         }
     }
+
     return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
         {/* <RideFormPreview /> */}
+        {selectedEventsForSlider && <ImageSlider events={selectedEventsForSlider} />}
         <ArrowScrollUp />
         {getEventsGallery()}
         <Spacer offset={4} />

@@ -89,6 +89,8 @@ export function PaymentForm({ product }) {
             rideId: product.rideId,
             startPoint: product.startPoint,
             twoWay: product.twoWay,
+            eventDate: product.eventDate,
+            rideTime: product.rideTime,
             direction: product.direction
         }
 
@@ -105,6 +107,7 @@ export function PaymentForm({ product }) {
                 }
             }).catch(e => {
             })
+
 
     }
 

@@ -252,7 +252,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
 
             {function attention_2_field() {
-                <FormControl style={formControlStyle}>
+                return <FormControl style={formControlStyle}>
                     <label style={labelStyle}>{lang === 'heb' ? 'שימו לב 2 (אופציונלי)' : 'Attention 2 (Optional)'}</label>
                     <TextField
                         className={classes.root}
@@ -266,7 +266,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
 
 
             {function minAgeField() {
-                <FormControl style={formControlStyle}>
+               return  <FormControl style={formControlStyle}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <label
                             dir={SIDE(lang)}
@@ -304,8 +304,8 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
 
 
-            {function emailAddressField() {
-                <FormControl style={formControlStyle}>
+            {function eventAddressField() {
+                return <FormControl style={formControlStyle}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_ADDRESS(lang)}</label>
                     <Places value={''}
                         handleAddressSelect={(address: string) => {
@@ -315,7 +315,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                 </FormControl>
             }()}
             {function eventDateField() {
-                <FormControl style={formControlStyle}>
+                return <FormControl style={formControlStyle}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_DATE(lang)}</label>
 
                     <TextField
@@ -394,7 +394,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
 
             {function detailsEditorField() {
-                <FormControl style={formControlStyle}>
+                return <FormControl style={formControlStyle}>
                     <Editor
                         editorStyle={{ background: SECONDARY_WHITE, minHeight: '200px', maxWidth: '100%' }}
                         editorState={editorState}
@@ -408,7 +408,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                 </FormControl>
             }()}
             {function submitField() {
-                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
+                return <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
                 <span>
                     <Button
                         onClick={submitUpdateEvent}

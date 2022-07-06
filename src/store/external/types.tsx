@@ -97,6 +97,7 @@ export type PNPEvent = {
     eventLocation: string
     eventId: string
     eventProducerId: string
+    eventShowsInGallery: boolean
     eventDate: string
     eventCanAddRides: boolean
     eventDetails: string
@@ -119,6 +120,7 @@ export type PNPPrivateEvent = {
     registrationRequired: boolean
     eventTitle: string
     eventLocation: string
+    eventShowsInGallery: boolean
     eventId: string
     eventWithGuests: boolean
     eventWithPassengers: boolean

@@ -8,7 +8,7 @@ import america from '../../assets/images/america.png'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { menuIcon } from "../../assets/images"
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import { DARKER_BLACK_SELECTED, PRIMARY_WHITE } from "../../settings/colors"
+import { DARKER_BLACK_SELECTED, PRIMARY_BLACK, PRIMARY_WHITE } from "../../settings/colors"
 import { useFirebase } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
 import { useNavigate } from "react-router"
@@ -21,7 +21,7 @@ export function ToolBar(props: ToolbarProps) {
 
     const nav = useNavigate()
     const { lang, setLang } = useLanguage()
-    return <div id='toolbar' style={{ ...toolbar() }}>
+    return <div id='toolbar' style={{ ...toolbar(),background:'rgba(29, 31, 34,0.4)',opacity:0.95 }}>
         <div style={{
             ...flex('row', 'center', 'center'),
             ...{ zIndex: '9', overflow: 'hidden' }

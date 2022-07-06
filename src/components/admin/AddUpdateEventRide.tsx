@@ -299,7 +299,7 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
                     onChange={(e) => changeRideBackTime(e.target.value)}
                 />
             </React.Fragment>
-        }}
+        }()}
 
 
         {function limitMaxNumberOfAttendancesField() {

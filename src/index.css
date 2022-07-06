@@ -6,12 +6,25 @@ code {
     monospace;
 }
 
+
 body {
   margin: 0;
-  
+  --ORANGE_GRADIENT_SECONDARY: linear-gradient(#bd3333, orangered, orange, orange);
+  --TOOLBAR_COLOR: rgb(36, 38, 43);
+  --PRIMARY_BLACK: rgb(29, 31, 34);
+  --SECONDARY_BLACK: rgb(65, 68, 82);
+  --PRIMARY_WHITE: rgb(255, 255, 255);
+  --SECONDARY_WHITE: whitesmoke;
+  --DARK_BLACK: linear-gradient(#ffc93c, #ff7a3c, #ff6f3c);
+  --DARKER_BLACK_SELECTED: linear-gradient(#ffc93c, #ff5f3c, #ff6a3c);
+  --ORANGE_GRADIENT_PRIMARY: linear-gradient(rgb(82, 90, 128), rgb(66, 75, 118), rgb(62, 69, 100));
+  --ORANGE_RED_GRADIENT_BUTTON: linear-gradient(#e52d27, #b31217);
+  --BLACK_ELEGANT: linear-gradient(#282c34, black);
+  --BLACK_ROYAL: linear-gradient(#243B55, #141E30);
+  --RED_ROYAL: linear-gradient(#ef473a, #cb2d3e);
   font-family: 'Open Sans Hebrew', serif;
   -webkit-font-smoothing: antialiased;
-  background-color: rgb(36, 38, 43);
+  background-color: var(--PRIMARY_BLACK);
   min-height: 100vh;
   -moz-osx-font-smoothing: grayscale;
   -ms-overflow-style: none;
@@ -26,12 +39,13 @@ html {
 
 body::-webkit-scrollbar {
   display: none;
-  
+
 }
 
 
 * {
   -ms-overflow-style: none;
+
 }
 
 ::-webkit-scrollbar {

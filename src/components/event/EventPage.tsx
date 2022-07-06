@@ -36,10 +36,6 @@ export default function EventPage() {
     const nav = useNavigate()
 
     const openRequestPaymentDialog = (ride?: PNPPublicRide) => {
-        if (!user || !appUser) {
-            nav('/login', { state: { cachedLocation: location.pathname } })
-            return
-        }
 
         if (event) {
             openDialog({
@@ -58,6 +54,7 @@ export default function EventPage() {
                         twoWay: ride ? ride?.extras.twoWay : selectedEventRide ? selectedEventRide.extras.twoWay : '',
                         price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
                         eventId: event.eventId,
+                        eventDate: event.eventDate,
                         rideId: ride ? ride.rideId : selectedEventRide ? selectedEventRide.rideId : ''
                     }} /></div>
             })

@@ -194,6 +194,22 @@ export class Realtime {
     }
 
 
+    async giveScannerPermissionsByEmail(email: string) {
+        return await this.getUserIdByEmail(email, async (userId) => {
+            return await this.getUserById2(userId, (user) => {
+                this.updateUser({ ...user, producer: true }, userId)
+            })
+        }, () => { })
+    }
+
+    async takeScannerPermissionsByEmail(email: string) {
+        return await this.getUserIdByEmail(email, async (userId) => {
+            return await this.getUserById2(userId, (user) => {
+                this.updateUser({ ...user, producer: false }, userId)
+            })
+        }, () => { })
+    }
+
     // Makes a user responsible of a private event
     // takes user as parameter and does the changes
     async makeUserResponsible(userId: string,
@@ -251,6 +267,11 @@ export class Realtime {
         return onValue(child(this.users, id), (snap) => {
             consume(userFromDict(snap))
         })
+    }
+    async getUserById2(id: string, consume: (u: PNPUser) => void) {
+        return await get(child(this.users, id)).then(snap =>
+            consume(userFromDict(snap)))
+            .catch((e) => this.createError("getUserById2", e));
     }
 
 
@@ -426,7 +447,7 @@ export class Realtime {
     }
 
     async removePrivateEvent(eventId: string) {
-        await remove(child(child(this.allEvents, 'private'), eventId))
+        await remove(child(child(child(this.allEvents, 'private'), 'approved'), eventId))
             .catch((e) => { this.createError('removePrivateEvent', e) })
         return await remove(child(child(child(this.rides, 'private'), 'ridesForEvents'), eventId))
             .catch((e) => { this.createError('removePrivateEvent', e) })
@@ -805,6 +826,17 @@ export class Realtime {
     }
 
     /**
+     * updateUser
+     * @param user user values to be updated
+     * @returns update callback
+     */
+    updateUser = async (user: object, id: string) => {
+        if (this.auth.currentUser)
+            return await update(child(this.users, id), user)
+    }
+
+
+    /**
       * updateCurrentUser
       * @param user user values to be updated
       * @returns update callback
@@ -959,7 +991,7 @@ export class Realtime {
         return onValue(child(this.siteSettings, 'home'), (snap) => {
             let dict = toDictionary<RegisterFormExtras>(snap)
             consume(dict)
-        },error)
+        }, error)
     }
 
     addListenerToBrowsingStat(page: PNPPage, date: string, consume: (data: { leaveNoAttendance: number, leaveWithAttendance: number }) => void) {

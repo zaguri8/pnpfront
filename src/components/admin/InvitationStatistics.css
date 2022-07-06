@@ -1,0 +1,84 @@
+.spanStyle {
+    color: whitesmoke;
+    text-align: center
+}
+
+.spanStyle_2 {
+    color: whitesmoke;
+    text-align: right;
+    font-family: Open Sans Hebrew;
+}
+
+.spanStyle_3 {
+    color: whitesmoke;
+    text-align: right;
+    width: 100px;
+    text-align: center;
+    font-family: Open Sans Hebrew;
+}
+
+.spanStyle_4 {
+    color: whitesmoke;
+    width: 50px;
+    text-align: center;
+    font-family: Open Sans Hebrew;
+}
+
+.spanStyle_2_small {
+    color: whitesmoke;
+    text-align: right;
+    font-family: Open Sans Hebrew;
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.spanStyle_3_small {
+    color: whitesmoke;
+    text-align: right;
+    width: 100px;
+    text-align: center;
+    font-family: Open Sans Hebrew;
+
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.spanStyle_4_small {
+    color: whitesmoke;
+    cursor: pointer;
+    width: 50px;
+    text-align: center;
+    font-family: Open Sans Hebrew;
+    font-size: 12px;
+}
+
+.confirmationsTable {
+
+    max-height: 300px;
+    overflow-y: scroll;
+    width: 100%;
+    min-width: 280px;
+    max-width: 300px;
+
+}
+
+.tooltip_statistics {
+    font-family: Open Sans Hebrew;
+    margin-bottom: 34px;
+    font-size: 18px;
+}
+
+.admin_section_invitation_stats {
+    margin-top: 32px;
+    border: .5px solid white;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--BLACK_ELEGANT);
+}
+.checkbox_invitation_stats { 
+    padding: 4px;
+    background: var(--RED_ROYAL);
+    margin: 8px;
+    color: var(--SECONDARY_WHITE);
+}

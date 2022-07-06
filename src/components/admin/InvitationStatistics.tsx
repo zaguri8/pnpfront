@@ -12,6 +12,7 @@ import SectionTitle from "../SectionTitle";
 import AddUpdatePrivateEventRide from "./AddUpdatePrivateEventRide";
 import { useFirebase } from "../../context/Firebase";
 import { Unsubscribe } from "firebase/database";
+import './InvitationStatistics.css'
 import { v4 } from "uuid";
 import $ from 'jquery'
 
@@ -19,7 +20,7 @@ import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { textFieldStyle } from "../../settings/styles";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
-import { getGuests, getPassengers, confirmationsPartition, default_no_arrival, getTotalAmountOfConfirmations, populatePassengersDictionaryWithConfirmation, getPassengersAndGuests, getInvitationRowGuests } from "./invitationsHelper";
+import { confirmationsPartition, default_no_arrival, getTotalAmountOfConfirmations, getPassengersAndGuests, getInvitationRowGuests } from "./invitationsHelper";
 
 export const buttonStyle = {
     textDecoration: 'none',
@@ -74,13 +75,13 @@ export default function InvitationStatistics() {
 
     const openDeleteDialog = () => {
         const divStyle = { padding: '8px' } as CSSProperties
-        const spanStyle = { color: SECONDARY_WHITE, textAlign: 'center' } as CSSProperties
+
         openDialog({
             content: <Stack style={divStyle} spacing={1}>
-                <span style={spanStyle}>
+                <span className="spanStyle">
                     {`האם את/ה בטוח/ה שברצונך למחוק את ההזמנה לאירוע ${privateEvent?.eventTitle} ?`}
                 </span>
-                <p style={spanStyle}>
+                <p className="spanStyle">
                     {'מחיקת ההזמנה תמחוק גם את ההסעות לאירוע'}
                 </p>
 
@@ -169,6 +170,7 @@ export default function InvitationStatistics() {
             ).then(() => {
                 dialog("אישור נמחק בהצלחה")
                 cancelLoad()
+                window.location.reload()
             }).catch(() => { cancelLoad() })
         }
 
@@ -275,7 +277,7 @@ export default function InvitationStatistics() {
         totalConfirmationsNumber: number
     }) => {
         return privateEvent ? <React.Fragment>
-            {<h4 style={props.style}>{'סה"כ אישורי הגעה: ' + props.totalConfirmationsNumber}</h4>}
+            {<h4 style={props.style}>{'סה"כ אישורי הגעה לאירוע: ' + props.totalConfirmationsNumber}</h4>}
         </React.Fragment> : null
 
     }
@@ -450,137 +452,140 @@ export default function InvitationStatistics() {
                                 style={{ color: SECONDARY_WHITE }} />
                             const totalConfirmations = Object.entries(confirmations)
                             const headerTitle = { color: SECONDARY_WHITE }
+                            function withRideArrivalConfirmations(withRide: boolean) {
+                                if (!privateEvent) return null
+                                return totalConfirmations.filter(x => !withRide ? x[0] === default_no_arrival : x[0] !== default_no_arrival).map(entry => {
+                                    return (
+                                        <React.Fragment>
+                                            <Accordion
+                                                key={v4()}
+                                                sx={{ border: '.1px solid white', borderRadius: '8px', background: BLACK_ELEGANT, color: SECONDARY_WHITE }}
+                                                expanded={accordionHash[entry[0]]}>
+                                                <AccordionSummary
+                                                    onClick={() => {
+                                                        let copy = accordionHash
+                                                        delete copy[entry[0]]
+                                                        setAccordionHash(copy)
+                                                    }}
+                                                    sx={{ maxHeight: 'min-content' }}>
+                                                    {function accordionSummary() {
+                                                        let { passengers, guests } = getPassengersAndGuests(entry[0], entry[1])
+                                                        const keyStyle: CSSProperties = {
+                                                            left: '8',
+                                                            bottom: '8',
+                                                            position: 'absolute'
+                                                        }
+                                                        const paragraphStyle: CSSProperties = {
+                                                            padding: '0px',
+                                                            margin: '0px'
+                                                        }
+                                                   
+                                                        return <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                            <h3 style={{ color: SECONDARY_WHITE, margin: '0px', padding: '0px' }}>{entry[0] !== "null" ? entry[0].split(' ל - ')[0] : ""}</h3>
+                                                            <div style={{ alignSelf: 'start', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
 
+                                                                {entry[0] !== default_no_arrival &&
+                                                                    <React.Fragment>
+                                                                        <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים הלוך: ' + passengers.to) : ('To event direction approvals: ' + passengers.to)}</p>
+                                                                        <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים חזור: ' + passengers.back) : ('Back from event direction approvals: ' + passengers.back)}</p>
+                                                                        <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים הלוך-חזור: ' + passengers.twoWay) : ('Both directions approvals: ' + passengers.twoWay)}</p>
+                                                                    </React.Fragment>}
+
+                                                                <p style={{ padding: '0px', margin: '0px', fontWeight: 'bold' }}>{lang === 'heb' ? ((entry[0] === default_no_arrival ? ('סה"כ : ' + (Math.max(passengers.total, guests)) + " אישורים") : ('סה"כ אישורי הגעה: ' + passengers.total))) : ('Total ride approvals: ' + passengers.total)}</p>
+
+                                                                <KeyboardDoubleArrowDownIcon
+                                                                    style={keyStyle}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    }()}
+                                                </AccordionSummary>
+
+                                                <AccordionDetails>
+                                                    <Stack key={entry[0]}>
+
+                                                        <Table style={{
+                                                            display: 'flex',
+                                                            background: PRIMARY_BLACK,
+                                                            flexDirection: 'column'
+                                                        }}>
+                                                            <TableHead style={{ width: '100%', minWidth: '280px', maxWidth: '300px' }}>
+
+                                                                <TableRow>
+
+                                                                    <TableCell className='spanStyle_3' sx={{ color: SECONDARY_WHITE }}>
+                                                                        {'שם'}
+                                                                    </TableCell>
+                                                                    <TableCell className='spanStyle_3' sx={{ color: SECONDARY_WHITE }}>
+                                                                        {'כיוון'}
+                                                                    </TableCell>
+
+                                                                    <TableCell className='spanStyle_4' sx={{ color: SECONDARY_WHITE }}>
+                                                                        {'אורחים'}
+                                                                    </TableCell>
+                                                                    <TableCell className='spanStyle_3' sx={{ color: SECONDARY_WHITE }}>
+                                                                        {'טלפון'}
+                                                                    </TableCell>
+
+                                                                </TableRow>
+
+                                                            </TableHead>
+
+
+                                                            {function confirmationsRideArrivalsTable() {
+                                                                if (entry[1].length < 1) return null
+                                                                return <React.Fragment>
+
+                                                                    <TableBody className='confirmationsTable' >
+
+                                                                        {entry[1].map(confirmation =>
+
+                                                                            <HtmlTooltip
+                                                                                key={v4()}
+                                                                                className='tooltip_statistics'
+                                                                                title={'לחץ על מנת לערוך'} arrow>
+
+                                                                                <TableRow
+                                                                                    onClick={() => {
+                                                                                        if (confirmation.rideArrival)
+                                                                                            openConfirmationUpdateDialog(confirmation)
+                                                                                        else alert('לא ניתן לערוך אישור ללא הסעה')
+                                                                                    }}
+                                                                                >
+                                                                                    <TableCell className='spanStyle_3_small' sx={{ color: SECONDARY_WHITE }}>
+                                                                                        {confirmation.userName}
+                                                                                    </TableCell>
+                                                                                    <TableCell className='spanStyle_3_small' sx={{ color: SECONDARY_WHITE }}>
+                                                                                        {entry[0] === default_no_arrival ? 'ללא' : confirmation.rideArrival ? (confirmation.directionType === '1' ? 'הלוך' : confirmation.directionType === '2' ? 'חזור' : 'הלוך-חזור') : 'ללא'}
+                                                                                    </TableCell>
+
+                                                                                    <TableCell className='spanStyle_4_small' sx={{ color: SECONDARY_WHITE }}>
+                                                                                        {getInvitationRowGuests(privateEvent, entry[0], confirmation)}
+                                                                                    </TableCell>
+                                                                                    <TableCell className='spanStyle_3_small' sx={{ color: SECONDARY_WHITE }}>
+                                                                                        {confirmation.phoneNumber}
+                                                                                    </TableCell>
+                                                                                </TableRow>
+                                                                            </HtmlTooltip>)}
+                                                                    </TableBody>
+                                                                </React.Fragment>
+                                                            }()}
+                                                        </Table>
+                                                    </Stack>
+                                                </AccordionDetails>
+                                            </Accordion></React.Fragment>)
+                                })
+                            }
+                            const labelStyle = { color: SECONDARY_WHITE, fontSize: '20px' } as CSSProperties
 
                             return <React.Fragment>
 
                                 <ConfirmationsHeader
-                                    totalConfirmationsNumber={getTotalAmountOfConfirmations(confirmations)}
+                                    totalConfirmationsNumber={getTotalAmountOfConfirmations(privateEvent, confirmations)}
                                     style={headerTitle} />
-                                {totalConfirmations.map(entry => {
-                                    return (
-                                        <Accordion
-                                            key={v4()}
-                                            sx={{ border: '.1px solid white', borderRadius: '8px', background: BLACK_ELEGANT, color: SECONDARY_WHITE }}
-                                            expanded={accordionHash[entry[0]]}>
-                                            <AccordionSummary
-                                                onClick={() => {
-                                                    let copy = accordionHash
-                                                    delete copy[entry[0]]
-                                                    setAccordionHash(copy)
-                                                }}
-                                                sx={{ maxHeight: 'min-content' }}>
-                                                {function accordionSummary() {
-                                                    let { passengers, guests } = getPassengersAndGuests(entry[0], entry[1])
-                                                    const keyStyle: CSSProperties = {
-                                                        left: '8',
-                                                        bottom: '8',
-                                                        position: 'absolute'
-                                                    }
-                                                    const paragraphStyle: CSSProperties = {
-                                                        padding: '0px',
-                                                        margin: '0px'
-                                                    }
-                                                    return <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <h3 style={{ color: SECONDARY_WHITE, margin: '0px', padding: '0px' }}>{entry[0].split(' ל - ')[0]}</h3>
-                                                        <div style={{ alignSelf: 'start', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                                                            {entry[0] !== default_no_arrival &&
-                                                                <React.Fragment>
-                                                                    <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים הלוך: ' + passengers.to) : ('To event direction approvals: ' + passengers.to)}</p>
-                                                                    <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים חזור: ' + passengers.back) : ('Back from event direction approvals: ' + passengers.back)}</p>
-                                                                    <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים הלוך-חזור: ' + passengers.twoWay) : ('Both directions approvals: ' + passengers.twoWay)}</p>
-                                                                </React.Fragment>}
-                                                            <p style={{ padding: '0px', margin: '0px', fontWeight: 'bold' }}>{lang === 'heb' ? ((entry[0] === default_no_arrival ? ('סה"כ : ' + (guests) + " אישורים") : ('סה"כ אישורי הגעה: ' + passengers.total))) : ('Total ride approvals: ' + passengers.total)}</p>
-                                                            <KeyboardDoubleArrowDownIcon
-                                                                style={keyStyle}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                }()}
-                                            </AccordionSummary>
-
-                                            <AccordionDetails>
-                                                <Stack key={entry[0]}>
-
-                                                    <Table style={{
-                                                        display: 'flex',
-                                                        background: PRIMARY_BLACK,
-                                                        flexDirection: 'column'
-                                                    }}>
-                                                        <TableHead style={{ width: '100%', minWidth: '280px', maxWidth: '300px' }}>
-
-                                                            <TableRow>
-
-                                                                <TableCell style={{ ...spanStyle, ...{ width: '100px', textAlign: 'center' } }}>
-                                                                    {'שם'}
-                                                                </TableCell>
-                                                                <TableCell style={{ ...spanStyle, ...{ width: '100px', textAlign: 'center' } }}>
-                                                                    {'כיוון'}
-                                                                </TableCell>
-
-                                                                <TableCell style={{ ...spanStyle, ...{ width: '50px', textAlign: 'center' } }}>
-                                                                    {'אורחים'}
-                                                                </TableCell>
-                                                                <TableCell style={{ ...spanStyle, ...{ width: '100px', textAlign: 'center' } }}>
-                                                                    {'טלפון'}
-                                                                </TableCell>
-
-                                                            </TableRow>
-
-                                                        </TableHead>
-
-
-                                                        {function confirmationsRideArrivalsTable() {
-                                                            if (entry[1].length < 1) return null
-                                                            return <React.Fragment>
-
-                                                                <TableBody style={{
-                                                                    maxHeight: '300px',
-                                                                    overflowY: 'scroll',
-                                                                    width: '100%',
-                                                                    minWidth: '280px',
-                                                                    maxWidth: '300px'
-                                                                }} >
-
-                                                                    {entry[1].map(confirmation =>
-
-                                                                        <HtmlTooltip
-                                                                            key={v4()}
-                                                                            sx={{
-
-                                                                                fontFamily: 'Open Sans Hebrew', marginBottom: '34px', fontSize: '18px'
-                                                                            }} title={'לחץ על מנת לערוך'} arrow>
-
-                                                                            <TableRow
-                                                                                onClick={() => {
-                                                                                    if (confirmation.rideArrival)
-                                                                                        openConfirmationUpdateDialog(confirmation)
-                                                                                    else alert('לא ניתן לערוך אישור ללא הסעה')
-                                                                                }}
-                                                                            >
-                                                                                <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '50px', textAlign: 'center', fontSize: '12px' } }}>
-                                                                                    {confirmation.userName}
-                                                                                </TableCell>
-                                                                                <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '100px', textAlign: 'center', fontSize: '12px' } }}>
-                                                                                    {entry[0] === default_no_arrival ? 'ללא' : confirmation.rideArrival ? (confirmation.directionType === '1' ? 'הלוך' : confirmation.directionType === '2' ? 'חזור' : 'הלוך-חזור') : 'ללא'}
-                                                                                </TableCell>
-
-                                                                                <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '50px', textAlign: 'center', fontSize: '12px' } }}>
-                                                                                    {getInvitationRowGuests(entry[0],confirmation)}
-                                                                                </TableCell>
-                                                                                <TableCell style={{ ...spanStyle, ...{ cursor: 'pointer', width: '100px', textAlign: 'center', fontSize: '12px' } }}>
-                                                                                    {confirmation.phoneNumber}
-                                                                                </TableCell>
-                                                                            </TableRow>
-                                                                        </HtmlTooltip>)}
-                                                                </TableBody>
-                                                            </React.Fragment>
-                                                        }()}
-                                                    </Table>
-                                                </Stack>
-                                            </AccordionDetails>
-                                        </Accordion>)
-                                })}
+                                {withRideArrivalConfirmations(false)}
+                                {privateEvent.eventWithPassengers && <p style={labelStyle}>אישורי הגעה להסעות</p>}
+                                {withRideArrivalConfirmations(true)}
                             </React.Fragment>
                         }()}
 
@@ -591,13 +596,7 @@ export default function InvitationStatistics() {
                     {function renderAdminSection() {
                         if (rides && location.state)
                             return (<Stack
-                                style={{
-                                    marginTop: '32px',
-                                    border: '.5px solid white',
-                                    padding: '16px',
-                                    borderRadius: '16px',
-                                    background: BLACK_ELEGANT
-                                }}
+                                className='admin_section_invitation_stats'
                                 spacing={1}>
                                 <PrivateRides event={privateEvent} rides={rides} />
 

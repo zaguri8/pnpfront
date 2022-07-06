@@ -1,4 +1,4 @@
-import { PassengersDictionary, PNPRideConfirmation } from "../../store/external/types";
+import { PassengersDictionary, PNPPrivateEvent, PNPRideConfirmation } from "../../store/external/types";
 
 export const default_no_arrival = 'אישורי הגעה ללא הסעה'
 export function getPassengers(confirmation: PNPRideConfirmation): number {
@@ -37,19 +37,24 @@ export function populatePassengersDictionaryWithConfirmation(confirmation: PNPRi
     passengers.total += num_passengers;
     return passengers
 }
-export function getTotalAmountOfConfirmations(map: { [dir: string]: PNPRideConfirmation[] } | undefined) {
+
+export function getTotalAmountOfConfirmations(event: PNPPrivateEvent, map: { [dir: string]: PNPRideConfirmation[] } | undefined) {
     if (!map) return 0 // there are no confirmations
     let output = 0
     let hash: any = {}
     for (let entry of Object.entries(map)) {
         INNER: for (let conf of entry[1]) {
             if (hash[conf.userName + conf.phoneNumber]) continue INNER;
-            output += getGuests(conf)
+            if (event.eventWithGuests)
+                output += getGuests(conf)
+            else
+                output += getPassengers(conf)
             hash[conf.userName + conf.phoneNumber] = true
         }
     }
     return output
 }
+
 export function confirmationsPartition(confirmations: PNPRideConfirmation[]): { [dir: string]: PNPRideConfirmation[] } {
     let map: { [dir: string]: PNPRideConfirmation[] } = {}
     for (let conf of confirmations) {
@@ -89,11 +94,20 @@ export function getPassengersAndGuests(destination: string, confirmations: PNPRi
         if (destination === default_no_arrival)
             guests += getGuests(confirmation) - getPassengers(confirmation)
     }
+
     return { passengers, guests }
 }
-export function getInvitationRowGuests(destination: string, confirmation: PNPRideConfirmation) {
+
+export function getInvitationRowGuests(event: PNPPrivateEvent, destination: string, confirmation: PNPRideConfirmation) {
     if (destination === default_no_arrival)
-        return getGuests(confirmation) - getPassengers(confirmation)
-    else
-        return Math.max(1, getGuests(confirmation) - (Math.abs(getGuests(confirmation) - getPassengers(confirmation))))
+        return Math.max(1, getGuests(confirmation) - getPassengers(confirmation))
+    else {
+        if (event.eventWithGuests && event.eventWithPassengers)
+            return Math.max(1, getGuests(confirmation) - (Math.abs(getGuests(confirmation) - getPassengers(confirmation))))
+        else if (event.eventWithPassengers) {
+            return Math.max(1, getPassengers(confirmation))
+        } else {
+            return Math.max(1, getGuests(confirmation))
+        }
+    }
 }

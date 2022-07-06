@@ -62,8 +62,8 @@ export function RegistrationForm({
                 background: SECONDARY_WHITE,
                 borderRadius: '32px',
                 alignSelf: 'center',
-                width:'100%',
-                maxWidth:'245px',
+                width: '100%',
+                maxWidth: '245px',
                 border: '.1px solid white',
                 color: PRIMARY_BLACK, ...{
                     '& input[type=number]': {
@@ -124,6 +124,7 @@ export function RegistrationForm({
         function validate(phone, fullName) {
             let errors = []
             if (!((phone.includes('050')
+                || phone.includes('051')
                 || phone.includes('052')
                 || phone.includes('053')
                 || phone.includes('054')

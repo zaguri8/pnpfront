@@ -8,7 +8,7 @@ import { List, Button, MenuItem, Stack, TextField, Typography, Checkbox } from '
 
 import { useFirebase } from '../../context/Firebase';
 import { PNPPrivateEvent, PNPRideConfirmation, PNPRideDirectionNumber, PNPUser } from '../../store/external/types';
-import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation } from '../../store/validators';
+import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation, isValidSingleRideConfirmation } from '../../store/validators';
 
 import { PNPPublicRide } from '../../store/external/types';
 import { useNavigate, useParams } from 'react-router';
@@ -99,8 +99,10 @@ function InvitationCard() {
     const nav = useNavigate()
     async function sendInvitation(userId?: string, u?: PNPUser) {
 
-        if (!event || !rides || (!selectedEventRide && newConfirmation?.rideArrival))
+        if (!event || !rides || (rides.length > 1 && !selectedEventRide && newConfirmation?.rideArrival)) {
+            
             return
+        }
 
         let actualConfirmation = event.registrationRequired ? {
             ...newConfirmation,
@@ -135,18 +137,25 @@ function InvitationCard() {
             alert('כדי לאשר הגעה יש לסמן הגעה בהסעות ולבחור הסעה')
             return
         }
-        if (!isValidRideConfirmation(actualConfirmation)) {
-            alert('אנא מלא את פרטייך ובחר הסעה')
+
+
+        if ((!rides || rides.length < 1)) {
+            if (!isValidSingleRideConfirmation(actualConfirmation)) {
+                alert('אנא מלא/י את כל פרטייך ')
+                return
+            }
+        } else if (!isValidRideConfirmation(actualConfirmation)) {
+            alert('אנא מלא/י את פרטייך ובחר הסעה')
             return
         }
         doLoad()
-        if (!actualConfirmation?.rideArrival || (isValidPublicRide(selectedEventRide!.ride!))) {
+        if (!actualConfirmation?.rideArrival || (rides && rides.length<1 && event.eventWithPassengers) || (isValidPublicRide(selectedEventRide!.ride!))) {
             await saveInvitationConfirmation(actualConfirmation!)
                 .then(() => {
                     firebase.realTime.addRideConfirmation(actualConfirmation!)
-                    alert(`תודה ${actualConfirmation?.userName}, קיבלנו את אישורך `)
                     setConfirmation(actualConfirmation!)
                     cancelLoad()
+                    alert(`תודה ${actualConfirmation?.userName}, קיבלנו את אישורך `)
                 })
         }
     }
@@ -323,8 +332,8 @@ function InvitationCard() {
 
                 <br />
                 {confirmation.rideArrival && <Stack>
-                    <span dir={'rtl'} style={{ padding: '4px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{lang === 'heb' ? confirmation.directions.replace(' to ', ' ל - ') : confirmation.directions}</span>
-                    <span dir={SIDE(lang)} style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר נוסעים בהסעות: ' : 'Number of ride passengers: ') + (confirmation.passengers ? confirmation.passengers : 1)}</span>
+                    <span dir={'rtl'} style={{ padding: '4px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{confirmation.directions!== 'null' ?  (lang === 'heb' ? confirmation.directions.replace(' to ', ' ל - ') : confirmation.directions) : confirmation.confirmationTitle}</span>
+                    <span dir={SIDE(lang)} style={{ padding: '8px', color: PRIMARY_BLACK, fontSize: '16px', fontWeight: 'bold' }}>{(lang === 'heb' ? 'מספר נוסעים בהסעות: ' : 'Number of ride passengers: ') + (confirmation.passengers && confirmation.passengers!== 'unset' ? confirmation.passengers : 1)}</span>
                 </Stack>}
             </div >
         </InnerPageHolder>
@@ -346,7 +355,7 @@ function InvitationCard() {
             <div style={{ width: '100%', background: PRIMARY_BLACK }}>
                 <List style={{ width: '85%', background: PRIMARY_BLACK, minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
                     {/* Arriving to rides Check box */}
-                    <Stack
+                    {event.eventWithPassengers && <Stack
                         alignItems={'center'}
                         justifyContent={'center'}
                         direction={'row'}
@@ -363,7 +372,7 @@ function InvitationCard() {
                                 })
                             }} />}
 
-                    </Stack>
+                    </Stack>}
                     {(rides && rides.length > 0 && newConfirmation?.rideArrival) ? <List style={{ width: '100%' }} dir={SIDE(lang)}>
 
                         <Typography
@@ -446,7 +455,7 @@ function InvitationCard() {
                                         ...submitButton(false),
                                         ... { textTransform: 'none', margin: '16px', padding: '8px', minWidth: lang === 'heb' ? '200px' : '250px' }
                                     }}
-                                    disabled={newConfirmation?.rideArrival && selectedEventRide === null}>
+                                    disabled={newConfirmation?.rideArrival && rides!==null && rides.length > 0 && selectedEventRide === null}>
                                     {CONFIRM_EVENT_ARRIVAL(lang)}
                                 </Button>
                             </span>

@@ -4,7 +4,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import TermsOfService from './components/TermsOfService'
 import logo_white from './assets/images/logo_white.png'
-import { Dialog, List, ListItem, Button, Stack } from '@mui/material';
+import { Dialog, List, ListItem, Button, Stack, CircularProgress } from '@mui/material';
 import { ILoadingContext, useLoading } from './context/Loading';
 import Profile from './components/auth/Profile'
 import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
@@ -25,7 +25,7 @@ import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
 import MyPayments from './components/payment/MyPayments';
-import Test from './components/MapComponent';
+import Test from './components/Test';
 import EventStatistics from './components/admin/EventStatistics';
 import AdminPanel from './components/admin/AdminPanel';
 import WhatsApp from './components/WhatsApp';
@@ -251,6 +251,7 @@ function App() {
         <Route path='/login' element={!isAuthenticated ? <Login /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='termsOfService' element={<TermsOfService />} />
+        <Route path='/test' element={<Test/>} />
         <Route path='/myaccount/profile' element={<Profile />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
         <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />

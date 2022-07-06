@@ -16,6 +16,9 @@ export type GalleryProps = {
 function GalleryItemTitle(props: { event: PNPEvent }) {
 
     const { lang } = useLanguage()
+
+
+
     return (<div style={{
         margin: '0px',
         marginTop: 'auto',
@@ -48,13 +51,6 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
 
 export function Gallery(props: GalleryProps) {
     const { lang } = useLanguage()
-    const containerStyle: CSSProperties = {
-        overflow: 'scroll',
-
-        display: 'flex',
-        direction: 'rtl',
-        paddingBottom: '32px',
-    }
 
     const cardStyle: CSSProperties = {
 
@@ -104,21 +100,27 @@ export function Gallery(props: GalleryProps) {
         setTimeout(() => {
             $('.loadingDivStyle').css('display', 'none')
         }, 550)
+
+        let clear = setInterval(() => {
+                $('gallery').scroll(() => {
+
+                },)
+        }, 1)
     }, [])
 
 
     const loadingDivStyle = {
         background: `url('${loadingGif}')`,
         width: '100%',
-        borderTopLeftRadius:'16px',
-        borderTopRightRadius:'16px',
-        backgroundSize:'cover',
+        borderTopLeftRadius: '16px',
+        borderTopRightRadius: '16px',
+        backgroundSize: 'cover',
         height: '100%'
     }
     return <div>
         {<h2 className='gallery_header' style={headerStyle}>{props.header}</h2>}
-        <div id='gallery_container' style={containerStyle}>
-            <div className='gallery' style={imageContainer}>
+        <div id='gallery_container' >
+            <div className='gallery' style={imageContainer} data-options="mode: carousel; height: 275px;">
 
                 {props.events.map(pnpEvent => {
 
@@ -131,7 +133,7 @@ export function Gallery(props: GalleryProps) {
                                 cursor: 'pointer',
                                 backgroundClip: 'border-box',
                                 backgroundColor: 'white',
-                                background:  `url('${pnpEvent.eventImageURL}') `,
+                                background: `url('${pnpEvent.eventImageURL}') `,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'no-repeat',

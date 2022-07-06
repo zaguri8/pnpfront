@@ -131,3 +131,20 @@ export function isValidRideConfirmation(ride: PNPRideConfirmation | undefined): 
     && (ride.directions !== null)
 }
 
+export function isValidSingleRideConfirmation(ride: PNPRideConfirmation | undefined): boolean {
+  return ride !== undefined
+    && ride !== null
+    && (ride.userId !== null
+      && ride.userId !== 'null')
+    && (ride.guests !== null
+      && ride.guests !== 'null')
+    && (ride.passengers !== null
+      && ride.phoneNumber !== 'null')
+    && (ride.phoneNumber !== null
+      && ride.userName !== 'null')
+    && (ride.userName !== null
+      && ride.passengers !== 'null')
+    && (ride.date !== null
+      && ride.date !== 'null')
+}
+

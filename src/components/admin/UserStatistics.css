@@ -2,10 +2,11 @@
     width: 360px;
     display: block;
 
-    max-height: 500px;
+    height: 450px;
     overflow-y: scroll;
     border-radius: 4px;
     font-size: 12px;
+
     background: none;
     position: relative;
     overscroll-behavior: none;
@@ -20,8 +21,30 @@
 
 #user_search_no_results {
     color: whitesmoke;
+    width: 100%;
+    font-size: 24px;
+
+    align-self: center;
     margin-bottom: 8px;
 }
+
+.thead_user_statistics {
+    font-size: 24px;
+    display: block;
+    align-self: center;
+}
+.scanner_perms_container {
+    column-gap: 8px;
+    padding: 16px;
+    display: flex;
+}
+@media only screen and (max-width:400px) {
+    .scanner_perms_container {
+        transform: scale(0.85);
+    }
+}
+
+
 
 .user_fields {
     padding: 8px;

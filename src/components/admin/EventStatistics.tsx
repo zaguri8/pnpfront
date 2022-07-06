@@ -21,7 +21,7 @@ import { isValidPublicRide } from "../../store/validators";
 import { elegantShadow, submitButton, textFieldStyle } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
-import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { makeStyles } from "@mui/styles";
 import AddUpdateEventRide from "./AddUpdateEventRide";
@@ -59,7 +59,7 @@ type RideStatistics = {
 
 export default function EventStatistics() {
     const location = useLocation()
-    const event: PNPEvent | null = location.state ? location.state as PNPEvent : null
+    const [event, setEvent] = useState<PNPEvent | null>(location.state ? location.state as PNPEvent : null)
     const [showingComponent, setShowingComponent] = useState<AdminScreens>(AdminScreens.rideTransactions)
 
 
@@ -96,14 +96,6 @@ export default function EventStatistics() {
         }
         return () => { unsub && unsub(); unsub2 && unsub2(); unsub3 && unsub3() }
     }, [])
-
-    const ActionCard = () => {
-        return <Stack spacing={3} dir={SIDE(lang)}>
-            <Button style={{ background: 'whitesmoke', color: '#6495ED', textTransform: 'none' }}>Show Public Events</Button>
-            <Button style={{ background: 'whitesmoke', color: '#6495ED', textTransform: 'none' }}>Show Private Events</Button>
-        </Stack>
-    }
-
 
     const nav = useNavigate()
     const deleteEvent = () => {
@@ -145,6 +137,24 @@ export default function EventStatistics() {
 
 
     const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
+        const approveAllTransactions = (rideId: string) => {
+            const send = {
+                rideId: rideId,
+                credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" }
+            }
+            closeDialog()
+            setTimeout(() => {
+                doLoad()
+                axios.post('https://nadavsolutions.com/gserver/approveRideTransactions', send)
+                    .then(res => {
+                        alert(res.data.result)
+                        cancelLoad()
+                    }).catch(e => {
+                        alert('אירעתה שגיאה בעת אישור העסקאות, אנא פנה למתכנת')
+                        cancelLoad()
+                    })
+            }, 50)
+        }
         return (<List>
             <h1 style={{ color: SECONDARY_WHITE }}>{'ניהול נסיעות'}</h1>
             {props.rides.length > 0 ? <table dir={'rtl'} style={{ width: '100%' }}  >
@@ -224,6 +234,33 @@ export default function EventStatistics() {
                                     }}
                                     style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: '#bd3333' }}>
                                     {`מחק`}
+                                </Button>}
+
+                                {<Button key={v4()}
+                                    onClick={() => {
+                                        openDialogWithTitle(<div>
+                                            <h4 style={
+                                                {
+                                                    fontWeight: '12px',
+                                                    textAlign: 'center',
+                                                    padding: '8px',
+                                                }
+                                            }>{`אישור עסקאות להסעה ל ${props.event.eventName} מנקודת יציאה :  ${ride.rideStartingPoint}`}</h4></div>)
+                                        openDialog({
+                                            content: <div style={{ padding: '4px' }}><button
+                                                onClick={() => approveAllTransactions(ride.rideId)}
+                                                style={{
+                                                    padding: '4px',
+                                                    margin: '16px',
+                                                    minWidth: '100px',
+                                                    fontSize: '18px',
+                                                    background: 'linear-gradient(#44A08D,#093637)',
+                                                    color: SECONDARY_WHITE
+                                                }}>{'אשר עסקאות'}</button></div>, title: `אישור עסקאות להסעה לאירוע`
+                                        })
+                                    }}
+                                    style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: 'linear-gradient(#44A08D,#093637)' }}>
+                                    {`אשר עסקאות`}
                                 </Button>}
                             </th>
                         </tr>)}
@@ -373,7 +410,6 @@ export default function EventStatistics() {
                     }
                 }).catch(() => { cancelLoad(); openDialog({ content: <h2>{'אירעה שגיאה בהבאת המשתמשים'}</h2> }) })
         }
-
 
 
         return <div>  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
@@ -642,6 +678,21 @@ export default function EventStatistics() {
             }
         }
     }
+    const actionToggleEventShowsInGallery = () => {
+        if (event) {
+            const toShow = event.eventShowsInGallery === undefined || event.eventShowsInGallery === null || event.eventShowsInGallery === false
+            let newEvent = { ...event, eventShowsInGallery: !event.eventShowsInGallery }
+            doLoad()
+            setEvent(newEvent)
+            firebase.realTime.updateEvent(event.eventId, newEvent).then(result => {
+                cancelLoad()
+                alert(toShow ? 'אירוע נוסף לגלריה בהצלחה' : 'אירוע הוסר מהגלריה בהצלחה')
+            }).catch(problem => {
+                cancelLoad()
+                alert("אירעתה שגיאה בפעולה זו, אנא פנה למתכנת");
+            })
+        }
+    }
     return (event ? <PageHolder style={{ background: BLACK_ELEGANT, overflowX: 'hidden' }}>
         <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
         <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
@@ -707,6 +758,15 @@ export default function EventStatistics() {
                         }}
                         style={{ ...buttonStyle, ...{ background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
                         {'עריכת אירוע'}
+                        <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
+                    </Button>
+                }()}
+
+                {function toggleEventShowsInGallery() {
+                    return <Button
+                        onClick={actionToggleEventShowsInGallery}
+                        style={{ ...buttonStyle, ...{ background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
+                        {event.eventShowsInGallery ? 'הסר אירוע מגלריה' : 'הוסף אירוע לגלריה'}
                         <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
                     </Button>
                 }()}

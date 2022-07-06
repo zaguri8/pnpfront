@@ -1,4 +1,4 @@
-import { Input, FormControl, InputLabel, TextField } from "@mui/material"
+import { Input, FormControl, InputLabel, TextField, ListItemSecondaryAction } from "@mui/material"
 import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE, TOOLBAR_LOGIN } from '../../settings/strings'
 import { makeStyles } from "@mui/styles"
 import SectionTitle from "../SectionTitle"
@@ -11,7 +11,7 @@ import { Link } from "react-router-dom"
 import { useLanguage } from "../../context/Language"
 import { useLocation } from "react-router"
 import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
-import { submitButton } from "../../settings/styles"
+import { submitButton, textFieldStyle } from "../../settings/styles"
 import { useLoading } from "../../context/Loading"
 import { useState } from "react"
 export default function Login() {
@@ -19,38 +19,7 @@ export default function Login() {
     const nav = useNavigate()
     const location = useLocation()
     const { firebase } = useFirebase()
-    const useStyles = makeStyles(theme => ({
-        labelRoot: {
-            right: '-64px'
-
-        },
-        root: {
-            "& .MuiOutlinedInput-root": {
-                background: SECONDARY_WHITE,
-                borderRadius: '32px',
-                padding: '0px',
-                minWidth:'275px',
-                alignSelf:'center',
-                border: '.1px solid white',
-                color: PRIMARY_BLACK, ...{
-                    '& input[type=number]': {
-                        '-moz-appearance': 'textfield'
-                    },
-                    '& input[type=number]::-webkit-outer-spin-button': {
-                        '-webkit-appearance': 'none',
-                        margin: 0
-                    },
-                    '& input[type=number]::-webkit-inner-spin-button': {
-                        '-webkit-appearance': 'none',
-                        margin: 0
-                    }
-                }
-            }
-        },
-        shrink: {
-            transformOrigin: "top right"
-        }
-    }));
+    const useStyles = makeStyles(()=>textFieldStyle('black',{background:SECONDARY_WHITE,width:'100%'}))
     const { doLoad, cancelLoad } = useLoading()
 
     const [user, setUser] = useState({ u: '', p: '' })

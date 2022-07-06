@@ -35,7 +35,7 @@ export const FirebaseContextProvider = (props: object) => {
   const [appUser, setAppUser] = useState<PNPUser | null>(null)
   const [error, setError] = useState<Error | null>(null)
   const { cancelLoad, doLoad } = useLoading()
-  useEffect(() => {
+  useEffect(() => {  
     doLoad()
     const unsubscribe = auth.onAuthStateChanged((user) => {
       let unsub: Unsubscribe | null = null
@@ -44,6 +44,7 @@ export const FirebaseContextProvider = (props: object) => {
           const au = userFromDict(snap)
           setAppUser(au)
           setUser(user)
+          console.log("again")
           cancelLoad()
         }, () => { cancelLoad() })
       } else {

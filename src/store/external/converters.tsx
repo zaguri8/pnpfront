@@ -25,6 +25,7 @@ export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
     return {
         eventId: snap.child('eventId').val(),
         eventName: snap.child('eventName').val(),
+        eventShowsInGallery: snap.child('eventShowsInGallery').val(),
         eventProducerId: snap.child('eventProducerId').val(),
         eventCanAddRides: snap.child('eventCanAddRides').val(),
         eventDate: snap.child('eventDate').val(),
@@ -61,6 +62,7 @@ export const privateEventFromDict: (snap: DataSnapshot) => PNPPrivateEvent = (sn
     return {
         eventTitle: snap.child('eventTitle').val(),
         eventId: snap.child('eventId').val(),
+        eventShowsInGallery: snap.child('eventShowsInGallery').val(),
         registrationRequired: snap.child('registrationRequired').val(),
         eventWithGuests: snap.child('eventWithGuests').val(),
         eventWithPassengers: snap.child('eventWithPassengers').val(),
@@ -236,8 +238,7 @@ export function getEventTypeFromString(t: string) {
             break
         case "bars":
             type = 'ברים'
-            break
-
+            break;
         case "weddings":
             type = "חתונות"
             break

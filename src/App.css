@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-color:rgb(36,38,43);
+  background-color: var(--PRIMARY_BLACK);
   min-height: 100vh;
   justify-content: center;
   
@@ -25,15 +25,16 @@
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: white;
+  width:max-content;
   font-weight: 500;
   font-size: 16px;
-  text-align: center;
+  text-align: start;
   font-family: 'Open Sans Hebrew';
   opacity: 0.8; /* Firefox */
 }
 /*https://w.wallha.com/ws/3/NtFfA6ir.jpg*/
 .App-header {
-  background-color: #282c34;
+  background-color: var(--PRIMARY_BLACK);
   background: linear-gradient(
     rgba(0, 0, 0, 0.5),
     rgba(0, 0, 0, 0.5)
