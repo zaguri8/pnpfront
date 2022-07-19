@@ -137,21 +137,23 @@ export default function EventStatistics() {
 
 
     const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
-        const approveAllTransactions = (rideId: string) => {
+        const approveAllTransactions = (ride: PNPPublicRide) => {
             const send = {
-                rideId: rideId,
+                rideId: ride.rideId,
                 credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" }
             }
             closeDialog()
             setTimeout(() => {
                 doLoad()
                 axios.post('https://nadavsolutions.com/gserver/approveRideTransactions', send)
-                    .then(res => {
+                    .then(async res => {
+                        ride.extras.rideTransactionsConfirmed = true
+                        await firebase.realTime.updatePublicRide(props.event.eventId, ride.rideId, ride)
+                        cancelLoad()
                         alert(res.data.result)
-                        cancelLoad()
                     }).catch(e => {
-                        alert('אירעתה שגיאה בעת אישור העסקאות, אנא פנה למתכנת')
                         cancelLoad()
+                        alert('אירעתה שגיאה בעת אישור העסקאות, אנא פנה למתכנת')
                     })
             }, 50)
         }
@@ -232,7 +234,7 @@ export default function EventStatistics() {
                                                 }}>{'מחק'}</button></div>, title: `מחיקת הסעה לאירוע`
                                         })
                                     }}
-                                    style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: '#bd3333' }}>
+                                    style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: RED_ROYAL }}>
                                     {`מחק`}
                                 </Button>}
 
@@ -248,7 +250,8 @@ export default function EventStatistics() {
                                             }>{`אישור עסקאות להסעה ל ${props.event.eventName} מנקודת יציאה :  ${ride.rideStartingPoint}`}</h4></div>)
                                         openDialog({
                                             content: <div style={{ padding: '4px' }}><button
-                                                onClick={() => approveAllTransactions(ride.rideId)}
+                                                onClick={() => approveAllTransactions(ride)}
+                                                disabled={ride.extras.rideTransactionsConfirmed}
                                                 style={{
                                                     padding: '4px',
                                                     margin: '16px',
@@ -256,7 +259,7 @@ export default function EventStatistics() {
                                                     fontSize: '18px',
                                                     background: 'linear-gradient(#44A08D,#093637)',
                                                     color: SECONDARY_WHITE
-                                                }}>{'אשר עסקאות'}</button></div>, title: `אישור עסקאות להסעה לאירוע`
+                                                }}>{ride.extras.rideTransactionsConfirmed ? "עסקאות אושרו" : 'אשר עסקאות'}</button></div>, title: `אישור עסקאות להסעה לאירוע`
                                         })
                                     }}
                                     style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: 'linear-gradient(#44A08D,#093637)' }}>
@@ -285,8 +288,9 @@ export default function EventStatistics() {
                         hash[stat.rideStartPoint].amount += Number(stat.amount)
                         let exists = hash[stat.rideStartPoint].users.findIndex(uid => uid.uid === stat.uid)
                         if (exists != -1) {
-                            if (stat.extraPeople)
+                            if (stat.extraPeople && hash[stat.rideStartPoint].users[exists].extraPeople) {
                                 hash[stat.rideStartPoint].users[exists].extraPeople.push(...stat.extraPeople)
+                            }
                         } else
                             hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
                     }

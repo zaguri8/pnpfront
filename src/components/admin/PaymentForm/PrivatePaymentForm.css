@@ -1,0 +1,8 @@
+._private_payment_link_frame {
+    min-height: 500px;
+
+    min-width: 300px;
+    border-radius: 8px;
+    border: 2px solid whitesmoke;
+    box-shadow: 1px 1px 30px 20px rgb(38, 41, 49);
+}

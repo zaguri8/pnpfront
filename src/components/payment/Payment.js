@@ -23,6 +23,7 @@ import HTMLFromText from '../utilities/HtmlFromText'
 import { isValidPhoneNumber } from '../../utilities';
 export function PaymentForm({ product }) {
 
+
     const { lang } = useLanguage()
     const { closeDialog } = useLoading()
     const nav = useNavigate()
@@ -35,6 +36,7 @@ export function PaymentForm({ product }) {
     const requestPayment = () => {
         if (!firebase.auth.currentUser || !appUser) {
             nav('/login', { state: { cachedLocation: location.pathname } })
+            closeDialog()
             return
         }
 
@@ -91,6 +93,7 @@ export function PaymentForm({ product }) {
             twoWay: product.twoWay,
             eventDate: product.eventDate,
             rideTime: product.rideTime,
+            backTime: product.backTime,
             direction: product.direction
         }
 
@@ -99,6 +102,7 @@ export function PaymentForm({ product }) {
             credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" },
             product: payProduct
         }
+
         axios.post('https://nadavsolutions.com/gserver/paymentLink', send)
             .then(res => {
                 if (res.data.data) {
@@ -377,7 +381,9 @@ export function PaymentForm({ product }) {
 
                     <Link
                         onClick={() => { closeDialog() }}
-                        style={{ fontSize: '12px', paddingTop: '8px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/termsOfService'}>{TOS(lang)}</Link>
+                        state={{returnPage:`/event/${product.eventId}`}}
+                        style={{ fontSize: '12px', paddingTop: '8px', textDecoration: 'underline', color: SECONDARY_WHITE }}
+                        to={'/termsOfService'}>{TOS(lang)}</Link>
                 </Stack>
             </div>
         )

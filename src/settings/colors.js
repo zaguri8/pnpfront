@@ -1,5 +1,5 @@
 export const ORANGE_GRADIENT_SECONDARY = "linear-gradient(#bd3333,orangered,orange,orange)"
-export const TOOLBAR_COLOR = "rgb(36,38,43)"
+export const TOOLBAR_COLOR = "transparent"
 export const PRIMARY_BLACK = "rgb(29, 31, 34)"
 export const SECONDARY_BLACK = "rgb(65,68,82)"
 export const PRIMARY_WHITE = 'rgb(255,255,255)'
@@ -13,3 +13,5 @@ export const ORANGE_RED_GRADIENT_BUTTON = "linear-gradient(#e52d27,#b31217)"
 export const BLACK_ELEGANT = "linear-gradient(#282c34,black)"
 export const BLACK_ROYAL = "linear-gradient(#243B55,#141E30)"
 export const RED_ROYAL = "linear-gradient(#ef473a,#cb2d3e)"
+export const PRIMARY_ORANGE = "orange";
+export const PRIMARY_PINK = "#DC23B1";

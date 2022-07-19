@@ -1,14 +1,46 @@
+import { useLocation, useNavigate, useParams } from "react-router"
 import { useLanguage } from "../context/Language"
-import { PRIMARY_WHITE } from "../settings/colors"
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../settings/colors"
 import { TERMS_OF_SERVICE, SIDE } from "../settings/strings"
 import SectionTitle from "./SectionTitle"
 import { InnerPageHolder } from "./utilities/Holders"
-
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { textAlign } from "@mui/system"
+import { useEffect, useState } from "react"
 
 export default function TermsOfService() {
     const { lang } = useLanguage()
+    const nav = useNavigate()
+    const location = useLocation()
+
     return <div dir={SIDE(lang)} id='copyrights'>
         <SectionTitle title={TERMS_OF_SERVICE(lang)} style={{}} />
+        {location.state && <div style={{
+            position: 'fixed',
+            bottom: 16,
+            left: 16
+        }}><ArrowBackIosIcon style={{
+            color: SECONDARY_WHITE,
+            background: DARK_BLACK.replace('#ffc', '-120deg,#ffc'),
+            borderRadius: '50%',
+            display: 'flex',
+            fontSize: '30px',
+            alignItems: 'center',
+            opacity: '0.9',
+            cursor: 'pointer',
+            justifyContent: 'center',
+            padding: '8px',
+            paddingLeft: '10px',
+            textAlign: 'center'
+        }} onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1.0'
+            e.currentTarget.style.border = '.1px solid whitesmoke'
+        }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0.9'
+                e.currentTarget.style.border = 'none'
+            }}
+            onClick={() => location.state && (location.state as any).returnPage && nav((location.state as any).returnPage as any)} /></div>}
         <InnerPageHolder style={{ maxWidth: '65%', width: '65%', marginLeft: 'auto', marginRight: 'auto' }}>
 
             {lang === 'heb' ?
@@ -99,7 +131,7 @@ export default function TermsOfService() {
                     <p>	•	על תקנון זה יחולו אך ורק דיני מדינת ישראל, אולם לא תהיה תחולה לכללי ברירת הדין הבינלאומי הקבועים בהם.</p>
                     <p>	•	לבתי המשפט במחוז מרכז תהיה סמכות שיפוט ייחודית בכל עניין הנובע ו / או הקשור לתקנון זה.</p>
                     <p>	•	מדיניות פרטיות:</p>
-                    
+
                     <p>	•	האתר מכבד את פרטיות הלקוחות.</p>
                     <p>	•	האתר לא יעביר את פרטי לקוחותיו לצד ג׳ למעט עסקאות, ומידע סטטיסטי שלא כולל פרטים אישיים.</p>
                     <p>	•	על מנת לספק שירות איכותי, אנו עשויים להשתמש בנתונים האישיים שלך, ובין היתר, מידע על השימוש שלך באתר ומידע על המכשיר הנייד שלך  או המחשב("המידע הנאסף באתר").המידע הנאסף באתר עשוי לשמש את האתר לצרכים הבאים:</p>

@@ -1,0 +1,108 @@
+.eventDateLocation_ePage {
+    padding-bottom: 8px;
+    padding-right: 16px;
+    background: white;
+    color: var(--PRIMARY_BLACK);
+    margin-top: 0px;
+    direction: rtl;
+    font-size: 11px;
+    margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+    text-align: right;
+}
+
+.eventTime_ePage {
+    color: var(--PRIMARY_PINK);
+    font-size: 12px;
+    transform: translateY(4px);
+}
+
+.ride_item_button {
+
+    display: flex;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    flex-direction: column;
+    width: 100%;
+
+}
+
+.eventTimeSelected_ePage {
+    color: var(--PRIMARY_WHITE);
+    font-size: 12px;
+    transform: translateY(4px);
+    font-weight: bold;
+}
+
+.eventRideRowName_ePage {
+    font-size: 12px;
+    transform: translateY(4px);
+    font-family: 'Open Sans Hebrew';
+}
+
+.attention_ePage {
+    font-size: 11px;
+    color: var(--PRIMARY_PINK);
+}
+
+.attention_container {
+    padding: 16px;
+    border-top-left-radius: 4px;
+    text-align: start;
+    border-top-right-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.attention_container span {
+    font-size: 11px;
+    display: block;
+}
+
+.eventName_ePage {
+    margin: 0px;
+}
+
+.eventDetailsContainer_ePage {
+    display: flex;
+    border-radius: 16px;
+    color: var(--PRIMARY_ORANGE);
+    font-size: 11px;
+    text-align: end;
+    flex-direction: column;
+    margin: 0px;
+}
+.hide_bg_ePage {
+    background: white;
+    position: absolute;
+    width: 100%;
+    border-top: 4px solid white;
+    transform: translateY(-25px);
+    padding: 32px;
+}
+.eventRideListContainerWrapper_ePage {
+    font-family: 'Open Sans Hebrew';
+    display: flex;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.eventRideListContainer_ePage {
+    background: white;
+    z-index: 2000;
+    margin: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    width: 100%;
+}
+
+.cantSeeCity_ePage {
+    color: var(--PRIMARY_PINK);
+    font-weight: 500;
+    font-size: 12px;
+}

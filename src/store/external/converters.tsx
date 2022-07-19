@@ -1,7 +1,7 @@
 
 import { DataSnapshot } from "firebase/database"
-import { PNPUser, PNPEvent, PNPPrivateRide, PNPTransactionConfirmation, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest, RegisterFormExtras } from "./types"
-
+import { PNPUser, PNPEvent, PNPPrivateRide, PNPTransactionConfirmation, PNPRideConfirmation, PNPPublicRide, PNPPrivateEvent, PNPRideRequest, RegisterFormExtras, PCustomerData, PProductData } from "./types"
+import { PPaymentPageData } from './types'
 
 
 export const rideRequestFromDict: (snap: DataSnapshot) => PNPRideRequest = (snap) => {
@@ -20,6 +20,28 @@ export const rideRequestFromDict: (snap: DataSnapshot) => PNPRideRequest = (snap
         eventImageURL: snap.child('eventImageURL').val(),
     }
 
+}
+
+export const pPaymentPageDataFromDict: (snap: DataSnapshot) => PPaymentPageData = (snap) => {
+    return {
+        'payment_page_uid': snap.child('payment_page_uid').val(),//'4e7ad1b7-3ac6-4b3d-b138-2effa8a19ca0',
+        'expiry_datetime': snap.child('expiry_datetime').val(),// '30',
+        "refURL_success": snap.child('refURL_success').val(),//"https://nadavsolutions.com/gserver/pnp/transactions/add",
+        'more_info': snap.child('more_info').val(), //unique_transaction_live_id,
+        'customer': snap.child('customer').val(),
+        'items': snap.child('items').val(),
+        'amount': snap.child('amount').val(),
+        'payments': snap.child('payments').val(),
+        'currency_code': snap.child('currency_code').val(),
+        'sendEmailApproval': snap.child('sendEmailApproval').val(),
+        'sendEmailFailure': snap.child('sendEmailFailure').val()
+    }
+}
+export const pPaymentTransactionDataFromDict: (snap: DataSnapshot) => { customer: PCustomerData, product: PProductData } = (snap) => {
+    return {
+        'customer': snap.child('customer').val(),//'4e7ad1b7-3ac6-4b3d-b138-2effa8a19ca0',
+        'product': snap.child('product').val()
+    }
 }
 export const eventFromDict: (snap: DataSnapshot) => PNPEvent = (snap) => {
     return {

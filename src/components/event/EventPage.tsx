@@ -1,26 +1,30 @@
 import { AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion, Button } from "@mui/material"
-import React, { useEffect, useLayoutEffect, useState } from "react"
+import React, { CSSProperties, useEffect, useLayoutEffect, useState } from "react"
 import { useParams } from "react-router"
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import $ from 'jquery'
+import './EventPage.css'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import sold_out from '../../assets/images/sold_out.png'
 import { PageHolder } from "../utilities/Holders";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useFirebase } from "../../context/Firebase"
-import { ADDRESS, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT } from "../../settings/strings"
+import { ADDRESS, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT, EVENT_DETAILS } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { PaymentForm } from "../payment/Payment";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE, DARKER_BLACK_SELECTED, RED_ROYAL } from "../../settings/colors";
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE, DARKER_BLACK_SELECTED, RED_ROYAL, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { useNavigate, useLocation } from 'react-router'
 import { PNPPublicRide } from "../../store/external/types";
 import RideRequestForm from "../ride/RideRequestForm";
 import { Unsubscribe } from "firebase/database";
 import HTMLFromText from "../utilities/HtmlFromText";
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
     const [expanded, setExpanded] = useState<boolean>(false)
@@ -36,38 +40,40 @@ export default function EventPage() {
     const nav = useNavigate()
 
     const openRequestPaymentDialog = (ride?: PNPPublicRide) => {
-
         if (event) {
             openDialog({
-                content: <div style={{ padding: '32px', }}><PaymentForm
-                    product={{
-                        name: `${event.eventName}`,
-                        desc: event.eventDetails,
-                        ticketsLeft: ride && ride.extras.rideMaxPassengers ? (Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)) : (selectedEventRide && selectedEventRide.extras.rideMaxPassengers) ? (Number(selectedEventRide.extras.rideMaxPassengers) - Number(selectedEventRide.passengers)) : 1000,
-                        soldOut: ride ? ride.extras.rideStatus === 'sold-out' : selectedEventRide ? selectedEventRide.extras.rideStatus === 'sold-out' : false,
-                        startPoint: ride ? ride.rideStartingPoint : selectedEventRide ? selectedEventRide.rideStartingPoint : '',
-                        rideTime: ride ? ride.rideTime : selectedEventRide ? selectedEventRide.rideTime : '',
-                        backTime: ride ? ride.backTime : selectedEventRide ? selectedEventRide.backTime : '',
-                        exactStartPoint: ride && ride.extras.exactStartPoint ? ride.extras.exactStartPoint : selectedEventRide && selectedEventRide.extras.exactStartPoint ? selectedEventRide?.extras.exactStartPoint : null,
-                        exactBackPoint: ride && ride.extras.exactBackPoint ? ride.extras.exactBackPoint : selectedEventRide && selectedEventRide.extras.exactBackPoint ? selectedEventRide?.extras.exactBackPoint : null,
-                        direction: ride ? ride.extras.rideDirection : selectedEventRide?.extras.rideDirection, // 2 - first way , 1 second way
-                        twoWay: ride ? ride?.extras.twoWay : selectedEventRide ? selectedEventRide.extras.twoWay : '',
-                        price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
-                        eventId: event.eventId,
-                        eventDate: event.eventDate,
-                        rideId: ride ? ride.rideId : selectedEventRide ? selectedEventRide.rideId : ''
-                    }} /></div>
+                content: <div style={{ padding: '32px', }}>
+                    <PaymentForm
+                        product={{
+                            name: `${event.eventName}`,
+                            desc: event.eventDetails,
+                            ticketsLeft: ride && ride.extras.rideMaxPassengers ? (Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)) : (selectedEventRide && selectedEventRide.extras.rideMaxPassengers) ? (Number(selectedEventRide.extras.rideMaxPassengers) - Number(selectedEventRide.passengers)) : 1000,
+                            soldOut: ride ? ride.extras.rideStatus === 'sold-out' : selectedEventRide ? selectedEventRide.extras.rideStatus === 'sold-out' : false,
+                            startPoint: ride ? ride.rideStartingPoint : selectedEventRide ? selectedEventRide.rideStartingPoint : '',
+                            rideTime: ride ? ride.rideTime : selectedEventRide ? selectedEventRide.rideTime : '',
+                            backTime: ride ? ride.backTime : selectedEventRide ? selectedEventRide.backTime : '',
+                            exactStartPoint: ride && ride.extras.exactStartPoint ? ride.extras.exactStartPoint : selectedEventRide && selectedEventRide.extras.exactStartPoint ? selectedEventRide?.extras.exactStartPoint : null,
+                            exactBackPoint: ride && ride.extras.exactBackPoint ? ride.extras.exactBackPoint : selectedEventRide && selectedEventRide.extras.exactBackPoint ? selectedEventRide?.extras.exactBackPoint : null,
+                            direction: ride ? ride.extras.rideDirection : selectedEventRide?.extras.rideDirection, // 2 - first way , 1 second way
+                            twoWay: ride ? ride?.extras.twoWay : selectedEventRide ? selectedEventRide.extras.twoWay : '',
+                            price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
+                            eventId: event.eventId,
+                            eventDate: event.eventDate,
+                            rideId: ride ? ride.rideId : selectedEventRide ? selectedEventRide.rideId : ''
+                        }} /></div>
             })
         }
     }
 
+
+    const { setHeaderBackground } = useHeaderBackgroundExtension()
     useEffect(() => {
         doLoad()
 
 
+
+
         const resize = () => {
-
-
             if (window.innerWidth > 1100) {
                 $('.ride_item_button').css('width', '50%')
             }
@@ -85,6 +91,7 @@ export default function EventPage() {
         if (id) {
             u1 = firebase.realTime.getPublicEventById(id, (event) => {
                 setEvent(event as PNPEvent)
+                setHeaderBackground(`url('${event?.eventImageURL}') no-repeat center`)
                 cancelLoad()
                 resize()
             })
@@ -98,6 +105,7 @@ export default function EventPage() {
             window.removeEventListener('resize', resize);
             u1 && (u1 as Unsubscribe) && (u1 as Unsubscribe)()
             u2 && (u2 as Unsubscribe) && (u2 as Unsubscribe)()
+            setHeaderBackground('none');
         }
     }, [])
 
@@ -124,34 +132,40 @@ export default function EventPage() {
         const showLeft = ride.extras.rideStatus === 'running-out'
         const soldOut = left === 0
         const labelText = soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (showLeft ? left + (lang === 'heb' ? (' כרטיסים' + (left <= 10 ? ' אחרונים' : ' זמינים')) : ' Tickets Available') : (lang === 'heb' ? 'כרטיסים זמינים' : 'Tickets Available'))
-        return (<div className={'sold_out_item_label'} style={{
-            direction: 'rtl',
-            textAlign: 'end',
+        return (<div className={'sold_out_item_label'}
+            style={{
+                direction: 'rtl',
+                textAlign: 'center',
+                color: (showLeft && !soldOut) ? '#EE1229' : soldOut ? 'gray' : (selectedEventRide === ride ? PRIMARY_WHITE : PRIMARY_BLACK),
+                display: 'flex',
+                background: selectedEventRide === ride ? 'rgba(0,0,0,0.8)' : ride.extras.rideStatus === 'sold-out' ? `url(${sold_out})` : 'none',
 
-            color: (showLeft && !soldOut) ? '#EE1229' : soldOut ? 'gray' : SECONDARY_WHITE,
-            marginLeft: '2px',
-            fontWeight: 'bold',
-            padding: '2px',
-            fontSize: '12px'
-        }}>{labelText}</div>)
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderTopLeftRadius: '8px',
+                borderBottomLeftRadius: '8px',
+                border: '.1px solid lightgray',
+                fontSize: '12px'
+            }}>{labelText}</div>)
     }
 
 
     const RideRow = ({ ride }: { ride: PNPPublicRide }) => {
         return (<MenuItem
+            dir='rtl'
             onClick={() => {
                 handleSelectEventRide(ride)
             }} style={{
-
                 backgroundColor: (selectedEventRide !== ride) ? 'white' : ride.extras.rideStatus === 'sold-out' ? 'orange' : ' none',
                 width: '100%',
                 backgroundPosition: ride.extras.rideStatus === 'sold-out' && selectedEventRide !== ride ? '50% center' : 'center center',
                 backgroundRepeat: 'no-repeat',
-                backgroundImage: selectedEventRide === ride ? DARK_BLACK : ride.extras.rideStatus === 'sold-out' ? `url(${sold_out})` : 'none',
+                background: selectedEventRide === ride ? 'rgba(0,0,0,0.8)' : ride.extras.rideStatus === 'sold-out' ? `url(${sold_out})` : 'none',
                 backgroundSize: (ride.extras.rideStatus === 'sold-out' && (selectedEventRide !== ride)) ? '125px 50px' : '100%',
                 color: (selectedEventRide === ride ? 'white' : 'black'),
-                border: '.1px solid gray',
-                borderRadius: '4px',
+                border: '.1px solid lightgray',
+                borderTopRightRadius: '8px',
+                borderBottomRightRadius: '8px',
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 padding: '8px',
@@ -162,196 +176,162 @@ export default function EventPage() {
                 width: '100%',
                 columnGap: '8px'
             }}>
-                <DirectionsBusIcon /> <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>{ride.rideStartingPoint}</span>
+                <DirectionsBusIcon style={{ color: PRIMARY_ORANGE }} />
+                <span className={selectedEventRide === ride ? 'eventTimeSelected_ePage' : 'eventTime_ePage'}>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
+                <span className='eventRideRowName_ePage'>{ride.rideStartingPoint}</span>
 
             </div>
-            <span>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
+
         </MenuItem>)
     }
 
     const RidesList = () => {
         return <React.Fragment>
             {(eventRides.map(ride => {
-                return <div key={ride.rideId + ride.rideStartingPoint}>
-                    <RideRow ride={ride} />
+                return <Stack style={{ width: '90%', marginLeft: 'auto', marginRight: 'auto' }} direction={'row'} key={ride.rideId + ride.rideStartingPoint}>
                     <SoldOutLabel ride={ride} />
-                </div>
+                    <RideRow ride={ride} />
+                </Stack>
             }))}
         </React.Fragment>
     }
 
+    const noRidesStyle = {
+        direction: SIDE(lang),
+        background: 'none',
+        textAlign: 'center',
+        fontSize: '12px',
+        color: PRIMARY_BLACK,
+        fontFamily: 'Open Sans Hebrew',
+        width: '100%',
+        alignSelf: 'center'
+    } as CSSProperties
+
+    const noRidesStyle2 = {
+        paddingLeft: lang === 'heb' ? '4px' : '0px',
+        paddingRight: lang === 'heb' ? '0px' : '4px',
+        textDecoration: 'underline',
+        textUnderlinePosition: 'under',
+        cursor: 'pointer'
+    } as CSSProperties
+
+
+
+
+
+
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
-        <PageHolder >
-            <List id='ride_start_point_list' style={{ margin: '0px', padding: '0px', alignItems: 'center', width: '100%' }}>
-                {event.eventImageURL.length > 0 && <img
-                    id='event_image_eventpage'
-                    alt={event.eventName}
-                    style={{ marginTop: '-2px', padding: '0px', alignSelf: 'center', width: '100%' }}
-                    src={event.eventImageURL} />}
+        <React.Fragment><PageHolder style={{
+            background: 'white',
+            transform: 'translateY(-24px)',
+            borderTopLeftRadius: '32px',
+            borderTopRightRadius: '32px'
+        }}  >
+            <List id='ride_start_point_list' style={{
+                margin: '0px',
+                borderTopLeftRadius: '32px',
+                borderTopRightRadius: '32px',
+                padding: '0px',
+                alignItems: 'center',
+                width: '100%'
+            }}>
 
-
-                <div style={{
-                    fontFamily: 'Open Sans Hebrew',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <div className="ride_item_button" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-
-                        <Accordion style={{ background: PRIMARY_BLACK, margin: '0px', borderTopLeftRadius: '0px', borderTopRightRadius: '0px' }} expanded={true}>
-                            <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-                                <p style={{
-                                    textAlign: 'center',
-                                    width: '100%',
-                                    color: PRIMARY_WHITE,
-                                    margin: '0px'
-                                }}>
-                                    {SHOW_RIDE_SELECT(lang)}</p>
-                            </AccordionSummary>
-                            <AccordionDetails>
-
-                                <div dir={SIDE(lang)} style={{ border: '.1px solid whitesmoke', padding: '8px', borderTopLeftRadius: '4px', borderTopRightRadius: '4px', backgroundImage: 'linear-gradient(#282c34,black)', alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
-
-                                    <InfoRoundedIcon style={{ padding: '8px', cursor: 'pointer', width: '25px', height: '25px', alignSelf: 'center', color: 'white' }} />
-                                    <span style={{ padding: '8px', fontWeight: 'bold', color: PRIMARY_WHITE, alignSelf: 'center' }}>{ATTENTION(lang)}</span>
-                                    <div dir={SIDE(lang)} style={{ display: 'flex', flexDirection: 'row' }}>
-
-                                        <span style={{
-                                            maxWidth: '200px',
-                                            fontSize: '15.2px',
-                                            padding: '8px',
-                                            width: '50%',
-                                            color: PRIMARY_WHITE,
-                                            float: 'left'
-                                        }}>
+                <div className="eventRideListContainerWrapper_ePage">
+                    <div className="ride_item_button">
+                        <Stack style={{ background: 'white', padding: '8px', paddingTop: '12px', borderTopLeftRadius: '32px', borderTopRightRadius: '32px' }}
+                            alignItems='center'
+                            dir='rtl' direction="row">
+                            <div className="c_square_b" />
+                            <p className='eventName_ePage'>{event.eventName}</p>
+                        </Stack>
+                        <p className='eventDateLocation_ePage'>
+                            <CalendarTodayIcon style={{ width: '12px', height: '12px', color: PRIMARY_ORANGE }} /> <span>
+                                {event.eventDate + " " + event.eventHours.startHour}
+                            </span>
+                            <LocationOnIcon style={{ width: '12px', height: '12px', color: PRIMARY_ORANGE }} /> <span>{event.eventLocation}</span>
+                        </p>
+                        <div className='eventRideListContainer_ePage'>
+                            <div style={{ margin: '0px', padding: '0px' }}>
+                                <hr className="light_hline" />
+                                <div dir={SIDE(lang)} className="attention_container">
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: '2px' }}>
+                                        <span className='attention_ePage'>
+                                            {ATTENTION(lang)}</span>
+                                        <span >
                                             {event.eventAttention?.eventAttention1 === 'unset' ? BOTH_DIRECTIONS(lang) : event.eventAttention?.eventAttention1}
                                         </span>
-                                        <span style={{
-                                            maxWidth: '200px',
-                                            fontSize: '15.2px',
-                                            padding: '8px',
-                                            width: '50%',
-                                            color: PRIMARY_WHITE,
-                                            float: 'right'
-                                        }}>{
-                                                event.eventAttention?.eventAttention2 === 'unset' ? NO_DELAYS(lang) : event.eventAttention?.eventAttention2}
-                                        </span>
                                     </div>
+                                    {eventRides.find(e => e.extras.isRidePassengersLimited) &&
+                                        <span dir={SIDE(lang)}>
+                                            {'מספר המקומות מוגבל ל-50 הרוכשים הראשונים בכל הסעה'}
+                                        </span>}
                                 </div>
-
-                                {eventRides.find(e => e.extras.isRidePassengersLimited) && <Stack>
-
-                                    <label dir={SIDE(lang)} style={{ border: '.1px solid whitesmoke', borderBottomLeftRadius: '4px', fontWeight: 'bold', borderBottomRightRadius: '4px', fontSize: '14px', backgroundPosition: '0px 20px', background: RED_ROYAL, padding: '16px', color: SECONDARY_WHITE, textAlign: 'center' }}>{lang === 'heb' ? 'מספר המקומות מוגבל ל50 הרוכשים הראשונים בכל הסעה' : 'Places are limited to the first 50 buyers from each city'}</label>
-
-                                </Stack>}
-
-                                <div style={{ color: PRIMARY_WHITE, padding: '12px' }}>{STARTING_POINT(lang)}</div>
-                                {!isLoading && eventRides.length > 0 ? <Stack
-                                    style={{ width: '100%', rowGap: '8px' }}>
-                                    <RidesList />
-                                    <div style={{
-                                        display: event.eventCanAddRides ? 'flex' : 'none',
-                                        rowGap: '8px',
-                                        flexDirection: 'column'
-                                    }}> <AddCircleOutlineIcon
-                                            onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
-                                            color={'inherit'} style={{
-                                                cursor: 'pointer',
-                                                width: '50px',
-                                                color: SECONDARY_WHITE,
-                                                height: '50px',
-                                                alignSelf: 'center'
-                                            }} />
-                                        <span style={{ color: PRIMARY_WHITE }}>{CANT_SEE_YOUR_CITY(lang)}</span></div>
-
-                                </Stack> : event.eventCanAddRides && <div style={{
-                                    direction: SIDE(lang),
-                                    background: 'none',
-                                    textAlign: 'center',
-                                    color: SECONDARY_WHITE,
-                                    fontFamily: 'Open Sans Hebrew',
-                                    width: '100%',
-                                    alignSelf: 'center'
-                                }}>{lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'} <b
-                                    onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
-                                    style={{
-                                        paddingLeft: lang === 'heb' ? '4px' : '0px',
-                                        paddingRight: lang === 'heb' ? '0px' : '4px',
-                                        textDecoration: 'underline',
-                                        textUnderlinePosition: 'under',
-                                        cursor: 'pointer'
-                                    }}> {lang === 'heb' ? `כאן` : 'Here'}</b >{lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
+                                {!isLoading && eventRides.length > 0 ?
+                                    <Stack
+                                        style={{ width: '100%', rowGap: '8px' }}>
+                                        <RidesList />
+                                    </Stack> : event.eventCanAddRides &&
+                                    <div style={noRidesStyle}>{lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'}
+                                        <b onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
+                                            style={noRidesStyle2}> {lang === 'heb' ? `כאן` : 'Here'}
+                                        </b >
+                                        {lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
                                 <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : (lang === 'heb' ? 'המשך להזמנת כרטיסים' : 'Continue to order page')} arrow>
                                     <span>
                                         <Button onClick={() => openRequestPaymentDialog()}
                                             id="request_event_order"
                                             aria-haspopup disabled={selectedEventRide === null}
-                                            sx={{
+                                            style={{
                                                 ...submitButton(true), ...{
                                                     maxWidth: '250px',
+                                                    fontWeight: 'bold',
                                                     textTransform: 'none'
                                                 }
                                             }}> {ORDER(lang)}</Button>
                                     </span>
+
                                 </HtmlTooltip>
 
-                                <p style={{
-                                    padding: '0px',
-                                    margin: '0px',
-                                    fontSize: '12px',
-                                    color: SECONDARY_WHITE
-                                }}>
-                                    {lang === 'heb' ? 'בחר נקודת יציאה ולחץ על הכפתור למעבר למסך הזמנה' : 'Pick your desired start destination and click the button the continue'}</p>
-                            </AccordionDetails>
-                        </Accordion>
+                            </div>
+                            <span style={{ fontSize: '10px' }}>
+                                {NO_DELAYS(lang)}
+                            </span>
+                        </div>
                     </div>
 
                 </div>
-                <br />
-                <div className="ride_item_button" style={{ marginLeft: 'auto', marginRight: 'auto' }} >
-                    <div style={{ padding: '8px' }}>
+                <div className="ride_item_button" style={{
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
+                }} >
+                    <div style={{
+                        padding: '8px'
+                    }}>
 
-
-
-                        <div style={{ background: 'whitesmoke' }}>
-
-                            <p style={{
-                                fontSize: '32px',
-                                marginBottom: '0px',
-                                textAlign: 'right',
-                                padding: '16px',
-                                color: PRIMARY_WHITE,
-                                background: PRIMARY_BLACK
-                            }}>{event.eventName}</p></div>
-                        <p style={{
+                        <hr className="light_hline" />
+                        <div style={{
+                            display: event.eventCanAddRides ? 'flex' : 'none',
+                            rowGap: '8px',
                             padding: '8px',
-                            marginTop: '0px',
-                            color: SECONDARY_WHITE,
-                            marginBottom: '0px',
-                            background: PRIMARY_BLACK,
-                            textAlign: 'right'
-                        }}>{START_DATE(lang)}<span>{event.eventDate + " " + event.eventHours.startHour}</span></p>
-                        <p dir={SIDE(lang)} style={{
-                            background: PRIMARY_BLACK,
-                            padding: '8px',
-                            color: SECONDARY_WHITE,
-                            marginTop: '0px',
-                            marginBottom: '0px',
-                            textAlign: 'right'
-                        }}>{ADDRESS(lang)}<span>{event.eventLocation}</span></p>
-                        <div style={{ display: 'flex', borderRadius: '16px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: DARK_BLACK, margin: '0px' }}>
-                            <div aria-controls="panel1d-content" id="panel1d-header">
-                                <p style={{
-                                    alignSelf: 'center',
-                                    textAlign: 'right',
-                                    fontWeight: 'bold',
-                                    padding: '16px',
-                                    fontSize: '22px',
-                                    color: PRIMARY_WHITE,
-                                    margin: '0px'
-                                }}>
-                                    {lang === 'heb' ? 'פרטי אירוע' : 'Event Details'}</p>
-                            </div>
+                            flexDirection: 'column'
+                        }}> <AddCircleOutlineIcon
+                                onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
+                                style={{
+                                    cursor: 'pointer',
+                                    width: '50px',
+                                    color: 'white',
+                                    borderRadius: '32px',
+                                    background: PRIMARY_PINK,
+                                    height: '50px',
+                                    alignSelf: 'center'
+                                }} />
+                            <span className='cantSeeCity_ePage'>
+                                {CANT_SEE_YOUR_CITY(lang)}
+                            </span>
+                        </div>
+                        <hr className="light_hline" />
+                        <div className='eventDetailsContainer_ePage'>
+                            <label>{EVENT_DETAILS(lang)}</label>
                             <div>
                                 <HTMLFromText
                                     style={{ direction: 'rtl', color: PRIMARY_WHITE, padding: '16px' }}
@@ -364,5 +344,7 @@ export default function EventPage() {
                 </div>
             </List>
         </PageHolder >
+            <div className='hide_bg_ePage'/>
+        </React.Fragment>
     ) : null)
 }

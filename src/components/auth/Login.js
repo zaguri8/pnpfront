@@ -13,25 +13,27 @@ import { useLocation } from "react-router"
 import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { submitButton, textFieldStyle } from "../../settings/styles"
 import { useLoading } from "../../context/Loading"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 export default function Login() {
 
     const nav = useNavigate()
     const location = useLocation()
     const { firebase } = useFirebase()
-    const useStyles = makeStyles(()=>textFieldStyle('black',{background:SECONDARY_WHITE,width:'100%'}))
+    const useStyles = makeStyles(() => textFieldStyle('black', { background: SECONDARY_WHITE, width: '100%' }))
     const { doLoad, cancelLoad } = useLoading()
-
     const [user, setUser] = useState({ u: '', p: '' })
     function login(e) {
         e.preventDefault()
         doLoad()
         signInWithEmailAndPassword(firebase.auth, user.u, user.p)
             .then(() => {
-
-                if (location.state && location.state.cachedLocation)
-                    nav(location.state.cachedLocation)
-                else
+                if (location.state && location.state.cachedLocation) {
+                    doLoad()
+                    setTimeout(() => {
+                        nav(location.state.cachedLocation)
+                        cancelLoad()
+                    }, 100)
+                } else
                     nav('/')
             })
             .catch(err => {

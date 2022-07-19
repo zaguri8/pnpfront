@@ -1,6 +1,6 @@
 import { Auth, User } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras } from './types'
-import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary } from './converters'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData } from './types'
+import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
 import { DocumentData } from 'firebase/firestore'
@@ -44,12 +44,14 @@ export class Realtime {
     private auth: Auth
     private storage: FirebaseStorage
     private statistics: DatabaseReference
+    private privatePaymentPages: DatabaseReference
     private transactions: DatabaseReference
     private transactionConfirmations: DatabaseReference
     constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
         this.siteSettings = ref(db, '/settings')
         this.allEvents = ref(db, '/events')
         this.rides = ref(db, "/rides")
+        this.privatePaymentPages = ref(db, '/paymentPages/private')
         this.statistics = ref(db, '/statistics')
         this.users = ref(db, '/users')
         this.errs = ref(db, '/errors')
@@ -1149,6 +1151,27 @@ export class Realtime {
             }))
             if (!consumed) consume(null)
         })
+    }
+
+
+    async getPendingPrivateTransaction(customerEmail: string): Promise<{ customer: PCustomerData, product: PProductData }> {
+        const snapshot = await get(
+            child(this.privatePaymentPages, customerEmail.replaceAll('.', '').replaceAll('$', "").replaceAll('#', ''))
+        )
+        return pPaymentTransactionDataFromDict(snapshot)
+    }
+
+    async addPendingPrivateTransaction(customerEmail: string,
+        pTransaction: { customer: PCustomerData, product: PProductData }) {
+        return await set(
+            child(this.privatePaymentPages, customerEmail.replaceAll('.', '').replaceAll('$', "").replaceAll('#', '')),
+            pTransaction)
+    }
+
+    async removePendingPrivateTransaction(customerEmail: string) {
+        return await remove(
+            child(this.privatePaymentPages, customerEmail)
+        )
     }
 }
 

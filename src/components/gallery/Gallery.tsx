@@ -1,24 +1,24 @@
 import { CSSProperties, useEffect } from "react"
 import { v4 } from "uuid"
-import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { useNavigate } from 'react-router'
 import $ from 'jquery'
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import loadingGif from '../../assets/gifs/loading.gif'
 import { PNPEvent } from "../../store/external/types";
 import { useLanguage } from "../../context/Language";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import pin from '../../assets/images/pin-location.png'
 import './Gallery.css'
+import { Stack } from "@mui/material";
 export type GalleryProps = {
     header: string
     events: PNPEvent[]
+    privateEvents: PNPEvent[]
 }
 
-function GalleryItemTitle(props: { event: PNPEvent }) {
-
+function GalleryItemTitleOld(props: { event: PNPEvent }) {
     const { lang } = useLanguage()
-
-
-
     return (<div style={{
         margin: '0px',
         marginTop: 'auto',
@@ -34,8 +34,6 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
     }}><h4 style={{ margin: '0px', padding: '6px', paddingBottom: '0px', paddingTop: '2px' }} >{props.event.eventName}</h4>
         <span style={{ display: 'flex', alignItems: 'center', fontSize: '10px', background: 'none', margin: '0px', paddingBottom: '1px', paddingTop: '0px', marginRight: '8px' }} >
 
-            <img src={pin} style={{ paddingLeft: '2px', width: '12.5px', height: '12.5px' }} />
-
             {props.event.eventLocation}
 
         </span>
@@ -49,25 +47,57 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
 }
 
 
+const paragraphStyle = {
+    fontSize: '12px',
+    margin: '0px'
+} as CSSProperties
+function GalleryItemTitle(props: { event: PNPEvent }) {
+
+    return <div style={{
+        marginBottom: '8px',
+        minWidth:'fit-content',
+        transform: 'translateX(4px)'
+    }} className="gallery_item_decoration">
+        <Stack display="flex" direction={'row'} alignItems="center" >
+            <div className='c_square'></div>
+            <p style={paragraphStyle}>
+                {props.event.eventName}
+            </p>
+        </Stack>
+    </div>
+}
+function GalleryItemBottom(props: { event: PNPEvent }) {
+
+    const todayIconStyle = {
+        width: '12px',
+        height: '12px',
+        color: 'orange',
+        paddingLeft: '4px'
+    } as CSSProperties
+    const locationPinIconStyle = {
+        paddingLeft: '2px',
+        width: '12.5px',
+        color: 'orange',
+        height: '12.5px'
+    } as CSSProperties
+
+    return <div >
+        <Stack display={'flex'} alignItems={'flex-start'} className="gallery_item_decoration">
+
+            <p style={paragraphStyle}><CalendarTodayIcon style={todayIconStyle} />{props.event.eventDate} </p>
+            <p style={paragraphStyle}><LocationOnIcon className="img_pin_location" style={locationPinIconStyle} />{props.event.eventLocation}</p>
+        </Stack>
+    </div>
+}
+
+
 export function Gallery(props: GalleryProps) {
     const { lang } = useLanguage()
 
-    const cardStyle: CSSProperties = {
 
-        maxWidth: '225px',
-        border: '.1px solid gray',
-        marginLeft: '8px',
-        marginRight: '8px',
-        minWidth: '225px',
-        minHeight: '190px',
-        borderRadius: '16px',
-
-        background: 'white'
-    }
     const imageContainer: CSSProperties = {
         display: 'flex',
         width: 'fit-content',
-        padding: '8px',
         textAlign: 'center'
     }
     const headerStyle: CSSProperties = {
@@ -77,35 +107,34 @@ export function Gallery(props: GalleryProps) {
         position: 'relative',
         border: '1px solid solid black',
         padding: '32px',
-        fontSize: '28px',
+        transform:'translateY(10px)',
+        paddingBottom:'0px',
+        fontSize: '16px',
         margin: '0px',
-        color: PRIMARY_WHITE
+        color: PRIMARY_ORANGE
     }
-    // POPUP VERSION //const dialogContext = useLoading()
-    // PAGE VERSION
+
     const nav = useNavigate()
     const handleOpen = (pnpEvent: PNPEvent) => {
-        // POPUP VERSION:   // dialogContext.openDialog({
-        //     content: <ListItem>
-        //         <img src={pnpEvent.eventImageURL} />
-        //     </ListItem>, title: pnpEvent.eventName
-        // })
-        // PAGE VERSION
         nav(`/event/${pnpEvent.eventId}`)
 
     }
-
-
+    const refactorEventIdForGalleryItem = (eventId: string) => {
+        return eventId.replaceAll(' ', '').replaceAll('-', '').replaceAll('_', '')
+    }
     useEffect(() => {
         setTimeout(() => {
             $('.loadingDivStyle').css('display', 'none')
         }, 550)
 
-        let clear = setInterval(() => {
-                $('gallery').scroll(() => {
-
-                },)
-        }, 1)
+        props.events.forEach(event => {
+            const trimmed = refactorEventIdForGalleryItem(event.eventId);
+            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventImageURL}')`)
+        })
+        props.privateEvents.forEach(event => {
+            const trimmed = refactorEventIdForGalleryItem(event.eventId);
+            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventImageURL}')`)
+        })
     }, [])
 
 
@@ -117,35 +146,45 @@ export function Gallery(props: GalleryProps) {
         backgroundSize: 'cover',
         height: '100%'
     }
-    return <div>
-        {<h2 className='gallery_header' style={headerStyle}>{props.header}</h2>}
+    return <div >
+        {<h3 className='gallery_header' style={headerStyle}>{props.header}</h3>}
         <div id='gallery_container' >
-            <div className='gallery' style={imageContainer} data-options="mode: carousel; height: 275px;">
+            <div className='gallery' style={imageContainer} >
 
                 {props.events.map(pnpEvent => {
-
-                    return (<div key={v4()}
-                        style={{
-                            ...cardStyle, ...{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                boxShadow: 'rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px',
-                                cursor: 'pointer',
-                                backgroundClip: 'border-box',
-                                backgroundColor: 'white',
-                                background: `url('${pnpEvent.eventImageURL}') `,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center center',
-                                backgroundRepeat: 'no-repeat',
-                            }
-                        }}
-                        className="gallery_img"
-                        onClick={() => handleOpen(pnpEvent)}>
-                        <div className='loadingDivStyle'
-
-                            style={loadingDivStyle} />
+                    return (<div key={v4()} style = {{transform:'scale(0.82)'}}>
                         <GalleryItemTitle event={pnpEvent} />
+                        <div
+                            className="gallery_img"
+                            id={`gallery_img_${refactorEventIdForGalleryItem(pnpEvent.eventId)}`}
+                            onClick={() => handleOpen(pnpEvent)}>
+                            <div className='loadingDivStyle'
+                                style={loadingDivStyle} />
+                            {/*<GalleryItemTitle event={pnpEvent} />*/}
 
+                        </div>
+                        <GalleryItemBottom event={pnpEvent} />
+                    </div>)
+                })}
+            </div>
+        </div>
+        {<h3 className='gallery_header' style={headerStyle}>{lang === 'heb' ? 'אירועים פרטיים' : 'Private event'}</h3>}
+        <div id='gallery_container' >
+            <div className='gallery' style={imageContainer}>
+
+                {props.privateEvents.map(pnpEvent => {
+                    return (<div key={v4()} style = {{transform:'scale(0.82)'}}>
+                        <GalleryItemTitle event={pnpEvent} />
+                        <div
+                            className="gallery_img"
+                            id={`gallery_img_${refactorEventIdForGalleryItem(pnpEvent.eventId)}`}
+                            onClick={() => handleOpen(pnpEvent)}>
+                            <div className='loadingDivStyle'
+                                style={loadingDivStyle} />
+                            {/*<GalleryItemTitle event={pnpEvent} />*/}
+
+                        </div>
+                        <GalleryItemBottom event={pnpEvent} />
                     </div>)
                 })}
             </div>

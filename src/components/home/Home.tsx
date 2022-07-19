@@ -17,7 +17,7 @@ import { useLanguage } from "../../context/Language"
 import About from "../About"
 import { InnerPageHolder } from "../utilities/Holders"
 import { Link } from "react-router-dom"
-import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import Spacer from "../utilities/Spacer"
 import { getEventType, getEventTypeFromString, getEventTypePriority } from "../../store/external/converters"
 import { v4 } from "uuid"
@@ -25,19 +25,27 @@ import { dateStringFromDate } from "../utilities/functions"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
 import ImageSlider from "../imageslider/ImageSlider"
+import logo from '../../assets/images/header.jpeg'
+import Footer from "../footer/Footer"
+import { useHeaderBackgroundExtension, useHeaderContext } from "../../context/HeaderContext"
 export default function Home() {
     const { user, firebase } = useFirebase()
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
     const { isCacheValid, cacheDone } = useCookies()
     const [selectedEventsForSlider, setSelectedEventsForSlider] = useState<PNPEvent[] | undefined>()
 
+    const {setIsShowingAbout} = useHeaderContext()
+    const { setHeaderBackground } = useHeaderBackgroundExtension()
     useEffect(() => {
+
+        setHeaderBackground(`url('${logo}')`)
+        setIsShowingAbout(true);
         const unsubEvents = firebase.realTime.addListenerToPublicEvents((events) => {
             const ev = Object.values(events)
             let filtered: PNPEvent[] = []
             for (let events of ev)
                 filtered.push(...events.filter(item => item.eventShowsInGallery))
-            
+
             setSelectedEventsForSlider(filtered)
             setPnpEvents(events)
         }, false)
@@ -51,7 +59,11 @@ export default function Home() {
             })
         }
 
-        return () => unsubEvents()
+        return () =>  { 
+            unsubEvents()
+            setHeaderBackground(PRIMARY_BLACK)
+            setIsShowingAbout(false)
+        }
     }, [])
 
 
@@ -75,10 +87,14 @@ export default function Home() {
         if (pnpEvents) {
             let allEvents = Object.entries(pnpEvents)
             allEvents.sort((x, y) => getEventTypePriority(x[0]) - getEventTypePriority(y[0]))
-            return (allEvents.map(k => <Gallery
+            let output = allEvents.reduce((prev, nextEntry) => prev.concat(...nextEntry[1]), [] as PNPEvent[])
+            let outputEvents = output.filter(event => event.eventType !== 'private events' && event.eventType !== 'weddings') 
+            let outputPrivateEvents = output.filter(event => event.eventType === 'private events' || event.eventType === 'weddings')
+            return <Gallery
                 key={v4()}
-                events={k[1]}
-                header={lang === 'heb' ? getEventTypeFromString(k[0]) : k[0].slice(0, 1).toUpperCase() + k[0].substring(1)} />))
+                events={outputEvents}
+                privateEvents={outputPrivateEvents}
+                header={lang ==='heb' ?  "אירועים אחרונים" : 'Latest Events'} />
         } else {
             return null;
         }
@@ -86,11 +102,10 @@ export default function Home() {
 
     return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
         {/* <RideFormPreview /> */}
-        {selectedEventsForSlider && <ImageSlider events={selectedEventsForSlider} />}
+        {/*{selectedEventsForSlider && <ImageSlider events={selectedEventsForSlider} />}*/}
         <ArrowScrollUp />
         {getEventsGallery()}
-        <Spacer offset={4} />
-        <SectionTitle withBg style={{
+        {/* <SectionTitle withBg style={{
             padding: '32px',
             fontWeight: 'bold',
             marginTop: '0px',
@@ -101,13 +116,12 @@ export default function Home() {
             background: 'none',
             alignSelf: 'center',
             fontSize: '38px'
-        }} title={'We Say No More!'} />
-        <br />
+        }} title={'We Say No More!'} /> */}
+      
         <SayNoMoreContainer />
-
-        <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} />
-        <WhyUsContainer />
-        <SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
+        {/* <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} /> */}
+        {/*<WhyUsContainer />*/}
+        {/*<SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
         <InnerPageHolder style={{
             marginLeft: 'auto',
             marginRight: 'auto',
@@ -117,9 +131,12 @@ export default function Home() {
         }}>
 
 
-            <About />
-        </InnerPageHolder>
-        <Link style={{ paddingTop: '32px', paddingBottom: '24px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/termsOfService'}>{TOS(lang)}</Link>
+        <About />
+        </InnerPageHolder>*/}
+        {/* <Link
+            state={{ returnPage: '/' }}
+            style={{ paddingTop: '32px', paddingBottom: '24px', textDecoration: 'underline', color: SECONDARY_WHITE }}
+            to={'/termsOfService'}>{TOS(lang)}</Link> */}
 
     </div>
 }

@@ -10,23 +10,26 @@ import { GoogleMapsContextProvider } from './context/GoogleMaps';
 import { LanguageContextProvider } from './context/Language';
 import { ScanningContextProvider } from './context/ScannerContext';
 import { CookieContextProvider } from './context/CookieContext';
+import { HeaderContextProvider } from './context/HeaderContext';
 
 
 ReactDOM.render(
   <HashRouter>
-    <LanguageContextProvider>
-      <GoogleMapsContextProvider>
-        <LoadingContextProvider>
-          <FirebaseContextProvider>
-            <ScanningContextProvider>
-              <CookieContextProvider>
-                <App />
-              </CookieContextProvider>
-            </ScanningContextProvider>
-          </FirebaseContextProvider>
-        </LoadingContextProvider>
-      </GoogleMapsContextProvider>
-    </LanguageContextProvider>
+    <HeaderContextProvider>
+      <LanguageContextProvider>
+        <GoogleMapsContextProvider>
+          <LoadingContextProvider>
+            <FirebaseContextProvider>
+              <ScanningContextProvider>
+                <CookieContextProvider>
+                  <App />
+                </CookieContextProvider>
+              </ScanningContextProvider>
+            </FirebaseContextProvider>
+          </LoadingContextProvider>
+        </GoogleMapsContextProvider>
+      </LanguageContextProvider>
+    </HeaderContextProvider>
   </HashRouter>,
   document.getElementById('root')
 );

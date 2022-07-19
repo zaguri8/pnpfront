@@ -1,7 +1,7 @@
 import './SearchRide.css'
 import { InnerPageHolder, PageHolder } from '../utilities/Holders'
 import { Input, Stack, TextField, MenuItem } from '@mui/material'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import { useEffect, useState } from 'react'
 import { PNPPublicRide } from '../../store/external/types'
 import { useLoading } from '../../context/Loading'
@@ -29,6 +29,7 @@ export default function SearchRide() {
     const { firebase, appUser } = useFirebase()
 
 
+
     useEffect(() => {
         doLoad()
         firebase.realTime.addListersForRideSearch(rides => {
@@ -36,6 +37,9 @@ export default function SearchRide() {
             cancelLoad()
         }, () => { cancelLoad() })
 
+        if (location.state) {
+            setSearchQuery(location.state as string)
+        }
     }, [])
 
 
@@ -47,12 +51,12 @@ export default function SearchRide() {
         const filterFunction = () => {
             const isValid = (ride: PNPPublicRide) => !ride.extras.rideStatus || ride.extras.rideStatus !== 'sold-out'
             if (searchQuery && secondQuery) {
-                return rides!.filter(ride => ride.rideDestination.includes(searchQuery) &&
+                return rides!.filter(ride => ride.rideDestination.toLowerCase().includes(searchQuery.toLowerCase()) &&
                     ride.rideStartingPoint.includes(secondQuery) && isValid(ride))
             } else if (searchQuery) {
-                return rides!.filter(ride => (ride.rideDestination.includes(searchQuery)) && isValid(ride))
+                return rides!.filter(ride => (ride.rideDestination.toLowerCase().includes(searchQuery.toLowerCase())) && isValid(ride))
             } else if (secondQuery) {
-                return rides!.filter(ride => ride.rideStartingPoint.includes(secondQuery) && isValid(ride))
+                return rides!.filter(ride => ride.rideStartingPoint.toLowerCase().includes(secondQuery.toLowerCase()) && isValid(ride))
             }
             return []
         }
@@ -95,8 +99,9 @@ export default function SearchRide() {
                         }}
                         style={{
                             background: 'white',
-                            width: '100%',
-                            maxWidth: '400px',
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
+                            width: '350px',
                             color: 'black',
                             border: '.1px solid gray',
                             borderRadius: '4px',
@@ -105,17 +110,13 @@ export default function SearchRide() {
                         }} value={ride.rideId}>
                         <div style={{
                             display: 'flex',
-                            width: '100%',
                             columnGap: '8px'
                         }}>
-                            <DirectionsBusIcon /> <span style={{ fontSize: '12px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>
+                            <DirectionsBusIcon /> <span style={{ fontSize: '10px', fontWeight: 'bold', fontFamily: 'Open Sans Hebrew' }}>
                                 {ride.rideStartingPoint + " :  " + ride.rideDestination}</span>
                         </div>
-                        {window.outerWidth > 400 && <span style={{ paddingLeft: '32px', fontSize: '10px' }}>{ride.rideTime}</span>}
-
 
                     </MenuItem>
-
                         <SoldOutLabel ride={ride} />
                     </React.Fragment>)
                 }
@@ -149,8 +150,8 @@ export default function SearchRide() {
                             marginTop: '16px',
                             borderRadius: '32px',
                             outline: 'none',
-                            color: PRIMARY_WHITE,
-                            background: DARK_BLACK
+                            color: PRIMARY_BLACK,
+                            background: PRIMARY_WHITE
                         }
                     }
                     color={'primary'}
@@ -175,8 +176,8 @@ export default function SearchRide() {
                             marginTop: '16px',
                             borderRadius: '32px',
                             outline: 'none',
-                            color: PRIMARY_WHITE,
-                            background: DARK_BLACK
+                            color: PRIMARY_BLACK,
+                            background: PRIMARY_WHITE
                         }
                     }
                     color={'primary'}
@@ -189,7 +190,7 @@ export default function SearchRide() {
         </Stack>
 
         <SectionTitle title={lang === 'heb' ? 'תוצאות' : 'Search results'} style={{ fontSize: '32px' }} />
-        <InnerPageHolder style={{ width: '60%' }}>
+        <InnerPageHolder style={{ width: '80%', background: 'none', border: 'none' }}>
             {rides && <Results />}
         </InnerPageHolder>
     </PageHolder>

@@ -74,6 +74,7 @@ export function getDefaultPublicRide(event?: PNPEvent | null, lang?: string): PN
         extras: {
             isRidePassengersLimited: true,
             rideStatus: 'on-going',
+            rideTransactionsConfirmed:false,
             rideMaxPassengers: '54',
             twoWayOnly: false,
             twoWay: true,
@@ -99,6 +100,7 @@ export function getDefaultPublicRide2(event?: PNPPrivateEvent | null, lang?: str
             isRidePassengersLimited: true,
             rideStatus: 'on-going',
             rideMaxPassengers: '54',
+            rideTransactionsConfirmed:false,
             twoWayOnly: false,
             twoWay: true,
             rideDirection: '2',

@@ -23,7 +23,7 @@ import MyCoins from "./MyCoins"
 function MyAccountItem({ title, icon, navTo, underCons }) {
     const nav = useNavigate()
     const { openUnderConstruction } = useLoading()
-    const {lang} = useLanguage()
+    const { lang } = useLanguage()
     return (<Button onClick={() => underCons ? openUnderConstruction(lang) : nav(navTo)} className='my_account_item' sx={{
         backgroundImage: DARK_BLACK,
         borderRadius: '12.5px',
@@ -57,6 +57,8 @@ export default function MyAccount() {
     const { lang } = useLanguage()
     const { signOut, appUser } = useFirebase()
     const { openDialog, closeDialog } = useLoading()
+
+   
     useEffect(() => {
         function resize() {
             const currentWidth = window.innerWidth
@@ -86,14 +88,7 @@ export default function MyAccount() {
         fontFamily: 'Open Sans Hebrew', ...any
     })
     const [bgSpace, setBgSpace] = useState('200px bottom')
-    return (<PageHolder style={{
-
-        backgroundImage: `url(${bus})`,
-        backgroundSize: 'contain',
-        transition: '.5s linear',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: bgSpace,
-    }}>
+    return (<PageHolder>
 
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder style={{

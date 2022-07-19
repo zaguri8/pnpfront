@@ -14,10 +14,6 @@ export default function ImageSlider(props) {
     const slide = () => { setShowingEvent(Math.floor(Math.random() * props.events.length)) }
 
     useEffect(() => {
-        console.log(props.events[showingEvent])
-    }, [showingEvent])
-
-    useEffect(() => {
         let slidingInterval = setInterval(slide, 7000)
         return () => clearInterval(slidingInterval)
     }, [])

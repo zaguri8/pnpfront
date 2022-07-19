@@ -165,7 +165,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
             width: '300px',
             position: 'fixed',
             right: '0',
-            zIndex: '10000',
+            zIndex: '10030',
         },
         ...flex('column', 'center'),
         ...{ background: PRIMARY_BLACK }

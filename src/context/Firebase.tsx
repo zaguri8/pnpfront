@@ -24,7 +24,7 @@ export interface IFirebaseContext {
   user: User | undefined | null;
   appUser: PNPUser | null;
   error: Error | null;
-  setUser: (user: User | null) => void;
+  setUser: (user: User | null | undefined) => void;
   setAppUser: (user: PNPUser | null) => void;
 }
 const FirebaseContext = React.createContext<IFirebaseContext | null>(null);
@@ -35,7 +35,7 @@ export const FirebaseContextProvider = (props: object) => {
   const [appUser, setAppUser] = useState<PNPUser | null>(null)
   const [error, setError] = useState<Error | null>(null)
   const { cancelLoad, doLoad } = useLoading()
-  useEffect(() => {  
+  useEffect(() => {
     doLoad()
     const unsubscribe = auth.onAuthStateChanged((user) => {
       let unsub: Unsubscribe | null = null
@@ -44,7 +44,6 @@ export const FirebaseContextProvider = (props: object) => {
           const au = userFromDict(snap)
           setAppUser(au)
           setUser(user)
-          console.log("again")
           cancelLoad()
         }, () => { cancelLoad() })
       } else {
@@ -73,6 +72,7 @@ export const useFirebase = () => {
       return await auth.signOut()
     },
     freeDbRef: getDatabase(app),
+    isLoadingAuth: firebaseContext?.user === undefined,
     isAuthenticated: firebaseContext?.user != null,
     uploadUserImage: async (imageBlob: ArrayBuffer) => {
       if (firebaseContext?.user?.uid) {

@@ -1,4 +1,4 @@
-import { DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_WHITE } from "./colors"
+import { DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, PRIMARY_PINK, SECONDARY_WHITE } from "./colors"
 
 export const bgColor = (color, size) => {
     return {
@@ -12,13 +12,13 @@ export const submitButton = (margin) => {
     return {
         fontFamily: 'Open Sans Hebrew',
         color: 'white',
-        fontSize: '22px',
+        fontSize: '16px',
         margin: margin ? '16px' : 'inherit',
         padding: margin ? '12px' : 'inherit',
         width: '50%',
         alignSelf: 'center',
         borderRadius: '4px',
-        backgroundImage: DARKER_BLACK_SELECTED
+        background: PRIMARY_PINK
     }
 }
 export const fullSubmitButton = { ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }

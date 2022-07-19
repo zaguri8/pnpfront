@@ -22,7 +22,6 @@ export type PNPTransactionConfirmation = {
 }
 
 // TODO : Add Ride Status 20/03/22
-
 export type PNPPublicRide = {
     rideId: string
     eventId: string
@@ -38,6 +37,7 @@ export type PNPPublicRide = {
 
 export type PNPRideExtras = {
     isRidePassengersLimited?: boolean
+    rideTransactionsConfirmed: boolean
     rideStatus?: 'on-going' | 'sold-out' | 'running-out'
     rideMaxPassengers?: string
     rideDirection: '2' | '1' // 1 - from event, 2 - to event
@@ -194,3 +194,32 @@ export type RegisterFormExtras = {
     requireBirthDate: boolean
     requireFavoriteEvents: boolean
 }
+
+
+
+export type PCustomerData = {
+    'customer_name': string,
+    'email': string,
+    'phone': string
+}
+export type PProductData = {
+    'name': string
+    'quantity': number,
+    'price': number
+}
+
+
+
+export type PPaymentPageData = {
+    'payment_page_uid': string//'4e7ad1b7-3ac6-4b3d-b138-2effa8a19ca0',
+    'expiry_datetime': string// '30',
+    "refURL_success": string//"https://nadavsolutions.com/gserver/pnp/transactions/add",
+    'more_info': string //unique_transaction_live_id,
+    'customer': PCustomerData,
+    'items': PProductData[],
+    'amount': number,
+    'payments': number,
+    'currency_code': string,
+    'sendEmailApproval': boolean,
+    'sendEmailFailure': boolean
+};

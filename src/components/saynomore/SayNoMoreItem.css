@@ -2,10 +2,35 @@
     display: flex;
     width:100%;
     overflow: scroll;
-    padding-top: 32px;
-    padding-bottom: 32px;
+    background: linear-gradient(45deg,
+        rgb(235, 21, 164),
+        rgb(235, 21, 164),
+        rgb(221, 71, 96),
+        rgb(236, 112, 18),
+        rgb(236, 112, 18)
+    );
+    text-align: center;
+    justify-content: center;
     position: relative;
-    flex-direction: row;
+    flex-direction: column;
+}
+#say_no_more_container p {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 8px;
+    margin-top: 16px;
+    font-family:sans-serif;
+}
+#exchanging_text_wsnm {
+    transition: .3s linear;
+    direction: rtl;
+}
+#say_no_more_container span {
+    color:var(--PRIMARY_WHITE);
+    padding: 4px;
+    font-family: 'Open Sans Hebrew';
+    font-weight: bold;
+    transform: translateY(-6px);
 }
 
 .say_no_more_item {

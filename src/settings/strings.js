@@ -93,7 +93,7 @@ export const START_DATE = (lang) => lang === 'heb' ? 'מועד התחלה: ' : '
 export const ADDRESS = (lang) => lang === 'heb' ? 'כתובת: ' : 'Address: '
 export const TICKET_PRICE = (lang) => lang === 'heb' ? 'מחיר כרטיס' : 'Ticket Price'
 export const EVENT_DETAILS = (lang) => lang === 'heb' ? 'פרטי אירוע' : 'Event Details: '
-export const ORDER = (lang) => lang === 'heb' ? 'עבור להזמנה' : 'Order Tickets'
+export const ORDER = (lang) => lang === 'heb' ? 'עברו להזמנה' : 'Order Tickets'
 export const CURRENCY = (lang) => lang === 'heb' ? `ש"ח` : 'NIS'
 export const AGES = (lang) => lang === 'heb' ? 'גילאים' : 'Ages'
 export const CLOSE = (lang) => lang === 'heb' ? 'סגור' : 'Close'
@@ -121,11 +121,11 @@ export const WHY_US_ITEM_6_TITLE = (lang) => lang === 'heb' ? 'מערכת יחס
 export const WHY_US_ITEM_6_CONTENT = (lang) => lang === 'heb' ? 'בכל נסיעה תצברו נקודה, ולאחר 5 נקודות תוכלו לממש אותן ולקבל נסיעה חינם!' : 'Each ride you take, you gain points too use in your next rides!'
 
 
-export const NO_MORE_ITEM_1 = (lang) => lang === 'heb' ? 'נהג תורן' : 'Duty Driver'
-export const NO_MORE_ITEM_2 = (lang) => lang === 'heb' ? 'חניונים במחירים מטורפים' : 'Expensive parking lots'
+export const NO_MORE_ITEM_1 = (lang) => lang === 'heb' ? 'לנהג תורן' : 'Duty Driver'
+export const NO_MORE_ITEM_2 = (lang) => lang === 'heb' ? 'לחניונים במחירים מטורפים' : 'Expensive parking lots'
 export const NO_MORE_ITEM_3 = (lang) => lang === 'heb' ? 'drink & drive' : 'drink & drive'
-export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'מוניות יקרות' : 'Expensive cabs'
-export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'מחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'
+export const NO_MORE_ITEM_4 = (lang) => lang === 'heb' ? 'למוניות יקרות' : 'Expensive cabs'
+export const NO_MORE_ITEM_5 = (lang) => lang === 'heb' ? 'למחסור בדרכי הגעה בלילות וסופי שבוע' : 'Lack of arriving ways on weekends'
 
 export const CREATE_EVENT_TITLE = (lang) => lang === 'heb' ? 'צור/י אירוע' : 'Create'
 export const CREATE_INVITATION_TITLE = (lang) => lang === 'heb' ? 'צור/י הזמנה' : 'Create Invitation'
@@ -135,6 +135,7 @@ export const EVENT_ADDRESS = (lang) => lang === 'heb' ? 'כתובת האירוע
 export const EVENT_START = (lang) => lang === 'heb' ? 'תחילת האירוע' : 'Event start date'
 export const EVENT_END = (lang) => lang === 'heb' ? 'סיום האירוע' : 'Event end date'
 
+export const WITHUS = (lang) => lang === 'heb' ? 'צאו איתנו לדרך!' : "Ride along with us!"
 export const EVENT_START_2 = (lang) => lang === 'heb' ? 'תחילת האירוע (מלל חופשי)' : 'Event start date (Free text)'
 export const EVENT_END_2 = (lang) => lang === 'heb' ? 'סיום האירוע (מלל חופשי)' : 'Event end date (Free text)'
 export const EVENT_DATE = (lang) => lang === 'heb' ? 'תאריך האירוע' : 'Event Date'
