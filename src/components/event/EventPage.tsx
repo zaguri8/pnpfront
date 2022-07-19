@@ -344,7 +344,6 @@ export default function EventPage() {
                 </div>
             </List>
         </PageHolder >
-            <div className='hide_bg_ePage'/>
         </React.Fragment>
     ) : null)
 }

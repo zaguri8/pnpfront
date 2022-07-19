@@ -4,6 +4,7 @@ import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, 
 import { useNavigate } from 'react-router'
 import $ from 'jquery'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+
 import loadingGif from '../../assets/gifs/loading.gif'
 import { PNPEvent } from "../../store/external/types";
 import { useLanguage } from "../../context/Language";
