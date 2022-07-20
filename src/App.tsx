@@ -63,9 +63,9 @@ function ImageHeader() {
   const useStyles = makeStyles(() => textFieldStyle(PRIMARY_BLACK, { maxHeight: '40px', minWidth: '300px', background: PRIMARY_WHITE }));
   const classes = useStyles()
   const { lang } = useLanguage()
-  const { showingHeaderImage, isShowingAbout } = useHeaderContext()
+  const {  isShowingAbout } = useHeaderContext()
   const { setHeaderBackground, setHeaderAbout } = useHeaderBackgroundExtension()
-  return (<div className='App-header' style={{
+  return (<div id = 'header_image_container' className='App-header' style={{
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'column',

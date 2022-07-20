@@ -300,8 +300,8 @@ export default function PaymentSuccess() {
                 <label>{lang === 'heb' ? 'מספר אישור' : 'Approval Number'}</label>
                 {transaction ? <span>{transaction.approval_num}</span> : <span>{LOADING(lang)}</span>}
 
-                <label>{lang === 'heb' ? 'שם בעל הכרטיס' : 'Card holder name'}</label>
-                {transaction ? <span>{transaction.card_holder_name}</span> : <span>{LOADING(lang)}</span>}
+                {/* <label>{lang === 'heb' ? 'שם בעל הכרטיס' : 'Card holder name'}</label>
+                {transaction ? <span>{transaction.card_holder_name}</span> : <span>{LOADING(lang)}</span>} */}
 
                 <label>{lang === 'heb' ? 'סוג חיוב' : 'Type of purchase'}</label>
                 {transaction ? <span>{transaction.number_of_payments === '1' ? (lang === 'heb' ? 'רגיל' : 'Normal') : lang === 'heb' ? 'תשלומים' : 'Payments'}</span> : <span>{NOTFOUND(lang)}</span>}
@@ -309,8 +309,8 @@ export default function PaymentSuccess() {
                 <label>{lang === 'heb' ? 'מספר תשלומים' : 'Number of Payments'}</label>
                 {transaction ? <span>{transaction.number_of_payments}</span> : <span>{LOADING(lang)}</span>}
 
-                <label>{lang === 'heb' ? '4 ספרות אחרונות של כרטיס' : 'Four last digits of card'}</label>
-                {transaction ? <span>{transaction.four_digits}</span> : <span>{LOADING(lang)}</span>}
+                {/* <label>{lang === 'heb' ? '4 ספרות אחרונות של כרטיס' : 'Four last digits of card'}</label>
+                {transaction ? <span>{transaction.four_digits}</span> : <span>{LOADING(lang)}</span>} */}
 
             </Stack> : <h1 dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontSize: '14px' }}>{lang === 'heb' ? 'קבלה לא נמצאה' : 'Receipt not found'}</h1>}
 

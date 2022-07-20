@@ -41,10 +41,11 @@
   background: linear-gradient(rgba(0, 0, 0, 0.5),
       rgba(0, 0, 0, 0.5)), url(./assets/images/header.jpeg) center center no-repeat;
   min-height: 48vh;
-  max-height: 400px;
+  background-attachment: fixed;
   border-bottom: .1px solid var(--SECONDARY_BLACK);
   position: relative;
   transition: none;
+  background-size: cover;
 }
 
 
@@ -97,3 +98,4 @@
   align-items: center;
   justify-content: center;
 }
+

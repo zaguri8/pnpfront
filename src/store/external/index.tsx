@@ -677,7 +677,10 @@ export class Realtime {
             .catch((e) => { this.createError('updateClubEvent', e) })
     }
 
-    updateEvent = async (eventId: string, event: any, blob?: ArrayBuffer, eventOldType?: string) => {
+    updateEvent = async (eventId: string, event: any,
+        mobileImageBuffer: ArrayBuffer | null,
+        desktopImageBuffer: ArrayBuffer | null,
+        eventOldType?: string) => {
         const uploadEvent = async () => {
             if (eventOldType !== event.eventType) {
                 // remove the event from old type route
@@ -692,15 +695,38 @@ export class Realtime {
                 .catch((e) => { this.createError('updateClubEvent', e) })
         }
 
-        if (blob) {
-            return await uploadBytes(storageRef(this.storage, 'EventImages/' + event.eventType + "/" + event.eventId), blob)
-                .then(async snap => {
-                    return await getDownloadURL(snap.ref)
-                        .then(async url => {
-                            event.eventImageURL = url
-                            return uploadEvent();
-                        })
-                })
+        if (mobileImageBuffer !== null || desktopImageBuffer !== null) {
+            if (mobileImageBuffer !== null) {
+                return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Mobile" + '/' + event.eventType + "/" + event.eventId), mobileImageBuffer)
+                    .then(async snap => {
+                        return await getDownloadURL(snap.ref)
+                            .then(async mobileUrl => {
+                                if (desktopImageBuffer !== null) {
+                                    return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Desktop" + '/' + event.eventType + "/" + event.eventId), desktopImageBuffer)
+                                        .then(async snapDesktop => {
+                                            return await getDownloadURL(snapDesktop.ref)
+                                                .then(async destkopUrl => {
+                                                    event.eventMobileImageURL = mobileUrl
+                                                    event.eventImageURL = destkopUrl
+                                                    return uploadEvent();
+                                                })
+                                        })
+                                } else {
+                                    event.eventMobileImageURL = mobileUrl
+                                    return uploadEvent();
+                                }
+                            })
+                    })
+            } else {
+                return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Desktop" + '/' + event.eventType + "/" + event.eventId), desktopImageBuffer!)
+                    .then(async snapDesktop => {
+                        return await getDownloadURL(snapDesktop.ref)
+                            .then(async destkopUrl => {
+                                event.eventImageURL = destkopUrl
+                                return uploadEvent();
+                            })
+                    })
+            }
         } else return await uploadEvent()
 
     }

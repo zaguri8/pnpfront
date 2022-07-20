@@ -688,7 +688,7 @@ export default function EventStatistics() {
             let newEvent = { ...event, eventShowsInGallery: !event.eventShowsInGallery }
             doLoad()
             setEvent(newEvent)
-            firebase.realTime.updateEvent(event.eventId, newEvent).then(result => {
+            firebase.realTime.updateEvent(event.eventId, newEvent,null,null).then(result => {
                 cancelLoad()
                 alert(toShow ? 'אירוע נוסף לגלריה בהצלחה' : 'אירוע הוסר מהגלריה בהצלחה')
             }).catch(problem => {

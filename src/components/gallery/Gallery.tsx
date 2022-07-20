@@ -130,11 +130,11 @@ export function Gallery(props: GalleryProps) {
 
         props.events.forEach(event => {
             const trimmed = refactorEventIdForGalleryItem(event.eventId);
-            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventImageURL}')`)
+            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
         })
         props.privateEvents.forEach(event => {
             const trimmed = refactorEventIdForGalleryItem(event.eventId);
-            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventImageURL}')`)
+            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
         })
     }, [])
 

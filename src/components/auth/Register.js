@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
 import './Register.css'
-import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { PRIMARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import SectionTitle from "../SectionTitle"
 import Button from "../Button"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
@@ -311,7 +311,7 @@ export default function Register() {
     }, [])
     return (<PageHolder>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
-        <InnerPageHolder style={{ background: BLACK_ROYAL }}>
+        <InnerPageHolder style={{ background: 'none', border: 'none' }}>
             <SectionTitle title={REGISTER_TITLE(lang)} style={{
                 background: 'none',
                 marginTop: '0px',

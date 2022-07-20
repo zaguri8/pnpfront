@@ -56,7 +56,6 @@ export default function Login() {
     }}>
         <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <div style={{
-            background: BLACK_ROYAL,
             width: '50%',
             maxWidth: '500px',
             marginTop: '32px',
@@ -69,7 +68,7 @@ export default function Login() {
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
-            border: '.5px solid white',
+            border: 'none',
         }}>
             <form onSubmit={login} style={{
                 display: 'flex',

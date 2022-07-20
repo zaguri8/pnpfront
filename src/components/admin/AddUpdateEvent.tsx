@@ -29,8 +29,10 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     const { user } = useFirebase();
 
     // state
-    const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
-    const [image, setImage] = useState<string>('')
+    const [imageBufferMobile, setImageBufferMobile] = useState<ArrayBuffer | null>(null)
+    const [imageBufferDesktop, setImageBufferDesktop] = useState<ArrayBuffer | null>(null)
+    const [imageMobile, setImageMobile] = useState<string>('')
+    const [imageDesktop, setImageDesktop] = useState<string>('')
     const [pnpEvent, setPnpEvent] = useState<PNPEvent>((props.event ?? getDefaultPublicEvent(user)))
     const [startDate, setStartDate] = useState<string>(props.event ? props.event.eventHours.startHour : '00:00')
     const [endDate, setEndDate] = useState<string>(props.event ? props.event.eventHours.endHour : '00:00')
@@ -58,11 +60,11 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     function submitUpdateEvent() {
         const dialogTitle = props.event ? 'ערכת אירוע בהצלחה! השינויים כבר ייכנסו לתוקף!' : 'הוספת אירוע בהצלחה ! בקרוב האירוע יופיע בדף הבית';
 
-        if ((props.event && props.event.eventImageURL) || imageBuffer
+        if ((props.event && props.event.eventImageURL) || (imageBufferDesktop || imageBufferMobile)
             && isValidEvent(pnpEvent)) {
             doLoad()
             firebase.realTime.updateEvent(pnpEvent.eventId,
-                pnpEvent, imageBuffer, oldEventType)
+                pnpEvent, imageBufferMobile, imageBufferDesktop, oldEventType)
                 .then(() => {
                     // update succeed
                     cancelLoad()
@@ -142,11 +144,25 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     function pickImage(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.files) {
             const imageUrl = URL.createObjectURL(event.target.files[0])
-            setImage(imageUrl)
+            setImageDesktop(imageUrl)
             const pickedImageFile = event.target.files[0]
             pickedImageFile.arrayBuffer().then(buff => {
-                setImageBuffer(buff)
+                setImageBufferDesktop(buff)
                 setPnpEvent({ ...pnpEvent, ...{ eventImageURL: 'valid' } })
+            }).catch(() => {
+                alert('אירעתה בעיה בבחירת התמונה אנא פנא לצוות האתר')
+            })
+            $('#menu_event_create_image_desktop').css('borderRadius', '75px')
+        }
+    }
+    function pickImageMobile(event: React.ChangeEvent<HTMLInputElement>) {
+        if (event.target.files) {
+            const imageUrl = URL.createObjectURL(event.target.files[0])
+            setImageMobile(imageUrl)
+            const pickedImageFile = event.target.files[0]
+            pickedImageFile.arrayBuffer().then(buff => {
+                setImageBufferMobile(buff)
+                setPnpEvent({ ...pnpEvent, ...{ eventMobileImageURL: 'valid' } })
             }).catch(() => {
                 alert('אירעתה בעיה בבחירת התמונה אנא פנא לצוות האתר')
             })
@@ -190,21 +206,38 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             {function imagePickerField() {
                 return <FormControl style={formControlStyle}>
                     <input
-                        onChange={pickImage}
+                        onChange={pickImageMobile}
                         type="file"
                         id="files_create_event" style={{ display: 'none' }} />
                     <img id='menu_event_create_image'
                         alt=''
-                        src={image ? image : props.event ? props.event.eventImageURL : event_placeholder}
+                        src={imageMobile ? imageMobile : props.event ? props.event.eventMobileImageURL : event_placeholder}
                         style={imageStyle} />
                     <label
                         style={pickImageLabelStyle}
                         onChange={(e) => alert(e)}
-                        htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}
+                        htmlFor='files_create_event'>{PICK_IMAGE(lang, true) + " Mobile"}
                     </label>
                 </FormControl>
             }()}
 
+            {function imagePickerFieldDesktop() {
+                return <FormControl style={formControlStyle}>
+                    <input
+                        onChange={pickImage}
+                        type="file"
+                        id="files_create_event_desktop" style={{ display: 'none' }} />
+                    <img id='menu_event_create_image_desktop'
+                        alt=''
+                        src={imageDesktop ? imageDesktop : props.event ? props.event.eventImageURL : event_placeholder}
+                        style={imageStyle} />
+                    <label
+                        style={pickImageLabelStyle}
+                        onChange={(e) => alert(e)}
+                        htmlFor='files_create_event_desktop'>{PICK_IMAGE(lang, true) + " Desktop"}
+                    </label>
+                </FormControl>
+            }()}
             {function eventTitleField() {
                 return <FormControl style={formControlStyle}>
                     <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_TITLE(lang)}</label>
@@ -266,7 +299,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
 
 
             {function minAgeField() {
-               return  <FormControl style={formControlStyle}>
+                return <FormControl style={formControlStyle}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <label
                             dir={SIDE(lang)}
@@ -409,12 +442,12 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
             {function submitField() {
                 return <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={!isValidEvent(pnpEvent) ? FILL_ALL_FIELDS(lang) : CONTINUE_TO_CREATE(lang)} arrow>
-                <span>
-                    <Button
-                        onClick={submitUpdateEvent}
-                        sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}</Button>
-                </span>
-            </HtmlTooltip>
+                    <span>
+                        <Button
+                            onClick={submitUpdateEvent}
+                            sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}</Button>
+                    </span>
+                </HtmlTooltip>
             }()}
         </Stack>
     </Stack>)

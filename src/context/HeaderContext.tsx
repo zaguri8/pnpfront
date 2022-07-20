@@ -7,17 +7,19 @@ import $ from 'jquery'
 import { useLocation } from "react-router";
 
 interface IHeaderContext {
-    showingHeaderImage: string
     isShowingAbout: boolean
     setIsShowingAbout: (on: boolean) => void
-    setShowingHeaderImage: (image: string) => void
 }
 
 const HeaderContext = React.createContext<IHeaderContext | null>(null);
 
 
+
+type HeaderImage = {
+    mobile: string
+    desktop: string
+}
 export const HeaderContextProvider = (props: object) => {
-    const [showingHeaderImage, setShowingHeaderImage] = useState(logo);
     const [isShowingAbout, setIsShowingAbout] = useState(true);
 
     const location = useLocation()
@@ -28,9 +30,11 @@ export const HeaderContextProvider = (props: object) => {
             setIsShowingAbout(false);
         }
     }, [])
+
+
     return <HeaderContext.Provider
         value={{
-            showingHeaderImage, setShowingHeaderImage, setIsShowingAbout, isShowingAbout
+            setIsShowingAbout, isShowingAbout
         }} {...props} ></HeaderContext.Provider>
 
 }
@@ -38,6 +42,7 @@ export const HeaderContextProvider = (props: object) => {
 
 export const useHeaderBackgroundExtension = () => {
     const location = useLocation()
+
     function setHeaderBackground(image: string) {
         if ($('.App-header').css('background') !== image) {
             if (location.pathname === '/') {
@@ -45,6 +50,10 @@ export const useHeaderBackgroundExtension = () => {
             } else {
                 $('.App-header').css('background', "linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1))," + image)
             }
+            if (location.pathname === '/') {
+                $('.App-header').css('height', '48vh')
+            }
+            $('.App-header').css('background-color', 'black')
             $('.App-header').css('background-size', 'cover')
         }
     }
@@ -60,13 +69,13 @@ export const useHeaderBackgroundExtension = () => {
         setHeaderBackground,
         setHeaderAbout
     }
+
+
 }
 
 export const useHeaderContext = () => {
     const context = React.useContext(HeaderContext) as IHeaderContext
     return {
-        showingHeaderImage: context?.showingHeaderImage,
-        setShowingHeaderImage: context?.setShowingHeaderImage,
         setIsShowingAbout: context?.setIsShowingAbout,
         isShowingAbout: context?.isShowingAbout
     }

@@ -25,6 +25,7 @@ import RideRequestForm from "../ride/RideRequestForm";
 import { Unsubscribe } from "firebase/database";
 import HTMLFromText from "../utilities/HtmlFromText";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
+import { getValidImageUrl } from "../../utilities";
 export default function EventPage() {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
     const [expanded, setExpanded] = useState<boolean>(false)
@@ -67,13 +68,19 @@ export default function EventPage() {
 
 
     const { setHeaderBackground } = useHeaderBackgroundExtension()
+
+
     useEffect(() => {
         doLoad()
 
 
 
 
-        const resize = () => {
+        const resize = (e?: PNPEvent) => {
+            let c: any = e;
+            if (!c) {
+                c = event;
+            }
             if (window.innerWidth > 1100) {
                 $('.ride_item_button').css('width', '50%')
             }
@@ -85,29 +92,43 @@ export default function EventPage() {
             } else if (window.innerWidth < 600) {
                 $('.ride_item_button').css('width', '100%')
             }
+            if (window.innerWidth > 900 && $('.App-header').css('background-size') !== "contain") {
+                $('.App-header').css('background', "linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1))," + `url('${getValidImageUrl(c)}') no-repeat center`)
+                $('.App-header').css('background-size', 'contain')
+                $('.App-header').css('height', '80vh')
+            } else if ($('.App-header').css('background-size') !== 'cover') {
+                $('.App-header').css('background', "linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1))," + `url('${getValidImageUrl(c)}') no-repeat center`)
+                $('.App-header').css('background-size', 'cover')
+                $('.App-header').css('height', '70vh')
+            }
         }
+
         let u1: Unsubscribe | null = null
         let u2: Unsubscribe | null = null
+        let removeResize: any;
         if (id) {
             u1 = firebase.realTime.getPublicEventById(id, (event) => {
                 setEvent(event as PNPEvent)
-                setHeaderBackground(`url('${event?.eventImageURL}') no-repeat center`)
                 cancelLoad()
-                resize()
+                removeResize = () => resize(event as PNPEvent)
+                window.addEventListener('resize', removeResize);
+                resize(event as PNPEvent)
             })
 
             u2 = firebase.realTime.getPublicRidesByEventId(id, (rides) => {
                 setEventRides(rides as PNPPublicRide[])
             })
         }
-        window.addEventListener('resize', resize)
         return () => {
-            window.removeEventListener('resize', resize);
+            if (removeResize)
+                window.removeEventListener('resize', removeResize)
             u1 && (u1 as Unsubscribe) && (u1 as Unsubscribe)()
             u2 && (u2 as Unsubscribe) && (u2 as Unsubscribe)()
             setHeaderBackground('none');
         }
     }, [])
+
+
 
     useEffect(() => {
         if (location.state) {
