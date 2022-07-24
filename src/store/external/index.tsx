@@ -1100,8 +1100,16 @@ export class Realtime {
         createNewCustomer((type: string, e: any) => this.createErrorCustomer(type, e), user).then(async (customerUid: string) => {
             user.customerId = customerUid
             return await set(child(this.users, this.auth.currentUser!.uid), user)
-                .catch((e) => { this.createError('addUser', e) })
-        }).catch(e => { this.createError('addUser', e) })
+                .catch((e) => {
+                    alert("אירעתה בעיית חיבור אינטרנט בעת הרשמה, אנא נסה/י להרשם מחדש")
+                    this.auth.currentUser?.delete();
+                    this.createError('addUser', e)
+                })
+        }).catch(e => {
+            alert("אירעתה בעיית חיבור אינטרנט בעת הרשמה, אנא נסה/י להרשם מחדש")
+            this.auth.currentUser?.delete();
+            this.createError('addUser', e)
+        })
 
     }
     /**

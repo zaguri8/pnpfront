@@ -56,7 +56,7 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
 
     return <div style={{
         marginBottom: '8px',
-        minWidth:'fit-content',
+        minWidth: 'fit-content',
         transform: 'translateX(4px)'
     }} className="gallery_item_decoration">
         <Stack display="flex" direction={'row'} alignItems="center" >
@@ -98,6 +98,7 @@ export function Gallery(props: GalleryProps) {
 
     const imageContainer: CSSProperties = {
         display: 'flex',
+        columnGap:'8px',
         width: 'fit-content',
         textAlign: 'center'
     }
@@ -108,8 +109,8 @@ export function Gallery(props: GalleryProps) {
         position: 'relative',
         border: '1px solid solid black',
         padding: '32px',
-        transform:'translateY(10px)',
-        paddingBottom:'0px',
+        transform: 'translateY(10px)',
+        paddingBottom: '0px',
         fontSize: '16px',
         margin: '0px',
         color: PRIMARY_ORANGE
@@ -153,7 +154,7 @@ export function Gallery(props: GalleryProps) {
             <div className='gallery' style={imageContainer} >
 
                 {props.events.map(pnpEvent => {
-                    return (<div key={v4()} style = {{transform:'scale(0.82)'}}>
+                    return (<div key={v4()} style={{ transform: 'scale(0.9)' }}>
                         <GalleryItemTitle event={pnpEvent} />
                         <div
                             className="gallery_img"
@@ -174,7 +175,7 @@ export function Gallery(props: GalleryProps) {
             <div className='gallery' style={imageContainer}>
 
                 {props.privateEvents.map(pnpEvent => {
-                    return (<div key={v4()} style = {{transform:'scale(0.82)'}}>
+                    return (<div key={v4()} style={{ transform: 'scale(0.9)', marginLeft: '4px', marginRight: '4px' }}>
                         <GalleryItemTitle event={pnpEvent} />
                         <div
                             className="gallery_img"
