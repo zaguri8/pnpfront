@@ -1,4 +1,5 @@
 import logo from '../assets/images/logo_white.png';
+
 import { HELLO, MENU_ITEM_1, MENU_ITEM_6, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, SIDE, TOOLBAR_LOGIN, MENU_ITEM_7, MENU_ITEM_8, CREATE_EVENT } from '../settings/strings.js';
 import { flex } from '../settings/styles.js';
 import ToolbarItem from './toolbar/ToolbarItem';

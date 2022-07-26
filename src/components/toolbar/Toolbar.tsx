@@ -2,12 +2,13 @@ import { toolbar } from "../../settings/styles"
 import ToolbarItem, { toolbarItemStyle } from "./ToolbarItem"
 import { CREATE_EVENT, TOOLBAR_LOGIN, MY_ACCOUNT } from "../../settings/strings"
 import { flex } from "../../settings/styles"
+import menuIcon from '../../assets/images/menuburger.svg';
+import userIcon from '../../assets/images/user.svg';
 import logo_white from '../../assets/images/logo_white.png'
 import search from '../../assets/images/search.png'
 import israel from '../../assets/images/israel.png'
 import america from '../../assets/images/america.png'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import { menuIcon } from "../../assets/images"
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { DARKER_BLACK_SELECTED, PRIMARY_BLACK, PRIMARY_WHITE } from "../../settings/colors"
@@ -41,7 +42,7 @@ export function ToolBar(props: ToolbarProps) {
             }} id='create_event' text={CREATE_EVENT(lang)} action={() => { nav('/createevent') }} />
  */}
             <ToolbarItem style={{marginBottom:'2px'}} id='options' image={menuIcon} action={props.menuToggle} />
-            <ToolbarItem id='login' icon={<AccountBoxIcon />}
+            <ToolbarItem id='login' image={userIcon}
 
                 style={{ color: PRIMARY_WHITE, marginTop: '4px' }}
                 action={() => {
