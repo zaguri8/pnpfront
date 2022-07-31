@@ -34,10 +34,8 @@ export default function EventPayment() {
         position: 'relative',
         fontFamily: 'Open Sans Hebrew',
         padding: '32px',
-        overflowX: 'hidden',
-        transform: `translateY(-200px) translateX(-15px)`,
+        overflowX: 'hidden'
     }}>
-        <div className='dim_payment'></div>
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
             product={{
                 name: `${paymentInfo.event.eventName}`,
