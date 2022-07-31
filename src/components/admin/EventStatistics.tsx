@@ -316,14 +316,7 @@ export default function EventStatistics() {
                     if (!hash[stat.rideStartPoint]) {
                         hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
                     } else {
-                        hash[stat.rideStartPoint].amount += Number(stat.amount)
-                        let exists = hash[stat.rideStartPoint].users.findIndex(uid => uid.uid === stat.uid)
-                        if (exists != -1) {
-                            if (stat.extraPeople && hash[stat.rideStartPoint].users[exists].extraPeople) {
-                                hash[stat.rideStartPoint].users[exists].extraPeople.push(...stat.extraPeople)
-                            }
-                        } else
-                            hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
+                        hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
                     }
                     t += Number(stat.amount)
                 }
