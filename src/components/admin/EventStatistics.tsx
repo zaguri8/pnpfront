@@ -280,7 +280,16 @@ export default function EventStatistics() {
             }
             let t = total
             const hash: { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } } = {}
-            props.statistics.forEach(stat => {
+
+            let hHash: { [uid: string]: RideStatistics } = {}
+            for (let i = 0; i < props.statistics.length; i++) {
+                if (!hHash[props.statistics[i].uid])
+                    hHash[props.statistics[i].uid] = props.statistics[i];
+                else
+                    hHash[props.statistics[i].uid].extraPeople.push(...props.statistics[i].extraPeople)
+            }
+            let newArray = Object.values(hHash)
+            newArray.forEach(stat => {
                 if (stat) {
                     if (!hash[stat.rideStartPoint]) {
                         hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
@@ -688,7 +697,7 @@ export default function EventStatistics() {
             let newEvent = { ...event, eventShowsInGallery: !event.eventShowsInGallery }
             doLoad()
             setEvent(newEvent)
-            firebase.realTime.updateEvent(event.eventId, newEvent,null,null).then(result => {
+            firebase.realTime.updateEvent(event.eventId, newEvent, null, null).then(result => {
                 cancelLoad()
                 alert(toShow ? 'אירוע נוסף לגלריה בהצלחה' : 'אירוע הוסר מהגלריה בהצלחה')
             }).catch(problem => {
