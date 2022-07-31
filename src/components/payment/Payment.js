@@ -324,7 +324,7 @@ export function PaymentForm({ product }) {
         return paymentLink ?
 
             <InnerPageHolder style={{ fontFamily: 'Open Sans Hebrew', overflowX: 'hidden', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto' }} >
-                <Stack alignItems={'center'} style={{ width: '100%', minWidth: '400px' }} spacing={1} justifyContent={'center'}>
+                <Stack alignItems={'center'} spacing={1} justifyContent={'center'}>
                     <div className='row_1_event_payment'>
                         <Stack direction={'row'}>
 

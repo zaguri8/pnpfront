@@ -34,6 +34,7 @@ export default function EventPayment() {
         position: 'relative',
         fontFamily: 'Open Sans Hebrew',
         padding: '32px',
+        maxWidth:'90%',
         overflowX: 'hidden'
     }}>
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
