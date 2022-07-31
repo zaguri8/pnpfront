@@ -322,9 +322,8 @@ export function PaymentForm({ product }) {
 
     const getElement = () => {
         return paymentLink ?
-
-            <InnerPageHolder style={{ fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto' }} >
-                <Stack alignItems={'center'} spacing={1} justifyContent={'center'}>
+            <InnerPageHolder style={{ fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', minWidth: 'fit-content' }} >
+                <Stack alignItems={'center'} spacing={1} justifyContent={'center'} minWidth={'fit-content'}>
                     <div className='row_1_event_payment'>
                         <Stack direction={'row'}>
 

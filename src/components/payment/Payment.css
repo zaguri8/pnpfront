@@ -19,14 +19,13 @@
 .row_1_event_payment {
   height: 50px;
   text-align: right;
-  border-radius: 8px;
   padding: 16px;
   border: 1px solid whitesmoke;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px;
-
   display: flex;
   flex-direction: column;
   width: 320px;
+  border-radius: 8px;
   background-color: white;
 }
 
