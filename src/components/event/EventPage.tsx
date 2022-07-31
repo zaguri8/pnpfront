@@ -13,7 +13,6 @@ import { useFirebase } from "../../context/Firebase"
 import { ADDRESS, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT, EVENT_DETAILS } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import { PaymentForm } from "../payment/Payment";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
@@ -42,27 +41,7 @@ export default function EventPage() {
 
     const openRequestPaymentDialog = (ride?: PNPPublicRide) => {
         if (event) {
-            openDialog({
-                content: <div style={{ padding: '32px', }}>
-                    <PaymentForm
-                        product={{
-                            name: `${event.eventName}`,
-                            desc: event.eventDetails,
-                            ticketsLeft: ride && ride.extras.rideMaxPassengers ? (Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)) : (selectedEventRide && selectedEventRide.extras.rideMaxPassengers) ? (Number(selectedEventRide.extras.rideMaxPassengers) - Number(selectedEventRide.passengers)) : 1000,
-                            soldOut: ride ? ride.extras.rideStatus === 'sold-out' : selectedEventRide ? selectedEventRide.extras.rideStatus === 'sold-out' : false,
-                            startPoint: ride ? ride.rideStartingPoint : selectedEventRide ? selectedEventRide.rideStartingPoint : '',
-                            rideTime: ride ? ride.rideTime : selectedEventRide ? selectedEventRide.rideTime : '',
-                            backTime: ride ? ride.backTime : selectedEventRide ? selectedEventRide.backTime : '',
-                            exactStartPoint: ride && ride.extras.exactStartPoint ? ride.extras.exactStartPoint : selectedEventRide && selectedEventRide.extras.exactStartPoint ? selectedEventRide?.extras.exactStartPoint : null,
-                            exactBackPoint: ride && ride.extras.exactBackPoint ? ride.extras.exactBackPoint : selectedEventRide && selectedEventRide.extras.exactBackPoint ? selectedEventRide?.extras.exactBackPoint : null,
-                            direction: ride ? ride.extras.rideDirection : selectedEventRide?.extras.rideDirection, // 2 - first way , 1 second way
-                            twoWay: ride ? ride?.extras.twoWay : selectedEventRide ? selectedEventRide.extras.twoWay : '',
-                            price: ride ? ride.ridePrice : selectedEventRide ? selectedEventRide?.ridePrice : '0',
-                            eventId: event.eventId,
-                            eventDate: event.eventDate,
-                            rideId: ride ? ride.rideId : selectedEventRide ? selectedEventRide.rideId : ''
-                        }} /></div>
-            })
+            nav('/event/payment', { state: { ride: ride ?? selectedEventRide, event: event } })
         }
     }
 
@@ -72,9 +51,6 @@ export default function EventPage() {
 
     useEffect(() => {
         doLoad()
-
-
-
 
         const resize = (e?: PNPEvent) => {
             let c: any = e;

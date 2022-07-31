@@ -55,6 +55,7 @@ import About from './components/About';
 import { makeStyles } from '@mui/styles';
 import { textFieldStyle } from './settings/styles';
 import Footer from './components/footer/Footer';
+import EventPayment from './components/payment/EventPayment';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -63,9 +64,9 @@ function ImageHeader() {
   const useStyles = makeStyles(() => textFieldStyle(PRIMARY_BLACK, { maxHeight: '40px', minWidth: '300px', background: PRIMARY_WHITE }));
   const classes = useStyles()
   const { lang } = useLanguage()
-  const {  isShowingAbout } = useHeaderContext()
+  const { isShowingAbout } = useHeaderContext()
   const { setHeaderBackground, setHeaderAbout } = useHeaderBackgroundExtension()
-  return (<div id = 'header_image_container' className='App-header' style={{
+  return (<div id='header_image_container' className='App-header' style={{
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'column',
@@ -305,6 +306,7 @@ function App() {
         <Route path='/login' element={isLoadingAuth ? <div /> : isAuthenticated ? <Navigate to={location.pathname} /> : <Login />} />
         <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
+        <Route path='/event/payment' element={<EventPayment />} />
         <Route path='termsOfService' element={<TermsOfService />} />
         <Route path='/test' element={<GeneratePaymentForm />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />

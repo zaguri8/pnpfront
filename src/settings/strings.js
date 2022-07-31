@@ -160,6 +160,8 @@ export const EXP_M = (lang) => lang === 'heb' ? 'חודש' : 'Month'
 export const EXP_Y = (lang) => lang === 'heb' ? 'שנה' : 'Year'
 export const CVV = (lang) => lang === 'heb' ? 'שלוש ספרות בגב כרטיס' : 'CVV'
 export const TOTAL_TO_PAY = (lang, price) => lang === 'heb' ? `סה"כ לתשלום: ${price} ש"ח` : `Total: ${price} ILS`
+export const TOTAL_TO_PAY_2 = (lang) => lang === 'heb' ? `סה"כ לתשלום:` : 'Total:'
+
 
 
 export const RIDE_INFO = (lang) => lang === 'heb' ? 'ברכישת הכרטיס תקבלו ברקוד שיופיע בהיסטוריית הנסיעות, אותו תראו בעליה לאוטובוס.' : 'When purchasing the ticket, you will receive confirmation of an email that will also appear in the travel history, which you will see when boarding the bus.'

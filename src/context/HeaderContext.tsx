@@ -55,6 +55,7 @@ export const useHeaderBackgroundExtension = () => {
             }
             $('.App-header').css('background-color', 'black')
             $('.App-header').css('background-size', 'cover')
+            $('.App-header').css('background-position', 'center')
         }
     }
 

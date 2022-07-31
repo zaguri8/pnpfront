@@ -52,6 +52,7 @@ const paragraphStyle = {
     fontSize: '12px',
     margin: '0px'
 } as CSSProperties
+
 function GalleryItemTitle(props: { event: PNPEvent }) {
 
     return <div style={{
