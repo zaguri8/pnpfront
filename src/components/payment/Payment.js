@@ -338,9 +338,7 @@ export function PaymentForm({ product }) {
                                 <p style={paragraphStyle}><CalendarTodayIcon style={todayIconStyle} />{product.eventDate} </p>
                             </Stack>
                             <Stack direction={'row'} alignItems={'center'}>
-                                <p style={paragraphStyle}><LocationOnIcon className="img_pin_location" style={locationPinIconStyle} />{product.eventLocation}</p>
-
-
+                                <p style={{ ...paragraphStyle, width: 'max-content' }}><LocationOnIcon className="img_pin_location" style={locationPinIconStyle} />{product.eventLocation}</p>
                             </Stack>
                         </Stack>
                     </div>
