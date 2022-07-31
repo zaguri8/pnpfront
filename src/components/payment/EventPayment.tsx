@@ -31,7 +31,11 @@ export default function EventPayment() {
         return paymentInfo && paymentInfo.ride.extras.rideStatus === 'sold-out'
     }
     return <PageHolder style={{
-        position: 'relative', fontFamily: 'Open Sans Hebrew', padding: '32px', overflowX: 'hidden', transform: `translateY(-200px) translateX(-15px)`,
+        position: 'relative',
+        fontFamily: 'Open Sans Hebrew',
+        padding: '32px',
+        overflowX: 'hidden',
+        transform: `translateY(-200px) translateX(-15px)`,
     }}>
         <div className='dim_payment'></div>
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm

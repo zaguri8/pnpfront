@@ -10,6 +10,8 @@
 .dim_payment {
   position: absolute;
   height: 200vh;
+  overflow-x: hidden;
+  width: 100%;
   transform: translateY(11.5px);
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 999;
