@@ -403,7 +403,7 @@ export function PaymentForm({ product }) {
     return (<List style={{
         paddingTop: '0px', direction: SIDE(lang),
         display: 'flex',
-        width: '90%',
+        maxWidth: '320px',
         zIndex: '1000',
         flexDirection: 'column',
         alignItems: 'center'
