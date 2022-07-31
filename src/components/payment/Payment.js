@@ -404,8 +404,9 @@ export function PaymentForm({ product }) {
     return (<List style={{
         paddingTop: '0px', direction: SIDE(lang),
         display: 'flex',
-        width:'300px',
-        zIndex:'1000',
+        width: '300px',
+        overflowX: 'hidden',
+        zIndex: '1000',
         flexDirection: 'column',
         alignItems: 'center'
     }}>
