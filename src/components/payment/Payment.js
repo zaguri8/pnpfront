@@ -367,7 +367,7 @@ export function PaymentForm({ product }) {
                         <iframe className='iframe_payment_event' src={paymentLink} />
                     </div>
                 </Stack></InnerPageHolder> : (
-                <InnerPageHolder style={{ background: 'white', marginLeft: 'auto', marginRight: 'auto' }}>
+                <InnerPageHolder style={{    overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto' }}>
                     <RideInfo />
 
 
