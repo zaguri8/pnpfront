@@ -287,13 +287,27 @@ export default function EventStatistics() {
                     hHash[props.statistics[i].uid] = props.statistics[i];
                 else {
                     if (hHash[props.statistics[i].uid].extraPeople) {
-                        hHash[props.statistics[i].uid].extraPeople.push(...props.statistics[i].extraPeople)
+                        if (props.statistics[i].extraPeople)
+                            hHash[props.statistics[i].uid].extraPeople.push(...props.statistics[i].extraPeople)
+                        else {
+                            hHash[props.statistics[i].uid].extraPeople.push({
+                                fullName: 'כרטיס נוסף',
+                                phoneNumber: 'מספר על שם הקונה'
+                            })
+                        }
                     } else {
-                        hHash[props.statistics[i].uid].extraPeople = props.statistics[i].extraPeople.concat({
-                            fullName: 'כרטיס נוסף',
-                            phoneNumber: 'מספר על שם הקונה'
-                        })
+                        if (props.statistics[i].extraPeople)
+                            hHash[props.statistics[i].uid].extraPeople = props.statistics[i].extraPeople.concat({
+                                fullName: 'כרטיס נוסף',
+                                phoneNumber: 'מספר על שם הקונה'
+                            })
+                        else
+                            hHash[props.statistics[i].uid].extraPeople = [{
+                                fullName: 'כרטיס נוסף',
+                                phoneNumber: 'מספר על שם הקונה'
+                            }]
                     }
+                    hHash[props.statistics[i].uid].amount += props.statistics[i].amount
                 }
             }
             let newArray = Object.values(hHash)
