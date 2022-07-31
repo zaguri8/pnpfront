@@ -285,8 +285,16 @@ export default function EventStatistics() {
             for (let i = 0; i < props.statistics.length; i++) {
                 if (!hHash[props.statistics[i].uid])
                     hHash[props.statistics[i].uid] = props.statistics[i];
-                else
-                    hHash[props.statistics[i].uid].extraPeople.push(...props.statistics[i].extraPeople)
+                else {
+                    if (hHash[props.statistics[i].uid].extraPeople) {
+                        hHash[props.statistics[i].uid].extraPeople.push(...props.statistics[i].extraPeople)
+                    } else {
+                        hHash[props.statistics[i].uid].extraPeople = props.statistics[i].extraPeople.concat({
+                            fullName: 'כרטיס נוסף',
+                            phoneNumber: 'מספר על שם הקונה'
+                        })
+                    }
+                }
             }
             let newArray = Object.values(hHash)
             newArray.forEach(stat => {
