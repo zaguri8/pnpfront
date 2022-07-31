@@ -322,7 +322,7 @@ export function PaymentForm({ product }) {
 
     const getElement = () => {
         return paymentLink ?
-            <InnerPageHolder style={{ direction: SIDE(lang), overflowX: 'hidden', fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000',width:'95%' }} >
+            <InnerPageHolder style={{ direction: SIDE(lang), overflowX: 'hidden', fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000',width:'fit-content'}} >
                 <Stack alignItems={'center'} spacing={1} justifyContent={'center'} minWidth={'100%'}>
                     <div className='row_1_event_payment'>
                         <Stack direction={'row'}>
@@ -366,7 +366,7 @@ export function PaymentForm({ product }) {
                         <iframe className='iframe_payment_event' src={paymentLink} />
                     </div>
                 </Stack></InnerPageHolder> : (
-                <InnerPageHolder style={{width:'95%' ,direction: SIDE(lang), overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000' }}>
+                <InnerPageHolder style={{width:'fit-content', direction: SIDE(lang), overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000' }}>
                     <RideInfo />
 
 
