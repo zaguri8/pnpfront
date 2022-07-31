@@ -33,7 +33,7 @@ export default function EventPayment() {
     return <PageHolder style={{
         position: 'relative',
         fontFamily: 'Open Sans Hebrew',
-        transform: `translateY(-200px) translateX(20px)`,
+        transform: `translateY(-200px)`,
     }}>
         <div className='dim_payment'></div>
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
