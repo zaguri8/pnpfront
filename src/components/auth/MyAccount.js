@@ -20,6 +20,7 @@ import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
 import Spacer from "../utilities/Spacer"
 import { useLoading } from "../../context/Loading"
 import MyCoins from "./MyCoins"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 function MyAccountItem({ title, icon, navTo, underCons }) {
     const nav = useNavigate()
     const { openUnderConstruction } = useLoading()
@@ -58,7 +59,6 @@ export default function MyAccount() {
     const { signOut, appUser } = useFirebase()
     const { openDialog, closeDialog } = useLoading()
 
-   
     useEffect(() => {
         function resize() {
             const currentWidth = window.innerWidth

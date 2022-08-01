@@ -1,9 +1,23 @@
 import logo from '../assets/images/logo_white.png';
+import homeIcon from '../assets/images/appmenu/pink/home.svg'
+import userIcon from '../assets/images/appmenu/pink/user.svg'
+import questionIcon from '../assets/images/appmenu/pink/question.svg'
+import coupleIcon from '../assets/images/appmenu/pink/coupon.svg'
+import busIcon from '../assets/images/appmenu/pink/bus.svg'
+import listIcon from '../assets/images/appmenu/pink/list.svg'
 
-import { HELLO, MENU_ITEM_1, MENU_ITEM_6, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, SIDE, TOOLBAR_LOGIN, MENU_ITEM_7, MENU_ITEM_8, CREATE_EVENT } from '../settings/strings.js';
+import homeIconWhite from '../assets/images/appmenu/white/home_white.svg'
+import userIconWhite from '../assets/images/appmenu/white/user_white.svg'
+import questionIconWhite from '../assets/images/appmenu/white/question_white.svg'
+import coupleIconWhite from '../assets/images/appmenu/white/coupon_white.svg'
+import busIconWhite from '../assets/images/appmenu/white/bus_white.svg'
+import listIconWhite from '../assets/images/appmenu/white/list_white.svg'
+
+
+import { HELLO, MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, SIDE, TOOLBAR_LOGIN, CREATE_EVENT, MENU_ITEM_5 } from '../settings/strings.js';
 import { flex } from '../settings/styles.js';
 import ToolbarItem from './toolbar/ToolbarItem';
-import HomeIcon from '@mui/icons-material/Home';
+import { v4 } from 'uuid';
 import { useLocation } from 'react-router'
 import { useFirebase } from '../context/Firebase';
 import { useLanguage } from '../context/Language.js';
@@ -12,9 +26,9 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router';
 import { useLoading } from '../context/Loading';
+import './AppMenu.css'
 import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, RED_ROYAL, SECONDARY_WHITE } from '../settings/colors.js';
 import { Stack } from '@mui/material';
-import Spacer from './utilities/Spacer';
 function MenuProfile(props: { clickedItem: (indexPath: number) => void }) {
 
     const { user, appUser, firebase, uploadUserImage } = useFirebase()
@@ -108,54 +122,68 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
     const clickedItem = (indexPath: number) => {
         props.menuToggle(() => {
             switch (indexPath) {
-                case 0:
-                    break;
                 case 1:
-                    if (location.pathname === '/myaccount')
-                        return
-                    else nav('/myaccount')
-                    break;
-                case 2:
-                    if (location.pathname === '/myaccount/transactions')
-                        return
-                    else nav('/myaccount/transactions')
-                    break;
-                case 3:
-                    openUnderConstruction(lang)
-                    break;
-                case 4:
-                    if (location.pathname === '/register')
-                        return
-                    else nav('/register')
-                    break;
-                case 5:
-                    if (location.pathname === '/login')
-                        return
-                    else nav('/login')
-                    break;
-                case 6:
-                    openUnderConstruction(lang)
-                    break;
-                case 7:
                     if (location.pathname === '/')
                         return
                     else nav('/')
                     break;
-                case 8:
+                case 2:
+                    if (location.pathname === '/myaccount/transactions?i=1')
+                        return
+                    else nav('/myaccount/transactions?i=1')
+                    break;
+                case 3:
+                    if (location.pathname === '/myaccount/transactions?i=2')
+                        return
+                    else nav('/myaccount/transactions?i=2')
+                    break;
+                case 4:
+                    openUnderConstruction(lang)
+                    break;
+                case 5:
                     if (location.pathname === '/createPrivateEvent')
                         return
                     else nav('/createPrivateEvent')
                     break;
-
-                case 9:
+                case 6:
                     if (location.pathname === '/createEvent')
                         return
                     else nav('/createEvent')
                     break;
+                case 8:
+                    if (location.pathname === '/login')
+                        return
+                    else nav('/login')
+                    break;
+
             }
         })
 
     }
+
+    const MenuItem = (props: {
+        text: string,
+        icon: string[],
+        marked: boolean,
+        action: () => void,
+    }) => {
+        return <li className={props.marked ? 'app_menu_item_activated' : 'app_menu_item'} onClick={props.action}>
+            <div className={props.marked ? 'app_menu_item_holder_activated' : 'app_menu_item_holder'}>
+                {!props.marked && <div className='app_menu_item_decor' />}
+                <img src={props.marked ? props.icon[1] : props.icon[0]} />
+                <p>{props.text}</p>
+            </div>
+        </li>
+    }
+    const menuItems = [//app_menu_item_activated
+        { text: MENU_ITEM_1(lang), icon: [homeIcon, homeIconWhite], marked: location.pathname === '/' },
+        { text: MENU_ITEM_2(lang), icon: [userIcon, userIconWhite], marked: (location.pathname === '/myaccount/transactions' && location.search === '?i=1') },
+        { text: MENU_ITEM_3(lang), icon: [listIcon, listIconWhite], marked: (location.pathname === '/myaccount/transactions' && location.search === '?i=2') },
+        { text: MENU_ITEM_4(lang), icon: [questionIcon, questionIconWhite], marked: location.pathname === '/howdoesitwork' },
+        { text: MENU_ITEM_5(lang), icon: [busIcon, busIconWhite], marked: location.pathname === '/createevent' },
+    ].map((item, index) => ({ ...item, action: () => clickedItem(index + 1) }))
+        .map(item => <MenuItem key={v4()} text={item.text} icon={item.icon} marked={item.marked} action={item.action} />)
+
 
     return <div id='menu' style={{
         ...{
@@ -172,21 +200,10 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
         ...{ background: PRIMARY_BLACK }
     }}>
         <ToolbarItem bold image={logo} />
-        <MenuProfile clickedItem={clickedItem} />
-        <ToolbarItem text={MENU_ITEM_2(lang)} bold={true} action={() => clickedItem(1)} line={true} style={{ width: '80%', marginTop: '4px', marginBottom: '8px', borderRadius: '8px' }} />
-        <ToolbarItem text={MENU_ITEM_3(lang)} bold={true} action={() => clickedItem(2)} line={true} style={{ width: '80%', marginTop: '4px', marginBottom: '8px', borderRadius: '8px' }} />
-        <ToolbarItem text={MENU_ITEM_4(lang)} bold={true} action={() => clickedItem(3)} line={true} style={{ width: '80%', marginTop: '4px', marginBottom: '8px', borderRadius: '8px' }} />
-        <ToolbarItem text={MENU_ITEM_6(lang)} bold={true} action={() => clickedItem(6)} line={true} style={{ width: '80%', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', borderRadius: '8px' }} />
-        <ToolbarItem text={MENU_ITEM_8(lang)}
-            icon={<DiamondIcon style={{ padding: '4px' }} />} bold={true} action={() => clickedItem(8)} line={true} style={{ width: '70%', padding: '4px', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: DARKER_BLACK_SELECTED }} />
-
-        <ToolbarItem text={CREATE_EVENT(lang)}
-            bold={true} action={() => clickedItem(9)} line={true} style={{ width: '50%', padding: '8px', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '8px', background: DARKER_BLACK_SELECTED }} />
-
-        <ToolbarItem text={MENU_ITEM_7(lang)}
-            icon={<HomeIcon style={{ padding: '4px' }} />} bold={true} action={() => clickedItem(7)} line={true} style={{ width: '80%', border: 'none', fontWeight: 'bold', marginTop: '8px', marginBottom: '0px', background: 'none' }} />
-
-
+        {/* <MenuProfile clickedItem={clickedItem} /> */}
+        <ul className='app_menu_list'>
+            {menuItems}
+        </ul>
     </div>
 }
 export default AppMenu

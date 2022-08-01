@@ -16,41 +16,29 @@ import { useFirebase } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
 import { useLocation, useNavigate } from "react-router"
 export type ToolbarProps = {
-    menuToggle: () => void
+    menuToggle: (off: boolean) => void
 }
 export function ToolBar(props: ToolbarProps) {
 
     const { user, appUser } = useFirebase()
-
     const nav = useNavigate()
-    const { lang, setLang } = useLanguage()
     const location = useLocation()
     return <div id='toolbar'>
         <div style={{
             ...flex('row', 'center', 'center'),
             ...{ zIndex: '9', overflow: 'hidden' }
         }}>
-            {/* <ToolbarItem style={{
-                'backgroundImage': DARKER_BLACK_SELECTED,
-                color: 'white',
-                paddingTop: '4px',
-                paddingBottom: '4px',
-                fontSize: '16px',
-                marginLeft: '4px',
-                minWidth: 'fit-content',
-                marginRight: '4px'
-            }} id='create_event' text={CREATE_EVENT(lang)} action={() => { nav('/createevent') }} />
- */}
-            <ToolbarItem style={{marginBottom:'2px'}} id='options' image={menuIcon} action={props.menuToggle} />
+            <ToolbarItem style={{ marginBottom: '2px' }} id='options' image={menuIcon} action={() => props.menuToggle(false)} />
             <ToolbarItem id='login' image={userIcon}
 
                 style={{ color: PRIMARY_WHITE, marginTop: '4px' }}
                 action={() => {
-                    user === null ? nav('/login') : nav('/myaccount')
+                    user === null ? nav('/login') : nav('/myaccount/transactions')
+                    props.menuToggle(true);
                 }} />
 
             {appUser && appUser.producer && <QrCodeScannerIcon
-                onClick={() =>  {
+                onClick={() => {
                     if (location.pathname === '/scan') return;
                     nav('/scan')
                 }}
@@ -60,9 +48,10 @@ export function ToolBar(props: ToolbarProps) {
             />}
 
             {appUser && appUser.admin && <AdminPanelSettingsIcon
-                onClick={() =>  {
+                onClick={() => {
                     if (location.pathname === '/adminPanel') return;
                     nav('/adminPanel')
+                    props.menuToggle(true);
                 }}
                 id='scan'
 
@@ -73,25 +62,10 @@ export function ToolBar(props: ToolbarProps) {
                 onClick={() => {
                     if (location.pathname === '/') return;
                     nav('/');
+                    props.menuToggle(true);
                 }
                 } />}
         </div>
-
-        {/* 
-        <div style={{ ...flex('row', 'center', 'center') }}>
-            <div id='lang' style={{
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }} onClick={() => setLang(lang === 'heb' ? 'en' : 'heb')}>
-                <ToolbarItem id='language' text={lang === 'heb' ? 'HE' : 'EN'} style={{ fontFamily: 'Open Sans Hebrew', fontSize: '14px', margin: '0px', color: 'white', padding: '2px' }} action={() => { }} />
-                <img style={{ padding: '4px', width: '25px', height: '25px' }} src={lang === 'heb' ? israel : america} />
-
-            </div>
-           
-
-        </div> */}
 
     </div>
 }

@@ -47,15 +47,11 @@ export const REGISTER_TITLE = (lang) => lang === 'heb' ? 'הרשמה' : 'Registe
 export const REGISTER_OK = (lang) => lang === 'heb' ? 'הירשם/י' : 'Register'
 export const LOGIN_OK = lang => lang === 'heb' ? 'התחבר/י' : 'Sign in'
 export const LOGOUT = (lang) => lang === 'heb' ? 'התנתק/י' : 'Sign out'
-export const MENU_ITEM_1 = (lang) => lang === 'heb' ? "אודות" : "About us"
+export const MENU_ITEM_1 = (lang) => lang === 'heb' ? "דף הבית" : "Home Page"
 export const MENU_ITEM_2 = (lang) => MY_ACCOUNT(lang)
 export const MENU_ITEM_3 = (lang) => lang === 'heb' ? "היסטוריית נסיעות וברקודים" : 'Ride history'
-export const MENU_ITEM_4 = (lang) => lang === 'heb' ? "חדש ב Pick n Pull" : 'New at Pick n Pull'
-export const MENU_ITEM_5 = (lang) => lang === 'heb' ? "סגור" : 'Close'
-export const MENU_ITEM_6 = (lang) => lang === 'heb' ? 'איך זה עובד?' : "How does it work"
-
-export const MENU_ITEM_7 = (lang) => lang === 'heb' ? 'דף הבית' : "Home page"
-export const MENU_ITEM_8 = (lang) => lang === 'heb' ? 'מתחתנים איתכם' : 'Marry along with us'
+export const MENU_ITEM_5 = (lang) => lang === 'heb' ? 'מתחתנים איתכם' : 'Marry along with us'
+export const MENU_ITEM_4 = (lang) => lang === 'heb' ? 'איך זה עובד?' : "How does it work"
 export const MY_ACCOUNT_ITEM_1 = (lang) => lang === 'heb' ? 'מטבעות שצברתי' : 'Coins ive earned'
 export const MY_ACCOUNT_ITEM_2 = (lang) => lang === 'heb' ? 'קופונים והטבות' : 'Coupons & Discounts'
 export const MY_ACCOUNT_ITEM_3 = (lang) => lang === 'heb' ? 'היסטוריית נסיעות' : 'Rides history'

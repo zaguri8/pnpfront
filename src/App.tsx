@@ -289,7 +289,15 @@ function App() {
 
       {dialogContext.content ? <PNPDialogComponent lang={lang} dialogContext={dialogContext} />
         : null}
-      <ToolBar menuToggle={() => toggleMenu()} />
+      <ToolBar menuToggle={(off) => {
+        if (off) {
+          if ($('.dim').css('display') === 'none')
+            return;
+          toggleMenu();
+        } else {
+          toggleMenu();
+        }
+      }} />
       <ImageHeader />
 
       <LoadingIndicator loading={dialogContext.isLoading || isLoadingAuth} />

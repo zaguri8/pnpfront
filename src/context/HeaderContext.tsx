@@ -42,7 +42,15 @@ export const HeaderContextProvider = (props: object) => {
 
 export const useHeaderBackgroundExtension = () => {
     const location = useLocation()
+    function hideHeader() {
+        $('.App-header').css('min-height', '10vh').css('height','10vh')
+        $('.footer_container').css('position','absolute')
+    }
 
+    function showHeader() {
+        $('.App-header').css('min-height', '48vh').css('height','48vh')
+        $('.footer_container').css('position','relative')
+    }
     function setHeaderBackground(image: string) {
         if ($('.App-header').css('background') !== image) {
             if (location.pathname === '/') {
@@ -68,7 +76,9 @@ export const useHeaderBackgroundExtension = () => {
     }
     return {
         setHeaderBackground,
-        setHeaderAbout
+        setHeaderAbout,
+        hideHeader,
+        showHeader
     }
 
 
