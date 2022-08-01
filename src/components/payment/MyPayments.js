@@ -45,13 +45,22 @@ const MyPayments = () => {
         hideHeader()
         return () => showHeader();
     }, [])
+
+
     useEffect(() => {
-        let unsub = null
+        let unsub = null, unsub2 = null;
         if (user && appUser) {
             doLoad()
             unsub = firebase.realTime.getAllTransactions(appUser.customerId, (trans) => {
-                setTransactions(trans)
-                cancelLoad()
+                unsub2 = firebase.realTime.addListenertoRidesForDates(trans, (transformed) => {
+                    console.log(transformed)
+                    setTransactions(transformed)
+                    cancelLoad()
+                }, (err) => {
+                    cancelLoad()
+                    if (err)
+                        nav('/');
+                })
             }, (e) => {
                 firebase.realTime.addError({
                     type: 'getAllTransactions',
@@ -63,7 +72,7 @@ const MyPayments = () => {
                 cancelLoad()
             })
         }
-        return () => unsub && unsub()
+        return () => { unsub && unsub(); unsub2 && unsub2(); }
     }, [])
 
 
@@ -85,7 +94,7 @@ const MyPayments = () => {
                 <Stack direction={'row'}>
 
                     <CalendarTodayIcon style={{ width: '12.5px', height: '12.5px', paddingInline: '8px', color: PRIMARY_ORANGE }} />
-                    <div style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.date}</div>
+                    <div style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.more_info.eventDate}</div>
                 </Stack>
             </div>
             <div style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>

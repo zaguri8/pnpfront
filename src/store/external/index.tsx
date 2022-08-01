@@ -158,6 +158,25 @@ export class Realtime {
         }, onError)
     }
 
+    addListenertoRidesForDates = (transactions: TransactionSuccess[],
+        onSuccess: (transformedTransactions: TransactionSuccess[]) => void,
+        onFailure: (o: Error) => void) => {
+        onValue(child(child(this.rides, 'public'), 'ridesForEvents'), (snap) => {
+            let i = 0;
+            let output = Array.from(transactions);
+            transactions.forEach(transaction => {
+                let tChild = snap.child(transaction.more_info.eventId)
+                    .child(transaction.more_info.rideId);
+                let rideDate = tChild.child('date')
+                    .val();
+                let rideTime = tChild.child('rideTime')
+                    .val();
+                output[i++].more_info.eventDate = rideDate + " " + rideTime;
+            })
+            onSuccess(output);
+        }, onFailure);
+    }
+
     addListersForRideSearch(onSuccess: (rides: PNPPublicRide[]) => void, onFailure: (o: Error) => void) {
         return onValue(child(child(this.rides, 'public'), 'ridesForEvents'), snap => {
             const rides: PNPPublicRide[] = []
