@@ -24,7 +24,7 @@ export default function EventPayment() {
     }, [location.state])
     useEffect(() => {
         window.scrollTo({
-            top: 64,
+            top: 128,
             left: 0,
             behavior: "smooth"
         })
