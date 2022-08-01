@@ -6,7 +6,7 @@ import { getDefaultPrivateEvent } from '../../store/external/helpers'
 import { PNPPrivateEvent } from '../../store/external/types'
 import { event_placeholder } from "../../assets/images";
 import { isValidPrivateEvent } from '../../store/validators'
-import { BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import { CREATE_EVENT, CREATE_INVITATION, CREATE_INVITATION_TITLE, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_START, EVENT_TITLE, PICK_IMAGE, SIDE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
 import Places from '../utilities/Places'
@@ -16,6 +16,7 @@ import { makeStyles } from '@mui/styles'
 import Spacer from '../utilities/Spacer'
 import { reverseDate, unReverseDate } from '../utilities/functions'
 import SectionTitle from '../SectionTitle'
+import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
 
 type FormFieldProps = {
     title: string,
@@ -28,12 +29,12 @@ type FormFieldProps = {
 }
 
 const FormField = React.memo((props: FormFieldProps) => {
-    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE, { background: PRIMARY_BLACK }))
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE, { background: PRIMARY_BLACK,border:`1px solid ${PRIMARY_PINK}` }))
     const classes = useStyles()
     const { lang } = useLanguage()
     return <Stack alignItems={'center'} justifyContent={'center'} spacing={1}>
         <label
-            style={{ ...props.style, ...{ padding: '4px',color:SECONDARY_WHITE, fontWeight: 'bold' } }}
+            style={{ ...props.style, ...{ padding: '4px', color: SECONDARY_WHITE, fontWeight: 'bold' } }}
         > {props.title}</label>
         {props.type === 'date' || props.type === 'time' ? <TextField
             dir={SIDE(lang)}
@@ -61,8 +62,15 @@ export default function PrivateEventConstruction() {
     const { doLoad, openDialog, cancelLoad } = useLoading()
     const { lang } = useLanguage()
 
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
     const [image, setImage] = useState<string>('')
+
+
+    useEffect(() => {
+        hideHeader();
+        return () => showHeader()
+    })
     // event properties changers
     const updateEventTitle = (title: string) => {
         setPrivateEvent({ ...privateEvent, ...{ eventTitle: title } })
@@ -121,7 +129,7 @@ export default function PrivateEventConstruction() {
     return <PageHolder style={{ maxWidth: '600px', border: 'none', marginLeft: 'auto', marginRight: 'auto' }}>
 
         <SectionTitle title={CREATE_INVITATION_TITLE(lang)} style={{}} />
-        <InnerPageHolder style={{ border: 'none', background: SECONDARY_BLACK }}>
+        <InnerPageHolder style={{border: '1px solid gray' , background: 'black' }}>
             < Stack style={{ maxWidth: '300px' }} spacing={1}>
 
                 <input onChange={(event) => {
@@ -146,14 +154,15 @@ export default function PrivateEventConstruction() {
                     height: '75px',
                     boxShadow: elegantShadow()
                 }} />          <label style={{
-                    color: SECONDARY_WHITE,
+                    color: PRIMARY_ORANGE,
                     padding: '8px',
                     borderRadius: '8px',
+                    fontWeight:'bold',
                     cursor: 'pointer',
                     alignSelf: 'center',
                     marginTop: '16px',
                     width: 'fit-content',
-                    backgroundImage: DARK_BLACK
+                    backgroundColor:'transparent'
                 }} onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}</label>
 
                 <FormField
@@ -171,9 +180,10 @@ export default function PrivateEventConstruction() {
                     className={''}
                     fixed={false}
                     id={{}}
-                
+
                     style={{
                         width: '100%',
+                        borderRadius:'32px',
                         marginBottom: '2px',
                         color: SECONDARY_WHITE,
                         background: PRIMARY_BLACK
@@ -214,7 +224,7 @@ export default function PrivateEventConstruction() {
                 <Spacer offset={1} />
                 <Button
                     onClick={addPrivateEventAction}
-                    style={{ ...submitButton(false), ...{ marginTop: '0px',width:'80%', textTransform: 'none' } }}>{CREATE_INVITATION(lang)}</Button>
+                    style={{ ...submitButton(false), ...{ marginTop: '0px', width: '80%',paddingTop:'8px',paddingBottom:'8px', textTransform: 'none' } }}>{CREATE_INVITATION(lang)}</Button>
             </Stack >
         </InnerPageHolder>
     </PageHolder>

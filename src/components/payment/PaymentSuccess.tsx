@@ -28,6 +28,7 @@ import { PNPPublicRide } from '../../store/external/types'
 import { isValidPublicRide } from '../../store/validators'
 import MapComponent from '../MapComponent';
 import { useGoogleState } from '../../context/GoogleMaps'
+import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
 function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
@@ -43,6 +44,14 @@ export default function PaymentSuccess() {
     const { lang } = useLanguage()
     const nav = useNavigate()
     const [transaction, setTransaction] = useState<TransactionSuccess | undefined>()
+
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
+
+
+    useEffect(() => {
+        hideHeader();
+        return () => showHeader()
+    })
     useEffect(() => {
         if (!query) { nav('/'); return }
         let unsub: Unsubscribe | null = null;
@@ -193,8 +202,8 @@ export default function PaymentSuccess() {
     return <PageHolder style={{ overflowX: 'hidden' }}>
         {transaction ? <div>
             <SectionTitle style={{ marginTop: '32px', marginBottom: '4px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
-     
-            <InnerPageHolder style={{background:'none',border:'none', margin: '0px', width: '250px', height: lang === 'heb' ? '400px' : '432px' }}>
+
+            <InnerPageHolder style={{ background: 'none', border: 'none', margin: '0px', width: '250px', height: lang === 'heb' ? '400px' : '432px' }}>
                 <h3
                     dir={SIDE(lang)}
                     style={{ background: 'black', color: 'white', borderRadius: '4px', padding: '4px', margin: '0px' }}
@@ -268,8 +277,8 @@ export default function PaymentSuccess() {
             </div>}
         </InnerPageHolder>
 
-        <SectionTitle title={TRANSACTION_DETAILS(lang)} style={{transform:'translateY(-176px)'}} />
-        <InnerPageHolder style={{ border: '.5px solid white', background: 'rgb(0,0,0,0.2)',transform:'translateY(-176px)', direction: SIDE(lang) }}>
+        <SectionTitle title={TRANSACTION_DETAILS(lang)} style={{ transform: 'translateY(-176px)' }} />
+        <InnerPageHolder style={{ border: '.5px solid white', background: 'rgb(0,0,0,0.2)', transform: 'translateY(-176px)', direction: SIDE(lang) }}>
             {<div id='floating_indicator_payment'>
 
                 <span>{lang === 'heb' ? 'קבלה למטה' : 'Receipt down'}</span>
@@ -317,6 +326,6 @@ export default function PaymentSuccess() {
             <img src={logo} style={{ maxWidth: '200px', height: '25px', alignSelf: 'flex-end', marginTop: '32px' }}></img>
         </InnerPageHolder>
 
-       
+
     </PageHolder>
 }

@@ -33,9 +33,10 @@ export default function EventPayment() {
         const onScrollHandler = () => {
             let window_y = window.scrollY
             if (window_y <= 30) {
-                $('.toolbar').css('background-color', 'rgba(0,0,0,0.5)')
+                $('.toolbar').css('background-color', 'black');
             }
         }
+        onScrollHandler();
         window.addEventListener('scroll', onScrollHandler)
         return () => { window.removeEventListener('scroll', onScrollHandler) }
     }, [])

@@ -2,14 +2,14 @@ import logo from '../assets/images/logo_white.png';
 import homeIcon from '../assets/images/appmenu/pink/home.svg'
 import userIcon from '../assets/images/appmenu/pink/user.svg'
 import questionIcon from '../assets/images/appmenu/pink/question.svg'
-import coupleIcon from '../assets/images/appmenu/pink/coupon.svg'
+import coupleIcon from '../assets/images/appmenu/pink/couple.svg'
 import busIcon from '../assets/images/appmenu/pink/bus.svg'
 import listIcon from '../assets/images/appmenu/pink/list.svg'
 
 import homeIconWhite from '../assets/images/appmenu/white/home_white.svg'
 import userIconWhite from '../assets/images/appmenu/white/user_white.svg'
 import questionIconWhite from '../assets/images/appmenu/white/question_white.svg'
-import coupleIconWhite from '../assets/images/appmenu/white/coupon_white.svg'
+import coupleIconWhite from '../assets/images/appmenu/white/couple_white.svg'
 import busIconWhite from '../assets/images/appmenu/white/bus_white.svg'
 import listIconWhite from '../assets/images/appmenu/white/list_white.svg'
 
@@ -180,7 +180,8 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
         { text: MENU_ITEM_2(lang), icon: [userIcon, userIconWhite], marked: (location.pathname === '/myaccount/transactions' && location.search === '?i=1') },
         { text: MENU_ITEM_3(lang), icon: [listIcon, listIconWhite], marked: (location.pathname === '/myaccount/transactions' && location.search === '?i=2') },
         { text: MENU_ITEM_4(lang), icon: [questionIcon, questionIconWhite], marked: location.pathname === '/howdoesitwork' },
-        { text: MENU_ITEM_5(lang), icon: [busIcon, busIconWhite], marked: location.pathname === '/createevent' },
+        { text: MENU_ITEM_5(lang), icon: [coupleIcon, coupleIconWhite], marked: location.pathname === '/createeventprivate' },
+        { text: CREATE_EVENT(lang), icon: [busIcon, busIconWhite], marked: location.pathname === '/createevent' },
     ].map((item, index) => ({ ...item, action: () => clickedItem(index + 1) }))
         .map(item => <MenuItem key={v4()} text={item.text} icon={item.icon} marked={item.marked} action={item.action} />)
 

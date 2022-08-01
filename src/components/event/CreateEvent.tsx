@@ -24,7 +24,7 @@ import { useLoading } from "../../context/Loading";
 import { submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { useNavigate } from "react-router";
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
@@ -32,6 +32,7 @@ import { v4 } from "uuid";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
 import { getCurrentDate } from "../../utilities";
 import { getDefaultPublicEvent } from "../../store/external/helpers";
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 
 export default function CreateEvent() {
     const { lang } = useLanguage()
@@ -56,6 +57,15 @@ export default function CreateEvent() {
     const [pnpEvent, setPnpEvent] = useState<PNPEvent>(getDefaultPublicEvent(user))
     const [startDate, setStartDate] = useState<string>('00:00')
     const [endDate, setEndDate] = useState<string>('00:00')
+
+
+
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
+    useEffect(() => {
+        hideHeader();
+        return () => showHeader()
+    })
+
     const onEditorStateChanged = (state: EditorState) => {
         setEditorState(state)
         if (editorState) {
@@ -97,7 +107,7 @@ export default function CreateEvent() {
     }
 
 
-    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE));
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE,{background:PRIMARY_BLACK,border:`1px solid ${PRIMARY_PINK}`}));
 
 
     const [mandatory, setMandatory] = useState<{ [id: number]: string }>({
@@ -171,7 +181,7 @@ export default function CreateEvent() {
 
     return (<PageHolder>
         <SectionTitle title={CREATE_EVENT_TITLE(lang)} style={{}} />
-        <InnerPageHolder style={{ background: 'none', border: '.8px solid gray' }}>
+        <InnerPageHolder style={{ background: 'black', border: '1px solid gray' }}>
 
             <Stack spacing={3} style={{ width: '100%',maxWidth:'300px' }} >
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
@@ -197,18 +207,19 @@ export default function CreateEvent() {
                         maxWidth: '225px',
                         height: '75px'
                     }} />          <label style={{
-                        color: PRIMARY_WHITE,
+                        color: PRIMARY_ORANGE,
+                        fontWeight:'bold',
                         padding: '8px',
                         borderRadius: '8px',
                         cursor: 'pointer',
                         alignSelf: 'center',
                         marginTop: '16px',
                         width: 'fit-content',
-                        backgroundImage: DARK_BLACK
+                        backgroundColor: 'transparent'
                     }} onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}</label>
                 </FormControl>
                 <FormControl style={{ width: '100%', alignSelf: 'center' }}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_TITLE(lang)}</label>
+                    <label style={{ padding: '4px', color: PRIMARY_ORANGE }}>{EVENT_TITLE(lang)}</label>
                     <TextField
                     
                         className={classes.root}
@@ -396,7 +407,7 @@ export default function CreateEvent() {
 
                         id={`arm${9}`}
                         value={getEventTypeFromString(pnpEvent.eventType!)}
-                        style={{ background: DARK_BLACK, fontFamily: 'Open Sans Hebrew', borderRadius: '32px', color: SECONDARY_WHITE }}
+                        style={{ background: 'transparent',fontWeight:'bold', fontFamily: 'Open Sans Hebrew', borderRadius: '32px', color: PRIMARY_ORANGE,border:`1px solid ${PRIMARY_ORANGE}` }}
                         onChange={(e) => {
                             (e.target.value as string && setMandatory({ ...mandatory, ...{ 9: e.target.value } }))
                             setPnpEvent({ ...pnpEvent, ...{ eventType: getEventType({ ...pnpEvent, ...{ eventType: e.target.value } }) } })
@@ -422,7 +433,7 @@ export default function CreateEvent() {
                     <span>
                         <Button
                             onClick={submitCreateEvent}
-                            sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {CREATE_EVENT(lang)}</Button>
+                            style={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {CREATE_EVENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
             </Stack>
