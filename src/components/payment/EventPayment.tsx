@@ -5,6 +5,7 @@ import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
 import { PNPEvent, PNPPublicRide } from '../../store/external/types'
 import { PageHolder } from '../utilities/Holders'
 import './EventPayment.css'
+import $ from 'jquery'
 import { PaymentForm } from './Payment'
 export default function EventPayment() {
     const location = useLocation()
@@ -28,6 +29,15 @@ export default function EventPayment() {
             left: 0,
             behavior: "smooth"
         })
+
+        const onScrollHandler = () => {
+            let window_y = window.scrollY
+            if (window_y <= 30) {
+                $('.toolbar').css('background-color', 'rgba(0,0,0,0.5)')
+            }
+        }
+        window.addEventListener('scroll', onScrollHandler)
+        return () => { window.removeEventListener('scroll', onScrollHandler) }
     }, [])
 
     function getTicketsLeft() {
