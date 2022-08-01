@@ -67,10 +67,10 @@
 }
 .app_menu_item_decor_3 {
     height:80px;
-    width: 30px;
+    width: 29px;
     position: absolute;
     left:0;
-    transform: rotate(25deg) translateX(-20px) translateY(-5px);
+    transform: rotate(20deg) translateX(-20px) translateY(-5px);
     margin-left: 8px;
     background-color: var(--PRIMARY_BLACK);
 }
