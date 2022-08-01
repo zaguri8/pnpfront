@@ -136,6 +136,11 @@ export function PaymentForm({ product }) {
                 if (res.data.data) {
                     setPaymentLink(res.data.data.payment_page_link)
                     cancelLoad()
+                    window.scrollTo({
+                        top: 32,
+                        left: 0,
+                        behavior: "smooth"
+                    })
                 }
             }).catch(e => {
             })
@@ -319,7 +324,6 @@ export function PaymentForm({ product }) {
             {populate()}
         </div>
     })
-
     const getElement = () => {
         return paymentLink ?
             <InnerPageHolder style={{ direction: SIDE(lang), overflowX: 'hidden', fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000' }} >
