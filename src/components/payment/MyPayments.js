@@ -77,14 +77,14 @@ const MyPayments = () => {
                 </Stack>
                 <Stack direction={'row'}>
 
-                    <LocationOnIcon style={{ width: '12.5px', height: '12.5px', color: PRIMARY_ORANGE,paddingInline:'8px', }} />
+                    <LocationOnIcon style={{ width: '12.5px', height: '12.5px', color: PRIMARY_ORANGE, paddingInline: '8px', }} />
                     <div style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.more_info.startPoint}</div>
-                
+
                 </Stack>
 
                 <Stack direction={'row'}>
 
-                    <CalendarTodayIcon style={{ width: '12.5px', height: '12.5px',paddingInline:'8px', color: PRIMARY_ORANGE }} />
+                    <CalendarTodayIcon style={{ width: '12.5px', height: '12.5px', paddingInline: '8px', color: PRIMARY_ORANGE }} />
                     <div style={{ fontSize: '10px', maxWidth: '120px', textAlign: 'center' }}>{transaction.date}</div>
                 </Stack>
             </div>
@@ -127,8 +127,7 @@ const MyPayments = () => {
 
 
     return (transactions && transactions.length > 0 ? <PageHolder
-        style={{ width: '100%',height:'100vh' }}
-    >
+        style={{ width: '100%' }}>
         <div className='account_page_top_bar_wrapper'>
             <div className='account_page_top_bar' dir={SIDE(lang)}>
                 <div className='account_page_bar_item_big'>
