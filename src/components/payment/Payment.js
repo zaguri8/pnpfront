@@ -137,7 +137,7 @@ export function PaymentForm({ product }) {
                     setPaymentLink(res.data.data.payment_page_link)
                     cancelLoad()
                     window.scrollTo({
-                        top: 32,
+                        top: 64,
                         left: 0,
                         behavior: "smooth"
                     })

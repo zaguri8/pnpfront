@@ -22,7 +22,13 @@ export default function EventPayment() {
             setPaymentInfo(stt)
         }
     }, [location.state])
-
+    useEffect(() => {
+        window.scrollTo({
+            top: 64,
+            left: 0,
+            behavior: "smooth"
+        })
+    }, [])
 
     function getTicketsLeft() {
         return !paymentInfo ? 0 : (Number(paymentInfo.ride.extras.rideMaxPassengers) - Number(paymentInfo.ride.passengers));
