@@ -127,7 +127,7 @@ const MyPayments = () => {
 
 
     return (transactions && transactions.length > 0 ? <PageHolder
-        style={{ width: '100%',minHeight:'600px' }}>
+        style={{ width: '100%' }}>
         <div className='account_page_top_bar_wrapper'>
             <div className='account_page_top_bar' dir={SIDE(lang)}>
                 <div className='account_page_bar_item_big'>

@@ -44,12 +44,12 @@ export const useHeaderBackgroundExtension = () => {
     const location = useLocation()
     function hideHeader() {
         $('.App-header').css('min-height', '10vh').css('height', '10vh')
-        $('.footer_container').css('position', 'absolute').css('marginTop', '64px')
+        $('.footer_container').css('transform', 'translateY(30px)')
     }
 
     function showHeader() {
         $('.App-header').css('min-height', '48vh').css('height', '48vh')
-        $('.footer_container').css('position', 'relative').css('marginTop', 'inherit')
+        $('.footer_container').css('transform', 'none')
     }
     function setHeaderBackground(image: string) {
         if ($('.App-header').css('background') !== image) {
