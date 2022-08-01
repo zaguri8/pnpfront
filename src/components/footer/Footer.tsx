@@ -17,7 +17,7 @@ export default function Footer() {
     const nav = useNavigate()
     const menuRightContent = {
         "איך זה עובד?": () => console.log("sd"),
-        "התחברות/הרשמה": () => nav('/myaccount'),
+        "התחברות/הרשמה": () => nav('/myaccount/transactions'),
         "צור/י אירוע": () => nav('/createevent'),
         "English": () => setLang(lang === 'heb' ? 'en' : 'heb')
     }
