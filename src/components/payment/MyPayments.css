@@ -97,7 +97,6 @@
     width: 100%;
     max-height: 500px;
     overflow-y: scroll;
-    margin-bottom: 64px;
     transform: translateX(-30px);
     margin-top: 16px;
 }
@@ -141,6 +140,6 @@
 @media only screen and (max-width:400px) {
 
     #transactions_table {
-        transform: none;
+        transform: translateX(-15px);
     }
 }
