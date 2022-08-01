@@ -46,8 +46,6 @@ export default function PaymentSuccess() {
     const [transaction, setTransaction] = useState<TransactionSuccess | undefined>()
 
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
-
-
     useEffect(() => {
         hideHeader();
         return () => showHeader()

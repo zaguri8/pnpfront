@@ -180,8 +180,8 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
         { text: MENU_ITEM_2(lang), icon: [userIcon, userIconWhite], marked: (location.pathname === '/myaccount/transactions' && location.search === '?i=1') },
         { text: MENU_ITEM_3(lang), icon: [listIcon, listIconWhite], marked: (location.pathname === '/myaccount/transactions' && location.search === '?i=2') },
         { text: MENU_ITEM_4(lang), icon: [questionIcon, questionIconWhite], marked: location.pathname === '/howdoesitwork' },
-        { text: MENU_ITEM_5(lang), icon: [coupleIcon, coupleIconWhite], marked: location.pathname === '/createeventprivate' },
-        { text: CREATE_EVENT(lang), icon: [busIcon, busIconWhite], marked: location.pathname === '/createevent' },
+        { text: MENU_ITEM_5(lang), icon: [coupleIcon, coupleIconWhite], marked: location.pathname === '/createPrivateEvent' },
+        { text: CREATE_EVENT(lang), icon: [busIcon, busIconWhite], marked: location.pathname === '/createEvent' },
     ].map((item, index) => ({ ...item, action: () => clickedItem(index + 1) }))
         .map(item => <MenuItem key={v4()} text={item.text} icon={item.icon} marked={item.marked} action={item.action} />)
 
