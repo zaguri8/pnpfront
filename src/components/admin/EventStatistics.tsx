@@ -21,12 +21,13 @@ import { isValidPublicRide } from "../../store/validators";
 import { elegantShadow, submitButton, textFieldStyle } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../SectionTitle";
-import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { makeStyles } from "@mui/styles";
 import AddUpdateEventRide from "./AddUpdateEventRide";
 import AddUpdateEvent from "./AddUpdateEvent";
 import { base64 } from "@firebase/util";
+import EventLinkRedirect from "./EventLinkRedirect";
 
 export type PNPRideExtraPassenger = {
     fullName: string,
@@ -125,11 +126,12 @@ export default function EventStatistics() {
 
     const buttonStyle = {
         textDecoration: 'none',
-        border: '.1px solid white',
+        border: `.1px solid ${PRIMARY_PINK}`,
         borderRadius: '16px',
         fontSize: '16px',
         fontFamily: 'Open Sans Hebrew',
-        background: DARK_BLACK,
+        background: 'black',
+
         color: SECONDARY_WHITE
     }
 
@@ -201,7 +203,7 @@ export default function EventStatistics() {
                                             }>{`נקודת יציאה : ${ride.rideStartingPoint}`}</h4></div>)
                                         openDialog({ content: <AddUpdateEventRide event={props.event} ride={ride} />, title: `עריכת הסעה לאירוע` })
                                     }}
-                                    style={{ color: SECONDARY_WHITE, border: '.1px solid black', background: DARK_BLACK }}>
+                                    style={{ color: SECONDARY_WHITE, border: '.1px solid black', background: 'transparent' }}>
                                     {`ערוך`}
                                 </Button>}
 
@@ -471,9 +473,11 @@ export default function EventStatistics() {
                                 style={{
                                     margin: '4px',
                                     fontSize: '14px',
-                                    padding: '4px', border: 'none',
-                                    background: DARKER_BLACK_SELECTED,
-                                    color: SECONDARY_WHITE
+                                    padding: '4px',
+                                    border: '1px solid white',
+                                    background: 'black',
+                                    fontWeight:'bold',
+                                    color: PRIMARY_ORANGE
                                 }}>
                                 {'הצג משתמשים'}
                             </button>
@@ -728,13 +732,29 @@ export default function EventStatistics() {
             })
         }
     }
+
+    useEffect(() => {
+        let unsub: Unsubscribe | undefined;
+        if (event) {
+            unsub = firebase.realTime.getLinkRedirectForEventId(event.eventId, (link, err) => {
+                if (err) {
+                    return;
+                }
+                setLinkRedirect(link);
+            })
+        }else {
+            console.log("event null")
+        }
+        return () => unsub && unsub();
+    }, [event])
+
+
+    const [linkRedirect, setLinkRedirect] = useState<string | null>()
     return (event ? <PageHolder style={{ background: BLACK_ELEGANT, overflowX: 'hidden' }}>
         <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
         <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
         <InnerPageHolder style={{ width: '80%', overflowY: 'hidden', overflowX: 'hidden', background: 'none', border: 'none' }} >
             <Stack spacing={3} style={{ width: '75%' }}>
-
-
                 {function addRideButton() {
                     return <Button
                         dir={'rtl'}
@@ -808,7 +828,7 @@ export default function EventStatistics() {
 
                 {function eventDeleteButton() {
                     return <Button
-                        style={{ borderRadius: '16px', fontFamily: 'Open Sans Hebrew', background: ORANGE_RED_GRADIENT_BUTTON, fontWeight: 'bold', color: SECONDARY_WHITE }}
+                        style={{ borderRadius: '16px',border:'1px solid red', fontFamily: 'Open Sans Hebrew', background: 'black', fontWeight: 'bold', color: SECONDARY_WHITE }}
                         onClick={() => {
                             openDialog({
                                 content: <div>
@@ -862,6 +882,9 @@ export default function EventStatistics() {
                     }}>{'ייצא לקובץ CSV'}</Button>
             }()}
 
+            <Spacer offset={1} />
+            {event &&  <EventLinkRedirect firebase={firebase} event={event} linkRedirect={linkRedirect} />}
+            { }
         </InnerPageHolder>
     </PageHolder> : <div>{'לא קיים לאירוע זה דף ניהול'}</div>)
 

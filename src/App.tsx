@@ -56,6 +56,8 @@ import { makeStyles } from '@mui/styles';
 import { textFieldStyle } from './settings/styles';
 import Footer from './components/footer/Footer';
 import EventPayment from './components/payment/EventPayment';
+import EventLinkRedirect from './components/admin/EventLinkRedirect';
+import LinkRedirect from './components/linkRedirect/LinkRedirect';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -315,6 +317,7 @@ function App() {
         <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='/event/payment' element={<EventPayment />} />
+        <Route path='/linkRedirect/:id' element={<LinkRedirect />} />
         <Route path='termsOfService' element={<TermsOfService />} />
         <Route path='/test' element={<GeneratePaymentForm />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />

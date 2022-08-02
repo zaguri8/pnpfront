@@ -41,6 +41,7 @@ export class Realtime {
     private allEvents: DatabaseReference
     private errs: DatabaseReference
     private users: DatabaseReference
+    private linkRedirects: DatabaseReference
     private auth: Auth
     private storage: FirebaseStorage
     private statistics: DatabaseReference
@@ -57,9 +58,39 @@ export class Realtime {
         this.errs = ref(db, '/errors')
         this.transactionConfirmations = ref(db, '/transactionConfirmations')
         this.transactions = ref(db, '/transactions')
+        this.linkRedirects = ref(db, '/linkRedirects')
         this.auth = auth
         this.storage = storage
     }
+
+
+    setLinkRedirect(id: string, redirectUrl: string, consume: (link: string | null) => void) {
+        set(child(this.linkRedirects, id), redirectUrl).then(success => {
+            consume(`https://www.pick-n-pull.co.il/#/linkRedirect/${id}`)
+        }).catch(err => {
+            consume(null)
+            return this.createError('setLinkRedirect', err);
+        })
+    }
+
+    getLinkRedirect(path: string, consume: (link: string | null, error: string | null) => void) {
+        return onValue(child(this.linkRedirects, path), (snap) => {
+            if (!snap.exists()) { return consume(null, "Link doesn't exist") }
+            return consume(snap.val(), null)
+        })
+    }
+    getLinkRedirectForEventId(eventId: string, consume: (link: string | null, error: string | null) => void) {
+        return onValue(this.linkRedirects, (snap) => {
+            if (!snap.exists()) { return consume(null, "This event  has no link") }
+            snap.forEach(l => {
+                if (l.val().includes(eventId)) {
+                    return consume(`https://pick-n-pull/#/linkRedirect/${l.key}`, null);
+                }
+            })
+        })
+    }
+
+
     /**
      * addError
      * @param error error to be added to db
@@ -271,6 +302,7 @@ export class Realtime {
                 return false
             }).catch((e) => this.createError("deleteConfirmation", e));
     }
+
     async getUserIdByEmail(email: string,
         consume: ((userId: string) => void),
         error: (() => void)) {

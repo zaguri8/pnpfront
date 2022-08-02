@@ -172,7 +172,7 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
                 {!props.marked && <div className='app_menu_item_decor' />}
                 <img src={props.marked ? props.icon[1] : props.icon[0]} />
                 <p>{props.text}</p>
-                {props.marked && (function () { let a = []; for (let i = 0; i < 2; i++) { a.push(<div className={`app_menu_item_decor_${(2 + i)}`} />); } return a; })()}
+                {props.marked && (function () { let a = []; for (let i = 0; i < 2; i++) { a.push(<div key ={v4()} className={`app_menu_item_decor_${(2 + i)}`} />); } return a; })()}
             </div>
         </li>
     }
