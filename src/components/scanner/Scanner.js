@@ -20,7 +20,7 @@ export default function Scanner() {
                 const n = Number(res.text)
                 nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res.text })
             } catch (e) {
-                alert('ברקוד לא תקין')
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res.text })
             }
         }
     }

@@ -61,6 +61,10 @@ export default function BScanResult() {
             firebase.realTime
                 .addListenerToTransactionConfirmation(queries.get('confirmationVoucher')!, (c) => {
                     doLoad()
+                    if (c === null) {
+                        decline()
+                        return;
+                    }
                     if (c.ridesLeft === 0) {
                         decline()
                     } else {

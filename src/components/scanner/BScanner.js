@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { QrReader } from 'react-qr-reader';
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
+import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
 import { PageHolder } from "../utilities/Holders";
 import { useScanner } from '../../context/ScannerContext'
 import Spacer from "../utilities/Spacer";
 import { Stack } from "@mui/material";
+import './BScanner.css'
 function BScanner() {
     const location = useLocation()
+    const nav = useNavigate()
     const { openScanner, isScanning, faceMode, setFaceMode, scannerLanguage, setScannerLanguage } = useScanner()
     useEffect(() => {
         if (!location.state)
             openScanner(scannerLanguage)
     }, [])
+    const inputRef = useRef()
     const selectionStyle = {
         background: SECONDARY_WHITE,
         width: '50%',
@@ -21,23 +24,37 @@ function BScanner() {
         alignSelf: 'center',
         margin: '16px'
     }
+
+    const updateScanResult = (res) => {
+        if (res) {
+            try {
+                const n = Number(res)
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
+            } catch (e) {
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
+            }
+        }
+    }
     return <div style={{
         padding: '16px',
         borderRadius: '32px',
         height: '100%',
+        display: 'flex',
         marginTop: '32px',
         minHeight: '420px',
         marginBottom: '32px',
+        alignItems: 'center',
+        flexDirection: 'column',
         width: window.outerWidth < 400 ? '80%' : '60%',
         marginLeft: 'auto',
         marginRight: 'auto',
-        background: ORANGE_GRADIENT_PRIMARY
+        background: 'black'
     }}>
 
 
         <Spacer offset={1} />
         {!isScanning ? <button
-            style={{ background: DARK_BLACK }}
+            style={{ background: PRIMARY_PINK, maxWidth: '200px' }}
             onClick={() => {
                 openScanner(scannerLanguage)
             }}>{scannerLanguage === 'עברית' ? 'פתח מצלמה' : `افتح الكاميرا`}</button> : <button
@@ -90,9 +107,16 @@ function BScanner() {
             }}
         />} */}
         <span style={{ color: SECONDARY_WHITE, fontSize: '12px' }}>{scannerLanguage === 'עברית' ? 'סורק זה דורש מצלמה של טלפון חכם' : `يتطلب هذا الماسح كاميرا هاتف ذكي`}</span>
-        <br />
-
-        <br />
+        <span>{scannerLanguage === 'עברית' ? 'אישור ידני' : 'تأكيد يدوي'}</span>
+        <input ref={inputRef} className="qr_code_num" placeholder={scannerLanguage === 'עברית' ? 'הכנס מספר אישור' : 'أدخل رقم التأكيد'}></input>
+        <button onClick={() => {
+            let val = inputRef.current.value
+            if (!val || val.length < 1) {
+                alert('יש להכניס מספר אישור')
+                return;
+            }
+            updateScanResult(val)
+        }} style={{ padding: '4px', paddingInline: '8px', marginTop: '16px', background: PRIMARY_ORANGE }}>{'אשר ידנית'}</button>
     </div>
 }
 

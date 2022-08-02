@@ -1,0 +1,10 @@
+.qr_code_num::placeholder {
+    color: black;
+    text-align: right;
+}
+.qr_code_num {
+    padding: 8px;
+    width: 100%;
+    text-align: right;
+    direction: rtl;
+}

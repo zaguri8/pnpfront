@@ -82,10 +82,12 @@ export class Realtime {
         return await set(newPath, error)
     }
 
-    async addListenerToTransactionConfirmation(voucher: string, consume: (c: PNPTransactionConfirmation) => void) {
-        return await get(child(this.transactionConfirmations, voucher)).then((snap) => {
-            consume(transactionConfirmationFromDict(snap))
-        })
+    async addListenerToTransactionConfirmation(voucher: string, consume: (c: PNPTransactionConfirmation | null) => void) {
+        let transactionsSnap = (await get(child(this.transactionConfirmations, voucher)));
+        if (!transactionsSnap.exists()) {
+            return consume(null)
+        }
+        return consume(transactionConfirmationFromDict(transactionsSnap))
     }
 
     async invalidateTransactionConfirmations(voucher: string, ridesLeft: number) {
