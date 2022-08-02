@@ -84,7 +84,7 @@ export class Realtime {
             if (!snap.exists()) { return consume(null, "This event  has no link") }
             snap.forEach(l => {
                 if (l.val().includes(eventId)) {
-                    return consume(`https://pick-n-pull/#/linkRedirect/${l.key}`, null);
+                    return consume(`https://pick-n-pull.co.il/#/linkRedirect/${l.key}`, null);
                 }
             })
         })
