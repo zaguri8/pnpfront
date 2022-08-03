@@ -49,7 +49,7 @@ const locationPinIconStyle = {
     color: 'orange',
     height: '12.5px'
 }
-export function PaymentForm({ product }) {
+export function PaymentForm({ product, paymentInfo }) {
 
 
     const { lang } = useLanguage()
@@ -63,7 +63,7 @@ export function PaymentForm({ product }) {
     const [extraPeople, setExtraPeople] = useState([])
     const requestPayment = () => {
         if (!firebase.auth.currentUser || !appUser) {
-            nav('/login', { state: { cachedLocation: location.pathname } })
+            nav('/login', { state: { cachedLocation: location.pathname, paymentInfo: paymentInfo } })
             closeDialog()
             return
         }

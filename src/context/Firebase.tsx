@@ -24,6 +24,7 @@ export interface IFirebaseContext {
   user: User | undefined | null;
   appUser: PNPUser | null;
   error: Error | null;
+  
   setUser: (user: User | null | undefined) => void;
   setAppUser: (user: PNPUser | null) => void;
 }

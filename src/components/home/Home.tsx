@@ -28,6 +28,7 @@ import ImageSlider from "../imageslider/ImageSlider"
 import logo from '../../assets/images/header.jpeg'
 import Footer from "../footer/Footer"
 import { useHeaderBackgroundExtension, useHeaderContext } from "../../context/HeaderContext"
+import { encryptMacdonald } from "../../utilities"
 export default function Home() {
     const { user, firebase } = useFirebase()
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
@@ -37,7 +38,7 @@ export default function Home() {
     const {setIsShowingAbout} = useHeaderContext()
     const { setHeaderBackground } = useHeaderBackgroundExtension()
     useEffect(() => {
-
+        encryptMacdonald("Helloworld")
         setHeaderBackground(`url('${logo}')`)
         setIsShowingAbout(true);
         const unsubEvents = firebase.realTime.addListenerToPublicEvents((events) => {
@@ -68,7 +69,7 @@ export default function Home() {
 
 
     function ArrowScrollUp() {
-
+        
         return <div
             id='arrow_scroll_up'
             onClick={(e) => {

@@ -122,7 +122,7 @@ export class Realtime {
     }
 
     async invalidateTransactionConfirmations(voucher: string, ridesLeft: number) {
-        return await update(child(this.transactionConfirmations, String(voucher)), { ridesLeft: ridesLeft })
+        return await update(child(this.transactionConfirmations, voucher), { ridesLeft: ridesLeft })
     }
 
 

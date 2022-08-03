@@ -17,7 +17,8 @@ export default function EventPayment() {
 
 
     useEffect(() => {
-        let stt = location.state as { ride: PNPPublicRide, event: PNPEvent }
+        let returnedInfo = (location.state as any)
+        let stt = (returnedInfo && returnedInfo.paymentInfo) ? returnedInfo.paymentInfo : (location.state as { ride: PNPPublicRide, event: PNPEvent })
         if (stt && !paymentInfo) {
             setHeaderBackground(`url('${stt.event.eventMobileImageURL ?? stt.event.eventImageURL}')`)
             setPaymentInfo(stt)
@@ -54,6 +55,7 @@ export default function EventPayment() {
     }}>
         <div className='dim_payment'></div>
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
+            paymentInfo={paymentInfo}
             product={{
                 name: `${paymentInfo.event.eventName}`,
                 desc: paymentInfo.event.eventDetails,

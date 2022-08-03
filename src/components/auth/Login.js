@@ -30,7 +30,7 @@ export default function Login() {
                 if (location.state && location.state.cachedLocation) {
                     doLoad()
                     setTimeout(() => {
-                        nav(location.state.cachedLocation)
+                        nav(location.state.cachedLocation, { state: location.state })
                         cancelLoad()
                     }, 100)
                 } else

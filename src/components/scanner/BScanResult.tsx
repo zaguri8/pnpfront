@@ -68,6 +68,7 @@ export default function BScanResult() {
                     if (c.ridesLeft === 0) {
                         decline()
                     } else {
+                
                         firebase.realTime.invalidateTransactionConfirmations(c.confirmationVoucher, c.twoWay ? (c.ridesLeft === 2 ? 1 : 0) : 0)
                             .then(() => { approve(c) })
                             .catch(decline)
