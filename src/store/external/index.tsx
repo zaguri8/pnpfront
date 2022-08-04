@@ -186,7 +186,6 @@ export class Realtime {
                     }
                 })
             })
-
             consume(allTransactions)
         }, onError)
     }
