@@ -53,7 +53,6 @@ const MyPayments = () => {
             doLoad()
             unsub = firebase.realTime.getAllTransactions(appUser.customerId, (trans) => {
                 unsub2 = firebase.realTime.addListenertoRidesForDates(trans, (transformed) => {
-                    console.log(transformed)
                     setTransactions(transformed)
                     cancelLoad()
                 }, (err) => {
