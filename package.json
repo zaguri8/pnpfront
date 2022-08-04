@@ -76,7 +76,7 @@
     "start": "env-cmd -f .env react-scripts start",
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
-    "d": "npm run build && git add . && git commit -m 'commit' && git push --force && firebase deploy",
+    "d": "node uploadgit",
     "eject": "react-scripts eject"
   },
   "browserslist": {
