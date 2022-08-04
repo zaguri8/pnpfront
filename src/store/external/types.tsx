@@ -1,3 +1,4 @@
+import { PNPRideExtraPassenger } from "../../components/admin/EventStatistics"
 
 
 export type PNPEventGraphics = {
@@ -67,6 +68,7 @@ export type PNPCoupon = {
     couponValue: string
     couponExpirationDate: string
 }
+
 
 
 export type PNPRideRequest = {
@@ -195,7 +197,8 @@ export type RegisterFormExtras = {
     requireFavoriteEvents: boolean
 }
 
-
+export type UserIdAndExtraPeople = { uid: string, extraPeople: PNPRideExtraPassenger[] }
+export type UserAndExtraPeople = { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }
 
 export type PCustomerData = {
     'customer_name': string,

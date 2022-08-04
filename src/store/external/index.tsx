@@ -1,5 +1,5 @@
 import { Auth, User } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData } from './types'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
@@ -16,6 +16,7 @@ import { TransactionSuccess } from '../payments/types'
 import { transactionSuccessFromDict } from '../payments/converters'
 import { getCurrentDate } from '../../utilities'
 import { dateStringFromDate } from '../../components/utilities/functions'
+import { PNPRideExtraPassenger } from '../../components/admin/EventStatistics'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -435,23 +436,26 @@ export class Realtime {
 
 
 
-    async getAllUsersByIds(ids_and_extraPeople: { uid: string, extraPeople: { fullName: string, phoneNumber: string }[] }[]): Promise<{ user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] | null> {
+    async getAllUsersByIds(
+        csvData: boolean,
+        ids_and_extraPeople: UserIdAndExtraPeople[]): Promise<UserAndExtraPeople[] | null> {
+        type ExtraPeople = { [uid: string]: { fullName: string, phoneNumber: string }[] }
         return await get(this.users)
             .then(snap => {
-                const total: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] = []
-                const extraPeople: any = {}
+                const total: UserAndExtraPeople[] = []
+                const extraPeople: ExtraPeople = {}
                 for (const id_and_p of ids_and_extraPeople) {
-                    let uid = id_and_p.uid.split('_nm')[0];
+                    let uid = csvData ? id_and_p.uid.split('_nm')[0] : id_and_p.uid;
                     if (!extraPeople[uid]) {
                         extraPeople[uid] = id_and_p.extraPeople
                     } else {
-                        if (!extraPeople[uid].includes(id_and_p.extraPeople[id_and_p.extraPeople.length - 1]))
+                        if (id_and_p.extraPeople && !extraPeople[uid].includes(id_and_p.extraPeople[id_and_p.extraPeople.length - 1]))
                             extraPeople[uid].push(...id_and_p.extraPeople)
                     }
                 }
                 snap.forEach(userSnap => {
                     var uid = userSnap.child('customerId').val()
-                    if (extraPeople[uid] || extraPeople[uid] === null) { // checks if has extraPeople or single
+                    if (extraPeople[uid] || extraPeople[uid] === null) {
                         total.push({
                             user: userFromDict(userSnap),
                             extraPeople: extraPeople[uid]
@@ -630,7 +634,6 @@ export class Realtime {
                 ret.push(eventFromDict(ev))
             })
 
-            const today = new Date();
             ret.sort((a, b) => {
                 const x = a.eventDate.split('/')
                 const y = b.eventDate.split('/')

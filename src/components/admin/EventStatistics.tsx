@@ -34,37 +34,24 @@ export type PNPRideExtraPassenger = {
     phoneNumber: string
 }
 
+export type PNPEventRidePurchaseData = { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } }
 
-enum AdminScreens {
-    ridesOverview, rideTransactions, rideRequests
-}
-
-type RideStatistics = {
+export type RideStatistics = {
     amount: string
     uid: string
     extraPeople: PNPRideExtraPassenger[]
     rideStartPoint: string
 }
 
-
-
-
-/**
- * 
- * Temporary Admin Panel
- * TODO: This page should recieve an event to show ride statistics for
- * trans : ride transactions for a given event
- * requests: ride requests from users for a given event
- * users: given a ride request list , get all the users correspinding for the requests
- */
+enum AdminScreens {
+    ridesOverview, rideTransactions, rideRequests
+}
 
 export default function EventStatistics() {
     const location = useLocation()
     const [event, setEvent] = useState<PNPEvent | null>(location.state ? location.state as PNPEvent : null)
     const [showingComponent, setShowingComponent] = useState<AdminScreens>(AdminScreens.rideTransactions)
-
-
-    const [objectsFromStatistics, setObjectsFromStatistics] = useState<{ [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } }>()
+    const [objectsFromStatistics, setObjectsFromStatistics] = useState<PNPEventRidePurchaseData>()
     const [total, setTotal] = useState(0)
 
     const [statistics, setStatistics] = useState<RideStatistics[] | null>(null)
@@ -281,8 +268,7 @@ export default function EventStatistics() {
                 return;
             }
             let t = total
-            const hash: { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } } = {}
-
+            const hash: PNPEventRidePurchaseData = {}
             let hHash: { [uid: string]: RideStatistics } = {}
             for (let i = 0; i < props.statistics.length; i++) {
                 if (!hHash[props.statistics[i].uid])
@@ -334,9 +320,9 @@ export default function EventStatistics() {
             setObjectsFromStatistics(hash)
         }, [])
 
-
-
-        function CustomerCardContainer(props: { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[] }) {
+        
+        type CustomerCardContainerProps = { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[] }
+        function CustomerCardContainer(props: CustomerCardContainerProps) {
             const [historyProp, setHistoryProp] = useState(props)
             const searchStyle = {
                 background: 'none',
@@ -377,7 +363,8 @@ export default function EventStatistics() {
             }, [])
 
 
-            const CustomerCard = (props: { customerData: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] } }) => {
+            type CustomerCardProps = { customerData: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] } }
+            const CustomerCard = (props: CustomerCardProps) => {
                 const labelTitleStyle = {
                     fontSize: '16px',
                     fontWeight: 'bold',
@@ -428,7 +415,7 @@ export default function EventStatistics() {
         const fetchUsersWithIds = async (ride: string, rideUsers: { uid: string, extraPeople: PNPRideExtraPassenger[] }[]) => {
             doLoad()
             let users = rideUsers.map(u => ({ ...u, uid: u.uid.split('_nm')[0] }))
-            firebase.realTime.getAllUsersByIds(users)
+            firebase.realTime.getAllUsersByIds(false, users)
                 .then((data) => {
                     if (data && data.length > 0) {
                         cancelLoad()
@@ -664,7 +651,9 @@ export default function EventStatistics() {
             </List></div> : <h4 style={{ color: SECONDARY_WHITE }}>{'אין בקשות לאירוע זה'}</h4>)
     }
 
-    const ShowingPanelScreen = (props: { event: PNPEvent, rides: PNPPublicRide[], requests: PNPRideRequest[], statistics: RideStatistics[], showingComponent: AdminScreens }) => {
+    type ShowingPanelScreenProps = { event: PNPEvent, rides: PNPPublicRide[], requests: PNPRideRequest[], statistics: RideStatistics[], showingComponent: AdminScreens }
+
+    const ShowingPanelScreen = (props: ShowingPanelScreenProps) => {
         return props.showingComponent === AdminScreens.ridesOverview ?
             <Rides rides={props.rides} event={props.event} />
             : props.showingComponent === AdminScreens.rideTransactions ?
@@ -676,7 +665,7 @@ export default function EventStatistics() {
         if (objectsFromStatistics && event) {
             const all = Object.keys(objectsFromStatistics).map((city) => {
                 return {
-                    fetchUsers: async () => await firebase.realTime.getAllUsersByIds(objectsFromStatistics[city].users),
+                    fetchUsers: async () => await firebase.realTime.getAllUsersByIds(true, objectsFromStatistics[city].users),
                     cityName: city
                 }
             })
