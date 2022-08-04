@@ -283,56 +283,53 @@ export default function EventStatistics() {
             let t = total
             const hash: { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } } = {}
 
-            let hHash: { [uid: string]: { [startPoint: string]: RideStatistics } } = {}
+            let hHash: { [uid: string]: RideStatistics } = {}
             for (let i = 0; i < props.statistics.length; i++) {
-                if (!hHash[props.statistics[i].uid] || !hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint]) {
-                    hHash[props.statistics[i].uid] = {}
-                    hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint] = props.statistics[i];
-                } else {
-                    if (hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint].extraPeople) {
+                if (!hHash[props.statistics[i].uid])
+                    hHash[props.statistics[i].uid] = props.statistics[i];
+                else {
+                    if (hHash[props.statistics[i].uid].extraPeople) {
                         if (props.statistics[i].extraPeople)
-                            hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint].extraPeople.push(...props.statistics[i].extraPeople)
+                            hHash[props.statistics[i].uid].extraPeople.push(...props.statistics[i].extraPeople)
                         else {
-                            hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint].extraPeople.push({
+                            hHash[props.statistics[i].uid].extraPeople.push({
                                 fullName: 'כרטיס נוסף',
                                 phoneNumber: 'מספר על שם הקונה'
                             })
                         }
                     } else {
                         if (props.statistics[i].extraPeople)
-                            hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint].extraPeople = props.statistics[i].extraPeople.concat({
+                            hHash[props.statistics[i].uid].extraPeople = props.statistics[i].extraPeople.concat({
                                 fullName: 'כרטיס נוסף',
                                 phoneNumber: 'מספר על שם הקונה'
                             })
                         else
-                            hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint].extraPeople = [{
+                            hHash[props.statistics[i].uid].extraPeople = [{
                                 fullName: 'כרטיס נוסף',
                                 phoneNumber: 'מספר על שם הקונה'
                             }]
                     }
-                    hHash[props.statistics[i].uid][props.statistics[i].rideStartPoint].amount += props.statistics[i].amount
+                    hHash[props.statistics[i].uid].amount += props.statistics[i].amount
                 }
             }
-            for (let entry of Object.entries(hHash)) {
-                let ridesForPerson = Object.values(entry[1]);
-                ridesForPerson.forEach(rideOfPerson => {
-                    if (rideOfPerson) {
-                        if (!hash[rideOfPerson.rideStartPoint]) {
-                            hash[rideOfPerson.rideStartPoint] = { amount: Number(rideOfPerson.amount), users: [{ uid: rideOfPerson.uid, extraPeople: rideOfPerson.extraPeople }] }
-                        } else {
-                            hash[rideOfPerson.rideStartPoint].amount += Number(rideOfPerson.amount)
-                            let exists = hash[rideOfPerson.rideStartPoint].users.findIndex(uid => uid.uid === rideOfPerson.uid)
-                            if (exists != -1) {
-                                if (rideOfPerson.extraPeople && hash[rideOfPerson.rideStartPoint].users[exists].extraPeople) {
-                                    hash[rideOfPerson.rideStartPoint].users[exists].extraPeople.push(...rideOfPerson.extraPeople)
-                                }
-                            } else
-                                hash[rideOfPerson.rideStartPoint].users.push({ uid: rideOfPerson.uid, extraPeople: rideOfPerson.extraPeople })
-                        }
-                        t += Number(rideOfPerson.amount)
+            let newArray = Object.values(hHash)
+            newArray.forEach(stat => {
+                if (stat) {
+                    if (!hash[stat.rideStartPoint]) {
+                        hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
+                    } else {
+                        hash[stat.rideStartPoint].amount += Number(stat.amount)
+                        let exists = hash[stat.rideStartPoint].users.findIndex(uid => uid.uid === stat.uid)
+                        if (exists != -1) {
+                            if (stat.extraPeople && hash[stat.rideStartPoint].users[exists].extraPeople) {
+                                hash[stat.rideStartPoint].users[exists].extraPeople.push(...stat.extraPeople)
+                            }
+                        } else
+                            hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
                     }
-                })
-            }
+                    t += Number(stat.amount)
+                }
+            })
             setTotal(t)
             setObjectsFromStatistics(hash)
         }, [])
@@ -430,7 +427,8 @@ export default function EventStatistics() {
 
         const fetchUsersWithIds = async (ride: string, rideUsers: { uid: string, extraPeople: PNPRideExtraPassenger[] }[]) => {
             doLoad()
-            firebase.realTime.getAllUsersByIds(rideUsers)
+            let users = rideUsers.map(u => ({ ...u, uid: u.uid.split('_nm')[0] }))
+            firebase.realTime.getAllUsersByIds(users)
                 .then((data) => {
                     if (data && data.length > 0) {
                         cancelLoad()

@@ -174,15 +174,17 @@ export class Realtime {
             const allTransactions: { rideStartPoint: string, extraPeople: { fullName: string, phoneNumber: string }[], uid: string, amount: string }[] = []
             let nextRef: DataSnapshot | null = null
             snap.forEach(user => {
+                let i = 0;
                 user.forEach(transaction => {
                     nextRef = transaction.child('more_info')
                     if (nextRef.exists() && nextRef!.child('eventId').val() === eid) {
                         allTransactions.push({
                             rideStartPoint: nextRef!.child('startPoint').val(),
-                            uid: user.key!,
+                            uid: user.key! + `_nm_${i}`,
                             extraPeople: nextRef!.child('extraPeople').val(),
                             amount: nextRef!.child('amount').val()
                         })
+                        i++;
                     }
                 })
             })
