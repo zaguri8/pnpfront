@@ -441,11 +441,12 @@ export class Realtime {
                 const total: { user: PNPUser, extraPeople: { fullName: string, phoneNumber: string }[] }[] = []
                 const extraPeople: any = {}
                 for (const id_and_p of ids_and_extraPeople) {
-                    if (!extraPeople[id_and_p.uid]) {
-                        extraPeople[id_and_p.uid] = id_and_p.extraPeople
+                    let uid = id_and_p.uid.split('_nm')[0];
+                    if (!extraPeople[uid]) {
+                        extraPeople[uid] = id_and_p.extraPeople
                     } else {
-                        if (!extraPeople[id_and_p.uid].includes(id_and_p.extraPeople[id_and_p.extraPeople.length - 1]))
-                            extraPeople[id_and_p.uid].push(...id_and_p.extraPeople)
+                        if (!extraPeople[uid].includes(id_and_p.extraPeople[id_and_p.extraPeople.length - 1]))
+                            extraPeople[uid].push(...id_and_p.extraPeople)
                     }
                 }
                 snap.forEach(userSnap => {
