@@ -54,9 +54,9 @@ export default function Scanner() {
             videoContainerStyle={{ maxHeight: '100%' }}
             constraints={{
                 audio: false,
-                facingMode: { exact: faceMode },
+                facingMode: { exact: 'user' },
                 aspectRatio: 1,
-                frameRate: { max: 30 }
+                frameRate:60
             }}
             onResult={(result, error) => {
                 if (!!result) {
