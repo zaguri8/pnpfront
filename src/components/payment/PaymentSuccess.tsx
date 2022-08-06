@@ -20,7 +20,7 @@ import { TRANSACTION_DETAILS } from '../../settings/strings'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import Spacer from '../utilities/Spacer'
 import { useLoading } from '../../context/Loading'
-import { BLACK_ELEGANT, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
+import { BLACK_ELEGANT, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import { QRCodeSVG } from 'qrcode.react'
 import { floatStyle } from '../WhatsApp'
 import { boxShadow, submitButton } from '../../settings/styles'
@@ -199,13 +199,9 @@ export default function PaymentSuccess() {
 
     return <PageHolder style={{ overflowX: 'hidden' }}>
         {transaction ? <div>
-            <SectionTitle style={{ marginTop: '32px', marginBottom: '4px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
+            <SectionTitle style={{ marginBottom: '4px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
 
-            <InnerPageHolder style={{ background: 'none', border: 'none', margin: '0px', width: '250px', height: lang === 'heb' ? '400px' : '432px' }}>
-                <h3
-                    dir={SIDE(lang)}
-                    style={{ background: 'black', color: 'white', borderRadius: '4px', padding: '4px', margin: '0px' }}
-                >{lang === 'heb' ? 'צלמו מסך למועד ההצגה !' : 'Take a screenshot for the event day !'}</h3>
+            <InnerPageHolder style={{ background: 'none', border: 'none', margin: '0px', width: '250px',padding:'0px', height: 'fit-content' }}>
                 <label dir={SIDE(lang)}
                     style={{
                         ...{
@@ -219,14 +215,32 @@ export default function PaymentSuccess() {
                     }}>
                     <InfoRoundedIcon style={{ padding: '2px', borderRadius: '16px', color: 'white' }} />
                     {lang === 'heb' ? 'שימו לב לשעות היציאה והחזרה - יש להגיע 10 דקות לפני. ההסעה לא תחכה למאחרים.' : 'Pay attention to the departure and return hours - you must arrive 10 minutes before. The shuttle will not wait for the latecomers.'}</label>
-                <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
-
+              
                 <span dir={SIDE(lang)}
 
                     style={bImportantStyle}>{(lang === 'heb' ? 'תוקף ברקוד: ' : 'Barcode expiration: ') + (lang === 'heb' ? (transaction.more_info.twoWay ? 'שני סריקות בלבד (סריקה לכל כיוון)' : 'סריקה אחת בלבד (כיוון אחד)') : (transaction.more_info.twoWay ? 'Two scans (Two directions)' : 'One Scan (One direction)'))}</span>
                 <b><span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, padding: '4px', margin: '4px', fontSize: '14px' }}>{(lang === 'heb' ? 'מספר נוסעים: ' : 'Number of passengers: ') + transaction.more_info.amount}</span></b>
 
                 <span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontSize: '9px', marginTop: '10px' }}>{lang === 'heb' ? 'במידה ורכשת מספר כרטיסים, הברקוד הנל מכיל את כולם.' : 'If you have purchased more then 1 ticket, the following barcode includes them as-well'}<b>{lang === 'heb' ? ' יש לעלות ביחד.' : 'Boarding together is required'}</b></span>
+                <Spacer offset={1}/>    
+                <Button style={{
+                    fontFamily: 'Open Sans Hebrew',
+                    textTransform: 'none',
+                    fontWeight:'bold',
+                    color: PRIMARY_WHITE,
+                    width:'100%',
+                    background: PRIMARY_PINK
+                }} onClick={() => {
+                    openDialog({
+                        content: <div>
+                            <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
+
+
+                            <Spacer offset={1}/>
+                            <label style ={{color:PRIMARY_ORANGE}}>{'צלמו מסך למועד האירוע !'}</label>
+                        </div>
+                    })
+                }}>{lang === 'heb' ? 'הצג ברקוד' : 'Show barcode'}</Button>
             </InnerPageHolder>
 
         </div> : null}
@@ -234,7 +248,7 @@ export default function PaymentSuccess() {
             <Button
 
                 onClick={openRideDetails}
-                style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%', maxWidth: '300px', padding: '0px', margin: '0px' } }}>{lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
+                style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%',backgroundColor:PRIMARY_ORANGE, maxWidth: '300px', padding: '0px', margin: '0px' } }}>{lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
         </InnerPageHolder>}
 
         <SectionTitle title={NAVIGATION(lang)} style={{ paddingBottom: '0px' }} />
