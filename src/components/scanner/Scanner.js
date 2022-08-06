@@ -45,14 +45,19 @@ export default function Scanner() {
                 padding: '0px',
                 width: '100%',
                 top: '0px',
-                maxHeight: 'max(100%,400px)',
+                maxHeight: '100%',
                 matchMedia: false,
                 borderRadius: '8px'
             }}
             containerStyle={{ margin: '16px', maxHeight: '100%', border: '1px solid white', borderRadius: '8px' }}
 
             videoContainerStyle={{ maxHeight: '100%' }}
-            constraints={{  audio: false, facingMode: { exact: faceMode }, aspectRatio: 1, frameRate: 24 }}
+            constraints={{
+                audio: false,
+                facingMode: { exact: faceMode },
+                aspectRatio: 1,
+                frameRate: { max: 30 }
+            }}
             onResult={(result, error) => {
                 if (!!result) {
                     updateScanResult(result)
