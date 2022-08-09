@@ -40,6 +40,19 @@ export const HeaderContextProvider = (props: object) => {
 
 }
 
+export const useBackgroundExtension = () => {
+    const changeBackgroundColor = (color: string) => {
+        $('.App').css('background-color', color)
+    }
+    const resetBackgroundColor = () => {
+        $('.App').css('background-color', PRIMARY_BLACK)
+
+    }
+    return {
+        changeBackgroundColor,
+        resetBackgroundColor
+    }
+}
 
 export const useHeaderBackgroundExtension = () => {
     const location = useLocation()
@@ -51,6 +64,14 @@ export const useHeaderBackgroundExtension = () => {
             .css('border', 'none')
         $('.footer_container')
             .css('transform', 'translateY(30px)')
+    }
+
+    function setHeaderColor(color: string) {
+        $('.App-header').css('background', color)
+
+    }
+    function resetHeaderColor() {
+        $('.App-header').css('background', PRIMARY_BLACK)
     }
 
     function showHeader() {
@@ -84,7 +105,9 @@ export const useHeaderBackgroundExtension = () => {
         setHeaderBackground,
         setHeaderAbout,
         hideHeader,
-        showHeader
+        showHeader,
+        setHeaderColor,
+        resetHeaderColor
     }
 
 

@@ -1,7 +1,7 @@
 
 import { PNPEvent } from "../../store/external/types"
 import { Button, Stack } from '@mui/material'
-import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK } from "../../settings/colors"
+import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors"
 import { useNavigate } from "react-router"
 import HTMLFromText from '../utilities/HtmlFromText'
 import { v4 } from 'uuid'
@@ -103,7 +103,7 @@ const AdminEventPanel = () => {
     }
     return <PageHolder style={{ background: PRIMARY_BLACK }}>
         <SectionTitle title={'ניהול אירועים'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ELEGANT }} >
+        <InnerPageHolder style={{ background: 'black' }} >
 
             {function eventManageTable() {
                 return <table dir={'rtl'} >
@@ -126,9 +126,9 @@ const AdminEventPanel = () => {
                             {location.state && (location.state as any).events && (location.state as { waitingEvents: PNPEvent[], events: PNPEvent[] }).events.map((event: PNPEvent) => <tr key={v4()} style={{ margin: '8px' }}>
                                 <th style={{ width: '50%' }}>  <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '4px', color: SECONDARY_WHITE }}>{event.eventName}</div></th>
                                 <th style={{ width: '50%' }}><Button
-                                    style={{ border: '.1px solid white', backgroundImage: BLACK_ELEGANT, minWidth: 'max-content', paddingLeft: '8px', paddingRight: '8px' }}
+                                    style={{ border: '.1px solid white', background:'black', minWidth: 'max-content', paddingLeft: '8px', paddingRight: '8px' }}
                                     onClick={() => { nav('/adminpanel/specificevent/eventstatistics', { state: event }) }}
-                                    sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#007AFF' } }}>
+                                    sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px',fontWeight:'bold', color: PRIMARY_PINK, background: '#007AFF' } }}>
                                     {'ניהול אירוע'}
                                 </Button></th>
                             </tr>)}
@@ -139,7 +139,7 @@ const AdminEventPanel = () => {
         </InnerPageHolder>
 
         <SectionTitle title={'אירועים ממתינים'} style={{ background: 'none' }} />
-        <InnerPageHolder style={{ background: BLACK_ELEGANT }} >
+        <InnerPageHolder style={{ background: 'black' }} >
             {function waitingEventsTable() {
                 if (location.state && (location.state as any).waitingEvents && (location.state as any).waitingEvents.length > 0)
                     return (<table dir={'rtl'}>

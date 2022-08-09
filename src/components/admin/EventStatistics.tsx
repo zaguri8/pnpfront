@@ -29,7 +29,7 @@ import AddUpdateEvent from "./AddUpdateEvent";
 import { base64 } from "@firebase/util";
 import EventLinkRedirect from "./EventLinkRedirect";
 import ScannerPermissions from "./ScannerPermissions";
-import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
+import { useBackgroundExtension, useHeaderBackgroundExtension } from "../../context/HeaderContext";
 
 export type PNPRideExtraPassenger = {
     fullName: string,
@@ -127,13 +127,13 @@ export default function EventStatistics() {
 
     const buttonStyle = {
         textDecoration: 'none',
-        border: `.1px solid ${PRIMARY_PINK}`,
+        border: `.1px solid ${'white'}`,
         borderRadius: '16px',
         fontSize: '16px',
         fontFamily: 'Open Sans Hebrew',
-        background: 'black',
-
-        color: SECONDARY_WHITE
+        background: 'whitesmoke',
+        fontWeight: 'bold',
+        color: PRIMARY_PINK
     }
 
 
@@ -241,7 +241,7 @@ export default function EventStatistics() {
                                     {`מחק`}
                                 </Button>}
 
-                                {<Button key={v4()}
+                                {/* {<Button key={v4()}
                                     onClick={() => {
                                         openDialogWithTitle(<div>
                                             <h4 style={
@@ -267,7 +267,7 @@ export default function EventStatistics() {
                                     }}
                                     style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: 'linear-gradient(#44A08D,#093637)' }}>
                                     {`אשר עסקאות`}
-                                </Button>}
+                                </Button>} */}
                             </th>
                         </tr>)}
                 </tbody>
@@ -752,12 +752,24 @@ export default function EventStatistics() {
         return () => unsub && unsub();
     }, [event])
 
+    const { setHeaderColor, resetHeaderColor } = useHeaderBackgroundExtension()
+    const { changeBackgroundColor, resetBackgroundColor } = useBackgroundExtension()
+    useEffect(() => {
+        setHeaderColor('black')
+        changeBackgroundColor('black')
+        return () => {
+            resetHeaderColor()
+            resetBackgroundColor()
+        }
+    }, [])
+
 
     const [linkRedirect, setLinkRedirect] = useState<string | null>()
-    return (event ? <PageHolder style={{ background: BLACK_ELEGANT, overflowX: 'hidden' }}>
-        <SectionTitle style={{ direction: 'rtl' }} title={`${event.eventName}`} />
-        <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
-        <InnerPageHolder style={{ width: '80%', overflowY: 'hidden', overflowX: 'hidden', background: 'none', border: 'none' }} >
+    return (event ? <PageHolder style={{ background: 'black', overflowX: 'hidden' }}>
+        <InnerPageHolder style={{ width: '80%', overflowY: 'hidden', overflowX: 'hidden', background: 'black', border: 'none' }} >
+            <SectionTitle style={{ marginTop: '4px', direction: 'rtl' }} title={`${event.eventName}`} />
+            <span style={{ color: SECONDARY_WHITE }}>{'ניהול הסעות לאירוע'}</span>
+            <Spacer offset={1} />
             <Stack spacing={3} style={{ width: '75%' }}>
                 {function addRideButton() {
                     return <Button
@@ -815,7 +827,7 @@ export default function EventStatistics() {
                         onClick={() => {
                             openDialog({ content: <AddUpdateEvent event={event} /> })
                         }}
-                        style={{ ...buttonStyle, ...{ background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
+                        style={{ ...buttonStyle, ...{ background: 'whitesmoke', fontWeight: 'bold' } }}>
                         {'עריכת אירוע'}
                         <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
                     </Button>
@@ -824,7 +836,7 @@ export default function EventStatistics() {
                 {function toggleEventShowsInGallery() {
                     return <Button
                         onClick={actionToggleEventShowsInGallery}
-                        style={{ ...buttonStyle, ...{ background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
+                        style={{ ...buttonStyle, ...{ background: 'whitesmoke', fontWeight: 'bold' } }}>
                         {event.eventShowsInGallery ? 'הסר אירוע מגלריה' : 'הוסף אירוע לגלריה'}
                         <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
                     </Button>
@@ -832,7 +844,7 @@ export default function EventStatistics() {
 
                 {function eventDeleteButton() {
                     return <Button
-                        style={{ borderRadius: '16px', border: '1px solid red', fontFamily: 'Open Sans Hebrew', background: 'black', fontWeight: 'bold', color: SECONDARY_WHITE }}
+                        style={{ borderRadius: '16px', border: '1px solid white', fontFamily: 'Open Sans Hebrew', background: 'black', fontWeight: 'bold', color: PRIMARY_PINK }}
                         onClick={() => {
                             openDialog({
                                 content: <div>
