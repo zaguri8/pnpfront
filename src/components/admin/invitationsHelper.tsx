@@ -92,7 +92,7 @@ export function getPassengersAndGuests(destination: string, confirmations: PNPRi
     for (let confirmation of confirmations) {
         passengers = populatePassengersDictionaryWithConfirmation(confirmation, passengers)
         if (destination === default_no_arrival)
-            guests += getGuests(confirmation) - getPassengers(confirmation)
+            guests += getGuests(confirmation) - getPassengers(confirmation) + 1;
     }
 
     return { passengers, guests }

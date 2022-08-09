@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react"
 import logo from '../assets/images/header.jpeg';
 import $ from 'jquery'
 import { useLocation } from "react-router";
+import { PRIMARY_BLACK } from "../settings/colors";
 
 interface IHeaderContext {
     isShowingAbout: boolean
@@ -43,8 +44,13 @@ export const HeaderContextProvider = (props: object) => {
 export const useHeaderBackgroundExtension = () => {
     const location = useLocation()
     function hideHeader() {
-        $('.App-header').css('min-height', '10vh').css('height', '10vh')
-        $('.footer_container').css('transform', 'translateY(30px)')
+        $('.App-header')
+            .css('min-height', '10vh')
+            .css('height', '10vh')
+            .css('background', PRIMARY_BLACK)
+            .css('border', 'none')
+        $('.footer_container')
+            .css('transform', 'translateY(30px)')
     }
 
     function showHeader() {

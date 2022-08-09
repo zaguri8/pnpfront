@@ -73,6 +73,7 @@ function ImageHeader() {
     alignItems: 'center',
     flexDirection: 'column',
     position: "relative",
+
     justifyContent: 'center'
   }}>
     <div className="header_content">
@@ -80,7 +81,6 @@ function ImageHeader() {
       {isShowingAbout && <Stack
         spacing={1}
         style={{
-
           transform: 'translateY(40px)'
         }}
         alignItems={'center'}

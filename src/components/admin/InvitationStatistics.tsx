@@ -149,29 +149,52 @@ export default function InvitationStatistics() {
         if (!privateEvent) return
 
         let confirmationPointer = confirmation
-        function update(pointer: PNPRideConfirmation) {
+        async function update(pointer: PNPRideConfirmation) {
+            if (!confirmations) return;
             doLoad()
-            firebase.realTime.updateConfirmation(
+            const updated = await firebase.realTime.updateConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName,
                 pointer
-            ).then(() => {
-                dialog("אישור עודכן בהצלחה")
-                cancelLoad()
-            }).catch(() => { cancelLoad() })
+            )
+            if (!updated || !(updated as PNPRideConfirmation)) {
+                alert('אירעתה שגיאה בעת עדכון אישור')
+                return
+            }
+            let confirs = Object.entries(confirmations)
+            let output = confirmations
+            confirs.forEach(ent => {
+                let f = ent[1].findIndex(d => d.userId === updated.userId && d.rideId === updated.rideId)
+                if (f !== -1) {
+                    output[ent[0]][f] = pointer
+                }
+            })
+            setConfirmations(output)
+            dialog("אישור עודכן בהצלחה")
+            cancelLoad()
         }
 
-        function deleteConfirmation(pointer: PNPRideConfirmation) {
+        async function deleteConfirmation() {
+            if (!confirmations) return;
             doLoad()
-            firebase.realTime.deleteConfirmation(
+            const deleted = await firebase.realTime.deleteConfirmation(
                 privateEvent!.eventId,
-                confirmation.userName,
-                pointer
-            ).then(() => {
-                dialog("אישור נמחק בהצלחה")
-                cancelLoad()
-                window.location.reload()
-            }).catch(() => { cancelLoad() })
+                confirmation.userName)
+            if (!deleted || typeof (deleted) === 'function') {
+                alert('אירעתה שגיאה בעת מחיקת אישור')
+                return
+            }
+            let confirs = Object.entries(confirmations)
+            let output = confirmations
+            confirs.forEach(ent => {
+                let f = ent[1].findIndex(d => d.userId === deleted.userId && d.rideId === deleted.rideId)
+                if (f !== -1) {
+                    output[ent[0]] = output[ent[0]].slice(0, Math.max(f - 1, 0)).concat(output[ent[0]].slice(f + 1, output[ent[0]].length))
+                }
+            })
+            setConfirmations(output)
+            dialog("אישור נמחק בהצלחה")
+            cancelLoad()
         }
 
         openDialog({
@@ -205,7 +228,7 @@ export default function InvitationStatistics() {
                 </Button>
 
                 <Button
-                    onClick={() => deleteConfirmation(confirmationPointer)}
+                    onClick={() => deleteConfirmation()}
                     style={{
                         ...buttonStyle, ...{
                             background: RED_ROYAL,
@@ -479,7 +502,7 @@ export default function InvitationStatistics() {
                                                             padding: '0px',
                                                             margin: '0px'
                                                         }
-                                                   
+
                                                         return <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                             <h3 style={{ color: SECONDARY_WHITE, margin: '0px', padding: '0px' }}>{entry[0] !== "null" ? entry[0].split(' ל - ')[0] : ""}</h3>
                                                             <div style={{ alignSelf: 'start', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -547,9 +570,7 @@ export default function InvitationStatistics() {
 
                                                                                 <TableRow
                                                                                     onClick={() => {
-                                                                                        if (confirmation.rideArrival)
-                                                                                            openConfirmationUpdateDialog(confirmation)
-                                                                                        else alert('לא ניתן לערוך אישור ללא הסעה')
+                                                                                        openConfirmationUpdateDialog(confirmation)
                                                                                     }}
                                                                                 >
                                                                                     <TableCell className='spanStyle_3_small' sx={{ color: SECONDARY_WHITE }}>

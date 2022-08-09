@@ -300,27 +300,28 @@ export class Realtime {
         confirmation: PNPRideConfirmation) {
         return await get(child(child(this.rides, 'confirmations'), eventId))
             .then(snap => {
-                snap.forEach(child => {
-                    if (child.child('userName').val() === userName) {
-                        update(child.ref, confirmation)
-                        return
+                let ret: PNPRideConfirmation | undefined
+                snap.forEach(cSnap => {
+                    if (cSnap.child('userName').val() === userName) {
+                        ret = cSnap.val() as PNPRideConfirmation
+                        update(cSnap.ref, confirmation)
                     }
                 })
+                return ret
             })
     }
     async deleteConfirmation(eventId: string,
-        userName: string,
-        confirmation: PNPRideConfirmation) {
+        userName: string) {
         return await get(child(child(this.rides, 'confirmations'), eventId))
             .then(snap => {
-                snap.forEach(child => {
-                    if (child.child('userName').val() === userName) {
-                        update(child.ref, confirmation)
-                        remove(child.ref)
-                        return true
+                let ret: PNPRideConfirmation | undefined;
+                snap.forEach(cSnap => {
+                    if (cSnap.child('userName').val() === userName) {
+                        ret = cSnap.val() as PNPRideConfirmation
+                        remove(cSnap.ref)
                     }
                 })
-                return false
+                return ret
             }).catch((e) => this.createError("deleteConfirmation", e));
     }
 
