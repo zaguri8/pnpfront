@@ -4,7 +4,7 @@ import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, 
 import { useNavigate } from 'react-router'
 import $ from 'jquery'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-
+import { motion } from 'framer-motion'
 import loadingGif from '../../assets/gifs/loading.gif'
 import { PNPEvent } from "../../store/external/types";
 import { useLanguage } from "../../context/Language";
@@ -99,7 +99,7 @@ export function Gallery(props: GalleryProps) {
 
     const imageContainer: CSSProperties = {
         display: 'flex',
-        columnGap:'8px',
+        columnGap: '8px',
         width: 'fit-content',
         textAlign: 'center'
     }
@@ -149,9 +149,21 @@ export function Gallery(props: GalleryProps) {
         backgroundSize: 'cover',
         height: '100%'
     }
+
+    const animations = {
+        initial: { opacity: 0, transform: 'translateX(200px)' },
+        animate: { opacity: 1, transform: 'translateX(0px)' },
+        exit: { opacity: 0 }
+    }
+
     return <div >
         {<h3 className='gallery_header' style={headerStyle}>{props.header}</h3>}
-        <div id='gallery_container' >
+        <motion.div
+            variants={animations}
+            initial={'initial'}
+            animate={'animate'}
+            exit={'exit'}
+            transition={{ duration: 0.5 }} id='gallery_container' >
             <div className='gallery' style={imageContainer} >
 
                 {props.events.map(pnpEvent => {
@@ -170,9 +182,14 @@ export function Gallery(props: GalleryProps) {
                     </div>)
                 })}
             </div>
-        </div>
+        </motion.div>
         {<h3 className='gallery_header' style={headerStyle}>{lang === 'heb' ? 'אירועים פרטיים' : 'Private event'}</h3>}
-        <div id='gallery_container' >
+        <motion.div
+            variants={animations}
+            initial={'initial'}
+            animate={'animate'}
+            exit={'exit'}
+            transition={{ duration: 1 }} id='gallery_container' >
             <div className='gallery' style={imageContainer}>
 
                 {props.privateEvents.map(pnpEvent => {
@@ -191,6 +208,6 @@ export function Gallery(props: GalleryProps) {
                     </div>)
                 })}
             </div>
-        </div>
-    </div >
+        </motion.div>
+    </div>
 }

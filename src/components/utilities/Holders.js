@@ -1,17 +1,18 @@
 import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK } from "../../settings/colors"
 import { motion } from 'framer-motion'
 const animations = {
-    initial: { opacity: 0,transform:'none' },
-    animate: { opacity: 1 ,transform:'rotate(360deg)'},
+    initial: { opacity: 0, transform: 'translateY(180px)' },
+    animate: { opacity: 1, transform: 'translateY(0px)' },
     exit: { opacity: 0 }
 }
-export const PageHolder = ({ children, style = {} }) => {
+export const PageHolder = ({ children, style = {}, transformUp = false}) => {
 
     return <motion.div
-        variants={animations}
+  variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: 'translateY(-42px)' } } } : animations}
         initial={'initial'}
         animate={'animate'}
         exit={'exit'}
+        transition={{ duration: 0.5 }}
         style={{
             ...{
                 width: '100%',
@@ -24,9 +25,10 @@ export const PageHolder = ({ children, style = {} }) => {
             }, ...style
         }}>{children}</motion.div>
 }
-export const InnerPageHolder = ({ children, style = {} }) => {
+export const InnerPageHolder = ({ children, style = {}, transformUp = false }) => {
     return <motion.div
-        variants={animations}
+        variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: 'translateY(-42px)' } } } : animations}
+        transition={{ duration: 0.5 }}
         initial={'initial'}
         animate={'animate'}
         exit={'exit'} style={{

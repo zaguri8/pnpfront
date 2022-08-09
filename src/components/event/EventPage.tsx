@@ -165,7 +165,7 @@ export default function EventPage() {
                 marginRight: 'auto',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: ride.extras.rideStatus === 'sold-out' && selectedEventRide !== ride ? '50% center' : 'center center',
-                
+
                 padding: '8px',
                 display: 'flex',
             }} value={ride.rideId}>
@@ -219,129 +219,132 @@ export default function EventPage() {
 
 
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
-        <React.Fragment><PageHolder style={{
-            background: 'white',
-            transform: 'translateY(-24px)',
-            borderTopLeftRadius: '32px',
-            borderTopRightRadius: '32px'
-        }}  >
-            <List id='ride_start_point_list' style={{
-                margin: '0px',
-                borderTopLeftRadius: '32px',
-                borderTopRightRadius: '32px',
-                padding: '0px',
-                alignItems: 'center',
-                width: '100%'
-            }}>
+        <React.Fragment>
+            <PageHolder
+                transformUp
+                style={{
+                    background: 'white',
+                    transform: 'translateY(-42px)',
+                    borderTopLeftRadius: '32px',
+                    borderTopRightRadius: '32px'
+                }}  >
+                <List id='ride_start_point_list' style={{
+                    margin: '0px',
+                    borderTopLeftRadius: '32px',
+                    borderTopRightRadius: '32px',
+                    padding: '0px',
+                    alignItems: 'center',
+                    width: '100%'
+                }}>
 
-                <div className="eventRideListContainerWrapper_ePage">
-                    <div className="ride_item_button">
-                        <Stack style={{ background: 'white', padding: '8px', paddingTop: '12px', borderTopLeftRadius: '32px', borderTopRightRadius: '32px' }}
-                            alignItems='center'
-                            dir='rtl' direction="row">
-                            <div className="c_square_b" />
-                            <p className='eventName_ePage'>{event.eventName}</p>
-                        </Stack>
-                        <p className='eventDateLocation_ePage'>
-                            <CalendarTodayIcon style={{ width: '12px', height: '12px', color: PRIMARY_ORANGE }} /> <span>
-                                {event.eventDate + " " + event.eventHours.startHour}
-                            </span>
-                            <LocationOnIcon style={{ width: '12px', height: '12px', color: PRIMARY_ORANGE }} /> <span>{event.eventLocation}</span>
-                        </p>
-                        <div className='eventRideListContainer_ePage'>
-                            <div style={{ margin: '0px', padding: '0px' }}>
-                                <hr className="light_hline" />
-                                <div dir={SIDE(lang)} className="attention_container">
-                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: '2px' }}>
-                                        <span className='attention_ePage'>
-                                            {ATTENTION(lang)}</span>
-                                        <span >
-                                            {event.eventAttention?.eventAttention1 === 'unset' ? BOTH_DIRECTIONS(lang) : event.eventAttention?.eventAttention1}
-                                        </span>
+                    <div className="eventRideListContainerWrapper_ePage">
+                        <div className="ride_item_button">
+                            <Stack style={{ background: 'white', padding: '8px', paddingTop: '12px', borderTopLeftRadius: '32px', borderTopRightRadius: '32px' }}
+                                alignItems='center'
+                                dir='rtl' direction="row">
+                                <div className="c_square_b" />
+                                <p className='eventName_ePage'>{event.eventName}</p>
+                            </Stack>
+                            <p className='eventDateLocation_ePage'>
+                                <CalendarTodayIcon style={{ width: '12px', height: '12px', color: PRIMARY_ORANGE }} /> <span>
+                                    {event.eventDate + " " + event.eventHours.startHour}
+                                </span>
+                                <LocationOnIcon style={{ width: '12px', height: '12px', color: PRIMARY_ORANGE }} /> <span>{event.eventLocation}</span>
+                            </p>
+                            <div className='eventRideListContainer_ePage'>
+                                <div style={{ margin: '0px', padding: '0px' }}>
+                                    <hr className="light_hline" />
+                                    <div dir={SIDE(lang)} className="attention_container">
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: '2px' }}>
+                                            <span className='attention_ePage'>
+                                                {ATTENTION(lang)}</span>
+                                            <span >
+                                                {event.eventAttention?.eventAttention1 === 'unset' ? BOTH_DIRECTIONS(lang) : event.eventAttention?.eventAttention1}
+                                            </span>
+                                        </div>
+                                        {eventRides.find(e => e.extras.isRidePassengersLimited) &&
+                                            <span dir={SIDE(lang)}>
+                                                {'מספר המקומות מוגבל ל-50 הרוכשים הראשונים בכל הסעה'}
+                                            </span>}
                                     </div>
-                                    {eventRides.find(e => e.extras.isRidePassengersLimited) &&
-                                        <span dir={SIDE(lang)}>
-                                            {'מספר המקומות מוגבל ל-50 הרוכשים הראשונים בכל הסעה'}
-                                        </span>}
+                                    {!isLoading && eventRides.length > 0 ?
+                                        <Stack
+                                            style={{ width: '100%', rowGap: '8px' }}>
+                                            <RidesList />
+                                        </Stack> : event.eventCanAddRides &&
+                                        <div style={noRidesStyle}>{lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'}
+                                            <b onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
+                                                style={noRidesStyle2}> {lang === 'heb' ? `כאן` : 'Here'}
+                                            </b >
+                                            {lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
+                                    <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : (lang === 'heb' ? 'המשך להזמנת כרטיסים' : 'Continue to order page')} arrow>
+                                        <span>
+                                            <Button onClick={() => openRequestPaymentDialog()}
+                                                id="request_event_order"
+                                                aria-haspopup disabled={selectedEventRide === null}
+                                                style={{
+                                                    ...submitButton(true), ...{
+                                                        maxWidth: '250px',
+                                                        fontWeight: 'bold',
+                                                        textTransform: 'none'
+                                                    }
+                                                }}> {ORDER(lang)}</Button>
+                                        </span>
+
+                                    </HtmlTooltip>
+
                                 </div>
-                                {!isLoading && eventRides.length > 0 ?
-                                    <Stack
-                                        style={{ width: '100%', rowGap: '8px' }}>
-                                        <RidesList />
-                                    </Stack> : event.eventCanAddRides &&
-                                    <div style={noRidesStyle}>{lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'}
-                                        <b onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
-                                            style={noRidesStyle2}> {lang === 'heb' ? `כאן` : 'Here'}
-                                        </b >
-                                        {lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
-                                <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : (lang === 'heb' ? 'המשך להזמנת כרטיסים' : 'Continue to order page')} arrow>
-                                    <span>
-                                        <Button onClick={() => openRequestPaymentDialog()}
-                                            id="request_event_order"
-                                            aria-haspopup disabled={selectedEventRide === null}
-                                            style={{
-                                                ...submitButton(true), ...{
-                                                    maxWidth: '250px',
-                                                    fontWeight: 'bold',
-                                                    textTransform: 'none'
-                                                }
-                                            }}> {ORDER(lang)}</Button>
-                                    </span>
-
-                                </HtmlTooltip>
-
+                                <span style={{ fontSize: '10px' }}>
+                                    {NO_DELAYS(lang)}
+                                </span>
                             </div>
-                            <span style={{ fontSize: '10px' }}>
-                                {NO_DELAYS(lang)}
-                            </span>
                         </div>
+
                     </div>
-
-                </div>
-                <div className="ride_item_button" style={{
-                    marginLeft: 'auto',
-                    marginRight: 'auto'
-                }} >
-                    <div style={{
-                        padding: '8px'
-                    }}>
-
-                        <hr className="light_hline" />
+                    <div className="ride_item_button" style={{
+                        marginLeft: 'auto',
+                        marginRight: 'auto'
+                    }} >
                         <div style={{
-                            display: event.eventCanAddRides ? 'flex' : 'none',
-                            rowGap: '8px',
-                            padding: '8px',
-                            flexDirection: 'column'
-                        }}> <AddCircleOutlineIcon
-                                onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
-                                style={{
-                                    cursor: 'pointer',
-                                    width: '50px',
-                                    color: 'white',
-                                    borderRadius: '32px',
-                                    background: PRIMARY_PINK,
-                                    height: '50px',
-                                    alignSelf: 'center'
-                                }} />
-                            <span className='cantSeeCity_ePage'>
-                                {CANT_SEE_YOUR_CITY(lang)}
-                            </span>
-                        </div>
-                        <hr className="light_hline" />
-                        <div className='eventDetailsContainer_ePage'>
-                            <label>{EVENT_DETAILS(lang)}</label>
-                            <div>
-                                <HTMLFromText
-                                    style={{ direction: 'rtl', color: PRIMARY_WHITE, padding: '16px' }}
-                                    text={event.eventDetails} />
+                            padding: '8px'
+                        }}>
+
+                            <hr className="light_hline" />
+                            <div style={{
+                                display: event.eventCanAddRides ? 'flex' : 'none',
+                                rowGap: '8px',
+                                padding: '8px',
+                                flexDirection: 'column'
+                            }}> <AddCircleOutlineIcon
+                                    onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
+                                    style={{
+                                        cursor: 'pointer',
+                                        width: '50px',
+                                        color: 'white',
+                                        borderRadius: '32px',
+                                        background: PRIMARY_PINK,
+                                        height: '50px',
+                                        alignSelf: 'center'
+                                    }} />
+                                <span className='cantSeeCity_ePage'>
+                                    {CANT_SEE_YOUR_CITY(lang)}
+                                </span>
                             </div>
+                            <hr className="light_hline" />
+                            <div className='eventDetailsContainer_ePage'>
+                                <label>{EVENT_DETAILS(lang)}</label>
+                                <div>
+                                    <HTMLFromText
+                                        style={{ direction: 'rtl', color: PRIMARY_WHITE, padding: '16px' }}
+                                        text={event.eventDetails} />
+                                </div>
+                            </div>
+
+
                         </div>
-
-
                     </div>
-                </div>
-            </List>
-        </PageHolder >
+                </List>
+            </PageHolder >
         </React.Fragment>
     ) : null)
 }
