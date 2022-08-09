@@ -35,7 +35,9 @@
 }
 .scanner_perms_container {
     column-gap: 8px;
+    flex-direction: column;
     padding: 16px;
+    
     display: flex;
 }
 @media only screen and (max-width:400px) {

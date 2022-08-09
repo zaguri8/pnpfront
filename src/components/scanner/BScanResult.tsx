@@ -38,7 +38,6 @@ export default function BScanResult() {
 
 
     const approve = (confirmation: PNPTransactionConfirmation) => {
-
         const valid = () => {
             if (scannerLanguage === 'עברית') {
                 return 'מספר נוסעים: '

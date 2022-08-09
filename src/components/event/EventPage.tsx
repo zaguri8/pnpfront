@@ -155,8 +155,6 @@ export default function EventPage() {
             }} style={{
                 backgroundColor: (selectedEventRide !== ride) ? 'white' : ride.extras.rideStatus === 'sold-out' ? 'orange' : ' none',
                 width: '100%',
-                backgroundPosition: ride.extras.rideStatus === 'sold-out' && selectedEventRide !== ride ? '50% center' : 'center center',
-                backgroundRepeat: 'no-repeat',
                 background: selectedEventRide === ride ? 'rgba(0,0,0,0.8)' : ride.extras.rideStatus === 'sold-out' ? `url(${sold_out})` : 'none',
                 backgroundSize: (ride.extras.rideStatus === 'sold-out' && (selectedEventRide !== ride)) ? '125px 50px' : '100%',
                 color: (selectedEventRide === ride ? 'white' : 'black'),
@@ -165,6 +163,9 @@ export default function EventPage() {
                 borderBottomRightRadius: '8px',
                 marginLeft: 'auto',
                 marginRight: 'auto',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: ride.extras.rideStatus === 'sold-out' && selectedEventRide !== ride ? '50% center' : 'center center',
+                
                 padding: '8px',
                 display: 'flex',
             }} value={ride.rideId}>

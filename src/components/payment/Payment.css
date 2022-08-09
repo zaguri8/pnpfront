@@ -9,7 +9,7 @@
 
 .dim_payment {
   position: absolute;
-  height: 200vh;
+  height: 250vh;
   overflow-x: hidden;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.3);
@@ -20,6 +20,7 @@
   height: 50px;
   text-align: right;
   padding: 16px;
+  min-width: 285px;
   border: 1px solid whitesmoke;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px;
   display: flex;
@@ -36,9 +37,11 @@
 
 .row_2_event_payment {
   height: 50px;
+  
   padding: 16px;
   border: 1px solid whitesmoke;
   width: fit-content;
+  min-width: 285px;
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 1px, rgba(0, 0, 0, 0.05) 0px 4px 2px, rgba(0, 0, 0, 0.05) 0px 8px 4px, rgba(0, 0, 0, 0.05) 0px 16px 8px, rgba(0, 0, 0, 0.05) 0px 32px 16px;
   background-color: white;

@@ -5,6 +5,10 @@ export const getCurrentDate = () => {
     date.setMonth(date.getMonth() + 1)
     return date
 }
+export const getDateString = (dateMili) => {
+    const date = new Date(dateMili)
+    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+}
 
 export const isValidPhoneNumber = (phone) => {
 

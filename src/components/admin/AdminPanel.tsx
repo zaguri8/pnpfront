@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { v4 } from "uuid"
 import { useFirebase } from "../../context/Firebase"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { useLoading } from "../../context/Loading"
 import { PNPPage } from "../../cookies/types"
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
@@ -29,7 +30,10 @@ export default function AdminPanel() {
     // const classes = useStyles()
 
     const [selectedDate, setSelectedDate] = useState<string>(dateStringFromDate(getCurrentDate()))
-
+    const { hideHeader } = useHeaderBackgroundExtension()
+    useEffect(() => {
+        hideHeader()
+    }, [])
     useEffect(() => {
         doLoad()
         const unsubStats = firebase.realTime.addListenerToUserStatistics(setUserStatistics)

@@ -19,6 +19,7 @@ export type PNPTransactionConfirmation = {
     amount: string
     twoWay: boolean
     ridesLeft: number
+    scanned?: boolean
     confirmationVoucher: string
 }
 
@@ -93,6 +94,7 @@ export type PNPUser = {
     favoriteEvents: string[],
     birthDate: string
     producer: boolean
+    producingEventId?: string
 }
 export type PNPEvent = {
     eventName: string
@@ -105,6 +107,7 @@ export type PNPEvent = {
     eventDetails: string
     eventType: string
     eventPrice: string
+    eventSendsSMS?: boolean
     eventHours: PNPEventHours
     eventAgeRange: PNPEventAgeRange
     expectedNumberOfPeople: string
@@ -226,3 +229,12 @@ export type PPaymentPageData = {
     'sendEmailApproval': boolean,
     'sendEmailFailure': boolean
 };
+
+export type PNPScanData = {
+    voucherNumber: string
+    scannerName: string,
+    scannerEmail: string,
+    clientEmail: string,
+    clientName: string
+    date: string
+}

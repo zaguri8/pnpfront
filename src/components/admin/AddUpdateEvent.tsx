@@ -4,7 +4,7 @@ import { useLoading } from "../../context/Loading";
 
 import { event_placeholder } from "../../assets/images";
 import { Stack, TextField, Checkbox, Button, Select, MenuItem, FormControl } from "@mui/material";
-import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE } from "../../settings/colors";
+import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE, PRIMARY_ORANGE } from "../../settings/colors";
 
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
 import { getCurrentDate } from "../../utilities";
@@ -23,6 +23,7 @@ import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router";
 import { getDefaultPublicEvent } from "../../store/external/helpers";
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 
 const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     const [editorState, setEditorState] = useState<EditorState | undefined>()
@@ -120,6 +121,9 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     const updateEventAddress = (address: string) => {
         setPnpEvent({ ...pnpEvent, ...{ eventLocation: address } })
     }
+    const updateEventSendsSMS = (eventSendsSMS: boolean) => {
+        setPnpEvent({ ...pnpEvent, ...{ eventSendsSMS: eventSendsSMS } })
+    }
 
     const updateEventAttention1 = (attention: string) => {
         setPnpEvent({ ...pnpEvent, ...{ eventAttention: { eventAttention1: attention, eventAttention2: pnpEvent.eventAttention ? pnpEvent.eventAttention.eventAttention2 : 'unset' } } })
@@ -193,10 +197,11 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
         direction: SIDE(lang)
     }
     const selectStyle = {
-        background: DARK_BLACK,
+        background: PRIMARY_WHITE,
         fontFamily: 'Open Sans Hebrew',
         borderRadius: '32px',
-        color: SECONDARY_WHITE
+        zIndex: '10000',
+        color: PRIMARY_ORANGE
     }
     return (<Stack>
 
@@ -420,8 +425,8 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
 
                         }}
                     >
-
                         {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</MenuItem>)}
+
                     </Select>
                 </FormControl>
             }()}

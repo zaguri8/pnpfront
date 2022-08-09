@@ -116,6 +116,7 @@ export function PaymentForm({ product, paymentInfo }) {
             extraPeople: extraPeople,
             amount: ticketAmount,
             eventId: product.eventId,
+            eventSendsSMS: product.eventSendsSMS ?? false,
             rideId: product.rideId,
             startPoint: product.startPoint,
             twoWay: product.twoWay,

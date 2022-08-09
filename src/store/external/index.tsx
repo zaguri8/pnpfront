@@ -43,6 +43,7 @@ export class Realtime {
     private errs: DatabaseReference
     private users: DatabaseReference
     private linkRedirects: DatabaseReference
+    private scanners: DatabaseReference
     private auth: Auth
     private storage: FirebaseStorage
     private statistics: DatabaseReference
@@ -52,6 +53,7 @@ export class Realtime {
     constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
         this.siteSettings = ref(db, '/settings')
         this.allEvents = ref(db, '/events')
+        this.scanners = ref(db, '/scanners')
         this.rides = ref(db, "/rides")
         this.privatePaymentPages = ref(db, '/paymentPages/private')
         this.statistics = ref(db, '/statistics')
@@ -127,6 +129,8 @@ export class Realtime {
     }
 
 
+
+
     getTransaction(customer_uid: string,
         transaction_uid: string,
         consume: (transaction: TransactionSuccess) => void,
@@ -137,6 +141,20 @@ export class Realtime {
     }
 
 
+    getAllTransactionConfirmations(
+        eventId: string,
+        consume: (transactions: PNPTransactionConfirmation[]) => void,
+        onError: (e: Error) => void) {
+        return onValue(this.transactionConfirmations, (snap) => {
+            let relevant: PNPTransactionConfirmation[] = []
+            snap.forEach(confirmation => {
+                if (confirmation.child('eventId').val() === eventId) {
+                    relevant.push(confirmation.val())
+                }
+            })
+            consume(relevant)
+        }, onError)
+    }
 
     getAllTransactions(customer_uid: string, consume: (transactions: TransactionSuccess[]) => void, onError: (e: Error) => void) {
         return onValue(child(this.transactions, customer_uid), (snap) => {
@@ -250,10 +268,11 @@ export class Realtime {
     }
 
 
-    async giveScannerPermissionsByEmail(email: string) {
+    async giveScannerPermissionsByEmail(email: string, eventId: string) {
         return await this.getUserIdByEmail(email, async (userId) => {
             return await this.getUserById2(userId, (user) => {
-                this.updateUser({ ...user, producer: true }, userId)
+                this.updateUser({ ...user, producer: true, producingEventId: eventId }, userId)
+
             })
         }, () => { })
     }
@@ -320,11 +339,14 @@ export class Realtime {
             }).catch((e) => this.createError("getUserIdByEmail", e));
     }
 
+
+
     getUserById(id: string, consume: (u: PNPUser) => void): Unsubscribe {
         return onValue(child(this.users, id), (snap) => {
             consume(userFromDict(snap))
         })
     }
+
     async getUserById2(id: string, consume: (u: PNPUser) => void) {
         return await get(child(this.users, id)).then(snap =>
             consume(userFromDict(snap)))
@@ -735,9 +757,29 @@ export class Realtime {
             .catch((e) => { this.createError('updateClubEvent', e) })
     }
 
+    async setScanner(eventid: string, uid: string, uname: string) {
+        return await set(child(child(this.scanners, eventid), uid),
+            { userId: uid, userName: uname })
+    }
+
+    async removeScanner(eventid: string, uid: string) {
+        return await remove(child(child(this.scanners, eventid), uid))
+    }
+
+    getAllScanners(eventId: string, consume: (names: string[]) => void) {
+        return onValue(child(this.scanners, eventId), snap => {
+            let output: string[] = []
+            snap.forEach(u => {
+                output.push(u.child('userName').val())
+            })
+            consume(output)
+        })
+    }
+
+
     updateEvent = async (eventId: string, event: any,
-        mobileImageBuffer: ArrayBuffer | null,
-        desktopImageBuffer: ArrayBuffer | null,
+        mobileImageBuffer?: ArrayBuffer | null,
+        desktopImageBuffer?: ArrayBuffer | null,
         eventOldType?: string) => {
         const uploadEvent = async () => {
             if (eventOldType !== event.eventType) {
@@ -753,14 +795,14 @@ export class Realtime {
                 .catch((e) => { this.createError('updateClubEvent', e) })
         }
 
-        if (mobileImageBuffer !== null || desktopImageBuffer !== null) {
+        if ((mobileImageBuffer && mobileImageBuffer !== null) || (desktopImageBuffer && desktopImageBuffer !== null)) {
             if (mobileImageBuffer !== null) {
-                return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Mobile" + '/' + event.eventType + "/" + event.eventId), mobileImageBuffer)
+                return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Mobile" + '/' + event.eventType + "/" + event.eventId), mobileImageBuffer!)
                     .then(async snap => {
                         return await getDownloadURL(snap.ref)
                             .then(async mobileUrl => {
                                 if (desktopImageBuffer !== null) {
-                                    return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Desktop" + '/' + event.eventType + "/" + event.eventId), desktopImageBuffer)
+                                    return await uploadBytes(storageRef(this.storage, 'EventImages/' + "Desktop" + '/' + event.eventType + "/" + event.eventId), desktopImageBuffer!)
                                         .then(async snapDesktop => {
                                             return await getDownloadURL(snapDesktop.ref)
                                                 .then(async destkopUrl => {
@@ -1264,6 +1306,23 @@ export class Realtime {
         return await remove(
             child(this.privatePaymentPages, customerEmail)
         )
+    }
+
+    SPECIFICS_EXTESION = {
+        invalidateTConfirmationByUID: async (email: string, rideId: string) => {
+            const transactions = (await get(this.transactions));
+            transactions.forEach(userTransactions => {
+                userTransactions.forEach(transaction => {
+                    let t_info = transaction.child('more_info').val()
+                    if (t_info.customerEmail === email && rideId === t_info.rideId) {
+                        remove(transaction.ref)
+                        return true
+                    }
+                })
+            })
+            return false
+        },
+
     }
 }
 

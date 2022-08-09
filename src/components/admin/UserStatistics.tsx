@@ -20,9 +20,7 @@ export default function UserStatistics() {
 
     const [users, setUsers] = useState<PNPUser[] | undefined>()
     const [usersCopy, setUsersCopy] = useState<PNPUser[] | undefined>()
-    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE))
 
-    const classes = useStyles()
 
 
     const [numOfShowing, setNumOfShowing] = useState(10)
@@ -99,30 +97,7 @@ export default function UserStatistics() {
     }
 
 
-    function giveUserPermissions() {
-        const email = $('#user_barcode_give_permissions_input').val() as string
-        if (!email) { alert('יש להכניס אימייל'); return; }
-        doLoad()
-        firebase.realTime.giveScannerPermissionsByEmail(email).then(() => {
-            cancelLoad()
-            alert(`המשתמש ${email} קיבל גישות סורק`)
-        }).catch(() => {
-            cancelLoad()
-            alert('אירעתה שגיאה בעת מתן גישות')
-        })
-    }
-
-
-    function takeUserPermissions() {
-        const email = $('#user_barcode_take_permissions_input').val() as string
-        firebase.realTime.takeScannerPermissionsByEmail(email).then(() => {
-            cancelLoad()
-            alert(`המשתמש ${email} איבד גישות סורק`)
-        }).catch(() => {
-            cancelLoad()
-            alert('אירעתה שגיאה בעת לקיחת גישות')
-        })
-    }
+ 
 
 
     return <PageHolder style={{ padding: '0px', scroll: 'hidden', background: BLACK_ELEGANT }}>
@@ -156,26 +131,6 @@ export default function UserStatistics() {
                 <option value='0'>הכל</option>
             </select>
 
-            <div className='scanner_perms_container'>
-                <Stack spacing={0.5}>
-                    <TextField
-                        classes={classes}
-                        id='user_barcode_give_permissions_input'
-                        placeholder="תן גישות סורק לפי אימייל" />
-                    <button style={{ ...buttonStyle, transform: 'scale(0.8)' }} onClick={giveUserPermissions}>
-                        תן גישות סורק
-                    </button>
-                </Stack>
-                <Stack spacing={0.5}>
-                    <TextField
-                        classes={classes}
-                        id='user_barcode_take_permissions_input'
-                        placeholder="קח גישות סורק לפי אימייל" />
-                    <button style={{ ...buttonStyle, transform: 'scale(0.8)' }} onClick={takeUserPermissions}>
-                        קח גישות סורק
-                    </button>
-                </Stack>
-            </div>
-
+         
         </InnerPageHolder></PageHolder>
 }

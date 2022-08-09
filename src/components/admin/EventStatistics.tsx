@@ -10,7 +10,7 @@ import { useLanguage } from "../../context/Language";
 import $ from 'jquery'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { SAME_SPOT, SIDE } from "../../settings/strings";
-import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPUser } from "../../store/external/types";
+import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPTransactionConfirmation, PNPUser } from "../../store/external/types";
 import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 
 import '../../settings/mainstyles.css'
@@ -28,6 +28,8 @@ import AddUpdateEventRide from "./AddUpdateEventRide";
 import AddUpdateEvent from "./AddUpdateEvent";
 import { base64 } from "@firebase/util";
 import EventLinkRedirect from "./EventLinkRedirect";
+import ScannerPermissions from "./ScannerPermissions";
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 
 export type PNPRideExtraPassenger = {
     fullName: string,
@@ -53,7 +55,7 @@ export default function EventStatistics() {
     const [showingComponent, setShowingComponent] = useState<AdminScreens>(AdminScreens.rideTransactions)
     const [objectsFromStatistics, setObjectsFromStatistics] = useState<PNPEventRidePurchaseData>()
     const [total, setTotal] = useState(0)
-
+    const [barCodes, setBarCodes] = useState<PNPTransactionConfirmation[] | undefined>()
     const [statistics, setStatistics] = useState<RideStatistics[] | null>(null)
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
     const { firebase } = useFirebase()
@@ -61,7 +63,6 @@ export default function EventStatistics() {
     const { openDialog, openDialogWithBottom, closeDialog, doLoad, cancelLoad, openDialogWithTitle } = useLoading()
     const [requests, setRequests] = useState<PNPRideRequest[] | null>(null)
     const [sortedRequests, setSortedRequests] = useState<{ startPoint: string, rideRequests: PNPRideRequest[] }[]>()
-
     useEffect(() => {
         let unsub3: Unsubscribe | null = null
         let unsub2: Unsubscribe | null = null
@@ -84,6 +85,19 @@ export default function EventStatistics() {
         }
         return () => { unsub && unsub(); unsub2 && unsub2(); unsub3 && unsub3() }
     }, [])
+    const { hideHeader } = useHeaderBackgroundExtension()
+    useEffect(() => {
+        hideHeader()
+    }, [])
+
+
+    useEffect(() => {
+        let sub: Unsubscribe | undefined;
+        if (!barCodes && event) {
+            sub = firebase.realTime.getAllTransactionConfirmations(event.eventId, setBarCodes, err => { })
+        }
+        return () => sub && sub()
+    }, [event])
 
     const nav = useNavigate()
     const deleteEvent = () => {
@@ -320,7 +334,7 @@ export default function EventStatistics() {
             setObjectsFromStatistics(hash)
         }, [])
 
-        
+
         type CustomerCardContainerProps = { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[] }
         function CustomerCardContainer(props: CustomerCardContainerProps) {
             const [historyProp, setHistoryProp] = useState(props)
@@ -873,8 +887,27 @@ export default function EventStatistics() {
             }()}
 
             <Spacer offset={1} />
-            {event && <EventLinkRedirect firebase={firebase} event={event} linkRedirect={linkRedirect} />}
-            { }
+            {(function eventRedirectLink() {
+                return event && <EventLinkRedirect firebase={firebase} event={event} linkRedirect={linkRedirect} />
+            })()}
+
+            {event && <ScannerPermissions event={event} />}
+
+            {event && <Stack direction={'row'} alignItems={'center'}>
+                <Checkbox checked={event.eventSendsSMS}
+                    onChange={(e) => {
+                        setEvent({ ...event, eventSendsSMS: e.target.checked })
+                        firebase.realTime.updateEvent(event.eventId, { ...event, eventSendsSMS: e.target.checked })
+                            .then(() => {
+                                alert(e.target.checked ? 'סמסים יישלחו כעת עבור הזמנות לאירוע זה' : 'סמסים לא יישלחו עבור הזמנות לאירוע זה')
+                            }).catch(err => {
+                                alert('אירעתה שגיאה בעת הזנת השיני אנא פנא אל המתכנת')
+                            })
+                    }}
+                    style={{ color: 'white' }} />
+
+                <label style={{ color: 'white' }}>שלח סמס בעת רכישת כרטיסים</label>
+            </Stack>}
         </InnerPageHolder>
     </PageHolder> : <div>{'לא קיים לאירוע זה דף ניהול'}</div>)
 

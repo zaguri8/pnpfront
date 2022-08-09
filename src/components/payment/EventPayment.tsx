@@ -71,6 +71,7 @@ export default function EventPayment() {
                 twoWay: paymentInfo.ride.extras.twoWay,
                 price: paymentInfo.ride.ridePrice,
                 eventId: paymentInfo.event.eventId,
+                eventSendsSMS:paymentInfo.event.eventSendsSMS,
                 eventDate: paymentInfo.event.eventDate,
                 rideId: paymentInfo.ride.rideId
             }} /> : <div className='mistake'>
