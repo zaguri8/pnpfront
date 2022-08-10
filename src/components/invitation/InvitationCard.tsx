@@ -355,12 +355,13 @@ function InvitationCard() {
             <div style={{ width: '100%', background: PRIMARY_BLACK }}>
                 <List style={{ width: '85%', background: PRIMARY_BLACK, minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
                     {/* Arriving to rides Check box */}
-                    {event.eventWithPassengers && <Stack
+                    {event.eventWithPassengers && newConfirmation && !newConfirmation.rideArrival && <Stack
                         alignItems={'center'}
                         justifyContent={'center'}
                         direction={'row'}
                         padding={'8px'}>
                         <label style={{ color: SECONDARY_WHITE }}>{'אני מגיע/ה בהסעות'}</label>
+                
                         {newConfirmation && <Checkbox
                             style={{ color: SECONDARY_WHITE }}
                             value={newConfirmation.rideArrival}

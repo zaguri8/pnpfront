@@ -383,7 +383,7 @@ export function PaymentForm({ product, paymentInfo }) {
                 <InnerPageHolder
                     transformUp
                     transformUpValue={120}
-                    style={{ direction: SIDE(lang), overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto', zIndex: '100000',isolation:'isolate' }}>
+                    style={{ direction: SIDE(lang), overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto', zIndex: '10000' }}>
                     <RideInfo />
 
 

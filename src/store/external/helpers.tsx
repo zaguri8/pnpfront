@@ -29,7 +29,7 @@ export function getDefaultConfirmation(event: PNPPrivateEvent): PNPRideConfirmat
     return {
         userId: 'guest',
         eventId: event.eventId ?? '',
-        rideArrival: false,
+        rideArrival: event.eventWithPassengers,
         guests: '1',
         directionType: 'null',
         splitGuestPassengers: false,
