@@ -85,7 +85,7 @@ export default function EventStatistics() {
         }
         return () => { unsub && unsub(); unsub2 && unsub2(); unsub3 && unsub3() }
     }, [])
-    const { hideHeader,showHeader } = useHeaderBackgroundExtension()
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     useEffect(() => {
         hideHeader()
         return () => showHeader()
@@ -336,7 +336,7 @@ export default function EventStatistics() {
         }, [])
 
 
-        type CustomerCardContainerProps = { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[] }
+        type CustomerCardContainerProps = { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[], ride: string }
         function CustomerCardContainer(props: CustomerCardContainerProps) {
             const [historyProp, setHistoryProp] = useState(props)
             const searchStyle = {
@@ -378,7 +378,7 @@ export default function EventStatistics() {
             }, [])
 
 
-            type CustomerCardProps = { customerData: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] } }
+            type CustomerCardProps = { customerData: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }, ride: string }
             const CustomerCard = (props: CustomerCardProps) => {
                 const labelTitleStyle = {
                     fontSize: '16px',
@@ -394,26 +394,68 @@ export default function EventStatistics() {
                     color: SECONDARY_WHITE,
                     fontSize: '14px'
                 }
-
                 return <div style={{
-                    padding: '8px'
+                    width: '90%',
                 }}>
+                    <div style={{
+                        display: 'flex',
+                        columnGap: '16px',
+                        padding: '16px',
+                        margin: '4px',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderBottom: `1px solid ${'white'}`
+                    }} >
 
-                    <div style={labelTitleStyle}>{'שם הקונה'}</div>
-                    <div style={labelSmallStyle}>{props.customerData.user.name}</div>
-                    <div style={labelTitleStyle}>{'מספר טלפון הקונה'}</div>
-                    <div style={labelSmallStyle}>{props.customerData.user.phone}</div>
+                        <Stack >
+                            <div style={labelTitleStyle}>{'שם הקונה'}</div>
+                            <div style={labelSmallStyle}>{props.customerData.user.name}</div>
+                            <div style={labelTitleStyle}>{'מספר טלפון הקונה'}</div>
+                            <div style={labelSmallStyle}>{props.customerData.user.phone}</div>
+                        </Stack>
+                        {props.customerData.extraPeople && props.customerData.extraPeople.length > 0 && <div>
+                            <label style={{ ...labelTitleStyle, ...{ textDecoration: 'underline' } }}>{'נוסעים נוספים: '}</label>
+                            {props.customerData.extraPeople.map((extra, i) => <Stack key={extra.fullName + extra.phoneNumber + i}>
+                                <label style={labelTitleStyleSecond}>{'נוסע מספר ' + (i + 2)}</label>
+                                <label style={labelSmallStyle}>{'שם: ' + extra.fullName}</label>
+                                <label style={labelSmallStyle}>{'טלפון: ' + extra.phoneNumber}</label>
+                            </Stack>)}
+                        </div>}
 
-                    {props.customerData.extraPeople && props.customerData.extraPeople.length > 0 && <div>
-                        <label style={{ ...labelTitleStyle, ...{ textDecoration: 'underline' } }}>{'נוסעים נוספים: '}</label>
-                        {props.customerData.extraPeople.map((extra, i) => <Stack key={extra.fullName + extra.phoneNumber + i}>
-                            <label style={labelTitleStyleSecond}>{'נוסע מספר ' + (i + 2)}</label>
-                            <label style={labelSmallStyle}>{'שם: ' + extra.fullName}</label>
-                            <label style={labelSmallStyle}>{'טלפון: ' + extra.phoneNumber}</label>
-                        </Stack>)}
-                    </div>}
-                    <hr />
-                </div>
+
+                        <Stack style={{ justifySelf: 'flex-start' }}>
+                            <Button
+                                onClick={() => {
+                                    doLoad()
+                                    firebase.realTime.removeTransaction(props.customerData.user.customerId, props.ride)
+                                        .then(removed => {
+                                            if (removed) {
+                                                alert('ברקוד ועסקה נמחקו בהצלחה')
+                                            } else {
+                                                alert('אירעתה שגיאה בעת ביטול הכרטיס, אנא פנא למתכנת')
+                                            }
+                                            cancelLoad()
+                                            window.location.reload()
+                                        }).catch(err => {
+                                            alert('אירעתה שגיאה בעת ביטול הכרטיס, אנא פנא למתכנת')
+                                            cancelLoad()
+                                        })
+                                }}
+                                style={{
+                                    background: 'whitesmoke',
+                                    fontWeight: 'bold',
+                                    color: PRIMARY_PINK,
+                                    textTransform: 'none',
+                                    fontFamily: 'Open Sans Hebrew'
+                                }}>
+                                בטל
+                            </Button>
+                        </Stack>
+
+                        <hr style={{ borderWidth: '1px', height: '1px', borderColor: 'rgba(255,255,255,0.15)' }} />
+                    </div>
+                </div >
             }
             return (<div style={{
                 display: 'flex',
@@ -422,7 +464,7 @@ export default function EventStatistics() {
                 overflowY: 'scroll',
                 padding: '8px',
                 maxHeight: '400px'
-            }}>{historyProp.data.map((data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} />)}
+            }}>{historyProp.data.map((data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} ride={props.ride} />)}
             </div>);
         }
 
@@ -432,6 +474,7 @@ export default function EventStatistics() {
             let users = rideUsers.map(u => ({ ...u, uid: u.uid.split('_nm')[0] }))
             firebase.realTime.getAllUsersByIds(false, users)
                 .then((data) => {
+
                     if (data && data.length > 0) {
                         cancelLoad()
                         openDialogWithTitle(<h3 style={
@@ -442,7 +485,7 @@ export default function EventStatistics() {
                             }
                         }>{ride}</h3>)
                         openDialog({
-                            content: <CustomerCardContainer data={data} />,
+                            content: <CustomerCardContainer data={data} ride={ride} />,
                             title: ride
                         })
                     } else {

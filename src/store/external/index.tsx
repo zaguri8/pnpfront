@@ -459,6 +459,19 @@ export class Realtime {
 
 
 
+    async removeTransaction(customerId: string, rideName: string) {
+        const transacs = await get(this.transactions)
+        let removed = false
+        transacs.child(customerId).forEach(transaction => {
+            if (transaction.child('more_info').child('startPoint').val() === rideName) {
+                remove(child(this.transactionConfirmations, transaction.child('approval_num').val()))
+                remove(transaction.ref)
+                removed = true
+            }
+        })
+        return removed
+    }
+
     async getAllUsersByIds(
         csvData: boolean,
         ids_and_extraPeople: UserIdAndExtraPeople[]): Promise<UserAndExtraPeople[] | null> {
