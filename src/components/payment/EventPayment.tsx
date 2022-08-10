@@ -50,10 +50,10 @@ export default function EventPayment() {
     }
     return <PageHolder style={{
         position: 'relative',
+        zIndex:'1000',
         fontFamily: 'Open Sans Hebrew',
-        transform: `translateY(-200px)`,
     }}>
-        <div className='dim_payment'></div>
+   
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
             paymentInfo={paymentInfo}
             product={{

@@ -27,6 +27,7 @@ import { isValidPhoneNumber } from '../../utilities';
 import { InnerPageHolder } from '../utilities/Holders'
 import { minWidth } from '@mui/system'
 import Spacer from '../utilities/Spacer'
+import { useDimExtension } from '../../context/HeaderContext';
 const paragraphStyle = {
     fontSize: '11px',
     color: PRIMARY_BLACK,
@@ -61,6 +62,12 @@ export function PaymentForm({ product, paymentInfo }) {
     const [paymentLink, setPaymentLink] = useState()
     const location = useLocation()
     const [extraPeople, setExtraPeople] = useState([])
+    const { dimOn, dimOff } = useDimExtension()
+    useEffect(() => {
+        dimOn()
+        return () => { dimOff() }
+    })
+
     const requestPayment = () => {
         if (!firebase.auth.currentUser || !appUser) {
             nav('/login', { state: { cachedLocation: location.pathname, paymentInfo: paymentInfo } })
@@ -325,9 +332,13 @@ export function PaymentForm({ product, paymentInfo }) {
             {populate()}
         </div>
     })
+
     const getElement = () => {
         return paymentLink ?
-            <InnerPageHolder style={{ direction: SIDE(lang), overflowX: 'hidden', fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000' }} >
+            <InnerPageHolder
+                transformUp
+                transformUpValue={160}
+                style={{ direction: SIDE(lang), overflowX: 'hidden', fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', zIndex: '10001' }} >
                 <Stack alignItems={'center'} spacing={1} justifyContent={'center'}>
                     <div className='row_1_event_payment'>
                         <Stack direction={'row'}>
@@ -369,7 +380,10 @@ export function PaymentForm({ product, paymentInfo }) {
                         <iframe className='iframe_payment_event' src={paymentLink} />
                     </div>
                 </Stack></InnerPageHolder> : (
-                <InnerPageHolder style={{ direction: SIDE(lang), overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto', zIndex: '1000' }}>
+                <InnerPageHolder
+                    transformUp
+                    transformUpValue={120}
+                    style={{ direction: SIDE(lang), overflowX: 'hidden', background: 'white', marginLeft: 'auto', marginRight: 'auto', zIndex: '100000',isolation:'isolate' }}>
                     <RideInfo />
 
 

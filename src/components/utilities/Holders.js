@@ -25,9 +25,9 @@ export const PageHolder = ({ children, style = {}, transformUp = false}) => {
             }, ...style
         }}>{children}</motion.div>
 }
-export const InnerPageHolder = ({ children, style = {}, transformUp = false }) => {
+export const InnerPageHolder = ({ children, style = {}, transformUp = false,transformUpValue=42 }) => {
     return <motion.div
-        variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: 'translateY(-42px)' } } } : animations}
+        variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: `translateY(-${transformUpValue}px)` } } } : animations}
         transition={{ duration: 0.5 }}
         initial={'initial'}
         animate={'animate'}

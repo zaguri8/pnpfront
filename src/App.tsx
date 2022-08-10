@@ -287,6 +287,8 @@ function App() {
   return (<div>
     <Scanner />
     <AppMenu menuToggle={toggleMenu} />
+    <div className='global_dim' style={{ position: 'fixed' ,display:'none', width: '100%', height: '100vh', background: 'rgba(0,0,0,0.3)',zIndex:'500' }}></div>
+
     <div className="App">
 
       {dialogContext.content ? <PNPDialogComponent lang={lang} dialogContext={dialogContext} />

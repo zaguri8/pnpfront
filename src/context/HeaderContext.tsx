@@ -40,6 +40,12 @@ export const HeaderContextProvider = (props: object) => {
 
 }
 
+export const useDimExtension = () => {
+    return {
+        dimOn: () => $('.global_dim').css('display', 'inherit'),
+        dimOff: () => $('.global_dim').css('display', 'none'),
+    }
+}
 export const useBackgroundExtension = () => {
     const changeBackgroundColor = (color: string) => {
         $('.App').css('background-color', color)
