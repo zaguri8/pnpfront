@@ -30,9 +30,10 @@ export default function AdminPanel() {
     // const classes = useStyles()
 
     const [selectedDate, setSelectedDate] = useState<string>(dateStringFromDate(getCurrentDate()))
-    const { hideHeader } = useHeaderBackgroundExtension()
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     useEffect(() => {
         hideHeader()
+        return () => showHeader()
     }, [])
     useEffect(() => {
         doLoad()

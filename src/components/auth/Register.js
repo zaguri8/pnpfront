@@ -26,6 +26,7 @@ import { Welcome } from "./Welcome"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
 import { createUserWithEmailAndPassword } from "firebase/auth"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 
 let finishRegister = false
 
@@ -297,6 +298,11 @@ export default function Register() {
     const { firebase } = useFirebase()
     const { isCacheValid, cacheDone } = useCookies()
     const { openDialog } = useLoading()
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    },[])
     useEffect(() => {
         return () => {
             if (!finishRegister)

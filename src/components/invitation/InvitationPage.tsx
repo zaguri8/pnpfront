@@ -10,9 +10,10 @@ const InvitationPage = () => {
     useLayoutEffect(() => {
         $('.dim').css({ 'display': 'none' })
     }, [])
-    const {hideHeader} = useHeaderBackgroundExtension()
+    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
     useEffect(() => {
         hideHeader()
+        return () => showHeader()
     },[])
     return <div >
         <div className="App" style={{ background: 'none' }}>

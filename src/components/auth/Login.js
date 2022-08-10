@@ -14,6 +14,7 @@ import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SEC
 import { submitButton, textFieldStyle } from "../../settings/styles"
 import { useLoading } from "../../context/Loading"
 import { useEffect, useState } from "react"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 export default function Login() {
 
     const nav = useNavigate()
@@ -44,6 +45,13 @@ export default function Login() {
     }
     const classes = useStyles()
     const { lang } = useLanguage()
+
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
+
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    }, [])
 
     return (<div style={{
         width: '100%',

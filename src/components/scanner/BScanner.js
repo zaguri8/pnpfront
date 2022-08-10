@@ -31,7 +31,7 @@ function BScanner() {
     const useStyles = makeStyles(textFieldStyle(PRIMARY_PINK, { background: PRIMARY_WHITE, direction: 'rtl' }))
     const classes = useStyles()
     const { doLoad, cancelLoad, openDialog } = useLoading()
-    const { hideHeader } = useHeaderBackgroundExtension()
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     const [producingEventId, setProducingEventId] = useState()
     const [producingEvent, setProducingEvent] = useState()
     const selectionStyle = {
@@ -82,9 +82,9 @@ function BScanner() {
             if (confirmation) {
                 if (confirmation.ridesLeft < 1) {
                     openDialog({
-                        content: <Stack spacing={1} style ={{maxWidth:'300px',padding:'18px'}}>
+                        content: <Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
                             <label style={{ color: 'white' }}>{'ברקוד זה נסרק כבר, ולא נשארו בו נסיעות'}</label>
-                            <label style={{ color: 'white',fontSize:'10px',fontWeight:'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateString(confirmation.lastScanDate) : getDateString(getCurrentDate()))}</label>
+                            <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateString(confirmation.lastScanDate) : getDateString(getCurrentDate()))}</label>
                         </Stack>
                     })
                     return
@@ -118,6 +118,7 @@ function BScanner() {
     }, [producingEventId])
     useEffect(() => {
         hideHeader()
+        return () => showHeader()
     }, [])
 
     const startProducerScanningSession = () => {

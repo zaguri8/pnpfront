@@ -85,9 +85,10 @@ export default function EventStatistics() {
         }
         return () => { unsub && unsub(); unsub2 && unsub2(); unsub3 && unsub3() }
     }, [])
-    const { hideHeader } = useHeaderBackgroundExtension()
+    const { hideHeader,showHeader } = useHeaderBackgroundExtension()
     useEffect(() => {
         hideHeader()
+        return () => showHeader()
     }, [])
 
 

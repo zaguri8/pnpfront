@@ -1,8 +1,9 @@
 import { Button, TextField } from "@mui/material";
 import { makeStyles } from '@mui/styles'
 import { sendPasswordResetEmail } from "firebase/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFirebase } from "../../context/Firebase";
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { BLACK_ROYAL, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
@@ -21,6 +22,11 @@ export default function ForgotPass() {
 
     const { firebase } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
+    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    },[])
 
     return <PageHolder>
         <InnerPageHolder style={{ background: BLACK_ROYAL }}>
@@ -36,6 +42,10 @@ export default function ForgotPass() {
             <label style={{ maxWidth: '275px', color: SECONDARY_WHITE, fontSize: '12px', padding: '4px' }}>{lang === 'heb' ? 'לא קיבלת את מייל האיפוס ? נסה לבדוק בדואר ספאם' : 'Havent got an email ? try looking in the spam mail'}</label>
             <Button
                 onClick={() => {
+                    if(email.length < 3) {
+                        alert("יש להכניס כתובת אימייל")
+                        return
+                    }
                     doLoad()
                     sendPasswordResetEmail(firebase.auth, email)
                         .then(res => {
