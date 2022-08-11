@@ -2,6 +2,7 @@ import { Stack, TextField } from "@mui/material"
 import { makeStyles } from "@mui/styles"
 import { CSSProperties, useEffect, useState } from "react"
 import { useFirebase } from "../../context/Firebase"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { useLoading } from "../../context/Loading"
 import { BLACK_ELEGANT, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { textFieldStyle } from "../../settings/styles"
@@ -22,6 +23,13 @@ export default function UserStatistics() {
     const [usersCopy, setUsersCopy] = useState<PNPUser[] | undefined>()
 
 
+    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
+
+
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    },[])
 
     const [numOfShowing, setNumOfShowing] = useState(10)
     useEffect(() => {

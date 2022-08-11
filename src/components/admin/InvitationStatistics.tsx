@@ -21,6 +21,7 @@ import { makeStyles } from "@mui/styles";
 import { textFieldStyle } from "../../settings/styles";
 import { HtmlTooltip } from "../utilities/HtmlTooltip";
 import { confirmationsPartition, default_no_arrival, getTotalAmountOfConfirmations, getPassengersAndGuests, getInvitationRowGuests } from "./invitationsHelper";
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 
 export const buttonStyle = {
     textDecoration: 'none',
@@ -52,7 +53,13 @@ export default function InvitationStatistics() {
     const useStyles = makeStyles(() => textFieldStyle())
     const classes = useStyles()
 
+    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
 
+
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    },[])
     const updateEvent = () => {
         if (privateEvent)
             firebase.realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })

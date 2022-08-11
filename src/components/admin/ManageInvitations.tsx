@@ -13,6 +13,7 @@ import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
 import { CSSProperties, useEffect, useState } from "react"
 import Spacer from "../utilities/Spacer"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 const ManageInvitations = () => {
 
 
@@ -21,6 +22,13 @@ const ManageInvitations = () => {
 
     const [privateEvents, setPrivateEvents] = useState<{ [type: string]: PNPPrivateEvent[] }>()
     const nav = useNavigate()
+    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
+
+
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    },[])
 
     const rowStyle = {
         flexDirection: 'row',

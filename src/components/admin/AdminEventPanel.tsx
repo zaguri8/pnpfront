@@ -10,7 +10,8 @@ import { useLocation } from 'react-router-dom'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
-import { CSSProperties } from "react"
+import { CSSProperties, useEffect } from "react"
+import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 const AdminEventPanel = () => {
 
     const location = useLocation()
@@ -20,6 +21,13 @@ const AdminEventPanel = () => {
     const tableTitleStyle: CSSProperties = { fontSize: '20px', color: SECONDARY_WHITE }
     const nav = useNavigate()
 
+    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
+
+
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    },[])
 
 
     function openEditDialog(event: PNPEvent) {
