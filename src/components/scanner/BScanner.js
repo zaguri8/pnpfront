@@ -18,14 +18,13 @@ import { getCurrentDate, getDateString } from "../../utilities";
 function BScanner() {
     const location = useLocation()
     const nav = useNavigate()
-    const { openScanner, isScanning, faceMode, setFaceMode, scannerLanguage, setScannerLanguage } = useScanner()
+    const { openScanner, isScanning, faceMode, setFaceMode, scannerLanguage, barCodes, setBarcodes, setScannerLanguage } = useScanner()
     useEffect(() => {
         if (!location.state)
             openScanner(scannerLanguage)
     }, [])
     const { user, appUser, firebase } = useFirebase()
     const inputRef = useRef()
-    const [barcodes, setBarcodes] = useState()
 
     const [inScanningZone, setInScanningZone] = useState()
     const useStyles = makeStyles(textFieldStyle(PRIMARY_PINK, { background: PRIMARY_WHITE, direction: 'rtl' }))
@@ -37,6 +36,7 @@ function BScanner() {
     const selectionStyle = {
         background: SECONDARY_WHITE,
         width: '50%',
+        minWidth:'100px',
         padding: '8px',
         textAlign: 'center',
         alignSelf: 'center',
@@ -58,9 +58,9 @@ function BScanner() {
                 <label style={{ padding: '2px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה מאושרת' : 'رحلة مصرٌحة'}</label>
             </Stack>
 
-            <label style={{padding:'0px',margin:'0px'}}>{valid()}</label><b>{confirmation.amount}</b>
-            <label style={{padding:'0px',margin:'0px'}}>{"שם אירוע: "}</label><b>CHAN HASHAYAROT</b>
-            <label style={{padding:'0px',margin:'0px'}}>{"יעד נסיעה: "}</label><b>Tel Aviv בורסא</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{valid()}</label><b>{confirmation.amount}</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{"שם אירוע: "}</label><b>CHAN HASHAYAROT</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{"יעד נסיעה: "}</label><b>Tel Aviv בורסא</b>
 
         </Stack>, 'success')
     }
@@ -81,8 +81,8 @@ function BScanner() {
                 nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
                 return
             }
-            let confirmationIdx = barcodes.findIndex(bcode => res === bcode.confirmationVoucher)
-            let confirmation = barcodes[confirmationIdx]
+            let confirmationIdx = barCodes.findIndex(bcode => res === bcode.confirmationVoucher)
+            let confirmation = barCodes[confirmationIdx]
             if (confirmation) {
                 if (confirmation.ridesLeft < 1) {
                     showPopover(<Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
@@ -94,7 +94,7 @@ function BScanner() {
 
                 firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
                     .then(() => {
-                        let temp = barcodes
+                        let temp = barCodes
                         temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1
                         approve(confirmation)
                         setBarcodes(temp)
@@ -111,7 +111,7 @@ function BScanner() {
         if (appUser.admin)
             setProducingEventId(0)
         else
-        setProducingEventId(appUser.producingEventId)
+            setProducingEventId(appUser.producingEventId)
     }, [appUser])
     useEffect(() => {
         let sub = null;
@@ -190,21 +190,6 @@ function BScanner() {
                         <br />
 
                         <Stack>
-                            <label style={{ color: SECONDARY_WHITE }}>{'כיוון מצלמה / الكاميرا'}</label>
-                            <select style={selectionStyle}
-                                value={faceMode}
-                                onChange={(e) => {
-                                    setFaceMode(e.target.value)
-                                }}>
-                                <option
-
-                                    value={'user'}>
-                                    {scannerLanguage === 'עברית' ? 'מצלמה קדמית' : `كاميرا أمامية`}
-                                </option>
-                                <option value={'environment'}>
-                                    {scannerLanguage === 'עברית' ? 'מצלמה אחורית' : `كاميرا الرؤية الخلفية`}
-                                </option>
-                            </select>
                             <label style={{ color: SECONDARY_WHITE }}>{'שפה / لغة'}</label>
                             <select
                                 value={scannerLanguage}
@@ -233,7 +218,7 @@ function BScanner() {
                 else if (producingEvent)
 
                     return <Stack spacing={1}>
-
+                        
                         <Button
                             onClick={startProducerScanningSession}
                             style={{

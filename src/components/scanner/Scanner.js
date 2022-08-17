@@ -8,19 +8,72 @@ import { useLoading } from '../../context/Loading'
 import { SECONDARY_WHITE } from "../../settings/colors"
 import { BARCODE_MESSAGE, CLOSE_SCANNER } from "../../settings/strings"
 
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 export default function Scanner() {
     const { appUser } = useFirebase()
     const nav = useNavigate()
-    const { isScanning, closeScanner, faceMode, scannerLanguage, setScannerLanguage } = useScanner()
+    const { isScanning, closeScanner, faceMode, scannerLanguage, setScannerLanguage, barCodes, setBarcodes } = useScanner()
+    const { openDialog, doLoad, cancelLoad, showPopover } = useLoading()
 
-    const { openDialog } = useLoading()
+    const approve = (confirmation) => {
+        const valid = () => {
+            if (scannerLanguage === 'עברית') {
+                return 'מספר נוסעים: '
+            } else {
+                return "عدد الركاب: "
+            }
+        }
+
+        cancelLoad()
+        showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <Stack direction={'row'} style={{ width: '100%', direction: 'rtl' }} spacing={1}>
+                <CheckCircleOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'transparent', width: '64px', height: '25px', color: '#4BB543' }} />
+                <label style={{ padding: '2px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה מאושרת' : 'رحلة مصرٌحة'}</label>
+            </Stack>
+
+            <label style={{ padding: '0px', margin: '0px' }}>{valid()}</label><b>{confirmation.amount}</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{"שם אירוע: "}</label><b>CHAN HASHAYAROT</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{"יעד נסיעה: "}</label><b>Tel Aviv בורסא</b>
+
+        </Stack>, 'success')
+    }
+
+    const decline = () => {
+        cancelLoad()
+        showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה לא מאושרת' : 'رحلة غير مصرٌحة'}</label>
+            <ErrorOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#bd3333' }} />
+        </Stack>, 'error')
+    }
+
     const updateScanResult = (res) => {
         if (res) {
-            try {
-                const n = Number(res.text)
-                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res.text })
-            } catch (e) {
-                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res.text })
+            if (appUser.admin && !appUser.producingEventId) {
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
+                return
+            }
+            let confirmationIdx = barCodes.findIndex(bcode => res === bcode.confirmationVoucher)
+            let confirmation = barCodes[confirmationIdx]
+            if (confirmation) {
+                if (confirmation.ridesLeft < 1) {
+                    showPopover(<Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
+                        <label style={{ color: 'white' }}>{'ברקוד זה נסרק כבר, ולא נשארו בו נסיעות'}</label>
+                        <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateString(confirmation.lastScanDate) : getDateString(getCurrentDate()))}</label>
+                    </Stack>, 'normal')
+                    return
+                }
+
+                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
+                    .then(() => {
+                        let temp = barCodes
+                        temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1
+                        approve(confirmation)
+                        setBarcodes(temp)
+                    })
+                    .catch(decline)
+            } else {
+                decline()
             }
         }
     }
@@ -54,9 +107,9 @@ export default function Scanner() {
             videoContainerStyle={{ maxHeight: '100%' }}
             constraints={{
                 audio: false,
-                facingMode: { exact: 'user' },
+                facingMode: { exact: 'evironment' },
                 aspectRatio: 1,
-                frameRate:60
+                frameRate: 60
             }}
             onResult={(result, error) => {
                 if (!!result) {
