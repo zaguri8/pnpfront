@@ -292,9 +292,9 @@ function App() {
     <div className='global_dim' style={{ position: 'fixed', display: 'none', width: '100%', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: '500' }}></div>
 
     <div className="App">
-
       {dialogContext.content ? <PNPDialogComponent lang={lang} dialogContext={dialogContext} />
         : null}
+      {dialogContext.popoverContent}
       <ToolBar menuToggle={(off) => {
         if (off) {
           if ($('.dim').css('display') === 'none')
@@ -321,14 +321,11 @@ function App() {
         <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='/event/payment' element={<EventPayment />} />
-
-
         <Route path='/event/test/:id' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventPageTest />} />
         <Route path='/event/test/payment' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventPaymentTest />} />
-
         <Route path='/linkRedirect/:id' element={<LinkRedirect />} />
         <Route path='termsOfService' element={<TermsOfService />} />
-        <Route path='/test' element={<GeneratePaymentForm />} />
+        <Route path='/test' element={<Test />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
         <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />
         <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />

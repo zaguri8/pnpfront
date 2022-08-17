@@ -12,6 +12,38 @@
   pointer-events: none;
 }
 
+.pop_over {
+  position: fixed;
+  bottom: 0;
+  margin: 8px;
+  margin-bottom: 0px;
+  background-color: rgb(20, 19, 27);
+  color: white;
+  z-index: 12000;
+  align-items: center;
+  justify-content: center;
+  direction: rtl;
+  display: block;
+  border-top-right-radius: 32px;
+  border-top-left-radius: 32px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  height: 25vh;
+  width: 96%;
+  padding-top: 16px;
+}
+
+.success {
+  border: 2px solid rgb(32, 141, 24);
+}
+
+.error {
+  border: 2px solid rgb(115, 13, 40);
+}
+
+.normal {
+  border: 2px solid rgb(28, 28, 36);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -98,4 +130,3 @@
   align-items: center;
   justify-content: center;
 }
-

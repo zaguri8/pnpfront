@@ -30,7 +30,7 @@ function BScanner() {
     const [inScanningZone, setInScanningZone] = useState()
     const useStyles = makeStyles(textFieldStyle(PRIMARY_PINK, { background: PRIMARY_WHITE, direction: 'rtl' }))
     const classes = useStyles()
-    const { doLoad, cancelLoad, openDialog } = useLoading()
+    const { doLoad, cancelLoad, openDialog, showPopover } = useLoading()
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     const [producingEventId, setProducingEventId] = useState()
     const [producingEvent, setProducingEvent] = useState()
@@ -50,62 +50,68 @@ function BScanner() {
                 return "عدد الركاب: "
             }
         }
+
         cancelLoad()
-        openDialog({
-            content: <Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה מאושרת' : 'رحلة مصرٌحة'}</label>
-                <label style={{ padding: '8px', color: SECONDARY_WHITE }}>{valid()}<b>{confirmation.amount}</b></label>
-                <CheckCircleOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#4BB543' }} />
+        showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <Stack direction={'row'} style={{ width: '100%', direction: 'rtl' }} spacing={1}>
+                <CheckCircleOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'transparent', width: '64px', height: '25px', color: '#4BB543' }} />
+                <label style={{ padding: '2px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה מאושרת' : 'رحلة مصرٌحة'}</label>
             </Stack>
-        })
+
+            <label style={{padding:'0px',margin:'0px'}}>{valid()}</label><b>{confirmation.amount}</b>
+            <label style={{padding:'0px',margin:'0px'}}>{"שם אירוע: "}</label><b>CHAN HASHAYAROT</b>
+            <label style={{padding:'0px',margin:'0px'}}>{"יעד נסיעה: "}</label><b>Tel Aviv בורסא</b>
+
+        </Stack>, 'success')
     }
 
     const decline = () => {
         cancelLoad()
-        openDialog({
-            content: <Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה לא מאושרת' : 'رحلة غير مصرٌحة'}</label>
-                <ErrorOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#bd3333' }} />
-            </Stack>
-        })
+        showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה לא מאושרת' : 'رحلة غير مصرٌحة'}</label>
+            <ErrorOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#bd3333' }} />
+        </Stack>, 'error')
     }
 
 
 
     const updateScanResult = (res) => {
         if (res) {
-            if (appUser.admin && !appUser.producingEventId) {
-                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
-                return
-            }
-            let confirmation = barcodes.find(bcode => res === bcode.confirmationVoucher)
+            // if (appUser.admin && !appUser.producingEventId) {
+            //     nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
+            //     return
+            // }
+            let confirmationIdx = barcodes.findIndex(bcode => res === bcode.confirmationVoucher)
+            let confirmation = barcodes[confirmationIdx]
             if (confirmation) {
                 if (confirmation.ridesLeft < 1) {
-                    openDialog({
-                        content: <Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
-                            <label style={{ color: 'white' }}>{'ברקוד זה נסרק כבר, ולא נשארו בו נסיעות'}</label>
-                            <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateString(confirmation.lastScanDate) : getDateString(getCurrentDate()))}</label>
-                        </Stack>
-                    })
+                    showPopover(<Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
+                        <label style={{ color: 'white' }}>{'ברקוד זה נסרק כבר, ולא נשארו בו נסיעות'}</label>
+                        <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateString(confirmation.lastScanDate) : getDateString(getCurrentDate()))}</label>
+                    </Stack>, 'normal')
                     return
                 }
+
                 firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
-                    .then(() => { approve(confirmation) })
+                    .then(() => {
+                        let temp = barcodes
+                        temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1
+                        approve(confirmation)
+                        setBarcodes(temp)
+                    })
                     .catch(decline)
             } else {
-                alert('ברקוד לא מאושר')
+                decline()
             }
         }
     }
 
 
     useEffect(() => {
-        if (appUser.admin) {
-            setProducingEventId(0)
-        } else {
-            setProducingEventId(appUser.producingEventId)
-        }
-
+        // if (appUser.admin)
+        //     setProducingEventId(0)
+        // else
+        setProducingEventId(appUser.producingEventId)
     }, [appUser])
     useEffect(() => {
         let sub = null;

@@ -1,5 +1,5 @@
 import { Auth, User } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople } from './types'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople, PNPTransactionConfirmationExtended } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
@@ -147,16 +147,16 @@ export class Realtime {
 
     getAllTransactionConfirmations(
         eventId: string,
-        consume: (transactions: PNPTransactionConfirmation[]) => void,
+        consume: (transactions: PNPTransactionConfirmationExtended[]) => void,
         onError: (e: Error) => void) {
         return onValue(this.transactionConfirmations, (snap) => {
-            let relevant: PNPTransactionConfirmation[] = []
+            let output: PNPTransactionConfirmationExtended[] = []
             snap.forEach(confirmation => {
                 if (confirmation.child('eventId').val() === eventId) {
-                    relevant.push(confirmation.val())
+                    output.push(confirmation.val())
                 }
             })
-            consume(relevant)
+            consume(output)
         }, onError)
     }
 

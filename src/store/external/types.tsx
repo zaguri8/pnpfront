@@ -23,6 +23,14 @@ export type PNPTransactionConfirmation = {
     confirmationVoucher: string
 }
 
+export type PNPTransactionConfirmationExtended = PNPTransactionConfirmation & {
+    customerEmail: string | undefined
+    customerName: string | undefined
+    customerPhone: string | undefined
+    startPoint: string | undefined
+    destination: string | undefined
+}
+
 // TODO : Add Ride Status 20/03/22
 export type PNPPublicRide = {
     rideId: string

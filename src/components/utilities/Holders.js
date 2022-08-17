@@ -5,15 +5,15 @@ const animations = {
     animate: { opacity: 1, transform: 'translateY(0px)' },
     exit: { opacity: 0 }
 }
-export const PageHolder = ({ children, style = {}, transformUp = false}) => {
+export const PageHolder = ({ children, style = {}, transformUp = false, className = "" }) => {
 
     return <motion.div
-  variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: 'translateY(-42px)' } } } : animations}
+        variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: 'translateY(-42px)' } } } : animations}
         initial={'initial'}
         animate={'animate'}
         exit={'exit'}
         transition={{ duration: 0.5 }}
-        style={{
+        style={className ? undefined : {
             ...{
                 width: '100%',
                 paddingBottom: '120px',
@@ -23,9 +23,11 @@ export const PageHolder = ({ children, style = {}, transformUp = false}) => {
                 flexDirection: 'column',
                 alignItems: 'center'
             }, ...style
-        }}>{children}</motion.div>
+        }}
+        className={className}
+    >{children}</motion.div>
 }
-export const InnerPageHolder = ({ children, style = {}, transformUp = false,transformUpValue=42 }) => {
+export const InnerPageHolder = ({ children, style = {}, transformUp = false, transformUpValue = 42 }) => {
     return <motion.div
         variants={transformUp ? { ...animations, ...{ animate: { ...animations.animate, transform: `translateY(-${transformUpValue}px)` } } } : animations}
         transition={{ duration: 0.5 }}
