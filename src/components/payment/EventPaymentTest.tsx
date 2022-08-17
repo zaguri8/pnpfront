@@ -7,7 +7,9 @@ import { PageHolder } from '../utilities/Holders'
 import './EventPayment.css'
 import $ from 'jquery'
 import { PaymentForm } from './Payment'
-export default function EventPayment() {
+import { PaymentFormTest } from './PaymentTest'
+import { useLanguage } from '../../context/Language'
+export default function EventPaymentTest() {
     const location = useLocation()
 
     const [paymentInfo, setPaymentInfo] = useState<{ ride: PNPPublicRide, event: PNPEvent } | undefined>();
@@ -48,13 +50,15 @@ export default function EventPayment() {
     function getIsSoldOut() {
         return paymentInfo && paymentInfo.ride.extras.rideStatus === 'sold-out'
     }
+
+    const { lang } = useLanguage()
     return <PageHolder style={{
         position: 'relative',
-        zIndex:'1000',
+        zIndex: '1000',
         fontFamily: 'Open Sans Hebrew',
     }}>
-   
-        {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
+
+        {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentFormTest
             paymentInfo={paymentInfo}
             product={{
                 name: `${paymentInfo.event.eventName}`,
@@ -71,11 +75,11 @@ export default function EventPayment() {
                 twoWay: paymentInfo.ride.extras.twoWay,
                 price: paymentInfo.ride.ridePrice,
                 eventId: paymentInfo.event.eventId,
-                eventSendsSMS:paymentInfo.event.eventSendsSMS,
+                eventSendsSMS: paymentInfo.event.eventSendsSMS,
                 eventDate: paymentInfo.event.eventDate,
                 rideId: paymentInfo.ride.rideId
             }} /> : <div className='mistake'>
-            You must have gotten here by mistake.
+            {lang === 'heb' ? 'נראה שהגעת לעמוד זה בטעות, נסה שוב מדף הבית' : 'You must have gotten here by mistake.'}
         </div>}
     </PageHolder>
 }

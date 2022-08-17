@@ -141,14 +141,11 @@ export function PaymentFormTest({ product, paymentInfo }) {
 
         axios.post('https://nadavsolutions.com/gserver/paymentLink/test', send)
             .then(res => {
-                if (res.data.data) {
-                    setPaymentLink(res.data.data.payment_page_link)
+                if (res.data.success) {
                     cancelLoad()
-                    window.scrollTo({
-                        top: 64,
-                        left: 0,
-                        behavior: "smooth"
-                    })
+                    alert(res.data.success)
+                } else {
+                    alert(res.data.error)
                 }
             }).catch(e => {
 
