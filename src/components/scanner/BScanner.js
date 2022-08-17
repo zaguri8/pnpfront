@@ -116,6 +116,7 @@ function BScanner() {
         }
         return () => sub && sub();
     }, [producingEventId])
+
     useEffect(() => {
         hideHeader()
         return () => showHeader()

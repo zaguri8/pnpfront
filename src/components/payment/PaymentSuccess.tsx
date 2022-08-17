@@ -201,7 +201,7 @@ export default function PaymentSuccess() {
         {transaction ? <div>
             <SectionTitle style={{ marginBottom: '4px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
 
-            <InnerPageHolder style={{ background: 'none', border: 'none', margin: '0px', width: '250px',padding:'0px', height: 'fit-content' }}>
+            <InnerPageHolder style={{ background: 'none', border: 'none', margin: '0px', width: '250px', padding: '0px', height: 'fit-content' }}>
                 <label dir={SIDE(lang)}
                     style={{
                         ...{
@@ -215,20 +215,20 @@ export default function PaymentSuccess() {
                     }}>
                     <InfoRoundedIcon style={{ padding: '2px', borderRadius: '16px', color: 'white' }} />
                     {lang === 'heb' ? 'שימו לב לשעות היציאה והחזרה - יש להגיע 10 דקות לפני. ההסעה לא תחכה למאחרים.' : 'Pay attention to the departure and return hours - you must arrive 10 minutes before. The shuttle will not wait for the latecomers.'}</label>
-              
+
                 <span dir={SIDE(lang)}
 
                     style={bImportantStyle}>{(lang === 'heb' ? 'תוקף ברקוד: ' : 'Barcode expiration: ') + (lang === 'heb' ? (transaction.more_info.twoWay ? 'שני סריקות בלבד (סריקה לכל כיוון)' : 'סריקה אחת בלבד (כיוון אחד)') : (transaction.more_info.twoWay ? 'Two scans (Two directions)' : 'One Scan (One direction)'))}</span>
                 <b><span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, padding: '4px', margin: '4px', fontSize: '14px' }}>{(lang === 'heb' ? 'מספר נוסעים: ' : 'Number of passengers: ') + transaction.more_info.amount}</span></b>
 
                 <span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontSize: '9px', marginTop: '10px' }}>{lang === 'heb' ? 'במידה ורכשת מספר כרטיסים, הברקוד הנל מכיל את כולם.' : 'If you have purchased more then 1 ticket, the following barcode includes them as-well'}<b>{lang === 'heb' ? ' יש לעלות ביחד.' : 'Boarding together is required'}</b></span>
-                <Spacer offset={1}/>    
+                <Spacer offset={1} />
                 <Button style={{
                     fontFamily: 'Open Sans Hebrew',
                     textTransform: 'none',
-                    fontWeight:'bold',
+                    fontWeight: 'bold',
                     color: PRIMARY_WHITE,
-                    width:'100%',
+                    width: '100%',
                     background: PRIMARY_PINK
                 }} onClick={() => {
                     openDialog({
@@ -236,8 +236,8 @@ export default function PaymentSuccess() {
                             <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
 
 
-                            <Spacer offset={1}/>
-                            <label style ={{color:PRIMARY_ORANGE}}>{'צלמו מסך למועד האירוע !'}</label>
+                            <Spacer offset={1} />
+                            <label style={{ color: PRIMARY_ORANGE }}>{'צלמו מסך למועד האירוע !'}</label>
                         </div>
                     })
                 }}>{lang === 'heb' ? 'הצג ברקוד' : 'Show barcode'}</Button>
@@ -248,46 +248,49 @@ export default function PaymentSuccess() {
             <Button
 
                 onClick={openRideDetails}
-                style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%',backgroundColor:PRIMARY_ORANGE, maxWidth: '300px', padding: '0px', margin: '0px' } }}>{lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
+                style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%', backgroundColor: PRIMARY_ORANGE, maxWidth: '300px', padding: '0px', margin: '0px' } }}>{lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
         </InnerPageHolder>}
+        {center && <React.Fragment>
+            <SectionTitle title={NAVIGATION(lang)} style={{ paddingBottom: '0px' }} />
+            <InnerPageHolder style={{ background: 'none', border: 'none' }}>
+                <MapComponent mapProps={{
+                    center: center,
+                    zoom: 15,
+                    content: null,
+                    containerStyle: {
+                        zIndex: 0,
+                        transform: 'translateY(-32px)',
+                        width: '300px',
+                        border: '1px solid white',
+                        height: '300px', ...boxShadow()
+                    }
+                }} />
+                <div style={{ zIndex: 1, border: '.1px solid white', padding: '4px', alignItems: 'center', borderBottomRightRadius: '8px', borderBottomLeftRadius: '8px', width: '293px', justifyContent: 'space-between', display: 'flex', flexDirection: 'row', transform: 'translateY(-156px)' }}>
+                    <img
+                        src={waze}
+                        style={{ cursor: 'pointer', height: '30px', width: '30px', margin: '4px', ...boxShadow() }}
+                        alt={'נווט עם וויז'}
+                        onClick={() => {
+                            window.open(`https://waze.com/ul?ll=${center.lat},${center.lng}&navigate=yes`)
+                        }}
+                    >
+                    </img>
+                    <label style={{ color: SECONDARY_WHITE }}>בחר אפליקציית ניווט</label>
+                    <img
+                        src={googleMap}
+                        style={{ cursor: 'pointer', height: '25px', width: '20px', margin: '4px', ...boxShadow() }}
+                        alt={'נווט עם גוגל'}
+                        onClick={() => {
+                            navFunc(center)
+                        }}
+                    >
+                    </img>
+                </div>
+            </InnerPageHolder>
 
-        <SectionTitle title={NAVIGATION(lang)} style={{ paddingBottom: '0px' }} />
-        <InnerPageHolder style={{ background: 'none', border: 'none' }}>
 
-            {center && <MapComponent mapProps={{
-                center: center,
-                zoom: 15,
-                content: null,
-                containerStyle: {
-                    zIndex: 0,
-                    transform: 'translateY(-32px)',
-                    width: '300px',
-                    border: '1px solid white',
-                    height: '300px', ...boxShadow()
-                }
-            }} />}
-            {center && <div style={{ zIndex: 1, border: '.1px solid white', padding: '4px', alignItems: 'center', borderBottomRightRadius: '8px', borderBottomLeftRadius: '8px', width: '293px', justifyContent: 'space-between', display: 'flex', flexDirection: 'row', transform: 'translateY(-156px)' }}>
-                <img
-                    src={waze}
-                    style={{ cursor: 'pointer', height: '30px', width: '30px', margin: '4px', ...boxShadow() }}
-                    alt={'נווט עם וויז'}
-                    onClick={() => {
-                        window.open(`https://waze.com/ul?ll=${center.lat},${center.lng}&navigate=yes`)
-                    }}
-                >
-                </img>
-                <label style={{ color: SECONDARY_WHITE }}>בחר אפליקציית ניווט</label>
-                <img
-                    src={googleMap}
-                    style={{ cursor: 'pointer', height: '25px', width: '20px', margin: '4px', ...boxShadow() }}
-                    alt={'נווט עם גוגל'}
-                    onClick={() => {
-                        navFunc(center)
-                    }}
-                >
-                </img>
-            </div>}
-        </InnerPageHolder>
+        </React.Fragment>}
+
 
         <SectionTitle title={TRANSACTION_DETAILS(lang)} style={{ transform: 'translateY(-176px)' }} />
         <InnerPageHolder style={{ border: '.5px solid white', background: 'rgb(0,0,0,0.2)', transform: 'translateY(-176px)', direction: SIDE(lang) }}>
