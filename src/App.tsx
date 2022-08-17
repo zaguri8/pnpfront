@@ -58,6 +58,8 @@ import Footer from './components/footer/Footer';
 import EventPayment from './components/payment/EventPayment';
 import EventLinkRedirect from './components/admin/EventLinkRedirect';
 import LinkRedirect from './components/linkRedirect/LinkRedirect';
+import EventPaymentTest from './components/payment/EventPaymentTest';
+import EventPageTest from './components/event/EventPageTest';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -287,7 +289,7 @@ function App() {
   return (<div>
     <Scanner />
     <AppMenu menuToggle={toggleMenu} />
-    <div className='global_dim' style={{ position: 'fixed' ,display:'none', width: '100%', height: '100vh', background: 'rgba(0,0,0,0.3)',zIndex:'500' }}></div>
+    <div className='global_dim' style={{ position: 'fixed', display: 'none', width: '100%', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: '500' }}></div>
 
     <div className="App">
 
@@ -319,6 +321,11 @@ function App() {
         <Route path='/register' element={!isAuthenticated ? <Register /> : <Navigate to={'/'} />} />
         <Route path='/event/:id' element={<EventPage />} />
         <Route path='/event/payment' element={<EventPayment />} />
+
+
+        <Route path='/event/test/:id' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventPageTest />} />
+        <Route path='/event/test/payment' element={!isAuthenticated || !appUser || !appUser.admin ? <NoPerms /> : <EventPaymentTest />} />
+
         <Route path='/linkRedirect/:id' element={<LinkRedirect />} />
         <Route path='termsOfService' element={<TermsOfService />} />
         <Route path='/test' element={<GeneratePaymentForm />} />
