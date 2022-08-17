@@ -77,10 +77,10 @@ function BScanner() {
 
     const updateScanResult = (res) => {
         if (res) {
-            // if (appUser.admin && !appUser.producingEventId) {
-            //     nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
-            //     return
-            // }
+            if (appUser.admin && !appUser.producingEventId) {
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
+                return
+            }
             let confirmationIdx = barcodes.findIndex(bcode => res === bcode.confirmationVoucher)
             let confirmation = barcodes[confirmationIdx]
             if (confirmation) {
@@ -108,9 +108,9 @@ function BScanner() {
 
 
     useEffect(() => {
-        // if (appUser.admin)
-        //     setProducingEventId(0)
-        // else
+        if (appUser.admin)
+            setProducingEventId(0)
+        else
         setProducingEventId(appUser.producingEventId)
     }, [appUser])
     useEffect(() => {
