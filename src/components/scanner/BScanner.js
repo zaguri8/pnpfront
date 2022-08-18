@@ -156,7 +156,7 @@ function BScanner() {
         marginRight: 'auto',
         background: 'black'
     }}>
-        {!appUser.admin && <React.Fragment>
+        {!appUser.admin && producingEvent && <React.Fragment>
             <label style={{
                 fontSize: '14px',
                 color: 'white',
