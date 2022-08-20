@@ -5,6 +5,8 @@ export const TOOLBAR_LOGIN = (lang) => lang === 'heb' ? 'התחברות ' : 'Sig
 export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language'
 export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
 export const CREATE_RIDE = (lang) => lang === 'heb' ? 'צור הסעה' : 'Create a ride'
+export const CREATE_RIDE_2 = (lang) => lang === 'heb' ? 'יצירת הסעה' : 'Create a ride'
+
 export const NO_RIDES = (lang) => lang === 'heb' ? 'לאירוע זה טרם קיימות הסעות, לחץ כאן על מנת ליצור ביקוש להסעה' : 'This event currently has no rides, make a request to create a ride'
 export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על כפתור הפלוס ופתח ביקוש' : 'Your city is missing? open a request for a ride by clicking the the plus button'
 export const RIDE_DATE = (lang) => lang === 'heb' ? 'תאריך הסעה' : 'Ride Date'
@@ -14,6 +16,8 @@ export const LEAVE_HOUR = (lang) => lang === 'heb' ? 'שעת יציאה' : 'Ride
 export const CONFIRM_RIDE = (lang) => lang === 'heb' ? 'אשר הגעה להסעה' : 'Confirm Arrival'
 export const CONFIRM_EVENT_ARRIVAL = (lang) => lang === 'heb' ? 'אשר הגעה' : 'Confirm Arrival'
 export const RETURN_HOUR = (lang) => lang === 'heb' ? 'שעת חזרה' : 'Back hour'
+export const RETURN_POINT = (lang) => lang === 'heb' ? 'נקודת חזרה' : 'return point'
+export const RETURN_HOUR_2 = (lang) => lang === 'heb' ? 'שעת חזרה' : 'return point'
 export const STARTING_POINT = (lang) => lang === 'heb' ? 'כל נקודות היציאה' : 'All starting points'
 export const PAYMENT_FOR_RIDE = (lang) => lang === 'heb' ? `תשלום עבור הסעה` : 'Payment for ride'
 export const STARTING_POINT_SINGLE = (lang) => lang === 'heb' ? 'נקודת יציאה' : 'Starting point'
@@ -28,6 +32,7 @@ export const CONTINUE_TO_CREATE = (lang) => lang === 'heb' ? 'בצע יצירת 
 export const ATTENTION = (lang) => lang === 'heb' ? 'שימו לב !' : 'Attention !'
 export const NO_DELAYS = (lang) => lang === 'heb' ? 'ההסעות יוצאות בדיוק בשעה שנקבעה, לכן אין איחורים' : 'The rides leave exactly at the scheduled moment'
 export const DESTINATION_POINT = (lang) => lang === 'heb' ? 'בחר יעד ' : 'Choose Destination'
+
 export const DEST = (lang) => lang === 'heb' ? 'יעד' : 'Destination'
 export const EXTRA_STOP_POINTS = (lang) => lang === 'heb' ? 'נקודות אסיפה נוספות' : 'Extra stop points'
 export const PASSENGERS = (lang) => lang === 'heb' ? 'מספר נוסעים' : 'Number of passengers'

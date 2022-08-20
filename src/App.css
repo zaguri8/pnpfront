@@ -57,10 +57,10 @@
 
 ::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: white;
+  color: var(--PRIMARY_BLACK);
   width: max-content;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 14px;
   text-align: start;
   font-family: 'Open Sans Hebrew';
   opacity: 0.8;

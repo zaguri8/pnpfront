@@ -5,7 +5,7 @@ import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECOND
 import { useNavigate } from "react-router"
 import HTMLFromText from '../utilities/HtmlFromText'
 import { v4 } from 'uuid'
-import SectionTitle from '../SectionTitle'
+import SectionTitle from "../other/SectionTitle"
 import { useLocation } from 'react-router-dom'
 import { PageHolder, InnerPageHolder } from '../utilities/Holders'
 import { useLoading } from "../../context/Loading"

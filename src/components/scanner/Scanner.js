@@ -107,7 +107,7 @@ export default function Scanner() {
             videoContainerStyle={{ maxHeight: '100%' }}
             constraints={{
                 audio: false,
-                facingMode: { exact: 'evironment' },
+                facingMode: { exact: 'environment' },
                 aspectRatio: 1,
                 frameRate: 60
             }}

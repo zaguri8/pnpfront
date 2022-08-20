@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useFirebase } from "../../context/Firebase";
-import SectionTitle from '../SectionTitle'
+import SectionTitle from "../other/SectionTitle";
 import { dateStringFromDate, hyphenToMinus } from '../utilities/functions'
 import { getCurrentDate } from '../../utilities'
 import { InnerPageHolder } from '../utilities/Holders'

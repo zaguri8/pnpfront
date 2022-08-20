@@ -21,7 +21,7 @@ import { PageHolder } from '../utilities/Holders'
 import { submitButton } from '../../settings/styles'
 import { useNavigate } from 'react-router'
 import './MyPayments.css'
-import SectionTitle from '../SectionTitle'
+import SectionTitle from '../other/SectionTitle';
 import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
 
 const logOutStyle = (width, any = {}) => ({

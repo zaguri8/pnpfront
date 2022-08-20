@@ -13,7 +13,7 @@ import React from 'react'
 import { v4 } from 'uuid'
 import { DESTINATION_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
-import SectionTitle from '../SectionTitle'
+import SectionTitle from '../other/SectionTitle'
 import Spacer from '../utilities/Spacer'
 export default function SearchRide() {
 

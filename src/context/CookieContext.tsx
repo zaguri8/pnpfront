@@ -3,7 +3,7 @@ import { PNPPage, PNPPageStats } from "../cookies/types";
 import { asyncLocalStorage } from '../cookies/index'
 import { PNPRideConfirmation } from '../store/external/types';
 
-interface ICookieContext {
+export interface ICookieContext {
     setCookies: (cookies: PNPPageStats[]) => void
     isCacheValid: (page: PNPPage) => Promise<boolean>
     cacheDone: (page: PNPPage) => void

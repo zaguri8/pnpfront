@@ -24,6 +24,7 @@ export type PNPTransactionConfirmation = {
 }
 
 export type PNPTransactionConfirmationExtended = PNPTransactionConfirmation & {
+    passengers: number | string | undefined
     customerEmail: string | undefined
     customerName: string | undefined
     customerPhone: string | undefined
@@ -72,6 +73,21 @@ export type PNPPrivateRide = {
     comments: string
 }
 
+
+export type PNPExplicitPrivateRide = {
+    customerPhone: string
+    customerName: string
+    rideId:string
+    rideStartingPoint: string
+    extraStopPoints: string[]
+    extraStopPointsBack: string[]
+    rideTime: string
+    backTime: string
+    backPoint: string
+    passengers: string
+    date: string
+    comments: string
+}
 export type PNPCoupon = {
     couponId: string
     couponValue: string

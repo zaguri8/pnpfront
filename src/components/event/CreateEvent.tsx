@@ -5,7 +5,7 @@ import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from "draft-js";
 import '../../App.css'
-import SectionTitle from "../SectionTitle";
+import SectionTitle from "../other/SectionTitle";
 import $ from 'jquery'
 import { useEffect, useState } from "react";
 import Places from "../utilities/Places";

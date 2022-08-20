@@ -1,5 +1,5 @@
 import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_ACCOUNT_ITEM_3, MY_ACCOUNT_ITEM_4, MY_COINS, SIDE } from "../../settings/strings"
-import SectionTitle from "../SectionTitle"
+import SectionTitle from "../other/SectionTitle"
 import spoil from '../../assets/images/myaccount/spoil-black.png'
 import settings from '../../assets/images/myaccount/settings.png'
 import coins from '../../assets/images/myaccount/coins.png'

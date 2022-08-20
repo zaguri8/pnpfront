@@ -20,7 +20,7 @@ import { v4 } from "uuid";
 import { isValidPublicRide } from "../../store/validators";
 import { elegantShadow, submitButton, textFieldStyle } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
-import SectionTitle from "../SectionTitle";
+import SectionTitle from "../other/SectionTitle";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilities/Spacer";
 import { makeStyles } from "@mui/styles";

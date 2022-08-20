@@ -1,11 +1,7 @@
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
-import SectionTitle from "../SectionTitle"
-import { RideFormPreview } from "../ride/RideFormPreview"
 import { Gallery } from "../gallery/Gallery"
-import WhyUsContainer from "../whyus/WhyUsContainer"
 import './Home.css'
 import { useFirebase } from "../../context/Firebase"
-import SimpleImageSlider from "react-simple-image-slider";
 import { useEffect, useRef } from "react"
 import React from 'react'
 import { useState } from "react"
@@ -14,17 +10,11 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { PNPEvent } from "../../store/external/types"
 import { ABOUT, CLUBS, CULTURE, SCHEDULED_EVENTS, TOS, WHY_US_TITLE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
-import About from "../About"
-import { InnerPageHolder } from "../utilities/Holders"
-import { Link } from "react-router-dom"
 import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
-import Spacer from "../utilities/Spacer"
 import { getEventType, getEventTypeFromString, getEventTypePriority } from "../../store/external/converters"
 import { v4 } from "uuid"
-import { dateStringFromDate } from "../utilities/functions"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
-import ImageSlider from "../imageslider/ImageSlider"
 import logo from '../../assets/images/header.jpeg'
 import Footer from "../footer/Footer"
 import { useHeaderBackgroundExtension, useHeaderContext } from "../../context/HeaderContext"
@@ -102,7 +92,6 @@ export default function Home() {
     }
 
     return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
-        {/* <RideFormPreview /> */}
         {/*{selectedEventsForSlider && <ImageSlider events={selectedEventsForSlider} />}*/}
         <ArrowScrollUp />
         {getEventsGallery()}

@@ -3,13 +3,13 @@ import { ToolBar } from './components/toolbar/Toolbar';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import $ from 'jquery'
 import search from './assets/images/search.png'
-import TermsOfService from './components/TermsOfService'
+import TermsOfService from './components/other/TermsOfService';
 import logo_white from './assets/images/logo_white.png'
 import { Dialog, List, ListItem, Button, Stack, CircularProgress, TextField } from '@mui/material';
 import { ILoadingContext, useLoading } from './context/Loading';
 import Profile from './components/auth/Profile'
 import { CLOSE, SIDE, NOTFOUND } from './settings/strings'
-import AppMenu from './components/AppMenu';
+import AppMenu from './components/other/AppMenu';
 import { Routes, Route, useNavigate, useLocation } from 'react-router';
 import { Navigate } from 'react-router-dom'
 import InvitationPage from './components/invitation/InvitationPage';
@@ -26,10 +26,10 @@ import MyAccount from './components/auth/MyAccount';
 import LoadingIndicator from './components/utilities/LoadingIndicator';
 import CreateRide from './components/ride/CreateRide';
 import MyPayments from './components/payment/MyPayments';
-import Test from './components/Test';
+import Test from './components/other/Test';
 import EventStatistics from './components/admin/EventStatistics';
 import AdminPanel from './components/admin/AdminPanel';
-import WhatsApp from './components/WhatsApp';
+import WhatsApp from './components/other/WhatsApp';
 import PaymentSuccess from './components/payment/PaymentSuccess'
 import SearchRide from './components/search/SearchRide';
 import BScanner from './components/scanner/BScanner.js';
@@ -51,7 +51,7 @@ import PrivatePaymentForm from './components/admin/PaymentForm/PrivatePaymentFor
 import GeneratePaymentForm from './components/admin/PaymentForm/GeneratePaymentForm';
 import PrivatePaymentConfirmation from './components/admin/PaymentForm/PrivatePaymentConfirmation';
 import { useHeaderBackgroundExtension, useHeaderContext } from './context/HeaderContext';
-import About from './components/About';
+import About from './components/other/About';
 import { makeStyles } from '@mui/styles';
 import { textFieldStyle } from './settings/styles';
 import Footer from './components/footer/Footer';
@@ -60,6 +60,7 @@ import EventLinkRedirect from './components/admin/EventLinkRedirect';
 import LinkRedirect from './components/linkRedirect/LinkRedirect';
 import EventPaymentTest from './components/payment/EventPaymentTest';
 import EventPageTest from './components/event/EventPageTest';
+import PriceStatistics from './components/admin/PriceStatistics/PriceStatistics';
 
 function ImageHeader() {
   const nav = useNavigate()
@@ -136,12 +137,12 @@ function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
     overflowY: 'stretch',
     zIndex: '3000',
     overflowX: 'hidden',
-    background: PRIMARY_BLACK
+    background: 'transparent'
   }} open={props.dialogContext.isDialogOpened}>
     {props.dialogContext.dialogTitle && <div style={{
       display: 'flex',
       color: SECONDARY_WHITE,
-      background: PRIMARY_BLACK,
+      background: 'transparent',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center'
@@ -174,7 +175,7 @@ function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
         }} style={{
           width: '100%',
           color: 'white',
-          backgroundImage: RED_ROYAL,
+          background: PRIMARY_ORANGE,
           fontFamily: 'Open Sans Hebrew',
           fontSize: '18px'
         }}>{CLOSE(props.lang)}</Button>
@@ -326,6 +327,7 @@ function App() {
         <Route path='/linkRedirect/:id' element={<LinkRedirect />} />
         <Route path='termsOfService' element={<TermsOfService />} />
         <Route path='/test' element={<Test />} />
+        <Route path='/test2' element={<PriceStatistics />} />
         <Route path='/scan' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanner />} />
         <Route path='/scanResult' element={!isAuthenticated || !appUser || !appUser.producer ? <NoPerms /> : <BScanResult />} />
         <Route path='/searchRide' element={!isAuthenticated || !appUser ? <Login /> : <SearchRide />} />

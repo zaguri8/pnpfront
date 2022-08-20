@@ -1,8 +1,8 @@
 import { Input, FormControl, InputLabel, TextField, ListItemSecondaryAction } from "@mui/material"
 import { EMAIL, FORGOT_PASSWORD, LOGIN_OK, MY_ACCOUNT, NO_ACCOUNT, OR, PASSWORD, SIDE, TOOLBAR_LOGIN } from '../../settings/strings'
 import { makeStyles } from "@mui/styles"
-import SectionTitle from "../SectionTitle"
-import Button from "../Button"
+import SectionTitle from "../other/SectionTitle"
+import Button from "../other/Button"
 import { Stack } from "@mui/material"
 import { useFirebase } from "../../context/Firebase"
 import { useNavigate } from "react-router"

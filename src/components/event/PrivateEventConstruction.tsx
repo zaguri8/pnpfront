@@ -15,7 +15,7 @@ import { elegantShadow, submitButton, textFieldStyle } from '../../settings/styl
 import { makeStyles } from '@mui/styles'
 import Spacer from '../utilities/Spacer'
 import { reverseDate, unReverseDate } from '../utilities/functions'
-import SectionTitle from '../SectionTitle'
+import SectionTitle from '../other/SectionTitle'
 import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
 
 type FormFieldProps = {

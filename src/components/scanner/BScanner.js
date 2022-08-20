@@ -20,7 +20,7 @@ function BScanner() {
     const nav = useNavigate()
     const { openScanner, isScanning, faceMode, setFaceMode, scannerLanguage, barCodes, setBarcodes, setScannerLanguage } = useScanner()
     useEffect(() => {
-        if (!location.state)
+        if (!location.state && appUser && appUser.admin)
             openScanner(scannerLanguage)
     }, [])
     const { user, appUser, firebase } = useFirebase()
@@ -57,8 +57,8 @@ function BScanner() {
                 <CheckCircleOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'transparent', width: '64px', height: '25px', color: '#4BB543' }} />
                 <label style={{ padding: '2px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה מאושרת' : 'رحلة مصرٌحة'}</label>
             </Stack>
-
-            <label style={{ padding: '0px', margin: '0px' }}>{valid()}</label><b>{confirmation.amount}</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{"שם לקוח: "}</label><b>{confirmation.customerName ?? ""}</b>
+            <label style={{ padding: '0px', margin: '0px' }}>{valid()}</label><b>{confirmation.passengers ?? 1}</b>
             <label style={{ padding: '0px', margin: '0px' }}>{"שם אירוע: "}</label><b>CHAN HASHAYAROT</b>
             <label style={{ padding: '0px', margin: '0px' }}>{"יעד נסיעה: "}</label><b>Tel Aviv בורסא</b>
 

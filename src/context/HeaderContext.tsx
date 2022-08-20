@@ -7,7 +7,7 @@ import $ from 'jquery'
 import { useLocation } from "react-router";
 import { PRIMARY_BLACK } from "../settings/colors";
 
-interface IHeaderContext {
+export interface IHeaderContext {
     isShowingAbout: boolean
     setIsShowingAbout: (on: boolean) => void
 }
@@ -46,6 +46,14 @@ export const useDimExtension = () => {
         dimOff: () => $('.global_dim').css('display', 'none'),
     }
 }
+export interface IDimExtension {
+    dimOn: () => void
+    dimOff: () => void
+}
+export interface IBackgroundExtension {
+    changeBackgroundColor: (color: string) => void
+    resetBackgroundColor: (color: string) => void
+}
 export const useBackgroundExtension = () => {
     const changeBackgroundColor = (color: string) => {
         $('.App').css('background-color', color)
@@ -60,6 +68,14 @@ export const useBackgroundExtension = () => {
     }
 }
 
+export interface IHeaderBackgroundExtension {
+    hideHeader: () => void
+    showHeader: () => void
+    setHeaderAbout: () => void
+    setHeaderBackground: () => void
+    setHeaderColor: (color: string) => void
+    resetHeaderColor: () => void
+}
 export const useHeaderBackgroundExtension = () => {
     const location = useLocation()
     function hideHeader() {

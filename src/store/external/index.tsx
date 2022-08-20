@@ -1,5 +1,5 @@
 import { Auth, User } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople, PNPTransactionConfirmationExtended } from './types'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople, PNPTransactionConfirmationExtended, PNPExplicitPrivateRide } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
@@ -554,20 +554,20 @@ export class Realtime {
             .catch((e) => { this.createError('removePrivateEvent', e) })
     }
 
-
     /**
-     * addPrivateRide
-     * @param ride a private ride to be added
-     * @returns a new reference or error reference
-     */
-    addPrivateRide = async (ride: PNPPrivateRide): Promise<object | void> => {
+ * addPrivateRide
+ * @param ride a private ride to be added
+ * @returns a new reference or error reference
+ */
+    addPrivateRideExplicit = async (ride: PNPExplicitPrivateRide): Promise<object | void> => {
         if (this.auth.currentUser) {
             const p = push(child(child(child(this.rides, 'private'), 'ridesForPeople'), this.auth.currentUser!.uid))
             ride.rideId = p.key!
             return await set(p, ride)
-                .catch((e) => { this.createError('addPublicRide', e) })
+                .catch((e) => { this.createError('addPrivateRideExplicit', e) })
         }
     }
+
 
 
     addPrivateEvent = async (event: PNPPrivateEvent, imageBuffer?: ArrayBuffer): Promise<{ id: string } | void> => {

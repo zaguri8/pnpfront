@@ -8,7 +8,7 @@ import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrow
 import { InnerPageHolder, PageHolder } from "../utilities/Holders";
 import AddUpdateEventInvitation from "./AddUpdateEventInvitation";
 import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, List, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material";
-import SectionTitle from "../SectionTitle";
+import SectionTitle from "../other/SectionTitle";
 import AddUpdatePrivateEventRide from "./AddUpdatePrivateEventRide";
 import { useFirebase } from "../../context/Firebase";
 import { Unsubscribe } from "firebase/database";

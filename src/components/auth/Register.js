@@ -5,8 +5,8 @@ import { Link } from "react-router-dom"
 import { makeStyles } from "@mui/styles"
 import './Register.css'
 import { PRIMARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
-import SectionTitle from "../SectionTitle"
-import Button from "../Button"
+import SectionTitle from "../other/SectionTitle"
+import Button from "../other/Button"
 import { InnerPageHolder, PageHolder } from "../utilities/Holders"
 import $ from 'jquery'
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
