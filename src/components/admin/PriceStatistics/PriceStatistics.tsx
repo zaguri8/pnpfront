@@ -15,8 +15,6 @@ export interface priceEval {
     "price-oneway"?: undefined;
 }
 async function ridePriceEval(start: string, dest: string): Promise<priceEval | null> {
-    console.log(start)
-    console.log(dest)
     var service = new google.maps.DistanceMatrixService();
     const response = await service.getDistanceMatrix(
         {
@@ -64,6 +62,27 @@ class PriceStatistics extends React.Component<Hooks, priceEval | undefined> {
         else
             this.setState({ error: 'No ride' })
 
+        if (p_eval) {
+            (this.props.loading as any).showPopover(<React.Fragment>
+                <Stack direction={'row'}
+                    alignSelf={'center'}
+                    marginLeft={'auto'}
+                    marginRight={'auto'}
+                    style={{ direction: 'rtl' }}
+                    width={'fit-content'}>
+                    <Stack style={{ padding: '8px' }}>
+                        <h3 style={this.headerStyle}>{'כיוון אחד'}</h3>
+                        <label style={this.labelStyle}>מרחק: {p_eval["km-oneway"] ? p_eval["km-oneway"] + ` ק"מ` : 'לא נמצא'}</label>
+                        <label style={this.labelStyle}>מחיר: {p_eval["price-oneway"] ? p_eval["price-oneway"] + ` ש"ח` : 'לא נמצא'}</label>
+                    </Stack>
+                    <Stack style={{ padding: '8px' }}>
+                        <h3 style={this.headerStyle}>{'שתי כיוונים'}</h3>
+                        <label style={this.labelStyle}>מרחק: {p_eval["km-twoway"] ? p_eval["km-twoway"] + ` ק"מ` : 'לא נמצא'}</label>
+                        <label style={this.labelStyle}>מחיר: {p_eval["price-twoway"] ? p_eval["price-twoway"] + ` ש"ח` : 'לא נמצא'}</label>
+                    </Stack>
+                </Stack>
+            </React.Fragment>,'success',7500)
+        }
     }
 
     componentDidMount() {

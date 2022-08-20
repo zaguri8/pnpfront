@@ -78,13 +78,11 @@ export const useLoading = () => {
         loadingContext!.setOpenPopover(true)
     }
 
-    const showPopover = (content: any, status: 'success' | 'normal' | 'error') => {
+    const showPopover = (content: any, status: 'success' | 'normal' | 'error', EXEC_TIME: number = 3000) => {
 
         openPopover(<PageHolder className={`pop_over ${status}`}>
             {content}
         </PageHolder>);
-
-        const EXEC_TIME = 3000;
         setTimeout(closePopover, EXEC_TIME);
     }
 
