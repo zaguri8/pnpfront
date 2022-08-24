@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import { useFirebase } from "../../context/Firebase";
 import SectionTitle from "../other/SectionTitle";
-import { dateStringFromDate, hyphenToMinus } from '../utilities/functions'
+import { dateStringFromDate, hyphenToMinus } from '../utilityComponents/functions'
 import { getCurrentDate } from '../../utilities'
-import { InnerPageHolder } from '../utilities/Holders'
+import { InnerPageHolder } from '../utilityComponents/Holders'
 import { useLocation } from 'react-router'
 import { Unsubscribe } from 'firebase/database'
 import { PNPPage } from '../../cookies/types'

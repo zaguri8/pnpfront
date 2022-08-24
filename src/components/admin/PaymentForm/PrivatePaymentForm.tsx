@@ -1,6 +1,6 @@
 import './PrivatePaymentForm.css'
 import { PProductData, PCustomerData, PPaymentPageData } from '../../../store/external/types'
-import { InnerPageHolder, PageHolder } from '../../utilities/Holders'
+import { InnerPageHolder, PageHolder } from '../../utilityComponents/Holders'
 import { useEffect, useState } from 'react'
 import { BLACK_ELEGANT } from '../../../settings/colors'
 import axios from 'axios'

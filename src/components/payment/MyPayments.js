@@ -14,10 +14,10 @@ import userIcon from '../../assets/images/appmenu/pink/user.svg'
 import listIcon from '../../assets/images/appmenu/pink/list.svg'
 
 import { LOGOUT, MY_ACCOUNT, MY_ACCOUNT_ITEM_1, MY_ACCOUNT_ITEM_2, MY_COINS, SIDE } from '../../settings/strings'
-import { ORANGE_GRADIENT_PRIMARY, SECONDARY_WHITE, PRIMARY_PINK, RED_ROYAL, PRIMARY_ORANGE } from '../../settings/colors'
+import { ORANGE_GRADIENT_PRIMARY, SECONDARY_WHITE, PRIMARY_PINK, RED_ROYAL, PRIMARY_ORANGE, PRIMARY_BLACK } from '../../settings/colors'
 import { useLanguage } from '../../context/Language'
 import { Button, Stack } from '@mui/material'
-import { PageHolder } from '../utilities/Holders'
+import { PageHolder } from '../utilityComponents/Holders'
 import { submitButton } from '../../settings/styles'
 import { useNavigate } from 'react-router'
 import './MyPayments.css'
@@ -113,15 +113,17 @@ const MyPayments = () => {
                     dir={SIDE(lang)}
                     style={{
                         padding: '8px',
-                        color: SECONDARY_WHITE
-                    }}>{lang === 'heb' ? 'האם ברצונך להתנתק מחשבון זה ' : 'Would you like to log out of this account : '}</span>
+                        fontWeight:'bold',
+                        color: PRIMARY_PINK
+                    }}>{lang === 'heb' ? 'האם ברצונך להתנתק מחשבון זה ?' : 'Would you like to log out of this account : '}</span>
                 <span
                     dir={SIDE(lang)}
                     style={{
                         padding: '8px',
-                        color: SECONDARY_WHITE
+
+                        color: PRIMARY_PINK
                     }}>{appUser.email}</span>
-                <Button style={logOutStyle('50%', { alignSelf: 'center' })} onClick={() => {
+                <Button style={logOutStyle('50%', { alignSelf: 'center',background:PRIMARY_PINK })} onClick={() => {
                     closeDialog()
                     alert('התנתקת בהצלחה.')
                     signOut()
@@ -134,7 +136,7 @@ const MyPayments = () => {
     }
 
 
-    return (transactions && transactions.length > 0 ? <PageHolder
+    return (<PageHolder
         style={{ width: '100%' }}>
         <div className='account_page_top_bar_wrapper'>
             <div className='account_page_top_bar' dir={SIDE(lang)}>
@@ -173,10 +175,10 @@ const MyPayments = () => {
             <h3 style={{ color: 'white', textAlign: lang === 'heb' ? 'right' : 'left' }}>{lang === 'heb' ? 'היסטוריית נסיעות' : 'Ride history'}</h3>
 
         </div>
-        <ul id={'transactions_table'}>
+        {transactions && transactions.length > 0 ? <ul id={'transactions_table'}>
 
             {transactions.map((trans, index) => <TransactionRow key={v4()} transaction={trans} index={index} />)}
-        </ul>
-    </PageHolder> : <h1 style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'אין נסיעות' : 'No Rides'}</h1>)
+        </ul> : lang === 'heb' ? <h3 style={{ color: PRIMARY_PINK }}>{'אין נסיעות'}</h3> : <h3 style={{ color: PRIMARY_PINK }} >{'No rides'}</h3>}
+    </PageHolder>)
 }
 export default MyPayments

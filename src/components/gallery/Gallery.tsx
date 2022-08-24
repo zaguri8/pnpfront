@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect } from "react"
+import React, { CSSProperties, useEffect, useLayoutEffect } from "react"
 import { v4 } from "uuid"
 import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { useNavigate } from 'react-router'
@@ -93,7 +93,7 @@ function GalleryItemBottom(props: { event: PNPEvent }) {
 }
 
 
-export function Gallery(props: GalleryProps) {
+function Gallery(props: GalleryProps) {
     const { lang } = useLanguage()
 
 
@@ -120,26 +120,22 @@ export function Gallery(props: GalleryProps) {
     const nav = useNavigate()
     const handleOpen = (pnpEvent: PNPEvent) => {
         nav(`/event/${pnpEvent.eventId}`)
+    }
 
-    }
-    const refactorEventIdForGalleryItem = (eventId: string) => {
-        return eventId.replaceAll(' ', '').replaceAll('-', '').replaceAll('_', '')
-    }
+
     useEffect(() => {
         setTimeout(() => {
             $('.loadingDivStyle').css('display', 'none')
         }, 550)
-
         props.events.forEach(event => {
-            const trimmed = refactorEventIdForGalleryItem(event.eventId);
-            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
+            const imageId = (event as any).imageId
+            $(`#gallery_img_${imageId}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
         })
         props.privateEvents.forEach(event => {
-            const trimmed = refactorEventIdForGalleryItem(event.eventId);
-            $(`#gallery_img_${trimmed}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
+            const imageId = (event as any).imageId
+            $(`#gallery_img_${imageId}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
         })
-    }, [])
-
+    },[])
 
     const loadingDivStyle = {
         background: `url('${loadingGif}')`,
@@ -167,16 +163,15 @@ export function Gallery(props: GalleryProps) {
             <div className='gallery' style={imageContainer} >
 
                 {props.events.map(pnpEvent => {
+                    const imageId = (pnpEvent as any).imageId
                     return (<div key={v4()} style={{ transform: 'scale(0.9)' }}>
                         <GalleryItemTitle event={pnpEvent} />
                         <div
                             className="gallery_img"
-                            id={`gallery_img_${refactorEventIdForGalleryItem(pnpEvent.eventId)}`}
+                            id={`gallery_img_${imageId}`}
                             onClick={() => handleOpen(pnpEvent)}>
                             <div className='loadingDivStyle'
                                 style={loadingDivStyle} />
-                            {/*<GalleryItemTitle event={pnpEvent} />*/}
-
                         </div>
                         <GalleryItemBottom event={pnpEvent} />
                     </div>)
@@ -193,16 +188,16 @@ export function Gallery(props: GalleryProps) {
             <div className='gallery' style={imageContainer}>
 
                 {props.privateEvents.map(pnpEvent => {
+                    const imageId = (pnpEvent as any).imageId
+
                     return (<div key={v4()} style={{ transform: 'scale(0.9)', marginLeft: '4px', marginRight: '4px' }}>
                         <GalleryItemTitle event={pnpEvent} />
                         <div
                             className="gallery_img"
-                            id={`gallery_img_${refactorEventIdForGalleryItem(pnpEvent.eventId)}`}
+                            id={`gallery_img_${imageId}`}
                             onClick={() => handleOpen(pnpEvent)}>
                             <div className='loadingDivStyle'
                                 style={loadingDivStyle} />
-                            {/*<GalleryItemTitle event={pnpEvent} />*/}
-
                         </div>
                         <GalleryItemBottom event={pnpEvent} />
                     </div>)
@@ -211,3 +206,4 @@ export function Gallery(props: GalleryProps) {
         </motion.div>
     </div>
 }
+export default  React.memo(Gallery)

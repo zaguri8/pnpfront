@@ -13,9 +13,9 @@ import { getEventTypeFromString } from "../../store/external/converters"
 import { PNPEvent, UserEnterStatistics } from "../../store/external/types"
 import { getCurrentDate } from "../../utilities"
 import SectionTitle from "../other/SectionTitle"
-import { dateStringFromDate, hyphenToMinus, reverseDate, unReverseDate } from "../utilities/functions"
-import { InnerPageHolder, PageHolder } from "../utilities/Holders"
-import Spacer from "../utilities/Spacer"
+import { dateStringFromDate, hyphenToMinus, reverseDate, unReverseDate } from "../utilityComponents/functions"
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
+import Spacer from "../utilityComponents/Spacer"
 import PNPChart from "./PNPChart"
 
 

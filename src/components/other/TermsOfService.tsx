@@ -3,7 +3,7 @@ import { useLanguage } from "../../context/Language"
 import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { TERMS_OF_SERVICE,SIDE } from "../../settings/strings"
 import SectionTitle from "./SectionTitle"
-import { InnerPageHolder } from "../utilities/Holders"
+import { InnerPageHolder } from "../utilityComponents/Holders"
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { textAlign } from "@mui/system"
 import { useEffect, useState } from "react"

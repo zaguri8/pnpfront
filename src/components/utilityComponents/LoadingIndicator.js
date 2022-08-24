@@ -22,8 +22,8 @@ export function LoadingIndicator(props) {
         transform: 'translate(calc(50vw - 50%), calc(50vh - 50%))'
     }}>
 
-        {/* <img style={{ width: '135px' }} src={bus} /> */}
-        <CircularProgress  style = {{zIndex:'10010',color:SECONDARY_WHITE}} size ={'70px'} thickness={1} />
+     
+        {props.progress ?? <CircularProgress  style = {{zIndex:'10010',color:SECONDARY_WHITE}} size ={'70px'} thickness={1} />}
         {/*<ThreeDots ariaLabel='loading-indicator' color={'white'} />*/}
     </div>);
 }

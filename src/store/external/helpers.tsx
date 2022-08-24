@@ -1,5 +1,5 @@
 import { User } from "firebase/auth";
-import { dateStringFromDate } from "../../components/utilities/functions";
+import { dateStringFromDate } from "../../components/utilityComponents/functions";
 import { SAME_SPOT } from "../../settings/strings";
 import { getCurrentDate } from "../../utilities";
 import { PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./types";

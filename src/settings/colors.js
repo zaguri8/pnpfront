@@ -1,6 +1,6 @@
 export const ORANGE_GRADIENT_SECONDARY = "linear-gradient(#bd3333,orangered,orange,orange)"
 export const TOOLBAR_COLOR = "transparent"
-export const PRIMARY_BLACK = "rgb(29, 31, 34)"
+export const PRIMARY_BLACK = "rgb(6, 7, 7)"
 export const SECONDARY_BLACK = "rgb(65,68,82)"
 export const PRIMARY_WHITE = 'rgb(255,255,255)'
 export const SECONDARY_WHITE = 'whitesmoke'

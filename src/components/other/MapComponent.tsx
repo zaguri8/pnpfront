@@ -1,7 +1,7 @@
 import { GoogleMap, LoadScript, useGoogleMap, useJsApiLoader } from '@react-google-maps/api'
 import { CSSProperties, useCallback, useEffect } from 'react';
 import { useGoogleState } from '../../context/GoogleMaps';
-import { PageHolder } from './../utilities/Holders';
+import { PageHolder } from '../utilityComponents/Holders';
 
 export type MapProps = {
     center: { lat: number, lng: number },

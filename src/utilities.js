@@ -10,6 +10,19 @@ export const getDateString = (dateMili) => {
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 }
 
+export const getDateTimeString = (dateMili) => {
+    const date = new Date(dateMili)
+    let hour = date.getHours()
+    let min = date.getMinutes()
+    let sec = date.getSeconds()
+    if (hour < 10)
+        hour = "0" + hour
+    if (min < 10)
+        min = "0" + min
+    if (sec < 10)
+        sec = "0" + sec
+    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} ${hour}:${min}:${sec}`
+}
 export const isValidPhoneNumber = (phone) => {
 
     return phone.match(/^0(5[^7]|[2-4]|[8-9]|7[0-9])[0-9]{7}$/)

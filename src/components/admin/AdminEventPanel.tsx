@@ -3,11 +3,11 @@ import { PNPEvent } from "../../store/external/types"
 import { Button, Stack } from '@mui/material'
 import { SECONDARY_WHITE, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, SECONDARY_BLACK, BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors"
 import { useNavigate } from "react-router"
-import HTMLFromText from '../utilities/HtmlFromText'
+import HTMLFromText from '../utilityComponents/HtmlFromText'
 import { v4 } from 'uuid'
 import SectionTitle from "../other/SectionTitle"
 import { useLocation } from 'react-router-dom'
-import { PageHolder, InnerPageHolder } from '../utilities/Holders'
+import { PageHolder, InnerPageHolder } from '../utilityComponents/Holders'
 import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
 import { CSSProperties, useEffect } from "react"

@@ -1,14 +1,14 @@
 import { FormControl, InputLabel, TextField, Stack, TextFieldProps, Select, MenuItem, Button, Checkbox } from "@mui/material";
 import { useLanguage } from "../../context/Language";
 import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_CREATE, CREATE_EVENT, CREATE_EVENT_TITLE, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_NUMBER_PPL, EVENT_START, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE, TERMS_OF_USE } from "../../settings/strings";
-import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from "draft-js";
 import '../../App.css'
 import SectionTitle from "../other/SectionTitle";
 import $ from 'jquery'
 import { useEffect, useState } from "react";
-import Places from "../utilities/Places";
+import Places from "../utilityComponents/Places";
 
 import { PNPEvent, PNPEventAgeRange, PNPEventAttention } from '../../store/external/types'
 import { makeStyles } from "@mui/styles";
@@ -23,11 +23,11 @@ import { useFirebase } from "../../context/Firebase";
 import { useLoading } from "../../context/Loading";
 import { submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
-import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_GRADIENT_SECONDARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
-import Spacer from "../utilities/Spacer";
+import Spacer from "../utilityComponents/Spacer";
 import { useNavigate } from "react-router";
-import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityComponents/functions";
 import { v4 } from "uuid";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
 import { getCurrentDate } from "../../utilities";

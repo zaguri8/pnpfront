@@ -4,12 +4,12 @@ import { FILL_ALL_FIELDS, FULL_NAME, PASSENGERS, PHONE_NUMBER, SIDE, STARTING_PO
 import { makeStyles } from "@mui/styles";
 import { PNPEvent, PNPRideRequest } from "../../store/external/types";
 import { useFirebase } from "../../context/Firebase";
-import Places from "../utilities/Places";
-import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import Places from "../utilityComponents/Places";
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { useState } from "react";
 import { submitButton } from "../../settings/styles";
 import { useLoading } from "../../context/Loading";
-import { PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
+import { PRIMARY_BLACK, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
 
 export default function RideRequestForm(props: { event: PNPEvent | undefined | null }) {
     const { lang } = useLanguage()
@@ -92,9 +92,9 @@ export default function RideRequestForm(props: { event: PNPEvent | undefined | n
     }));
     const classes = useStyles()
     return <Stack spacing={3} sx={{ width: '80%', padding: '16px' }}>
-        <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? `בקשת פתיחת הסעה לאירוע : ${props.event?.eventName ?? ''}` : ` Request a ride for event:  ${props.event?.eventName ?? ''}`}</label>
+        <label style={{ color: PRIMARY_PINK }}>{lang === 'heb' ? `בקשת פתיחת הסעה לאירוע : ${props.event?.eventName ?? ''}` : ` Request a ride for event:  ${props.event?.eventName ?? ''}`}</label>
         <FormControl>
-            <label style={{ color: SECONDARY_WHITE }}>{FULL_NAME(lang)}</label>
+            <label style={{ color: PRIMARY_PINK }}>{FULL_NAME(lang)}</label>
             <TextField
                 className={classes.root}
                 onChange={(e) => setFullName(e.target.value)}
@@ -104,7 +104,7 @@ export default function RideRequestForm(props: { event: PNPEvent | undefined | n
         </FormControl>
         <FormControl>
 
-            <label style={{ color: SECONDARY_WHITE }}>{PHONE_NUMBER(lang)}</label>
+            <label style={{ color: PRIMARY_PINK }}>{PHONE_NUMBER(lang)}</label>
             <TextField
                 className={classes.root}
 
@@ -113,7 +113,7 @@ export default function RideRequestForm(props: { event: PNPEvent | undefined | n
 
         </FormControl>
         <FormControl>
-            <label style={{ color: SECONDARY_WHITE }}>{PASSENGERS(lang)}</label>
+            <label style={{ color: PRIMARY_PINK }}>{PASSENGERS(lang)}</label>
             <TextField
                 className={classes.root}
 
@@ -134,7 +134,7 @@ export default function RideRequestForm(props: { event: PNPEvent | undefined | n
         </FormControl>
 
         <FormControl>
-            <label style={{ color: SECONDARY_WHITE }}>{STARTING_POINT_SINGLE(lang)}</label>
+            <label style={{ color: PRIMARY_PINK }}>{STARTING_POINT_SINGLE(lang)}</label>
             <Places value={request.startingPoint} handleAddressSelect={setStartingPoint} types={['address']} className='ride_request_places' id={'ride_request_places'} fixed={false} placeHolder={lang === 'heb' ? 'בחר נקודת יציאה' : 'Choose starting point'} style={{ ...{ padding: '0px', margin: '0px', width: '100%', color: PRIMARY_BLACK }, ...{ cursor: 'pointer' } }} />
         </FormControl>
         <FormControl>

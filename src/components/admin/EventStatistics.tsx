@@ -11,7 +11,7 @@ import $ from 'jquery'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { SAME_SPOT, SIDE } from "../../settings/strings";
 import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPTransactionConfirmation, PNPUser } from "../../store/external/types";
-import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 
 import '../../settings/mainstyles.css'
 import axios from "axios";
@@ -22,7 +22,7 @@ import { elegantShadow, submitButton, textFieldStyle } from "../../settings/styl
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../other/SectionTitle";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
-import Spacer from "../utilities/Spacer";
+import Spacer from "../utilityComponents/Spacer";
 import { makeStyles } from "@mui/styles";
 import AddUpdateEventRide from "./AddUpdateEventRide";
 import AddUpdateEvent from "./AddUpdateEvent";
@@ -191,15 +191,18 @@ export default function EventStatistics() {
 
                                 {<Button
                                     onClick={() => {
-                                        openDialogWithTitle(<div style={{ background: ORANGE_GRADIENT_PRIMARY }}><h3 style={
+                                        openDialogWithTitle(<div style={{ background: 'none', padding: '8px' }}><h3 style={
                                             {
                                                 fontWeight: '14px',
+                                                fontSize: '12px',
                                                 textAlign: 'center'
                                             }
                                         }>{`עריכת הסעה לאירוע: ${props.event.eventName}`}</h3>
                                             <h4 style={
                                                 {
                                                     fontWeight: '12px',
+                                                    fontSize: '12px',
+
                                                     textAlign: 'center'
                                                 }
                                             }>{`נקודת יציאה : ${ride.rideStartingPoint}`}</h4></div>)
@@ -233,7 +236,7 @@ export default function EventStatistics() {
                                                     margin: '16px',
                                                     minWidth: '100px',
                                                     fontSize: '18px',
-                                                    background: ORANGE_RED_GRADIENT_BUTTON,
+                                                    background: PRIMARY_PINK,
                                                     color: SECONDARY_WHITE
                                                 }}>{'מחק'}</button></div>, title: `מחיקת הסעה לאירוע`
                                         })
@@ -341,9 +344,10 @@ export default function EventStatistics() {
             const [historyProp, setHistoryProp] = useState(props)
             const searchStyle = {
                 background: 'none',
-                color: SECONDARY_WHITE,
-                border: '.5px solid whitesmoke',
+                color: PRIMARY_BLACK,
+                border: `.5px solid ${PRIMARY_BLACK}`,
                 textDecoration: 'none',
+
                 fontSize: '18px',
                 fontFamily: 'Open Sans Hebrew',
                 padding: '16px',
@@ -383,19 +387,22 @@ export default function EventStatistics() {
                 const labelTitleStyle = {
                     fontSize: '16px',
                     fontWeight: 'bold',
-                    color: SECONDARY_WHITE
+                    color: PRIMARY_BLACK
                 }
                 const labelTitleStyleSecond = {
                     fontSize: '14px',
                     fontWeight: 'bold',
-                    color: SECONDARY_WHITE
+                    color: PRIMARY_BLACK
                 }
                 const labelSmallStyle = {
-                    color: SECONDARY_WHITE,
+                    color: PRIMARY_BLACK,
                     fontSize: '14px'
                 }
                 return <div style={{
                     width: '90%',
+                    justifyContent: 'center',
+                    display: 'flex',
+                    alignItems: 'center'
                 }}>
                     <div style={{
                         display: 'flex',
@@ -790,8 +797,6 @@ export default function EventStatistics() {
                 }
                 setLinkRedirect(link);
             })
-        } else {
-            console.log("event null")
         }
         return () => unsub && unsub();
     }, [event])
@@ -825,8 +830,7 @@ export default function EventStatistics() {
                                 content: <div style={{ padding: '16px' }}>
                                     <h3 style={{
                                         fontWeight: '14px',
-                                        background: PRIMARY_BLACK,
-                                        color: SECONDARY_WHITE,
+                                        color: PRIMARY_PINK,
                                         padding: '4px',
                                         textAlign: 'center'
                                     }}>{`הוסף הסעה ל ${event.eventName}`}</h3>

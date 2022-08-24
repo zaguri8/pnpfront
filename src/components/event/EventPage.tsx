@@ -6,7 +6,7 @@ import $ from 'jquery'
 import './EventPage.css'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import sold_out from '../../assets/images/sold_out.png'
-import { PageHolder } from "../utilities/Holders";
+import { PageHolder } from "../utilityComponents/Holders";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useFirebase } from "../../context/Firebase"
@@ -17,12 +17,12 @@ import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { submitButton } from '../../settings/styles'
 import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE, DARKER_BLACK_SELECTED, RED_ROYAL, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors";
-import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { useNavigate, useLocation } from 'react-router'
 import { PNPPublicRide } from "../../store/external/types";
 import RideRequestForm from "../ride/RideRequestForm";
 import { Unsubscribe } from "firebase/database";
-import HTMLFromText from "../utilities/HtmlFromText";
+import HTMLFromText from "../utilityComponents/HtmlFromText";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { getValidImageUrl } from "../../utilities";
 export default function EventPage() {
@@ -51,7 +51,6 @@ export default function EventPage() {
 
     useEffect(() => {
         doLoad()
-
         const resize = (e?: PNPEvent) => {
             let c: any = e;
             if (!c) {

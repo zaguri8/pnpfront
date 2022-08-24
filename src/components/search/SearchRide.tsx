@@ -1,5 +1,5 @@
 import './SearchRide.css'
-import { InnerPageHolder, PageHolder } from '../utilities/Holders'
+import { InnerPageHolder, PageHolder } from '../utilityComponents/Holders'
 import { Input, Stack, TextField, MenuItem } from '@mui/material'
 import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import { useEffect, useState } from 'react'
@@ -14,7 +14,8 @@ import { v4 } from 'uuid'
 import { DESTINATION_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
 import SectionTitle from '../other/SectionTitle'
-import Spacer from '../utilities/Spacer'
+import Spacer from '../utilityComponents/Spacer'
+import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
 export default function SearchRide() {
 
 
@@ -27,7 +28,12 @@ export default function SearchRide() {
     const nav = useNavigate()
     const { doLoad, cancelLoad } = useLoading()
     const { firebase, appUser } = useFirebase()
-
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
+    
+    useEffect(() => {
+        hideHeader()
+        return () => showHeader()
+    }, [])
 
 
     useEffect(() => {

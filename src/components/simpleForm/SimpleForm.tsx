@@ -1,6 +1,6 @@
 import { Button, Stack } from "@mui/material";
 import React from "react";
-import Spacer from "../utilities/Spacer";
+import Spacer from "../utilityComponents/Spacer";
 import { withHooks } from "../generics/withHooks";
 import { FormStyles } from "./simpleform.styles";
 import { SimpleFormField, SimpleFormProps, SimpleFormState, Styles } from "./simpleform.types";
@@ -61,9 +61,6 @@ class SimpleForm extends React.Component<SimpleFormProps, SimpleFormState> {
         </React.Fragment>
     }
 
-    componentDidMount() {
-        console.log((this.props as any).firebase)
-    }
 
     render(): React.ReactNode {
         return <form style={{ ...this.styles.formStyle, ...{ ...this.props.style } }} onSubmit={(e) => {

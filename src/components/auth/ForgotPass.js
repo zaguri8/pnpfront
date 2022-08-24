@@ -9,7 +9,7 @@ import { useLoading } from "../../context/Loading";
 import { BLACK_ROYAL, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { SIDE } from "../../settings/strings";
 import { submitButton, textFieldStyle } from "../../settings/styles";
-import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 
 
 export default function ForgotPass() {

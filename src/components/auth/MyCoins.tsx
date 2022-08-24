@@ -4,7 +4,7 @@ import { useLanguage } from "../../context/Language";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { MY_COINS, SIDE } from "../../settings/strings";
 import { elegantShadow } from "../../settings/styles";
-import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 
 export default function MyCoins() {
 

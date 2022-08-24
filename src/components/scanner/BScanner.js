@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { QrReader } from 'react-qr-reader';
 import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
-import { PageHolder } from "../utilities/Holders";
+import { PageHolder } from "../utilityComponents/Holders";
 import { useScanner } from '../../context/ScannerContext'
-import Spacer from "../utilities/Spacer";
+import Spacer from "../utilityComponents/Spacer";
 import { Button, Stack, TextField } from "@mui/material";
 import './BScanner.css'
 import { makeStyles } from "@mui/styles";
@@ -29,14 +29,14 @@ function BScanner() {
     const [inScanningZone, setInScanningZone] = useState()
     const useStyles = makeStyles(textFieldStyle(PRIMARY_PINK, { background: PRIMARY_WHITE, direction: 'rtl' }))
     const classes = useStyles()
-    const { doLoad, cancelLoad, openDialog, showPopover } = useLoading()
+    const { doLoad, cancelLoad, openDialog, showPopover, closePopover } = useLoading()
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     const [producingEventId, setProducingEventId] = useState()
     const [producingEvent, setProducingEvent] = useState()
     const selectionStyle = {
         background: SECONDARY_WHITE,
         width: '50%',
-        minWidth:'100px',
+        minWidth: '100px',
         padding: '8px',
         textAlign: 'center',
         alignSelf: 'center',
@@ -131,12 +131,10 @@ function BScanner() {
     const startProducerScanningSession = () => {
         doLoad()
         let unsub = firebase.realTime.getAllTransactionConfirmations(producingEventId, transactions => {
-            setTimeout(() => {
-                setBarcodes(transactions)
-                setInScanningZone(true)
-                cancelLoad()
-                unsub()
-            }, 1000)
+            setBarcodes(transactions)
+            setInScanningZone(true)
+            setTimeout(cancelLoad, 1000)
+            unsub()
         })
     }
 
@@ -181,6 +179,7 @@ function BScanner() {
                             style={{ background: PRIMARY_PINK, maxWidth: '200px' }}
                             onClick={() => {
                                 openScanner(scannerLanguage)
+                                closePopover()
                             }}>{scannerLanguage === 'עברית' ? 'פתח מצלמה' : `افتح الكاميرا`}</button> : <button
                                 style={{ background: '#bd3333' }}
                                 onClick={() => {
@@ -218,7 +217,7 @@ function BScanner() {
                 else if (producingEvent)
 
                     return <Stack spacing={1}>
-                        
+
                         <Button
                             onClick={startProducerScanningSession}
                             style={{

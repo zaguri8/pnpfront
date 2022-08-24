@@ -1,16 +1,19 @@
 .spanStyle {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
+
     text-align: center
 }
 
 .spanStyle_2 {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
+
     text-align: right;
     font-family: Open Sans Hebrew;
 }
 
 .spanStyle_3 {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
+
     text-align: right;
     width: 100px;
     text-align: center;
@@ -18,14 +21,15 @@
 }
 
 .spanStyle_4 {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
     width: 50px;
     text-align: center;
     font-family: Open Sans Hebrew;
 }
 
 .spanStyle_2_small {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
+
     text-align: right;
     font-family: Open Sans Hebrew;
     font-size: 12px;
@@ -34,7 +38,8 @@
 }
 
 .spanStyle_3_small {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
+
     text-align: right;
     width: 100px;
     text-align: center;
@@ -45,7 +50,8 @@
 }
 
 .spanStyle_4_small {
-    color: whitesmoke;
+    color: var(--PRIMARY_BLACK);
+
     cursor: pointer;
     width: 50px;
     text-align: center;

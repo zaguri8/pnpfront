@@ -5,13 +5,16 @@ import $ from 'jquery'
 import { SECONDARY_WHITE } from "../settings/colors"
 import { AnimatePresence } from "framer-motion"
 import { motion } from 'framer-motion'
-import { PageHolder } from "../components/utilities/Holders"
+import { PageHolder } from "../components/utilityComponents/Holders"
 const LoadingContext = createContext<ILoadingContext | null>(null)
-
+const queue: any[] = []
+let isShowingPopover = false
 export type ILoadingContext = {
     loading: boolean;
     setLoading: (loading: boolean) => void;
     openDialog: boolean;
+    setLoadingContent: (content: any) => void;
+    loadingContent: any;
     openPopover: boolean;
     setDialogContent: (content: any) => void
     setOpenDialog: (open: boolean) => void;
@@ -31,7 +34,7 @@ export const LoadingContextProvider = (props: object) => {
     const [dialogContent, setDialogContent] = useState(false)
     const [dialogtitle, setDialogTitle] = useState(null)
     const [dialogbottom, setDialogBottom] = useState(null)
-
+    const [loadingContent, setLoadingContent] = useState(null)
     const [popOverContent, setPopoverContent] = useState(null)
     const [openPopover, setOpenPopover] = useState(false)
 
@@ -42,6 +45,8 @@ export const LoadingContextProvider = (props: object) => {
         openDialog,
         setPopoverContent,
         setOpenPopover,
+        setLoadingContent,
+        loadingContent,
         openPopover,
         popOverContent,
         dialogtitle,
@@ -67,6 +72,7 @@ export const useLoading = () => {
             $('.dim').css('display', 'block')
         }
         loadingContext!.setLoading(false)
+        loadingContext!.setLoadingContent(null)
     }
     const openDialog = (content: any) => {
         loadingContext!.setDialogContent(content)
@@ -76,14 +82,34 @@ export const useLoading = () => {
     const openPopover = (content: any) => {
         loadingContext!.setPopoverContent(content)
         loadingContext!.setOpenPopover(true)
+        isShowingPopover = true;
     }
 
-    const showPopover = (content: any, status: 'success' | 'normal' | 'error', EXEC_TIME: number = 3000) => {
 
-        openPopover(<PageHolder className={`pop_over ${status}`}>
-            {content}
-        </PageHolder>);
-        setTimeout(closePopover, EXEC_TIME);
+    const showPopover = (content: any, status: 'success' | 'normal' | 'error', EXEC_TIME: number = 3000) => {
+        if (!isShowingPopover) {
+            const pop = queue.pop()
+            if (pop) {
+                openPopover(<PageHolder className={`pop_over ${pop.status}`}>
+                    {pop.content}
+                </PageHolder>)
+                queue.push({ content, status, EXEC_TIME })
+            } else {
+                openPopover(<PageHolder className={`pop_over ${status}`}>
+                    {content}
+                </PageHolder>)
+            }
+            if (EXEC_TIME > 0)
+                setTimeout(closePopover, EXEC_TIME)
+        } else {
+            if (queue[queue.length - 1] !== { content, status, EXEC_TIME })
+                queue.push({ content, status, EXEC_TIME })
+            if (EXEC_TIME > 0)
+                setTimeout(() => {
+                    showPopover(content, status, EXEC_TIME)
+                }, 200)
+        }
+
     }
 
     const setDialogTitle = (content: any) => {
@@ -107,11 +133,18 @@ export const useLoading = () => {
     const closePopover = () => {
         loadingContext!.setPopoverContent(null)
         loadingContext!.setOpenPopover(false)
+        isShowingPopover = false
+    }
+    const doSpecialLoad = (content: any) => {
+        loadingContext!.setLoadingContent(content)
+        doLoad()
     }
     return {
         isLoading: loadingContext?.loading,
         doLoad: doLoad,
         cancelLoad: cancelLoad,
+        doLoadSpecial: doSpecialLoad,
+        loadingContent: loadingContext!.loadingContent,
         closePopover: closePopover,
         showPopover: showPopover,
         openDialog: (content: any) => openDialog(content),

@@ -4,9 +4,9 @@ import { useLoading } from "../../context/Loading";
 
 import { event_placeholder } from "../../assets/images";
 import { Stack, TextField, Checkbox, Button, Select, MenuItem, FormControl } from "@mui/material";
-import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE, RED_ROYAL } from "../../settings/colors";
+import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE, RED_ROYAL, PRIMARY_PINK } from "../../settings/colors";
 
-import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityComponents/functions";
 import { getCurrentDate } from "../../utilities";
 
 import { Editor, EditorState } from "react-draft-wysiwyg";
@@ -16,9 +16,9 @@ import { CSSProperties, useEffect, useState } from "react";
 import { fullSubmitButton, submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent, isValidPrivateEvent } from "../../store/validators";
 import { CONTINUE_TO_CREATE, CREATE_EVENT, EVENT_ADDRESS, EVENT_DATE, EVENT_END_2, EVENT_NUMBER_PPL, EVENT_START_2, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
-import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
-import Places from "../utilities/Places";
+import Places from "../utilityComponents/Places";
 import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router";
@@ -38,7 +38,7 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
     const { firebase } = useFirebase()
     const { user } = useFirebase();
-    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE));
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE,{background:PRIMARY_BLACK}));
     const classes = useStyles()
     const { lang } = useLanguage()
 
@@ -126,7 +126,7 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
     const formControlStyle = { width: '100%', alignSelf: 'center' }
     const fitFormControlStyle = { width: 'fit-content', alignSelf: 'center' }
     const upperStackStyle = { width: '80%', alignSelf: 'center' }
-    const labelStyleSimple = { padding: '8px', color: SECONDARY_WHITE }
+    const labelStyleSimple = { padding: '8px', color: PRIMARY_PINK }
     const directionStyle = { direction: SIDE(lang) }
     const editorStyle = {
         background: SECONDARY_WHITE,
@@ -142,7 +142,7 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
     }
 
     const labelStyle = {
-        color: PRIMARY_WHITE,
+        color: PRIMARY_PINK,
         padding: '8px',
         borderRadius: '8px',
         cursor: 'pointer',
@@ -156,7 +156,8 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
         border: '.8px solid white',
         borderRadius: '32px',
         color: SECONDARY_WHITE,
-        background: 'none'
+        
+        background: PRIMARY_BLACK
     }
 
     return (<Stack>
@@ -185,7 +186,7 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                     <img id='menu_event_create_image' alt='' src={image ? image : props.event ? props.event.eventImageURL : event_placeholder} style={imageStyle} />
 
                     <label
-                        style={labelStyle}
+                        style={{...labelStyle,background:PRIMARY_PINK,color:SECONDARY_WHITE}}
                         onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}
                     </label>
                 </FormControl>
@@ -314,7 +315,7 @@ const AddUpdateEventInvitation = (props: { event?: PNPPrivateEvent }) => {
                     <span>
                         <Button
                             onClick={submitUpdateEvent}
-                            sx={fullSubmitButton}>
+                            style={fullSubmitButton as any}>
                             {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}
                         </Button>
                     </span>

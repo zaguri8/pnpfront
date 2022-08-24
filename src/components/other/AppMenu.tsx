@@ -15,7 +15,7 @@ import listIconWhite from '../../assets/images/appmenu/white/list_white.svg'
 
 
 import { HELLO, MENU_ITEM_1, MENU_ITEM_2, MENU_ITEM_3, MENU_ITEM_4, REGISTER_TITLE, SIDE, TOOLBAR_LOGIN, CREATE_EVENT, MENU_ITEM_5 } from '../../settings/strings.js';
-import { flex } from '../../settings/styles.js';
+import { boxShadow, flex } from '../../settings/styles.js';
 import ToolbarItem from './../toolbar/ToolbarItem';
 import { v4 } from 'uuid';
 import { useLocation } from 'react-router'
@@ -192,14 +192,21 @@ function AppMenu(props: { menuToggle: (completion?: () => void) => void }) {
             whiteSpace: 'nowrap',
             direction: 'rtl',
             'overflow': 'scroll',
+        
             height: '100vh',
             width: '300px',
+            overflowX:'hidden',
+            borderBottomLeftRadius:'72px',
+
             position: 'fixed',
+            
+            borderLeft:'1px solid rgba(255,255,255,0.5)',
             right: '0',
             zIndex: '10030',
+            ...boxShadow()
         },
         ...flex('column', 'center'),
-        ...{ background: PRIMARY_BLACK }
+        ...{ background: PRIMARY_BLACK.replace('7)','7,0.9)').replace('rgb','rgba') }
     }}>
         <ToolbarItem bold image={logo} />
         {/* <MenuProfile clickedItem={clickedItem} /> */}

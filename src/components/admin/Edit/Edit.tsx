@@ -5,7 +5,7 @@ import { useLoading } from '../../../context/Loading'
 import { BLACK_ELEGANT, DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE } from '../../../settings/colors'
 import { RegisterFormExtras } from '../../../store/external/types'
 import SectionTitle from '../../other/SectionTitle'
-import { InnerPageHolder, PageHolder } from '../../utilities/Holders'
+import { InnerPageHolder, PageHolder } from '../../utilityComponents/Holders'
 import { buttonStyle, checkBoxStyle } from '../InvitationStatistics'
 import './Edit.css'
 export default function Edit() {

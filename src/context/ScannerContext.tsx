@@ -42,6 +42,7 @@ export const useScanner = () => {
         $('.dim').css('display', 'inherit')
         scanningContext!.setOpenScanner(true)
         scanningContext!.setScannerLanguage(language)
+        
     }
     const setScannerLanguage = (lang: string) => {
         scanningContext!.setScannerLanguage(lang)

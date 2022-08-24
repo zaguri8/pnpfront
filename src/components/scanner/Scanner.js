@@ -1,17 +1,18 @@
 import { MenuItem, Select, Stack } from "@mui/material"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { QrReader } from "react-qr-reader"
 import { useNavigate } from "react-router"
 import { useFirebase } from "../../context/Firebase"
 import { useScanner } from "../../context/ScannerContext"
 import { useLoading } from '../../context/Loading'
-import { SECONDARY_WHITE } from "../../settings/colors"
+import { PRIMARY_PINK, SECONDARY_WHITE } from "../../settings/colors"
 import { BARCODE_MESSAGE, CLOSE_SCANNER } from "../../settings/strings"
 
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { getCurrentDate, getDateString, getDateTimeString } from "../../utilities"
 export default function Scanner() {
-    const { appUser } = useFirebase()
+    const { appUser, firebase } = useFirebase()
     const nav = useNavigate()
     const { isScanning, closeScanner, faceMode, scannerLanguage, setScannerLanguage, barCodes, setBarcodes } = useScanner()
     const { openDialog, doLoad, cancelLoad, showPopover } = useLoading()
@@ -26,17 +27,40 @@ export default function Scanner() {
         }
 
         cancelLoad()
-        showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <Stack direction={'row'} style={{ width: '100%', direction: 'rtl' }} spacing={1}>
-                <CheckCircleOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'transparent', width: '64px', height: '25px', color: '#4BB543' }} />
-                <label style={{ padding: '2px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה מאושרת' : 'رحلة مصرٌحة'}</label>
+        showPopover(<Stack style={{
+            padding: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
+            <Stack direction={'row'}
+                style={{ width: '100%', direction: 'rtl' }}
+                alignItems={'center'}
+                justifyContent={'center'}
+                spacing={1}>
+                <CheckCircleOutlineIcon style={{
+                    alignItems: 'center',
+                    borderRadius: '32px',
+                    background: 'transparent',
+                    width: '64px',
+                    height: '25px',
+                    color: '#4BB543'
+                }} />
+                <label style={{
+                    padding: '3px',
+                    color: SECONDARY_WHITE,
+                    fontWeight: '600'
+                }}>{scannerLanguage === 'עברית' ? `נסיעה מאושרת, סריקה ${confirmation.ridesLeft === 2 ? 1 : 2}` : 'رحلة مصرٌحة'}</label>
             </Stack>
+            <Stack direction={'row'}>
+                <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{valid()}</label><b>{confirmation.amount}</b>
+                <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{"שם לקוח: "}</label><b>{confirmation.customerName}</b>
+            </Stack>
+            <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{"שם אירוע: "}</label><b>{confirmation.destination}</b>
+            <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{"נקודת יציאה: "}</label><b>{confirmation.startPoint}</b>
 
-            <label style={{ padding: '0px', margin: '0px' }}>{valid()}</label><b>{confirmation.amount}</b>
-            <label style={{ padding: '0px', margin: '0px' }}>{"שם אירוע: "}</label><b>CHAN HASHAYAROT</b>
-            <label style={{ padding: '0px', margin: '0px' }}>{"יעד נסיעה: "}</label><b>Tel Aviv בורסא</b>
-
-        </Stack>, 'success')
+        </Stack>, 'success', 0)
     }
 
     const decline = () => {
@@ -44,26 +68,25 @@ export default function Scanner() {
         showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה לא מאושרת' : 'رحلة غير مصرٌحة'}</label>
             <ErrorOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#bd3333' }} />
-        </Stack>, 'error')
+        </Stack>, 'error', 0)
     }
 
     const updateScanResult = (res) => {
         if (res) {
             if (appUser.admin && !appUser.producingEventId) {
-                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res })
+                nav({ pathname: '/scanResult', search: '?confirmationVoucher=' + res.text })
                 return
             }
-            let confirmationIdx = barCodes.findIndex(bcode => res === bcode.confirmationVoucher)
-            let confirmation = barCodes[confirmationIdx]
-            if (confirmation) {
+            let confirmationIdx = barCodes.findIndex(bcode => res.text === bcode.confirmationVoucher)
+            if (confirmationIdx != -1) {
+                let confirmation = barCodes[confirmationIdx]
                 if (confirmation.ridesLeft < 1) {
                     showPopover(<Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
                         <label style={{ color: 'white' }}>{'ברקוד זה נסרק כבר, ולא נשארו בו נסיעות'}</label>
-                        <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateString(confirmation.lastScanDate) : getDateString(getCurrentDate()))}</label>
-                    </Stack>, 'normal')
+                        <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateTimeString(confirmation.lastScanDate) : getDateTimeString(getCurrentDate()))}</label>
+                    </Stack>, 'normal', 0)
                     return
                 }
-
                 firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
                     .then(() => {
                         let temp = barCodes
@@ -91,37 +114,42 @@ export default function Scanner() {
         flexDirection: 'column'
     }
     return isScanning && appUser && appUser.producer ? <div style={fullscreen} >
+        <Suspense fallback={<div>
+            {'this is a placeholder since the barcode reader crashed'}
+        </div>}>
+            <QrReader
+                videoStyle={{
+                    margin: '0px',
+                    padding: '0px',
+                    width: '100%',
+                    top: '0px',
+                    maxHeight: '100%',
+                    matchMedia: false,
+                    borderRadius: '8px'
+                }}
+                containerStyle={{ margin: '16px', maxHeight: '100%', border: '1px solid white', borderRadius: '8px' }}
 
-        <QrReader
-            videoStyle={{
-                margin: '0px',
-                padding: '0px',
-                width: '100%',
-                top: '0px',
-                maxHeight: '100%',
-                matchMedia: false,
-                borderRadius: '8px'
-            }}
-            containerStyle={{ margin: '16px', maxHeight: '100%', border: '1px solid white', borderRadius: '8px' }}
-
-            videoContainerStyle={{ maxHeight: '100%' }}
-            constraints={{
-                audio: false,
-                facingMode: { exact: 'environment' },
-                aspectRatio: 1,
-                frameRate: 60
-            }}
-            onResult={(result, error) => {
-                if (!!result) {
-                    updateScanResult(result)
-                    closeScanner()
-                } else if (error) {
-                    if (error.name === 'OverconstrainedError' || error.name === 'NotFoundError') {
-                        openDialog({ content: <span style={{ padding: '12px', color: SECONDARY_WHITE }}>{scannerLanguage === 'עברית' ? 'מכשירך אינו תומך בסורק זה' : 'جهازك لا يدعم هذا الماسح'}</span> })
+                videoContainerStyle={{ maxHeight: '100%' }}
+                constraints={{
+                    audio: false,
+                    aspectRatio: 1,
+                    facingMode: { exact: 'environment' },
+                    frameRate: 800
+                }}
+                onResult={(result, error) => {
+                    if (result) {
+                        updateScanResult(result)
                         closeScanner()
+                    } else if (error) {
+                        if (error.name === 'OverconstrainedError' || error.name === 'NotFoundError') {
+                            openDialog({ content: <span style={{ padding: '12px', color: PRIMARY_PINK }}>{scannerLanguage === 'עברית' ? 'מכשירך אינו תומך בסורק זה' : 'جهازك لا يدعم هذا الماسح'}</span> })
+                            closeScanner()
+
+                        }
                     }
-                }
-            }} />
+                }} />
+
+        </Suspense>
 
         <Stack >
             <p

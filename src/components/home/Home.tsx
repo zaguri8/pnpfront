@@ -1,5 +1,5 @@
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
-import { Gallery } from "../gallery/Gallery"
+import Gallery from "../gallery/Gallery"
 import './Home.css'
 import { useFirebase } from "../../context/Firebase"
 import { useEffect, useRef } from "react"
@@ -19,16 +19,14 @@ import logo from '../../assets/images/header.jpeg'
 import Footer from "../footer/Footer"
 import { useHeaderBackgroundExtension, useHeaderContext } from "../../context/HeaderContext"
 import { encryptMacdonald } from "../../utilities"
-export default function Home() {
+export function Home() {
     const { user, firebase } = useFirebase()
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
     const { isCacheValid, cacheDone } = useCookies()
-    const [selectedEventsForSlider, setSelectedEventsForSlider] = useState<PNPEvent[] | undefined>()
 
-    const {setIsShowingAbout} = useHeaderContext()
+    const { setIsShowingAbout } = useHeaderContext()
     const { setHeaderBackground } = useHeaderBackgroundExtension()
     useEffect(() => {
-        encryptMacdonald("Helloworld")
         setHeaderBackground(`url('${logo}')`)
         setIsShowingAbout(true);
         const unsubEvents = firebase.realTime.addListenerToPublicEvents((events) => {
@@ -36,8 +34,6 @@ export default function Home() {
             let filtered: PNPEvent[] = []
             for (let events of ev)
                 filtered.push(...events.filter(item => item.eventShowsInGallery))
-
-            setSelectedEventsForSlider(filtered)
             setPnpEvents(events)
         }, false)
         let validToCache = isCacheValid(PNPPage.home)
@@ -50,7 +46,7 @@ export default function Home() {
             })
         }
 
-        return () =>  { 
+        return () => {
             unsubEvents()
             setHeaderBackground(PRIMARY_BLACK)
             setIsShowingAbout(false)
@@ -59,7 +55,7 @@ export default function Home() {
 
 
     function ArrowScrollUp() {
-        
+
         return <div
             id='arrow_scroll_up'
             onClick={(e) => {
@@ -74,59 +70,37 @@ export default function Home() {
         </div>
     }
     const { lang } = useLanguage()
-    function getEventsGallery() {
+
+
+    const getEvents = React.useMemo(() => {
+        let events: { outputEvents: PNPEvent[], outputPrivateEvents: PNPEvent[] } = { outputEvents: [], outputPrivateEvents: [] }
         if (pnpEvents) {
             let allEvents = Object.entries(pnpEvents)
             allEvents.sort((x, y) => getEventTypePriority(x[0]) - getEventTypePriority(y[0]))
             let output = allEvents.reduce((prev, nextEntry) => prev.concat(...nextEntry[1]), [] as PNPEvent[])
-            let outputEvents = output.filter(event => event.eventType !== 'private events' && event.eventType !== 'weddings') 
+            let outputEvents = output.filter(event => event.eventType !== 'private events' && event.eventType !== 'weddings')
             let outputPrivateEvents = output.filter(event => event.eventType === 'private events' || event.eventType === 'weddings')
-            return <Gallery
-                key={v4()}
-                events={outputEvents}
-                privateEvents={outputPrivateEvents}
-                header={lang ==='heb' ?  "אירועים אחרונים" : 'Latest Events'} />
-        } else {
-            return null;
+            outputEvents.forEach((e, i) => (outputEvents[i] as any).imageId = outputEvents[i].eventId.replaceAll(' ', '').replaceAll('-', '').replaceAll('_', ''))
+            outputPrivateEvents.forEach((e, i) => (outputPrivateEvents[i] as any).imageId = outputPrivateEvents[i].eventId.replaceAll(' ', '').replaceAll('-', '').replaceAll('_', ''))
+            events = { outputEvents, outputPrivateEvents }
         }
+        return events
+    }, [pnpEvents])
+
+    const EventGallery = () => {
+        let ev = getEvents
+        if (!ev) return null
+        return <Gallery
+            key={v4()}
+            events={(ev as any).outputEvents}
+            privateEvents={(ev as any).outputPrivateEvents}
+            header={lang === 'heb' ? "אירועים אחרונים" : 'Latest Events'} />
     }
 
     return <div style={{ overscrollBehavior: 'auto', maxWidth: '100%', overflow: 'hidden' }}>
-        {/*{selectedEventsForSlider && <ImageSlider events={selectedEventsForSlider} />}*/}
         <ArrowScrollUp />
-        {getEventsGallery()}
-        {/* <SectionTitle withBg style={{
-            padding: '32px',
-            fontWeight: 'bold',
-            marginTop: '0px',
-            fontStyle: 'italic',
-            color: PRIMARY_WHITE,
-            width: '80%',
-            paddingRight: '45px',
-            background: 'none',
-            alignSelf: 'center',
-            fontSize: '38px'
-        }} title={'We Say No More!'} /> */}
-      
+        {pnpEvents && <EventGallery />}
         <SayNoMoreContainer />
-        {/* <SectionTitle style={{ padding: '42px', margin: '0px' }} title={WHY_US_TITLE(lang)} /> */}
-        {/*<WhyUsContainer />*/}
-        {/*<SectionTitle style={{ paddingTop: '42px', margin: '0px' }} title={ABOUT(lang)} />
-        <InnerPageHolder style={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            marginBottom: '16px',
-            width: '50%',
-            background: BLACK_ROYAL
-        }}>
-
-
-        <About />
-        </InnerPageHolder>*/}
-        {/* <Link
-            state={{ returnPage: '/' }}
-            style={{ paddingTop: '32px', paddingBottom: '24px', textDecoration: 'underline', color: SECONDARY_WHITE }}
-            to={'/termsOfService'}>{TOS(lang)}</Link> */}
-
     </div>
 }
+export default Home

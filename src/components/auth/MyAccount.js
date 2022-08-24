@@ -4,20 +4,20 @@ import spoil from '../../assets/images/myaccount/spoil-black.png'
 import settings from '../../assets/images/myaccount/settings.png'
 import coins from '../../assets/images/myaccount/coins.png'
 import ridehistory from '../../assets/images/myaccount/historyRides.png'
-import { InnerPageHolder, PageHolder } from "../utilities/Holders"
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
 import '../saynomore/SayNoMoreItem.css'
 import { useLanguage } from "../../context/Language"
 import { Button, Stack } from "@mui/material"
 import bus from '../../assets/images/bus.png'
 import $ from 'jquery'
-import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors"
 
 import { useEffect, useState } from "react"
 import { useFirebase } from "../../context/Firebase"
 
 import { useNavigate } from 'react-router'
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
-import Spacer from "../utilities/Spacer"
+import Spacer from "../utilityComponents/Spacer"
 import { useLoading } from "../../context/Loading"
 import MyCoins from "./MyCoins"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
@@ -122,13 +122,13 @@ export default function MyAccount() {
                         dir={SIDE(lang)}
                         style={{
                             padding: '8px',
-                            color: SECONDARY_WHITE
+                            color: PRIMARY_BLACK
                         }}>{lang === 'heb' ? 'האם ברצונך להתנתק מחשבון זה ' : 'Would you like to log out of this account : '}</span>
                     <span
                         dir={SIDE(lang)}
                         style={{
                             padding: '8px',
-                            color: SECONDARY_WHITE
+                            color: PRIMARY_BLACK
                         }}>{appUser.email}</span>
                     <Button style={logOutStyle('50%', { alignSelf: 'center' })} onClick={() => {
                         closeDialog()

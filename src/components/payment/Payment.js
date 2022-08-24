@@ -8,7 +8,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import React, { useEffect, useState } from 'react'
-import { HtmlTooltip } from '../utilities/HtmlTooltip'
+import { HtmlTooltip } from '../utilityComponents/HtmlTooltip'
 import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, FULL_NAME, PHONE_NUMBER, RIDE_INFO, SAME_SPOT, TERMS_OF_USE, TOS, TOTAL_TO_PAY_2 } from '../../settings/strings'
 import { submitButton, textFieldStyle } from '../../settings/styles'
 import { useFirebase } from '../../context/Firebase'
@@ -22,11 +22,11 @@ import { AMOUNT_OF_TICKETS, PAYMENT_FOR_RIDE, SIDE, TOTAL_TO_PAY } from '../../s
 import { useLocation, useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
-import HTMLFromText from '../utilities/HtmlFromText'
+import HTMLFromText from '../utilityComponents/HtmlFromText'
 import { isValidPhoneNumber } from '../../utilities';
-import { InnerPageHolder } from '../utilities/Holders'
+import { InnerPageHolder } from '../utilityComponents/Holders'
 import { minWidth } from '@mui/system'
-import Spacer from '../utilities/Spacer'
+import Spacer from '../utilityComponents/Spacer'
 import { useDimExtension } from '../../context/HeaderContext';
 const paragraphStyle = {
     fontSize: '11px',
@@ -338,7 +338,17 @@ export function PaymentForm({ product, paymentInfo }) {
             <InnerPageHolder
                 transformUp
                 transformUpValue={160}
-                style={{ direction: SIDE(lang), overflowX: 'hidden', fontFamily: 'Open Sans Hebrew', background: 'transparent', border: 'none', marginLeft: 'auto', marginRight: 'auto', zIndex: '10001' }} >
+                style={{
+                    direction: SIDE(lang),
+                    overflowX: 'hidden',
+                    fontFamily: 'Open Sans Hebrew',
+                    background: 'transparent',
+                    border: 'none',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+
+                    zIndex: '10001'
+                }} >
                 <Stack alignItems={'center'} spacing={1} justifyContent={'center'}>
                     <div className='row_1_event_payment'>
                         <Stack direction={'row'}>

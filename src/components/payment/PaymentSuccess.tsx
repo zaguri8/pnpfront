@@ -17,8 +17,8 @@ import logo from '../../assets/images/logo_white.png'
 import SectionTitle from '../other/SectionTitle'
 import './PaymentSuccess.css'
 import { TRANSACTION_DETAILS } from '../../settings/strings'
-import { PageHolder, InnerPageHolder } from '../utilities/Holders'
-import Spacer from '../utilities/Spacer'
+import { PageHolder, InnerPageHolder } from '../utilityComponents/Holders'
+import Spacer from '../utilityComponents/Spacer'
 import { useLoading } from '../../context/Loading'
 import { BLACK_ELEGANT, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
 import { QRCodeSVG } from 'qrcode.react'
@@ -33,6 +33,18 @@ function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
 }
+export const bImportantStyle = {
+    color: SECONDARY_WHITE,
+    padding: '8px',
+    minWidth: 'max-content',
+    borderRadius: '2px',
+    border: '.1px solid whitesmoke',
+    background: 'black',
+    margin: '8px',
+    fontWeight: 'bold',
+    fontSize: '12px'
+}
+
 export default function PaymentSuccess() {
 
     const query = useQuery()
@@ -110,7 +122,7 @@ export default function PaymentSuccess() {
                             openDialog({ content: getElement(dbRide) })
                             setRide(dbRide)
                         } else {
-                            openDialog({ content: <label style={{ padding: '6px', color: SECONDARY_WHITE }}>{lang === 'heb' ? 'פרטי הסעה זו אינם קיימים, ייתכן שזו הסעה ישנה ' : 'There is no details for this ride in the system, it might be an exp[red ride'}</label> })
+                            openDialog({ content: <label style={{ padding: '6px', color: PRIMARY_BLACK }}>{lang === 'heb' ? 'פרטי הסעה זו אינם קיימים, ייתכן שזו הסעה ישנה ' : 'There is no details for this ride in the system, it might be an exp[red ride'}</label> })
                         }
                     }).catch(() => { cancelLoad() })
             } else {
@@ -122,7 +134,7 @@ export default function PaymentSuccess() {
     const getElement = (product: PNPPublicRide) => {
 
         return (<div>
-            <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', padding: '8px', alignItems: 'center', color: SECONDARY_WHITE, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', padding: '8px', alignItems: 'center', color: PRIMARY_BLACK, justifyContent: 'center' }}>
                 <div style={{ padding: '8px' }}>
                     <label dir={SIDE(lang)}>{(lang === 'heb' ? 'הסעה ל' : 'Ride to ') + transaction!.more_info.productName}</label>
                     <hr style={{ borderWidth: '.1px', borderColor: 'gray' }} />
@@ -133,23 +145,23 @@ export default function PaymentSuccess() {
                                     {(lang === 'heb' ? 'נקודת יציאה' : 'Starting point: ')}
                                 </label>
 
-                                <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.extras.exactStartPoint}</label></div> : null}
+                                <label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{product.extras.exactStartPoint}</label></div> : null}
                             {product.extras.exactBackPoint ? <div><label style={{ display: 'block', fontWeight: 'bold' }}>
                                 {(lang === 'heb' ? 'נקודת חזרה' : 'Back point: ')}
                             </label>
                                 <div>
-                                    <label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{SAME_SPOT(lang)}</label> </div> </div> : ''}
+                                    <label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{SAME_SPOT(lang)}</label> </div> </div> : ''}
                         </Stack>
 
                         <Stack >
                             {(product.extras.twoWay || product.extras.rideDirection === '2') && <div><label style={{ fontWeight: 'bold' }}>
                                 {(lang === 'heb' ? 'שעת יציאה' : 'Ride time: ')}
                             </label>
-                                <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.rideTime}</label> </div></div>}
+                                <div><label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{product.rideTime}</label> </div></div>}
                             {(product.extras.twoWay || product.extras.rideDirection === '1') && <div><label style={{ fontWeight: 'bold' }}>
                                 {(lang === 'heb' ? 'שעת חזרה' : 'Back time: ')}
                             </label>
-                                <div><label style={{ color: PRIMARY_WHITE, fontSize: '14px' }}>{product.backTime}</label> </div></div>}
+                                <div><label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{product.backTime}</label> </div></div>}
                         </Stack>
                     </Stack>
                 </div>
@@ -185,17 +197,6 @@ export default function PaymentSuccess() {
         if (transaction)
             codeAddress(transaction.more_info.startPoint)
     }, [google, transaction])
-    const bImportantStyle = {
-        color: SECONDARY_WHITE,
-        padding: '4px',
-        minWidth: 'max-content',
-        borderRadius: '2px',
-        border: '.1px solid whitesmoke',
-        background: 'black',
-        margin: '8px',
-        fontWeight: 'bold',
-        fontSize: '12px'
-    }
 
     return <PageHolder style={{ overflowX: 'hidden' }}>
         {transaction ? <div>
@@ -231,15 +232,14 @@ export default function PaymentSuccess() {
                     width: '100%',
                     background: PRIMARY_PINK
                 }} onClick={() => {
-                    openDialog({
-                        content: <div>
-                            <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
-
-
-                            <Spacer offset={1} />
-                            <label style={{ color: PRIMARY_ORANGE }}>{'צלמו מסך למועד האירוע !'}</label>
-                        </div>
-                    })
+                    nav('/test', { state: transaction })
+                    // openDialog({
+                    //     content: <div>
+                    //         <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
+                    //         <Spacer offset={1} />
+                    //         <label style={{ color: PRIMARY_ORANGE }}>{'צלמו מסך למועד האירוע !'}</label>
+                    //     </div>
+                    // })
                 }}>{lang === 'heb' ? 'הצג ברקוד' : 'Show barcode'}</Button>
             </InnerPageHolder>
 

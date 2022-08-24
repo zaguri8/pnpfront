@@ -7,7 +7,7 @@ import './Register.css'
 import { PRIMARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
 import SectionTitle from "../other/SectionTitle"
 import Button from "../other/Button"
-import { InnerPageHolder, PageHolder } from "../utilities/Holders"
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
 import $ from 'jquery'
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
@@ -18,10 +18,10 @@ import { TextField } from "@mui/material"
 import { DatePicker } from "@mui/lab"
 import { useLoading } from "../../context/Loading"
 import { useLocation } from "react-router"
-import FavoriteEventsDialog, { events } from "../utilities/PNPDialog"
+import FavoriteEventsDialog, { events } from "../utilityComponents/PNPDialog"
 import { useLanguage } from "../../context/Language"
 import { submitButton } from "../../settings/styles"
-import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions"
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityComponents/functions"
 import { Welcome } from "./Welcome"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
@@ -56,13 +56,13 @@ export function RegistrationForm({
     const useStyles = makeStyles(theme => ({
         labelRoot: {
             right: '-64px'
-
         },
         root: {
             "& .MuiOutlinedInput-root": {
                 background: SECONDARY_WHITE,
-                borderRadius: '32px',
+                borderRadius: '16px',
                 alignSelf: 'center',
+                fontSize:'11px',
                 width: '100%',
                 maxWidth: '245px',
                 border: '.1px solid white',
@@ -204,59 +204,65 @@ export function RegistrationForm({
             width: '80%',
             minWidth: '300px',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            alignSelf:'center'
         }, ...style
     }}>
 
-        <Stack spacing={3} style={{ width: '80%' }}>
+        <Stack spacing={3}  alignSelf={'center'}>
+            <Stack direction={'row'} spacing={4}>
             <FormControl>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{FULL_NAME(lang)}</label>
-                <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
-                    classes={{ root: classes.root }}
-                    placeholder={FULL_NAME(lang)}
-                    onChange={(e) => { updateFullName(e.target.value) }}
-                    id="first_name_input" aria-describedby="first_name_helper_text" />
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{PHONE_NUMBER(lang)}</label>
+                    <TextField
+                        type="tel"
+                        placeholder={PHONE_NUMBER(lang)}
+                        onChange={(e) => { updateUserPhone(e.target.value) }}
+                        name="phone"
+                        classes={{ root: classes.root }}
+                        autoComplete="phone"
+                        sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
 
-            </FormControl>
-            <FormControl>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PHONE_NUMBER(lang)}</label>
-                <TextField
-                    type="tel"
-                    placeholder={PHONE_NUMBER(lang)}
-                    onChange={(e) => { updateUserPhone(e.target.value) }}
-                    name="phone"
-                    classes={{ root: classes.root }}
-                    autoComplete="phone"
-                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="phone_number_input" aria-describedby="phone_number_helper_text" />
+                </FormControl>
+                <FormControl>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{FULL_NAME(lang)}</label>
+                    <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
+                        classes={{ root: classes.root }}
+                        placeholder={FULL_NAME(lang)}
+                        onChange={(e) => { updateFullName(e.target.value) }}
+                        id="first_name_input" aria-describedby="first_name_helper_text" />
 
-            </FormControl>
-            <FormControl>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EMAIL(lang)}</label>
-                <TextField
-                    autoComplete="username"
-                    type='email'
-                    onChange={(e) => { updateEmail(e.target.value) }}
-                    placeholder={EMAIL(lang)}
-                    name="email"
-                    classes={{ root: classes.root }}
-                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
+                </FormControl>
+             
+            </Stack>
+            <Stack direction={'row'} spacing={4}>
 
-            </FormControl>
 
-            <FormControl>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{PASSWORD(lang)}</label>
-                <TextField
-                    autoComplete="new-password"
-                    type="password"
-                    placeholder={PASSWORD(lang)}
-                    onChange={(e) => { updatePassword(e.target.value) }}
-                    classes={{ root: classes.root }}
-                    name="new-password"
-                    sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
-            </FormControl>
+                <FormControl>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{PASSWORD(lang)}</label>
+                    <TextField
+                        autoComplete="new-password"
+                        type="password"
+                        placeholder={PASSWORD(lang)}
+                        onChange={(e) => { updatePassword(e.target.value) }}
+                        classes={{ root: classes.root }}
+                        name="new-password"
+                        sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
+                </FormControl>
+                <FormControl>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{EMAIL(lang)}</label>
+                    <TextField
+                        autoComplete="username"
+                        type='email'
+                        onChange={(e) => { updateEmail(e.target.value) }}
+                        placeholder={EMAIL(lang)}
+                        name="email"
+                        classes={{ root: classes.root }}
+                        sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="email_input" aria-describedby="email_helper_text" />
 
+                </FormControl>
+            </Stack>
             {registerSettings && registerSettings.requireBirthDate && <FormControl>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{BIRTH_DATE(lang)}</label>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{BIRTH_DATE(lang)}</label>
                 <TextField
                     type="date"
                     placeholder={BIRTH_DATE(lang)}
@@ -281,7 +287,7 @@ export function RegistrationForm({
             <Stack >
 
 
-                <label style={{ fontSize: '14px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
+                <label style={{ fontSize: '12px', color: SECONDARY_WHITE }}>{TERMS_OF_USE(lang)}</label>
                 <Checkbox
                     style={{ width: 'fit-content', alignSelf: 'center', background: PRIMARY_BLACK, color: SECONDARY_WHITE, margin: '8px' }}
                     onChange={handleTermsOfUseChange}
@@ -302,7 +308,7 @@ export default function Register() {
     useEffect(() => {
         hideHeader()
         return () => showHeader()
-    },[])
+    }, [])
     useEffect(() => {
         return () => {
             if (!finishRegister)
@@ -316,7 +322,6 @@ export default function Register() {
         }
     }, [])
     return (<PageHolder>
-        <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <InnerPageHolder style={{ background: 'none', border: 'none' }}>
             <SectionTitle title={REGISTER_TITLE(lang)} style={{
                 background: 'none',

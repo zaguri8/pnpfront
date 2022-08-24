@@ -62,7 +62,6 @@ export default function Login() {
         flexDirection: 'column',
         alignItems: 'center'
     }}>
-        <SectionTitle title={MY_ACCOUNT(lang)} style={{}} />
         <div style={{
             width: '50%',
             maxWidth: '500px',

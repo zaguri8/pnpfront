@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useFirebase } from "../../context/Firebase"
 import { Unsubscribe } from "firebase/database"
 import { PNPTransactionConfirmation } from "../../store/external/types"
-import Spacer from "../utilities/Spacer"
+import Spacer from "../utilityComponents/Spacer"
 import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, SECONDARY_WHITE } from "../../settings/colors"
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useLoading } from "../../context/Loading"

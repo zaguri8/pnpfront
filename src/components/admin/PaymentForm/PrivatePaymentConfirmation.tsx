@@ -5,7 +5,7 @@ import { useFirebase } from "../../../context/Firebase";
 import { useLoading } from "../../../context/Loading";
 import { SECONDARY_WHITE } from "../../../settings/colors";
 import { PCustomerData, PPaymentPageData, PProductData } from "../../../store/external/types";
-import { InnerPageHolder, PageHolder } from "../../utilities/Holders";
+import { InnerPageHolder, PageHolder } from "../../utilityComponents/Holders";
 // A custom hook that builds on useLocation to parse
 // the query string for you.
 function useQuery() {

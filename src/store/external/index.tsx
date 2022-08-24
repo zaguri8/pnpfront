@@ -15,7 +15,7 @@ import { createNewCustomer } from '../payments'
 import { TransactionSuccess } from '../payments/types'
 import { transactionSuccessFromDict } from '../payments/converters'
 import { getCurrentDate } from '../../utilities'
-import { dateStringFromDate } from '../../components/utilities/functions'
+import { dateStringFromDate } from '../../components/utilityComponents/functions'
 import { PNPRideExtraPassenger } from '../../components/admin/EventStatistics'
 
 export type ExternalStoreActions = {
@@ -129,7 +129,10 @@ export class Realtime {
     }
 
     async invalidateTransactionConfirmations(voucher: string, ridesLeft: number) {
-        return await update(child(this.transactionConfirmations, voucher), { ridesLeft: ridesLeft })
+        return await update(child(this.transactionConfirmations, voucher), {
+            ridesLeft: ridesLeft,
+            lastScanDate: getCurrentDate().getMilliseconds()
+        })
     }
 
 
@@ -274,18 +277,16 @@ export class Realtime {
 
     async giveScannerPermissionsByEmail(email: string, eventId: string) {
         return await this.getUserIdByEmail(email, async (userId) => {
-            return await this.getUserById2(userId, (user) => {
-                this.updateUser({ ...user, producer: true, producingEventId: eventId }, userId)
-
-            })
+            this.updateUser({
+                producer: true,
+                producingEventId: eventId
+            }, userId)
         }, () => { })
     }
 
     async takeScannerPermissionsByEmail(email: string) {
         return await this.getUserIdByEmail(email, async (userId) => {
-            return await this.getUserById2(userId, (user) => {
-                this.updateUser({ ...user, producer: false }, userId)
-            })
+            this.updateUser({ producer: false }, userId)
         }, () => { })
     }
 

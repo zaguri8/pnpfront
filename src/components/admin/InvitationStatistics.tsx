@@ -1,11 +1,11 @@
 import React, { CSSProperties, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { useLoading } from "../../context/Loading";
-import { BLACK_ELEGANT, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { BLACK_ELEGANT, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_PINK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { PNPPrivateEvent, PNPPublicRide, PNPRideConfirmation } from "../../store/external/types";
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import { InnerPageHolder, PageHolder } from "../utilities/Holders";
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 import AddUpdateEventInvitation from "./AddUpdateEventInvitation";
 import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, List, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material";
 import SectionTitle from "../other/SectionTitle";
@@ -19,7 +19,7 @@ import $ from 'jquery'
 import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { textFieldStyle } from "../../settings/styles";
-import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { confirmationsPartition, default_no_arrival, getTotalAmountOfConfirmations, getPassengersAndGuests, getInvitationRowGuests } from "./invitationsHelper";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 
@@ -53,13 +53,13 @@ export default function InvitationStatistics() {
     const useStyles = makeStyles(() => textFieldStyle())
     const classes = useStyles()
 
-    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
+    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
 
 
     useEffect(() => {
         hideHeader()
         return () => showHeader()
-    },[])
+    }, [])
     const updateEvent = () => {
         if (privateEvent)
             firebase.realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
@@ -94,7 +94,7 @@ export default function InvitationStatistics() {
 
                 <Button style={{
                     ...buttonStyle,
-                    background: RED_ROYAL
+                    background: PRIMARY_PINK
                 }} onClick={deleteEvent}>
                     {'מחק/י הזמנה'}
                 </Button>
@@ -238,7 +238,7 @@ export default function InvitationStatistics() {
                     onClick={() => deleteConfirmation()}
                     style={{
                         ...buttonStyle, ...{
-                            background: RED_ROYAL,
+                            background: PRIMARY_PINK,
                             width: 'fit-content'
                         }
                     }}>
@@ -326,7 +326,7 @@ export default function InvitationStatistics() {
                             privateEvent && openDialog({
                                 content: <div style={{ padding: '16px' }}>
                                     <h3 style={{
-                                        fontWeight: '14px',
+                                        fontWeight: '12px',
                                         background: PRIMARY_BLACK,
                                         color: SECONDARY_WHITE,
                                         padding: '4px',
@@ -377,15 +377,17 @@ export default function InvitationStatistics() {
                                                 {function editRideButton() {
                                                     return <Button
                                                         onClick={() => {
-                                                            openDialogWithTitle(<div style={{ background: ORANGE_GRADIENT_PRIMARY }}><h3 style={
+                                                            openDialogWithTitle(<div style={{ background: 'none' }}><h3 style={
                                                                 {
-                                                                    fontWeight: '14px',
+                                                                    fontWeight: '12px',
+                                                                    color: PRIMARY_BLACK,
                                                                     textAlign: 'center'
                                                                 }
                                                             }>{`עריכת הסעה לאירוע: ${props.event.eventTitle}`}</h3>
                                                                 <h4 style={
                                                                     {
                                                                         fontWeight: '12px',
+                                                                        color: PRIMARY_BLACK,
                                                                         textAlign: 'center'
                                                                     }
                                                                 }>{`נקודת יציאה : ${ride.rideStartingPoint}`}</h4></div>)
@@ -401,7 +403,7 @@ export default function InvitationStatistics() {
                                                         onClick={() => {
                                                             openDialogWithTitle(<div><h3 style={
                                                                 {
-                                                                    fontWeight: '14px',
+                                                                    fontWeight: '12px',
                                                                     textAlign: 'center',
                                                                     padding: '8px',
                                                                 }
@@ -420,8 +422,8 @@ export default function InvitationStatistics() {
                                                                         padding: '4px',
                                                                         margin: '16px',
                                                                         minWidth: '100px',
-                                                                        fontSize: '18px',
-                                                                        background: ORANGE_RED_GRADIENT_BUTTON,
+                                                                        fontSize: '12px',
+                                                                        background: PRIMARY_PINK,
                                                                         color: SECONDARY_WHITE
                                                                     }}>{'מחק'}</button></div>, title: `מחיקת הסעה לאירוע`
                                                             })

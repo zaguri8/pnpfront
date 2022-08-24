@@ -4,9 +4,9 @@ import { useLoading } from "../../context/Loading";
 
 import { event_placeholder } from "../../assets/images";
 import { Stack, TextField, Checkbox, Button, Select, MenuItem, FormControl } from "@mui/material";
-import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE, PRIMARY_ORANGE } from "../../settings/colors";
+import { SECONDARY_WHITE, PRIMARY_BLACK, DARK_BLACK, PRIMARY_WHITE, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors";
 
-import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions";
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityComponents/functions";
 import { getCurrentDate } from "../../utilities";
 
 import { Editor, EditorState } from "react-draft-wysiwyg";
@@ -16,9 +16,9 @@ import React, { CSSProperties, useEffect, useState } from "react";
 import { submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
 import { CONTINUE_TO_CREATE, CREATE_EVENT, EVENT_ADDRESS, EVENT_DATE, EVENT_END, EVENT_NUMBER_PPL, EVENT_START, EVENT_TITLE, EVENT_TYPE, FILL_ALL_FIELDS, PICK_IMAGE, SIDE } from "../../settings/strings";
-import { HtmlTooltip } from "../utilities/HtmlTooltip";
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { getEventType, getEventTypeFromString } from "../../store/external/converters";
-import Places from "../utilities/Places";
+import Places from "../utilityComponents/Places";
 import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router";
@@ -46,7 +46,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
     const { firebase } = useFirebase()
     const { lang } = useLanguage()
-    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE));
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE,{background:PRIMARY_BLACK}));
     const classes = useStyles()
 
 
@@ -190,16 +190,20 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
         alignSelf: 'center',
         marginTop: '16px',
         width: 'fit-content',
-        backgroundImage: DARK_BLACK
+        background: PRIMARY_PINK
     }
-    const labelStyle = { padding: '4px', color: SECONDARY_WHITE }
+    const labelStyle = { padding: '4px', color: PRIMARY_PINK }
     const directionStyle = {
         direction: SIDE(lang)
     }
     const selectStyle = {
-        background: PRIMARY_WHITE,
+        background: PRIMARY_BLACK,
         fontFamily: 'Open Sans Hebrew',
         borderRadius: '32px',
+        padding:'8px',
+        margin:'8px',
+        width:'100%',
+        alignSelf:'center',
         zIndex: '10000',
         color: PRIMARY_ORANGE
     }
@@ -245,7 +249,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
             {function eventTitleField() {
                 return <FormControl style={formControlStyle}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_TITLE(lang)}</label>
+                    <label style={{ padding: '4px', color: PRIMARY_PINK }}>{EVENT_TITLE(lang)}</label>
                     <TextField
                         className={classes.root}
                         placeholder={props.event ? props.event.eventName : EVENT_TITLE(lang)}
@@ -344,17 +348,17 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
 
             {function eventAddressField() {
                 return <FormControl style={formControlStyle}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_ADDRESS(lang)}</label>
+                    <label style={{ padding: '4px', color: PRIMARY_PINK }}>{EVENT_ADDRESS(lang)}</label>
                     <Places value={''}
                         handleAddressSelect={(address: string) => {
                             updateEventAddress(address)
-                        }} types={['address']} className={''} id={{}} fixed={false} style={{ width: '100%', border: '.8px solid white', borderRadius: '32px', color: SECONDARY_WHITE, background: 'none' }} placeHolder={props.event ? props.event.eventLocation : EVENT_ADDRESS(lang)} />
+                        }} types={['address']} className={''} id={{}} fixed={false} style={{ width: '100%', border: '.8px solid white', borderRadius: '32px', color: SECONDARY_WHITE, background: PRIMARY_BLACK }} placeHolder={props.event ? props.event.eventLocation : EVENT_ADDRESS(lang)} />
 
                 </FormControl>
             }()}
             {function eventDateField() {
                 return <FormControl style={formControlStyle}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_DATE(lang)}</label>
+                    <label style={{ padding: '4px', color: PRIMARY_PINK }}>{EVENT_DATE(lang)}</label>
 
                     <TextField
                         value={props.event ? unReverseDate(props.event.eventDate) : unReverseDate(pnpEvent.eventDate)}
@@ -373,7 +377,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
             {function eventStartTimeField() {
                 return <FormControl style={formControlStyle}>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}>{EVENT_START(lang)}</label>
+                    <label style={{ padding: '4px', color: PRIMARY_PINK }}>{EVENT_START(lang)}</label>
                     <TextField
                         value={startDate}
                         classes={{ root: classes.root }}
@@ -411,12 +415,11 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
             }()}
 
             {function eventTypeField() {
-                return <FormControl style={formControlStyle} fullWidth>
+                return <FormControl style={{...formControlStyle}} fullWidth>
 
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE }}
+                    <label style={{ padding: '4px', color: PRIMARY_PINK }}
                         id="create_event_type_select">{EVENT_TYPE(lang)}</label>
-                    <Select
-                        labelId="create_event_type_select"
+                    <select
 
                         value={getEventTypeFromString(pnpEvent.eventType!)}
                         style={selectStyle}
@@ -425,9 +428,9 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
 
                         }}
                     >
-                        {eventTypes.map(type => <MenuItem key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</MenuItem>)}
+                        {eventTypes.map(type => <option key={type + "Create_Event_Menu_Item"} style={{ fontFamily: 'Open Sans Hebrew' }} value={type}>{type}</option>)}
 
-                    </Select>
+                    </select>
                 </FormControl>
             }()}
 
@@ -450,7 +453,7 @@ const AddUpdateEvent = (props: { event?: PNPEvent }) => {
                     <span>
                         <Button
                             onClick={submitUpdateEvent}
-                            sx={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}</Button>
+                            style={{ ...submitButton(false), ... { textTransform: 'none', margin: '0px', padding: '8px', width: '75%' } }}> {props.event ? 'שמור שינויים' : CREATE_EVENT(lang)}</Button>
                     </span>
                 </HtmlTooltip>
             }()}

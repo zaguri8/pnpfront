@@ -5,7 +5,7 @@ import { useLoading } from '../../context/Loading'
 import { isValidPrivateRide } from '../../store/validators'
 import $ from 'jquery'
 import axios from "axios"
-import { InnerPageHolder, PageHolder } from "../utilities/Holders"
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
 import { Checkbox } from "@mui/material"
 import { useLocation, useNavigate } from "react-router"
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -14,15 +14,15 @@ import bus from '../../assets/images/appmenu/pink/bus.svg'
 import { ACCEPT_TERMS_REQUEST, COMMENTS, CONTINUE_TO_CREATE, CREATE_RIDE, CREATE_RIDE_2, DESTINATION_POINT, FILL_ALL_FIELDS, FULL_NAME, LEAVE_HOUR, PASSENGERS, PHONE_NUMBER, RETURN_HOUR, RETURN_HOUR_2, RETURN_POINT, RIDE_DATE, SIDE, STARTING_POINT, STARTING_POINT_SINGLE, TERMS_OF_USE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
 import { FormControl, TextField, Stack, Button } from "@mui/material"
-import { HtmlTooltip } from "../utilities/HtmlTooltip"
+import { HtmlTooltip } from "../utilityComponents/HtmlTooltip"
 import { submitButton, textFieldStyle } from "../../settings/styles"
 import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, SECONDARY_WHITE } from "../../settings/colors"
 import { makeStyles } from "@mui/styles"
-import { dateStringFromDate, reverseDate, unReverseDate } from "../utilities/functions"
-import Spacer from "../utilities/Spacer"
+import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityComponents/functions"
+import Spacer from "../utilityComponents/Spacer"
 import { getCurrentDate } from "../../utilities"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
-import Places from "../utilities/Places"
+import Places from "../utilityComponents/Places"
 
 
 

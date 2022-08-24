@@ -8,8 +8,8 @@ import { BLACK_ELEGANT, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/co
 import { textFieldStyle } from "../../settings/styles"
 import { PNPUser } from "../../store/external/types"
 import SectionTitle from "../other/SectionTitle"
-import { InnerPageHolder, PageHolder } from "../utilities/Holders"
-import Spacer from "../utilities/Spacer"
+import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
+import Spacer from "../utilityComponents/Spacer"
 import { buttonStyle } from "./InvitationStatistics"
 const today = new Date()
 import './UserStatistics.css'

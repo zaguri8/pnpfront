@@ -8,7 +8,7 @@ import React from 'react'
 import { Stack, TextField, Button, MenuItem, Checkbox, Select } from "@mui/material"
 import { makeStyles } from "@mui/styles"
 import { submitButton } from "../../settings/styles"
-import { SECONDARY_WHITE, PRIMARY_BLACK } from "../../settings/colors"
+import { SECONDARY_WHITE, PRIMARY_BLACK, PRIMARY_PINK } from "../../settings/colors"
 import { SAME_SPOT } from "../../settings/strings"
 import { getDefaultPublicRide, getDefaultPublicRide2 } from "../../store/external/helpers"
 
@@ -23,11 +23,11 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
         {
             root: {
                 "& .MuiOutlinedInput-root": {
-                    background: SECONDARY_WHITE,
+                    background: PRIMARY_BLACK,
                     borderRadius: '32px',
                     padding: '0px',
                     border: '.1px solid white',
-                    color: PRIMARY_BLACK,
+                    color: SECONDARY_WHITE,
                     WebkitAppearance: 'none'
                     , ...{
                         '& input[type=number]': {
@@ -162,7 +162,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
     return <Stack spacing={2} style={{ padding: '16px', minWidth: '250px' }}>
         {function twoWayRideCheckBoxField() {
             return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית'}</label>
+                <label style={{ color: PRIMARY_PINK }}>{'הסעה דו כיוונית'}</label>
                 <Checkbox
                     style={{ width: 'fit-content', alignSelf: 'center' }}
                     checked={ride.extras.twoWay}
@@ -175,7 +175,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
 
         {function onlyTwoWayRideCheckBoxField() {
             return <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <label style={{ color: SECONDARY_WHITE }}>{'הסעה דו כיוונית בלבד'}</label>
+                <label style={{ color: PRIMARY_PINK }}>{'הסעה דו כיוונית בלבד'}</label>
                 <Checkbox
                     style={{ width: 'fit-content', alignSelf: 'center' }}
                     checked={ride.extras.twoWayOnly}
@@ -189,7 +189,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
         {function rideDirectionField() {
             if (!ride.extras.twoWay)
                 return <Stack direction='column' spacing={2}>
-                    <label style={{ color: SECONDARY_WHITE }}>{'בחר כיוון נסיעה'}</label>
+                    <label style={{ color: PRIMARY_PINK }}>{'בחר כיוון נסיעה'}</label>
                     <Select
                         value={ride.extras.rideDirection}
                         style={{ color: PRIMARY_BLACK, borderRadius: '32px', background: SECONDARY_WHITE }}
@@ -207,7 +207,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
         {function startPointField() {
             if (ride.extras.twoWay || ride.extras.rideDirection === '2')
                 return <Stack direction='column' spacing={2}>
-                    <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת יציאה'}</label>
+                    <label style={{ color: PRIMARY_PINK }}>{'הכנס נקודת יציאה'}</label>
                     <TextField
                         autoComplete=""
                         InputLabelProps={{
@@ -215,11 +215,11 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                         }}
                         classes={{ root: classes.root }}
 
-                        style={{ color: SECONDARY_WHITE }}
+                        style={{ color: PRIMARY_PINK }}
                         placeholder={props.ride ? props.ride.rideStartingPoint : 'נקודת יציאה'}
                         onChange={(e) => changeRideStartingPoint(e.target.value)}
                     />
-                    <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת יציאה מדויקת'}</label>
+                    <label style={{ color: PRIMARY_PINK }}>{'הכנס נקודת יציאה מדויקת'}</label>
                     <TextField
                         autoComplete=""
                         InputLabelProps={{
@@ -227,7 +227,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                         }}
                         classes={{ root: classes.root }}
 
-                        style={{ color: SECONDARY_WHITE }}
+                        style={{ color: PRIMARY_PINK }}
                         placeholder={props.ride ? props.ride.extras.exactStartPoint : 'נקודת יציאה מדויקת'}
                         onChange={(e) => changeRideExactStartPoint(e.target.value)}
                     />
@@ -239,7 +239,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
         {function backPointField() {
             if (ride.extras.twoWay || ride.extras.rideDirection === '1')
                 return <Stack direction='column' spacing={2}>
-                    <label style={{ color: SECONDARY_WHITE }}>{'הכנס נקודת חזרה מדויקת'}</label>
+                    <label style={{ color: PRIMARY_PINK }}>{'הכנס נקודת חזרה מדויקת'}</label>
                     <TextField
                         autoComplete=""
                         InputLabelProps={{
@@ -247,7 +247,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                         }}
                         classes={{ root: classes.root }}
 
-                        style={{ color: SECONDARY_WHITE }}
+                        style={{ color: PRIMARY_PINK }}
                         placeholder={props.ride ? props.ride.extras.exactBackPoint : ride.extras.twoWay && ride.extras.exactBackPoint ? ride.extras.exactBackPoint : 'נקודת חזרה מדויקת'}
                         onChange={(e) => changeRideExactBackPoint(e.target.value)}
                     />
@@ -258,7 +258,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
 
         {function rideTimeField() {
             return <React.Fragment>
-                <label style={{ color: SECONDARY_WHITE }}> {'הכנס שעת יציאה'}</label>
+                <label style={{ color: PRIMARY_PINK }}> {'הכנס שעת יציאה'}</label>
                 <TextField
                     classes={{ root: classes.root }}
                     InputLabelProps={{
@@ -266,7 +266,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                     }}
                     required
                     type='text'
-                    style={{ color: SECONDARY_WHITE }}
+                    style={{ color: PRIMARY_PINK }}
 
                     placeholder={props.ride ? props.ride.rideTime : '00:00'}
                     name='time'
@@ -277,7 +277,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
 
         {function backTimeField() {
             return <React.Fragment>
-                <label style={{ color: SECONDARY_WHITE }}> {'הכנס שעת חזרה'}</label>
+                <label style={{ color: PRIMARY_PINK }}> {'הכנס שעת חזרה'}</label>
                 <TextField
                     classes={{ root: classes.root }}
                     InputLabelProps={{
@@ -285,7 +285,7 @@ const AddUpdatePrivateEventRide = (props: { ride?: PNPPublicRide, event: PNPPriv
                     }}
                     required
                     type='text'
-                    style={{ color: SECONDARY_WHITE }}
+                    style={{ color: PRIMARY_PINK }}
 
                     placeholder={props.ride ? props.ride.backTime : '00:00'}
                     name='time'
