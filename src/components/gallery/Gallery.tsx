@@ -1,60 +1,28 @@
-import React, { CSSProperties, useEffect, useLayoutEffect } from "react"
+import React, { CSSProperties, useEffect } from "react"
 import { v4 } from "uuid"
-import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
-import { useNavigate } from 'react-router'
+import { PRIMARY_ORANGE } from "../../settings/colors";
 import $ from 'jquery'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { motion } from 'framer-motion'
 import loadingGif from '../../assets/gifs/loading.gif'
 import { PNPEvent } from "../../store/external/types";
-import { useLanguage } from "../../context/Language";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import pin from '../../assets/images/pin-location.png'
 import './Gallery.css'
 import { Stack } from "@mui/material";
+import { Hooks } from "../generics/types";
+import { withHookGroup } from "../generics/withHooks";
 export type GalleryProps = {
     header: string
     events: PNPEvent[]
     privateEvents: PNPEvent[]
 }
-
-function GalleryItemTitleOld(props: { event: PNPEvent }) {
-    const { lang } = useLanguage()
-    return (<div style={{
-        margin: '0px',
-        marginTop: 'auto',
-        background: SECONDARY_WHITE,
-        textAlign: 'start',
-        display: 'flex',
-        height: '26%',
-        color: PRIMARY_BLACK,
-        flexDirection: 'column',
-        paddingBottom: '6px',
-        borderBottomLeftRadius: '16px',
-        borderBottomRightRadius: '16px'
-    }}><h4 style={{ margin: '0px', padding: '6px', paddingBottom: '0px', paddingTop: '2px' }} >{props.event.eventName}</h4>
-        <span style={{ display: 'flex', alignItems: 'center', fontSize: '10px', background: 'none', margin: '0px', paddingBottom: '1px', paddingTop: '0px', marginRight: '8px' }} >
-
-            {props.event.eventLocation}
-
-        </span>
-        <span dir={'ltr'} style={{
-            fontSize: '10px',
-            fontWeight: '600',
-            padding: '1px',
-            marginLeft: '8px',
-            marginTop: '0px', color: BLACK_ROYAL
-        }}>{props.event.eventDate}</span></div>);
-}
-
-
 const paragraphStyle = {
     fontSize: '12px',
     margin: '0px'
 } as CSSProperties
 
-function GalleryItemTitle(props: { event: PNPEvent }) {
-
+type GalleryItemProps = { event: PNPEvent }
+function GalleryItemTitle(props: GalleryItemProps) {
     return <div style={{
         marginBottom: '8px',
         minWidth: 'fit-content',
@@ -68,7 +36,7 @@ function GalleryItemTitle(props: { event: PNPEvent }) {
         </Stack>
     </div>
 }
-function GalleryItemBottom(props: { event: PNPEvent }) {
+function GalleryItemBottom(props: GalleryItemProps) {
 
     const todayIconStyle = {
         width: '12px',
@@ -93,8 +61,7 @@ function GalleryItemBottom(props: { event: PNPEvent }) {
 }
 
 
-function Gallery(props: GalleryProps) {
-    const { lang } = useLanguage()
+function Gallery(props: GalleryProps & Hooks) {
 
 
     const imageContainer: CSSProperties = {
@@ -104,7 +71,7 @@ function Gallery(props: GalleryProps) {
         textAlign: 'center'
     }
     const headerStyle: CSSProperties = {
-        textAlign: lang === 'heb' ? 'right' : 'left',
+        textAlign: props.language.lang === 'heb' ? 'right' : 'left',
         fontWeight: '300',
         fontFamily: 'Open Sans Hebrew ',
         position: 'relative',
@@ -117,9 +84,8 @@ function Gallery(props: GalleryProps) {
         color: PRIMARY_ORANGE
     }
 
-    const nav = useNavigate()
     const handleOpen = (pnpEvent: PNPEvent) => {
-        nav(`/event/${pnpEvent.eventId}`)
+        props.nav(`/event/${pnpEvent.eventId}`)
     }
 
 
@@ -135,7 +101,7 @@ function Gallery(props: GalleryProps) {
             const imageId = (event as any).imageId
             $(`#gallery_img_${imageId}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
         })
-    },[])
+    }, [])
 
     const loadingDivStyle = {
         background: `url('${loadingGif}')`,
@@ -178,7 +144,7 @@ function Gallery(props: GalleryProps) {
                 })}
             </div>
         </motion.div>
-        {<h3 className='gallery_header' style={headerStyle}>{lang === 'heb' ? 'אירועים פרטיים' : 'Private event'}</h3>}
+        {<h3 className='gallery_header' style={headerStyle}>{props.language.lang === 'heb' ? 'אירועים פרטיים' : 'Private event'}</h3>}
         <motion.div
             variants={animations}
             initial={'initial'}
@@ -206,4 +172,4 @@ function Gallery(props: GalleryProps) {
         </motion.div>
     </div>
 }
-export default  React.memo(Gallery)
+export default withHookGroup<GalleryProps>(React.memo(Gallery), ['language', 'nav'])

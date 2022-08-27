@@ -19,27 +19,26 @@ export default function determineRoute(
     type: PNPRouteType,
     language: any
 ) {
-    const { appUser } = useFirebase()
     if (type === 'register')
         return <Route
             path={path}
             key={location.pathname}
-            element={<RegisterRoute {...{ path, element, language, appUser, type }} />} />
+            element={<RegisterRoute {...{ path, element, language, type }} />} />
     if (type === 'admin')
         return <Route
             path={path}
             key={location.pathname}
-            element={<AdminAuthenticatedRoute {...{ path, element, language, appUser, type }} />} />
+            element={<AdminAuthenticatedRoute {...{ path, element, language, type }} />} />
     if (type === 'producer')
         return <Route
             path={path}
             key={location.pathname}
-            element={<ProducerAuthenticatedRoute {...{ path, element, language, appUser, type }} />} />
+            element={<ProducerAuthenticatedRoute {...{ path, element, language, type }} />} />
     if (type === 'auth')
         return <Route
             path={path}
             key={location.pathname}
-            element={<AuthenticatedRoute {...{ path, element, language, appUser, type }} />} />
+            element={<AuthenticatedRoute {...{ path, element, language, type }} />} />
 
     return <Route
         path={path}

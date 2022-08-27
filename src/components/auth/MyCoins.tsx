@@ -4,9 +4,11 @@ import { useLanguage } from "../../context/Language";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { MY_COINS, SIDE } from "../../settings/strings";
 import { elegantShadow } from "../../settings/styles";
+import { Hooks } from "../generics/types";
+import { withHookGroup } from "../generics/withHooks";
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 
-export default function MyCoins() {
+function MyCoins(props:Hooks) {
 
 
 
@@ -88,20 +90,15 @@ export default function MyCoins() {
     const coinTextStyle = {
         fontSize: '24px'
     }
-
-    const { lang } = useLanguage()
-
-    const { appUser } = useFirebase()
-
     return <PageHolder>
         <InnerPageHolder style={{ background: 'none', border: 'none' }}>
 
 
             <Stack alignItems={'center'} style={coinStackStyleOuter}>
                 <Typography
-                    dir={SIDE(lang)}
+                    dir={SIDE(props.language.lang)}
                     style={textStyle}>
-                    {MY_COINS(lang)}
+                    {MY_COINS(props.language.lang)}
                 </Typography>
 
                 <Stack direction='row' style={coinStackStyle}
@@ -120,7 +117,7 @@ export default function MyCoins() {
                                         <Typography
                                             style={coinTextStyle}
                                             color='white'>
-                                            {appUser && appUser.coins}
+                                            {props.firebase.firebase.appUser && props.firebase.firebase.appUser.coins}
                                         </Typography>
                                     </div>
                                 </div>
@@ -133,3 +130,5 @@ export default function MyCoins() {
         </InnerPageHolder>
     </PageHolder>
 }
+
+export default withHookGroup(MyCoins,['language','firebase'])

@@ -7,7 +7,7 @@ import { textFieldStyle } from '../../../settings/styles'
 import dollar from '../../../assets/images/dollar.png'
 import { InnerPageHolder, PageHolder } from '../../utilityComponents/Holders'
 import { buttonStyle } from '../InvitationStatistics'
-import serverRequest from '../../../ApiManager/ApiManager'
+import ServerRequest from '../../../ApiManager/ApiManager'
 import './GeneratePaymentForm.css'
 import { useFirebase } from '../../../context/Firebase'
 import { useLoading } from '../../../context/Loading'
@@ -25,7 +25,7 @@ export default function GeneratePaymentForm() {
         const totalToPay = $('#payment_p_5').val() as number
         doLoad()
 
-        serverRequest('generatePrivatePaymentLink',
+        ServerRequest('generatePrivatePaymentLink',
             {
                 customer: {
                     'customer_name': customerName,

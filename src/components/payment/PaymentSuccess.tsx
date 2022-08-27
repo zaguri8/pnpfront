@@ -8,9 +8,7 @@ import React, { useEffect, useState } from 'react'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import { useLocation } from 'react-router-dom'
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import { useFirebase } from '../../context/Firebase'
-import { useNavigate } from 'react-router'
-import { useLanguage } from '../../context/Language'
+
 import { LOADING, NAVIGATION, NOTFOUND, RIDE_INFO, SAME_SPOT, SIDE } from '../../settings/strings'
 import { TransactionSuccess } from '../../store/payments/types'
 import logo from '../../assets/images/logo_white.png'
@@ -19,16 +17,15 @@ import './PaymentSuccess.css'
 import { TRANSACTION_DETAILS } from '../../settings/strings'
 import { PageHolder, InnerPageHolder } from '../utilityComponents/Holders'
 import Spacer from '../utilityComponents/Spacer'
-import { useLoading } from '../../context/Loading'
-import { BLACK_ELEGANT, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
-import { QRCodeSVG } from 'qrcode.react'
-import { floatStyle } from '../other/WhatsApp'
+import { PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../settings/colors'
+
 import { boxShadow, submitButton } from '../../settings/styles'
 import { PNPPublicRide } from '../../store/external/types'
 import { isValidPublicRide } from '../../store/validators'
 import MapComponent from '../other/MapComponent'
 import { useGoogleState } from '../../context/GoogleMaps'
-import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
+import { Hooks } from '../generics/types'
+import { CommonHooks, withHookGroup } from '../generics/withHooks'
 function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
@@ -45,40 +42,34 @@ export const bImportantStyle = {
     fontSize: '12px'
 }
 
-export default function PaymentSuccess() {
+function PaymentSuccess(props: Hooks) {
 
     const query = useQuery()
-
-    const { firebase, appUser } = useFirebase()
     const location = useLocation()
-    const { doLoad, cancelLoad, isLoading, openDialog } = useLoading()
     const [ride, setRide] = useState<PNPPublicRide | undefined>()
-    const { lang } = useLanguage()
-    const nav = useNavigate()
     const [transaction, setTransaction] = useState<TransactionSuccess | undefined>()
 
-    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     useEffect(() => {
-        hideHeader();
-        return () => showHeader()
+        props.headerExt.hideHeader();
+        return () => props.headerExt.showHeader()
     })
     useEffect(() => {
-        if (!query) { nav('/'); return }
+        if (!query) { props.nav('/'); return }
         let unsub: Unsubscribe | null = null;
         if (query.has('customer_uid') && query.has('transaction_uid')) {
-            doLoad()
-            unsub = firebase.realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
+            props.loading.doLoad()
+            unsub = props.firebase.firebase.realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
                 setTransaction(trans)
-                cancelLoad()
+                props.loading.cancelLoad()
             }, (e: Error) => {
-                firebase.realTime.addError({
+                props.firebase.firebase.realTime.addError({
                     type: 'getTransaction',
                     error: '',
                     date: new Date().toISOString(),
                     errorId: '',
                     extraData: e
                 })
-                cancelLoad()
+                props.loading.cancelLoad()
             })
         } else if (location.state && location.state as TransactionSuccess) {
             setTransaction(location.state as TransactionSuccess)
@@ -107,26 +98,26 @@ export default function PaymentSuccess() {
 
 
     const openRideDetails = async () => {
-        if (isLoading) return;
+        if (props.loading.isLoading) return;
         if (transaction) {
 
             if (!ride) {
-                doLoad()
+                props.loading.doLoad()
                 const eventId = transaction.more_info.eventId
                 const rideId = transaction.more_info.rideId
-                await firebase.realTime.getPublicRideById(eventId, rideId)
+                await props.firebase.firebase.realTime.getPublicRideById(eventId, rideId)
                     .then(dbRide => {
-                        cancelLoad()
+                        props.loading.cancelLoad()
                         if (isValidPublicRide(dbRide)) {
 
-                            openDialog({ content: getElement(dbRide) })
+                            props.loading.openDialog({ content: getElement(dbRide) })
                             setRide(dbRide)
                         } else {
-                            openDialog({ content: <label style={{ padding: '6px', color: PRIMARY_BLACK }}>{lang === 'heb' ? 'פרטי הסעה זו אינם קיימים, ייתכן שזו הסעה ישנה ' : 'There is no details for this ride in the system, it might be an exp[red ride'}</label> })
+                            props.loading.openDialog({ content: <label style={{ padding: '6px', color: PRIMARY_BLACK }}>{props.language.lang === 'heb' ? 'פרטי הסעה זו אינם קיימים, ייתכן שזו הסעה ישנה ' : 'There is no details for this ride in the system, it might be an exp[red ride'}</label> })
                         }
-                    }).catch(() => { cancelLoad() })
+                    }).catch(() => { props.loading.cancelLoad() })
             } else {
-                openDialog({ content: getElement(ride) })
+                props.loading.openDialog({ content: getElement(ride) })
             }
         }
     }
@@ -136,30 +127,30 @@ export default function PaymentSuccess() {
         return (<div>
             <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', padding: '8px', alignItems: 'center', color: PRIMARY_BLACK, justifyContent: 'center' }}>
                 <div style={{ padding: '8px' }}>
-                    <label dir={SIDE(lang)}>{(lang === 'heb' ? 'הסעה ל' : 'Ride to ') + transaction!.more_info.productName}</label>
+                    <label dir={SIDE(props.language.lang)}>{(props.language.lang === 'heb' ? 'הסעה ל' : 'Ride to ') + transaction!.more_info.productName}</label>
                     <hr style={{ borderWidth: '.1px', borderColor: 'gray' }} />
                     <Stack direction='row'>
                         <Stack>
                             {product.extras.exactStartPoint ? <div>
                                 <label style={{ display: 'block', fontWeight: 'bold' }}>
-                                    {(lang === 'heb' ? 'נקודת יציאה' : 'Starting point: ')}
+                                    {(props.language.lang === 'heb' ? 'נקודת יציאה' : 'Starting point: ')}
                                 </label>
 
                                 <label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{product.extras.exactStartPoint}</label></div> : null}
                             {product.extras.exactBackPoint ? <div><label style={{ display: 'block', fontWeight: 'bold' }}>
-                                {(lang === 'heb' ? 'נקודת חזרה' : 'Back point: ')}
+                                {(props.language.lang === 'heb' ? 'נקודת חזרה' : 'Back point: ')}
                             </label>
                                 <div>
-                                    <label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{SAME_SPOT(lang)}</label> </div> </div> : ''}
+                                    <label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{SAME_SPOT(props.language.lang)}</label> </div> </div> : ''}
                         </Stack>
 
                         <Stack >
                             {(product.extras.twoWay || product.extras.rideDirection === '2') && <div><label style={{ fontWeight: 'bold' }}>
-                                {(lang === 'heb' ? 'שעת יציאה' : 'Ride time: ')}
+                                {(props.language.lang === 'heb' ? 'שעת יציאה' : 'Ride time: ')}
                             </label>
                                 <div><label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{product.rideTime}</label> </div></div>}
                             {(product.extras.twoWay || product.extras.rideDirection === '1') && <div><label style={{ fontWeight: 'bold' }}>
-                                {(lang === 'heb' ? 'שעת חזרה' : 'Back time: ')}
+                                {(props.language.lang === 'heb' ? 'שעת חזרה' : 'Back time: ')}
                             </label>
                                 <div><label style={{ color: PRIMARY_PINK, fontSize: '14px' }}>{product.backTime}</label> </div></div>}
                         </Stack>
@@ -200,10 +191,10 @@ export default function PaymentSuccess() {
 
     return <PageHolder style={{ overflowX: 'hidden' }}>
         {transaction ? <div>
-            <SectionTitle style={{ marginBottom: '4px' }} title={lang === 'heb' ? 'ברקוד' : 'Barcode'} />
+            <SectionTitle style={{ marginBottom: '4px' }} title={props.language.lang === 'heb' ? 'ברקוד' : 'Barcode'} />
 
             <InnerPageHolder style={{ background: 'none', border: 'none', margin: '0px', width: '250px', padding: '0px', height: 'fit-content' }}>
-                <label dir={SIDE(lang)}
+                <label dir={SIDE(props.language.lang)}
                     style={{
                         ...{
                             color: SECONDARY_WHITE,
@@ -215,14 +206,14 @@ export default function PaymentSuccess() {
                         }, ... { border: 'none', fontWeight: 'bold' }
                     }}>
                     <InfoRoundedIcon style={{ padding: '2px', borderRadius: '16px', color: 'white' }} />
-                    {lang === 'heb' ? 'שימו לב לשעות היציאה והחזרה - יש להגיע 10 דקות לפני. ההסעה לא תחכה למאחרים.' : 'Pay attention to the departure and return hours - you must arrive 10 minutes before. The shuttle will not wait for the latecomers.'}</label>
+                    {props.language.lang === 'heb' ? 'שימו לב לשעות היציאה והחזרה - יש להגיע 10 דקות לפני. ההסעה לא תחכה למאחרים.' : 'Pay attention to the departure and return hours - you must arrive 10 minutes before. The shuttle will not wait for the latecomers.'}</label>
 
-                <span dir={SIDE(lang)}
+                <span dir={SIDE(props.language.lang)}
 
-                    style={bImportantStyle}>{(lang === 'heb' ? 'תוקף ברקוד: ' : 'Barcode expiration: ') + (lang === 'heb' ? (transaction.more_info.twoWay ? 'שני סריקות בלבד (סריקה לכל כיוון)' : 'סריקה אחת בלבד (כיוון אחד)') : (transaction.more_info.twoWay ? 'Two scans (Two directions)' : 'One Scan (One direction)'))}</span>
-                <b><span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, padding: '4px', margin: '4px', fontSize: '14px' }}>{(lang === 'heb' ? 'מספר נוסעים: ' : 'Number of passengers: ') + transaction.more_info.amount}</span></b>
+                    style={bImportantStyle}>{(props.language.lang === 'heb' ? 'תוקף ברקוד: ' : 'Barcode expiration: ') + (props.language.lang === 'heb' ? (transaction.more_info.twoWay ? 'שני סריקות בלבד (סריקה לכל כיוון)' : 'סריקה אחת בלבד (כיוון אחד)') : (transaction.more_info.twoWay ? 'Two scans (Two directions)' : 'One Scan (One direction)'))}</span>
+                <b><span dir={SIDE(props.language.lang)} style={{ color: SECONDARY_WHITE, padding: '4px', margin: '4px', fontSize: '14px' }}>{(props.language.lang === 'heb' ? 'מספר נוסעים: ' : 'Number of passengers: ') + transaction.more_info.amount}</span></b>
 
-                <span dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontSize: '9px', marginTop: '10px' }}>{lang === 'heb' ? 'במידה ורכשת מספר כרטיסים, הברקוד הנל מכיל את כולם.' : 'If you have purchased more then 1 ticket, the following barcode includes them as-well'}<b>{lang === 'heb' ? ' יש לעלות ביחד.' : 'Boarding together is required'}</b></span>
+                <span dir={SIDE(props.language.lang)} style={{ color: SECONDARY_WHITE, fontWeight: 'bold', fontSize: '9px', marginTop: '10px' }}>{props.language.lang === 'heb' ? 'במידה ורכשת מספר כרטיסים, הברקוד הנל מכיל את כולם.' : 'If you have purchased more then 1 ticket, the following barcode includes them as-well'}<b>{props.language.lang === 'heb' ? ' יש לעלות ביחד.' : 'Boarding together is required'}</b></span>
                 <Spacer offset={1} />
                 <Button style={{
                     fontFamily: 'Open Sans Hebrew',
@@ -231,16 +222,7 @@ export default function PaymentSuccess() {
                     color: PRIMARY_WHITE,
                     width: '100%',
                     background: PRIMARY_PINK
-                }} onClick={() => {
-                    nav('/test', { state: transaction })
-                    // openDialog({
-                    //     content: <div>
-                    //         <QRCodeSVG style={{ width: '171px', height: '171px', margin: '8px' }} value={transaction.approval_num} />
-                    //         <Spacer offset={1} />
-                    //         <label style={{ color: PRIMARY_ORANGE }}>{'צלמו מסך למועד האירוע !'}</label>
-                    //     </div>
-                    // })
-                }}>{lang === 'heb' ? 'הצג ברקוד' : 'Show barcode'}</Button>
+                }} onClick={() => { props.nav('/barcode', { state: transaction }) }}>{props.language.lang === 'heb' ? 'הצג ברקוד' : 'Show barcode'}</Button>
             </InnerPageHolder>
 
         </div> : null}
@@ -248,10 +230,10 @@ export default function PaymentSuccess() {
             <Button
 
                 onClick={openRideDetails}
-                style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%', backgroundColor: PRIMARY_ORANGE, maxWidth: '300px', padding: '0px', margin: '0px' } }}>{lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
+                style={{ ...submitButton(false), ...{ textTransform: 'none', width: '100%', backgroundColor: PRIMARY_ORANGE, maxWidth: '300px', padding: '0px', margin: '0px' } }}>{props.language.lang === 'heb' ? 'הצג פרטי הסעה' : 'Show ride details'}</Button>
         </InnerPageHolder>}
         {center && <React.Fragment>
-            <SectionTitle title={NAVIGATION(lang)} style={{ paddingBottom: '0px' }} />
+            <SectionTitle title={NAVIGATION(props.language.lang)} style={{ paddingBottom: '0px' }} />
             <InnerPageHolder style={{ background: 'none', border: 'none' }}>
                 <MapComponent mapProps={{
                     center: center,
@@ -292,51 +274,51 @@ export default function PaymentSuccess() {
         </React.Fragment>}
 
 
-        <SectionTitle title={TRANSACTION_DETAILS(lang)} style={{ transform: 'translateY(-176px)' }} />
-        <InnerPageHolder style={{ border: '.5px solid white', background: 'rgb(0,0,0,0.2)', transform: 'translateY(-176px)', direction: SIDE(lang) }}>
+        <SectionTitle title={TRANSACTION_DETAILS(props.language.lang)} style={{ transform: 'translateY(-176px)' }} />
+        <InnerPageHolder style={{ border: '.5px solid white', background: 'rgb(0,0,0,0.2)', transform: 'translateY(-176px)', direction: SIDE(props.language.lang) }}>
             {<div id='floating_indicator_payment'>
 
-                <span>{lang === 'heb' ? 'קבלה למטה' : 'Receipt down'}</span>
+                <span>{props.language.lang === 'heb' ? 'קבלה למטה' : 'Receipt down'}</span>
                 <KeyboardDoubleArrowDownIcon />
             </div>}
-            {transaction ? <Stack className='payment_details_holder' dir={SIDE(lang)}>
-                <label>{lang === 'heb' ? 'מוצר' : 'Product'}</label>
-                {transaction ? <span>{transaction.more_info.productName}</span> : <span>{LOADING(lang)}</span>}
+            {transaction ? <Stack className='payment_details_holder' dir={SIDE(props.language.lang)}>
+                <label>{props.language.lang === 'heb' ? 'מוצר' : 'Product'}</label>
+                {transaction ? <span>{transaction.more_info.productName}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                <label>{lang === 'heb' ? 'כמות' : 'Product'}</label>
-                {transaction ? <span>{transaction.more_info.amount}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'כמות' : 'Product'}</label>
+                {transaction ? <span>{transaction.more_info.amount}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                <label>{lang === 'heb' ? 'כיווני נסיעה' : 'Product'}</label>
-                {transaction ? <span>{transaction.more_info.twoWay ? 'שני כיוונים' : 'כיוון אחד'}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'כיווני נסיעה' : 'Product'}</label>
+                {transaction ? <span>{transaction.more_info.twoWay ? 'שני כיוונים' : 'כיוון אחד'}</span> : <span>{LOADING(props.language.lang)}</span>}
                 {transaction && !transaction.more_info.twoWay &&
-                    <div><label>{lang === 'heb' ? 'כיוון נסיעה' : 'Product'}</label>
+                    <div><label>{props.language.lang === 'heb' ? 'כיוון נסיעה' : 'Product'}</label>
                         <span>{transaction.more_info.direction === '1' ? 'הלוך' : 'חזור'}</span></div>}
 
-                <label>{lang === 'heb' ? 'סטאטוס' : 'Status'}</label>
-                {transaction ? <span>{transaction.status_description}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'סטאטוס' : 'Status'}</label>
+                {transaction ? <span>{transaction.status_description}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                <label>{lang === 'heb' ? 'סה"כ שולם' : 'Amount'}</label>
-                {transaction ? <span>{transaction.amount + "₪"}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'סה"כ שולם' : 'Amount'}</label>
+                {transaction ? <span>{transaction.amount + "₪"}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                <label>{lang === 'heb' ? 'תאריך רכישה' : 'Purchase Date'}</label>
-                {transaction ? <span>{transaction.date}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'תאריך רכישה' : 'Purchase Date'}</label>
+                {transaction ? <span>{transaction.date}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                <label>{lang === 'heb' ? 'מספר אישור' : 'Approval Number'}</label>
-                {transaction ? <span>{transaction.approval_num}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'מספר אישור' : 'Approval Number'}</label>
+                {transaction ? <span>{transaction.approval_num}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                {/* <label>{lang === 'heb' ? 'שם בעל הכרטיס' : 'Card holder name'}</label>
-                {transaction ? <span>{transaction.card_holder_name}</span> : <span>{LOADING(lang)}</span>} */}
+                {/* <label>{props.language.lang === 'heb' ? 'שם בעל הכרטיס' : 'Card holder name'}</label>
+                {transaction ? <span>{transaction.card_holder_name}</span> : <span>{LOADING(props.language.lang)}</span>} */}
 
-                <label>{lang === 'heb' ? 'סוג חיוב' : 'Type of purchase'}</label>
-                {transaction ? <span>{transaction.number_of_payments === '1' ? (lang === 'heb' ? 'רגיל' : 'Normal') : lang === 'heb' ? 'תשלומים' : 'Payments'}</span> : <span>{NOTFOUND(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'סוג חיוב' : 'Type of purchase'}</label>
+                {transaction ? <span>{transaction.number_of_payments === '1' ? (props.language.lang === 'heb' ? 'רגיל' : 'Normal') : props.language.lang === 'heb' ? 'תשלומים' : 'Payments'}</span> : <span>{NOTFOUND(props.language.lang)}</span>}
 
-                <label>{lang === 'heb' ? 'מספר תשלומים' : 'Number of Payments'}</label>
-                {transaction ? <span>{transaction.number_of_payments}</span> : <span>{LOADING(lang)}</span>}
+                <label>{props.language.lang === 'heb' ? 'מספר תשלומים' : 'Number of Payments'}</label>
+                {transaction ? <span>{transaction.number_of_payments}</span> : <span>{LOADING(props.language.lang)}</span>}
 
-                {/* <label>{lang === 'heb' ? '4 ספרות אחרונות של כרטיס' : 'Four last digits of card'}</label>
-                {transaction ? <span>{transaction.four_digits}</span> : <span>{LOADING(lang)}</span>} */}
+                {/* <label>{props.language.lang === 'heb' ? '4 ספרות אחרונות של כרטיס' : 'Four last digits of card'}</label>
+                {transaction ? <span>{transaction.four_digits}</span> : <span>{LOADING(props.language.lang)}</span>} */}
 
-            </Stack> : <h1 dir={SIDE(lang)} style={{ color: SECONDARY_WHITE, fontSize: '14px' }}>{lang === 'heb' ? 'קבלה לא נמצאה' : 'Receipt not found'}</h1>}
+            </Stack> : <h1 dir={SIDE(props.language.lang)} style={{ color: SECONDARY_WHITE, fontSize: '14px' }}>{props.language.lang === 'heb' ? 'קבלה לא נמצאה' : 'Receipt not found'}</h1>}
 
             <img src={logo} style={{ maxWidth: '200px', height: '25px', alignSelf: 'flex-end', marginTop: '32px' }}></img>
         </InnerPageHolder>
@@ -344,3 +326,4 @@ export default function PaymentSuccess() {
 
     </PageHolder>
 }
+export default withHookGroup(PaymentSuccess, CommonHooks)

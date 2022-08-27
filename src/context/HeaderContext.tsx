@@ -72,7 +72,7 @@ export interface IHeaderBackgroundExtension {
     hideHeader: () => void
     showHeader: () => void
     setHeaderAbout: () => void
-    setHeaderBackground: () => void
+    setHeaderBackground: (background: string) => void
     setHeaderColor: (color: string) => void
     resetHeaderColor: () => void
 }

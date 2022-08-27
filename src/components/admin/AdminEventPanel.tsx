@@ -12,26 +12,18 @@ import { useLoading } from "../../context/Loading"
 import { useFirebase } from "../../context/Firebase"
 import { CSSProperties, useEffect } from "react"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
-const AdminEventPanel = () => {
-
+import { Hooks } from "../generics/types"
+import { CommonHooks, withHookGroup } from "../generics/withHooks"
+const AdminEventPanel = (props: Hooks) => {
     const location = useLocation()
-    const { openDialog, doLoad, cancelLoad } = useLoading()
-    const { firebase } = useFirebase()
-
     const tableTitleStyle: CSSProperties = { fontSize: '20px', color: SECONDARY_WHITE }
-    const nav = useNavigate()
-
-    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
-
-
     useEffect(() => {
-        hideHeader()
-        return () => showHeader()
-    },[])
-
+        props.headerExt.hideHeader()
+        return () => props.headerExt.showHeader()
+    }, [])
 
     function openEditDialog(event: PNPEvent) {
-        openDialog({
+        props.loading.openDialog({
             content: <InnerPageHolder style={{ padding: '8px', margin: '8px', background: SECONDARY_BLACK }}>
                 <Stack spacing={2} style={{ padding: '8px', color: SECONDARY_WHITE, width: '100%' }}>
 
@@ -134,9 +126,9 @@ const AdminEventPanel = () => {
                             {location.state && (location.state as any).events && (location.state as { waitingEvents: PNPEvent[], events: PNPEvent[] }).events.map((event: PNPEvent) => <tr key={v4()} style={{ margin: '8px' }}>
                                 <th style={{ width: '50%' }}>  <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '4px', color: SECONDARY_WHITE }}>{event.eventName}</div></th>
                                 <th style={{ width: '50%' }}><Button
-                                    style={{ border: '.1px solid white', background:'black', minWidth: 'max-content', paddingLeft: '8px', paddingRight: '8px' }}
-                                    onClick={() => { nav('/adminpanel/specificevent/eventstatistics', { state: event }) }}
-                                    sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px',fontWeight:'bold', color: PRIMARY_PINK, background: '#007AFF' } }}>
+                                    style={{ border: '.1px solid white', background: 'black', minWidth: 'max-content', paddingLeft: '8px', paddingRight: '8px' }}
+                                    onClick={() => { props.nav('/adminpanel/specificevent/eventstatistics', { state: event }) }}
+                                    sx={{ ... { width: 'fit-content', fontSize: '14px', margin: '4px', padding: '4px', fontWeight: 'bold', color: PRIMARY_PINK, background: '#007AFF' } }}>
                                     {'ניהול אירוע'}
                                 </Button></th>
                             </tr>)}
@@ -182,15 +174,15 @@ const AdminEventPanel = () => {
                                                 <Button
                                                     style={{ width: '100px', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
                                                     onClick={() => {
-                                                        doLoad()
-                                                        firebase.realTime.approveEvent(event.eventId)
+                                                        props.loading.doLoad()
+                                                        props.firebase.firebase.realTime.approveEvent(event.eventId)
                                                             .then(() => {
                                                                 alert('אירוע אושר בהצלחה')
-                                                                nav('/adminpanel')
-                                                                cancelLoad()
+                                                                props.nav('/adminpanel')
+                                                                props.loading.cancelLoad()
                                                             }).catch(() => {
                                                                 alert('קרתה שגיאה בעת אישור האירוע, אנא פנא אל מתכנת האתר')
-                                                                cancelLoad()
+                                                                props.loading.cancelLoad()
                                                             })
                                                     }}
                                                 >
@@ -207,4 +199,4 @@ const AdminEventPanel = () => {
         </InnerPageHolder>
     </PageHolder>
 }
-export default AdminEventPanel
+export default withHookGroup(AdminEventPanel, CommonHooks)

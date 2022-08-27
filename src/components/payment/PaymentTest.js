@@ -28,6 +28,7 @@ import { InnerPageHolder } from '../utilityComponents/Holders'
 import { minWidth } from '@mui/system'
 import Spacer from '../utilityComponents/Spacer'
 import { useDimExtension } from '../../context/HeaderContext';
+import ServerRequest from '../../ApiManager/ApiManager';
 const paragraphStyle = {
     fontSize: '11px',
     color: PRIMARY_BLACK,
@@ -138,20 +139,16 @@ export function PaymentFormTest({ product, paymentInfo }) {
             credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" },
             product: payProduct
         }
-
-        axios.post('https://nadavsolutions.com/gserver/paymentLink/test', send)
-            .then(res => {
-                if (res.data.success) {
-                    cancelLoad()
-                    alert(res.data.success)
-                } else {
-                    alert(res.data.error)
-                }
-            }).catch(e => {
-
-            })
-
-
+        ServerRequest('paymentLink/test', send, res => {
+            cancelLoad()
+            if (res.success) {
+                alert(res.success)
+            } else {
+                alert(res.error)
+            }
+        }, err => {
+            cancelLoad()
+        })
     }
 
 

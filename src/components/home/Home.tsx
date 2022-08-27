@@ -2,34 +2,30 @@ import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
 import Gallery from "../gallery/Gallery"
 import './Home.css'
 import { useFirebase } from "../../context/Firebase"
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 import React from 'react'
 import { useState } from "react"
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { PNPEvent } from "../../store/external/types"
-import { ABOUT, CLUBS, CULTURE, SCHEDULED_EVENTS, TOS, WHY_US_TITLE } from "../../settings/strings"
 import { useLanguage } from "../../context/Language"
-import { BLACK_ROYAL, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_WHITE, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
-import { getEventType, getEventTypeFromString, getEventTypePriority } from "../../store/external/converters"
+import { PRIMARY_BLACK} from "../../settings/colors"
+import { getEventTypePriority } from "../../store/external/converters"
 import { v4 } from "uuid"
 import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
 import logo from '../../assets/images/header.jpeg'
-import Footer from "../footer/Footer"
 import { useHeaderBackgroundExtension, useHeaderContext } from "../../context/HeaderContext"
-import { encryptMacdonald } from "../../utilities"
-export function Home() {
-    const { user, firebase } = useFirebase()
+import { Hooks } from "../generics/types"
+import { withHookGroup } from "../generics/withHooks"
+export function Home(props:Hooks) {
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
     const { isCacheValid, cacheDone } = useCookies()
-
     const { setIsShowingAbout } = useHeaderContext()
-    const { setHeaderBackground } = useHeaderBackgroundExtension()
     useEffect(() => {
-        setHeaderBackground(`url('${logo}')`)
+        props.headerExt.setHeaderBackground(`url('${logo}')`)
         setIsShowingAbout(true);
-        const unsubEvents = firebase.realTime.addListenerToPublicEvents((events) => {
+        const unsubEvents = props.firebase.firebase.realTime.addListenerToPublicEvents((events) => {
             const ev = Object.values(events)
             let filtered: PNPEvent[] = []
             for (let events of ev)
@@ -40,7 +36,7 @@ export function Home() {
         if (validToCache instanceof Promise) {
             (validToCache as Promise<boolean>).then((valid) => {
                 if (valid) {
-                    firebase.realTime.addUserStatistic(PNPPage.home)
+                    props.firebase.firebase.realTime.addUserStatistic(PNPPage.home)
                     cacheDone(PNPPage.home)
                 }
             })
@@ -48,7 +44,7 @@ export function Home() {
 
         return () => {
             unsubEvents()
-            setHeaderBackground(PRIMARY_BLACK)
+            props.headerExt.setHeaderBackground(PRIMARY_BLACK)
             setIsShowingAbout(false)
         }
     }, [])
@@ -103,4 +99,4 @@ export function Home() {
         <SayNoMoreContainer />
     </div>
 }
-export default Home
+export default withHookGroup(Home,['headerExt','firebase'])

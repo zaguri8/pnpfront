@@ -5,16 +5,17 @@ import $ from 'jquery'
 import { useParams } from 'react-router'
 import { DARK_BLACK, RED_ROYAL, SECONDARY_WHITE } from '../../settings/colors'
 import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
-const InvitationPage = () => {
+import { withHook } from '../generics/withHooks'
+import { Hooks } from '../generics/types'
+const InvitationPage = (props: Hooks) => {
     const { id } = useParams()
     useLayoutEffect(() => {
         $('.dim').css({ 'display': 'none' })
     }, [])
-    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
     useEffect(() => {
-        hideHeader()
-        return () => showHeader()
-    },[])
+        props.headerExt.hideHeader()
+        return () => props.headerExt.showHeader()
+    }, [])
     return <div >
         <div className="App" style={{ background: 'none' }}>
             {!id && <div>Invitation is not valid</div>}
@@ -22,4 +23,4 @@ const InvitationPage = () => {
         </div>
     </div>
 }
-export default InvitationPage
+export default withHook(InvitationPage, 'headerExt')

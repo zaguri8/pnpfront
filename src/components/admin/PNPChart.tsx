@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
-import { useFirebase } from "../../context/Firebase";
-import SectionTitle from "../other/SectionTitle";
-import { dateStringFromDate, hyphenToMinus } from '../utilityComponents/functions'
-import { getCurrentDate } from '../../utilities'
-import { InnerPageHolder } from '../utilityComponents/Holders'
-import { useLocation } from 'react-router'
+import { hyphenToMinus } from '../utilityComponents/functions'
 import { Unsubscribe } from 'firebase/database'
 import { PNPPage } from '../../cookies/types'
-export default function PNPChart(props: { page: PNPPage, date: string }) {
-    const { firebase } = useFirebase()
+import { Hooks } from "../generics/types";
+import { withHook } from "../generics/withHooks";
+type PNPChartProps = { page: PNPPage, date: string }
+function PNPChart(props: PNPChartProps & Hooks) {
     const [chartData, setChartData] = useState<any[]>()
     useEffect(() => {
         let unsub: Unsubscribe | null = null
         if (props.page) {
-            unsub = firebase.realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
+            unsub = props.firebase.firebase.realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
                 setChartData([
                     ["נכנסו ונרשמו", "נכנסו וייצאו"],
                     ["נכנסו ונרשמו", d.leaveWithAttendance],
@@ -37,3 +34,4 @@ export default function PNPChart(props: { page: PNPPage, date: string }) {
     >
     </Chart> : null
 }
+export default withHook<PNPChartProps>(PNPChart, 'firebase')

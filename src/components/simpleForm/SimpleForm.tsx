@@ -18,11 +18,19 @@ class SimpleForm extends React.Component<SimpleFormProps, SimpleFormState> {
         if (!this.props.coupledFields) return null
         return <React.Fragment>
             <Stack
+                style={this.props.layout === 'grid' ? {
+                    display: 'grid',
+                    rowGap: this.props.rowGap ? `${this.props.rowGap}px` : '0px',
+                    columnGap: this.props.colGap ? `${this.props.colGap}px` : '0px',
+                    gridTemplateColumns: `repeat(${this.props.numCols},1fr)`,
+                    gridTemplateRows: `repeat(${this.props.numRows},1fr)`,
+                    placeItems: 'center'
+                } : {}}
                 direction={'row'}
                 alignItems={'center'}
                 justifyContent={'center'}
                 spacing={1}>
-                <Spacer offset={1} />
+                {this.props.layout.includes('linear') && <Spacer offset={1} />}
                 {this.props.coupledFields.map((fields, index) =>
                     <this.StandAloneFieldElements
                         key={index + "coupled_field"}
@@ -34,18 +42,20 @@ class SimpleForm extends React.Component<SimpleFormProps, SimpleFormState> {
 
     private StandAloneFieldElements(props: { fields: SimpleFormField[], inStack: boolean }) {
         const El = props.fields.map(field => {
-
             return <Stack
                 key={field.name + field.placeHolder}
                 direction={'column'}
                 alignItems={'center'}
-                style={{ width: '100%' }}
+                rowGap={0.5}
                 justifyContent={'center'}>
                 <label style={this.styles.formLabelStyle}>{field.label}</label>
                 <input
                     id={field.name + "_input"}
                     ref={field.ref}
-                    style={this.styles.inputStyle}
+                    style={{
+                        ...(field.style ?? this.styles.inputStyle),
+                        maxWidth: '400px'
+                    }}
                     type={field.type}
                     required={field.mandatory}
                     defaultValue={field.initialValue}
@@ -76,8 +86,23 @@ class SimpleForm extends React.Component<SimpleFormProps, SimpleFormState> {
                 }
             this.props.onSubmit(map)
         }} dir={'rtl'}>
-            <this.StandAloneFieldElements fields={this.props.standAloneFields} inStack={true} />
-            <this.CoupleFieldElements />
+
+            {
+                (() => {
+                    if (this.props.standAlonePrioritize) {
+                        return (<React.Fragment>
+                            <this.StandAloneFieldElements fields={this.props.standAloneFields} inStack={true} />
+                            <this.CoupleFieldElements />
+                        </React.Fragment>)
+                    } else {
+                        return (<React.Fragment>
+                            <this.CoupleFieldElements />
+                            <this.StandAloneFieldElements fields={this.props.standAloneFields} inStack={true} />
+                        </React.Fragment>)
+                    }
+                })()
+            }
+
             <Button style={this.styles.submitStyle} type={'submit'}>{'שליחה'}</Button>
         </form>
     }

@@ -4,8 +4,10 @@ import { StyledFirebaseAuth } from "react-firebaseui"
 import { useFirebase } from "../../context/Firebase"
 import { CSSProperties } from "react"
 import { style } from "@mui/system"
-export default function Auth(props: { title: string, redirect?: string, style?: CSSProperties }) {
-    const { firebase, appUser, user } = useFirebase()
+import { Hooks } from "../generics/types"
+import { withHook } from "../generics/withHooks"
+type AuthProps = { title: string, redirect?: string, style?: CSSProperties }
+function Auth(props: AuthProps & Hooks) {
     const location = useLocation()
     return (<div style={{
         width: '100%',
@@ -15,5 +17,7 @@ export default function Auth(props: { title: string, redirect?: string, style?: 
         ...style
     }}>{props.title}</p>
         <StyledFirebaseAuth uiConfig={uiConfig("#" + props.redirect ? props.redirect : location.pathname)}
-            firebaseAuth={firebase.auth} /></div>)
+            firebaseAuth={props.firebase.firebase.auth} /></div>)
 }
+
+export default withHook<AuthProps>(Auth, 'firebase')

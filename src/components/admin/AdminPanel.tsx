@@ -1,17 +1,13 @@
-import { Button, Stack, TextField } from "@mui/material"
-import { makeStyles } from "@mui/styles"
+import { Button, Stack } from "@mui/material"
 import React, { useEffect, useState } from "react"
-import { useNavigate } from "react-router"
 import { v4 } from "uuid"
-import { useFirebase } from "../../context/Firebase"
-import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
-import { useLoading } from "../../context/Loading"
 import { PNPPage } from "../../cookies/types"
-import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, PRIMARY_BLACK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
-import { flex, textFieldStyle } from "../../settings/styles"
+import { BLACK_ELEGANT,PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
 import { getEventTypeFromString } from "../../store/external/converters"
 import { PNPEvent, UserEnterStatistics } from "../../store/external/types"
 import { getCurrentDate } from "../../utilities"
+import { Hooks } from "../generics/types"
+import { CommonHooks, withHookGroup } from "../generics/withHooks"
 import SectionTitle from "../other/SectionTitle"
 import { dateStringFromDate, hyphenToMinus, reverseDate, unReverseDate } from "../utilityComponents/functions"
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
@@ -19,26 +15,18 @@ import Spacer from "../utilityComponents/Spacer"
 import PNPChart from "./PNPChart"
 
 
-export default function AdminPanel() {
+function AdminPanel(props: Hooks) {
     const [publicEvents, setPublicEvents] = useState<{ [type: string]: { waiting: PNPEvent[], events: PNPEvent[] } }>()
-    const [waitingEvents, setWaitingEvents] = useState<PNPEvent[]>()
     const [userStatistics, setUserStatistics] = useState<UserEnterStatistics>()
-    const { firebase } = useFirebase()
-    const nav = useNavigate()
-    const { doLoad, cancelLoad } = useLoading()
-    // const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE))
-    // const classes = useStyles()
-
     const [selectedDate, setSelectedDate] = useState<string>(dateStringFromDate(getCurrentDate()))
-    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     useEffect(() => {
-        hideHeader()
-        return () => showHeader()
+        props.headerExt.hideHeader()
+        return () => props.headerExt.showHeader()
     }, [])
     useEffect(() => {
-        doLoad()
-        const unsubStats = firebase.realTime.addListenerToUserStatistics(setUserStatistics)
-        const unsub = firebase.realTime.addListenerToPublicEvents((publicEv) => {
+        props.loading.doLoad()
+        const unsubStats = props.firebase.firebase.realTime.addListenerToUserStatistics(setUserStatistics)
+        const unsub = props.firebase.firebase.realTime.addListenerToPublicEvents((publicEv) => {
 
             const newHash: { [type: string]: { waiting: PNPEvent[], events: PNPEvent[] } } = {}
 
@@ -60,7 +48,7 @@ export default function AdminPanel() {
                 }
             })
             setPublicEvents(newHash)
-            cancelLoad()
+            props.loading.cancelLoad()
         }, true)
 
         return () => {
@@ -72,13 +60,13 @@ export default function AdminPanel() {
 
 
 
-    function AdminPanelNavButton(props: { page: string, path: string }) {
+    function AdminPanelNavButton(properties: { page: string, path: string }) {
         return <React.Fragment>
-            <SectionTitle title={props.page} style={{ background: 'none' }} />
+            <SectionTitle title={properties.page} style={{ background: 'none' }} />
             <InnerPageHolder style={{ background: BLACK_ELEGANT, borderRadius: '8px' }}>
                 <Button
                     style={{ border: '.1px solid white', fontWeight: 'bold', background: BLACK_ELEGANT, minWidth: '110px' }}
-                    onClick={() => { nav(props.path) }}
+                    onClick={() => { props.nav(properties.path) }}
                     sx={{
                         ... {
                             width: 'fit-content',
@@ -91,7 +79,7 @@ export default function AdminPanel() {
                             background: '#007AFF'
                         }
                     }}>
-                    {`עבור ל${props.page}`}
+                    {`עבור ל${properties.page}`}
                 </Button>
             </InnerPageHolder>
         </React.Fragment>
@@ -150,7 +138,7 @@ export default function AdminPanel() {
                                 <th style={{ width: '50%' }}>  <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '4px', color: SECONDARY_WHITE }}>{getEventTypeFromString(entry[0])}</div></th>
                                 <th style={{ width: '50%' }}><Button
                                     style={{ backgroundImage: BLACK_ELEGANT, border: '.1px solid white', minWidth: '110px' }}
-                                    onClick={() => { nav('/adminpanel/specificevent', { state: { waitingEvents: entry[1].waiting, events: entry[1].events } }) }}
+                                    onClick={() => { props.nav('/adminpanel/specificevent', { state: { waitingEvents: entry[1].waiting, events: entry[1].events } }) }}
                                     sx={{
                                         ... {
                                             width: 'fit-content',
@@ -173,6 +161,10 @@ export default function AdminPanel() {
         </InnerPageHolder>
         {function invitationManagerSection() {
             return <AdminPanelNavButton page='ניהול הזמנות' path='/adminpanel/invitations' />
+        }()}
+
+        {function rideRequests() {
+            return <AdminPanelNavButton page='הזמנות נסיעה' path='/adminpanel/rideRequests' />
         }()}
 
         {function userManagerSection() {
@@ -223,3 +215,4 @@ export default function AdminPanel() {
     </PageHolder >
 
 }
+export default withHookGroup(AdminPanel, CommonHooks)

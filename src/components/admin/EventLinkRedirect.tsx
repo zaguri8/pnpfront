@@ -7,24 +7,25 @@ import { PRIMARY_PINK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/c
 import { FirebaseTools } from "../../store/external";
 import { PNPEvent } from "../../store/external/types";
 import $ from 'jquery'
-import { useLoading } from "../../context/Loading";
-export default function EventLinkRedirect(props: {
+import { withHook } from "../generics/withHooks";
+import { Hooks } from "../generics/types";
+type EventLinkRedirectProps = {
     event: PNPEvent,
     linkRedirect: string | undefined | null,
     firebase: FirebaseTools
-}) {
+}
+function EventLinkRedirect(props: EventLinkRedirectProps & Hooks) {
     const useStyles = makeStyles(textFieldStyle(SECONDARY_WHITE, { border: `1px solid ${PRIMARY_PINK}`, margin: '0px', height: '40px', padding: '0px', direction: 'rtl' }))
     const classes = useStyles()
 
 
-    const { doLoad, cancelLoad } = useLoading()
     const linkCode = async () => {
         let path = $('#link_code_admin').val() as string
         if (!path) {
             alert('יש להכניס קוד זימון תקין')
             return
         }
-        doLoad()
+        props.loading.doLoad()
         props.firebase.realTime.setLinkRedirect(path,
             `https://www.pick-n-pull.co.il/#/event/${props.event.eventId}`,
             (link) => {
@@ -32,7 +33,7 @@ export default function EventLinkRedirect(props: {
                     alert('אירעתה שגיאה ביצירת הלינק, אנא פנא אל המתכנת')
                     return
                 }
-                cancelLoad()
+                props.loading.cancelLoad()
                 alert(`לינק נוסף בהצלחה, ${link}`)
             }
         )
@@ -47,7 +48,7 @@ export default function EventLinkRedirect(props: {
 
     const labelStyle = {
         color: 'white',
-        fontSize:'12px'
+        fontSize: '12px'
     } as CSSProperties
     return <Stack spacing={1}>
         <TextField id='link_code_admin' classes={classes} placeholder={"הכנס קוד זימון"} />
@@ -61,3 +62,4 @@ export default function EventLinkRedirect(props: {
     </Stack>
 
 }
+export default withHook<EventLinkRedirectProps>(EventLinkRedirect, 'loading')

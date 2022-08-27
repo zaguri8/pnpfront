@@ -6,20 +6,22 @@ export const FormStyles: Styles = {
     formLabelStyle: {
         color: 'white',
         padding: '4px',
+        fontWeight:'bold',
+        margin:'4px',
+        marginTop:'8px',
         fontSize: '14px'
     } as CSSProperties,
     inputStyle: {
         padding: '4px',
         border: 'none',
-        width:'100%',
         background: 'white',
         borderRadius: '8px'
     } as CSSProperties,
     formStyle: {
-        maxWidth: '300px',
-        width: 'max-content',
         padding: '16px',
         display: 'flex',
+        width:'80%',
+        margin:'8px',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
@@ -30,6 +32,7 @@ export const FormStyles: Styles = {
     submitStyle: {
         ...submitButton(4),
         textTransform: 'none',
+        maxWidth:'250px',
         maxHeight: '30px',
     } as CSSProperties
 }

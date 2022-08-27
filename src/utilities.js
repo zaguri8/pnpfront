@@ -57,3 +57,4 @@ export function getValidImageUrl(event) {
         else return eventImageURL
     }
 }
+

@@ -1,10 +1,13 @@
+import { Auth, User } from "firebase/auth"
 import { NavigateFunction } from "react-router"
 import { ICookieContext } from "../../context/CookieContext"
 import { IFirebaseContext } from "../../context/Firebase"
 import { IGoogleContext } from "../../context/GoogleMaps"
 import { IBackgroundExtension, IDimExtension, IHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { ILanguageContext } from "../../context/Language"
-import { ILoadingContext } from "../../context/Loading"
+import { PNPPage } from "../../cookies/types"
+import { Realtime } from "../../store/external"
+import { PNPRideConfirmation, PNPUser } from "../../store/external/types"
 
 
 export type Hook = IFirebaseContext | ILanguageContext | {
@@ -26,7 +29,7 @@ export type Hook = IFirebaseContext | ILanguageContext | {
     closeDialog: () => void;
 } | IBackgroundExtension | NavigateFunction | IHeaderBackgroundExtension | IDimExtension | IGoogleContext | ICookieContext
 export type Hooks = {
-    firebase: IFirebaseContext,
+    firebase: { firebase: { realTime: Realtime, auth: Auth, appUser: PNPUser | undefined | null, user: User | undefined | null } },
     loading: {
         isLoading: boolean | undefined;
         doLoad: () => void;
@@ -51,5 +54,11 @@ export type Hooks = {
     headerExt: IHeaderBackgroundExtension,
     dimExt: IDimExtension,
     google: IGoogleContext
-    cookies: ICookieContext
+    cookies: ICookieContext & {
+        getPageLastTimeCache: (page: PNPPage) => Date | null,
+        isCacheValid: (page: PNPPage) => boolean,
+        cacheDone: (page: PNPPage) => void,
+        saveInvitationConfirmation: (invConfirmation: PNPRideConfirmation) => Promise<boolean>
+        getInvitationConfirmation: (eventId: string) => Promise<PNPRideConfirmation | undefined>
+    }
 }

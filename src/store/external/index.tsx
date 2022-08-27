@@ -3,6 +3,7 @@ import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideCon
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
+import { RideStatistics } from '../../components/admin/EventStatistics'
 import { DocumentData } from 'firebase/firestore'
 import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
 import { child, Database, DatabaseReference, DataSnapshot, get, onValue, push, query, ref, remove, set, Unsubscribe, update } from 'firebase/database'
@@ -190,14 +191,13 @@ export class Realtime {
                     return 1;
                 return 0;
             })
-
             consume(transactions)
         }, onError)
     }
 
-    getAllTransactionsForEvent(eid: string, consume: (transactions: { rideStartPoint: string, uid: string, extraPeople: { fullName: string, phoneNumber: string }[], amount: string }[]) => void, onError: (e: Error) => void) {
+    getAllTransactionsForEvent(eid: string, consume: (transactions: RideStatistics[]) => void, onError: (e: Error) => void) {
         return onValue(this.transactions, (snap) => {
-            const allTransactions: { rideStartPoint: string, extraPeople: { fullName: string, phoneNumber: string }[], uid: string, amount: string }[] = []
+            const allTransactions: RideStatistics[] = []
             let nextRef: DataSnapshot | null = null
             snap.forEach(user => {
                 let i = 0;
@@ -207,12 +207,20 @@ export class Realtime {
                         allTransactions.push({
                             rideStartPoint: nextRef!.child('startPoint').val(),
                             uid: user.key! + `_nm_${i}`,
+                            customerId: transaction.child('customer_uid').val(),
+                            customerPhone: nextRef!.child('customerPhone').val(),
+                            customerEmail: nextRef!.child('customerEmail').val(),
+                            customerName: nextRef!.child('customerName').val(),
+                            date: transaction!.child('date').val(),
                             extraPeople: nextRef!.child('extraPeople').val(),
                             amount: nextRef!.child('amount').val()
                         })
                         i++;
                     }
                 })
+            })
+            allTransactions.sort((a, b) => {
+                return new Date(b.date).getTime() - new Date(a.date).getTime()
             })
             consume(allTransactions)
         }, onError)
@@ -568,6 +576,31 @@ export class Realtime {
                 .catch((e) => { this.createError('addPrivateRideExplicit', e) })
         }
     }
+
+    /**
+* addPrivateRide
+* @param ride a private ride to be added
+* @returns a new reference or error reference
+*/
+    getAllPrivateRideExplicit = (consume: (rides: PNPExplicitPrivateRide[]) => void,
+        error: (error: any) => void) => {
+        return onValue(child(child(this.rides, 'private'), 'ridesForPeople'), (snap) => {
+            let ret: PNPExplicitPrivateRide[] = []
+            const currentDate = getCurrentDate()
+            snap.forEach(cusSnap => {
+                cusSnap.forEach(rideSnap => {
+                    const date = rideSnap.child('date').val().split('/')
+                    if (date[2] >= currentDate.getFullYear() && date[1] >= currentDate.getMonth())
+                        if (date[0] >= currentDate.getDate())
+                            ret.push(rideSnap.val())
+                        else remove(rideSnap.ref)
+                    else remove(rideSnap.ref)
+                })
+            })
+            consume(ret)
+        }, error)
+    }
+
 
 
 
@@ -1216,19 +1249,20 @@ export class Realtime {
      */
     addUser = async (user: PNPUser): Promise<object | undefined> => {
         if (this.auth.currentUser === null) return
-        createNewCustomer((type: string, e: any) => this.createErrorCustomer(type, e), user).then(async (customerUid: string) => {
-            user.customerId = customerUid
-            return await set(child(this.users, this.auth.currentUser!.uid), user)
-                .catch((e) => {
-                    alert("אירעתה בעיית חיבור אינטרנט בעת הרשמה, אנא נסה/י להרשם מחדש")
-                    this.auth.currentUser?.delete();
-                    this.createError('addUser', e)
-                })
-        }).catch(e => {
-            alert("אירעתה בעיית חיבור אינטרנט בעת הרשמה, אנא נסה/י להרשם מחדש")
-            this.auth.currentUser?.delete();
-            this.createError('addUser', e)
-        })
+        createNewCustomer((type: string, e: any) => this.createErrorCustomer(type, e), user)
+            .then(async (customerUid: any) => {
+                user.customerId = customerUid
+                return await set(child(this.users, this.auth.currentUser!.uid), user)
+                    .catch((e) => {
+                        alert("אירעתה בעיית חיבור אינטרנט בעת הרשמה, אנא נסה/י להרשם מחדש")
+                        this.auth.currentUser?.delete();
+                        this.createError('addUser', e)
+                    })
+            }).catch(e => {
+                alert("אירעתה בעיית חיבור אינטרנט בעת הרשמה, אנא נסה/י להרשם מחדש")
+                this.auth.currentUser?.delete();
+                this.createError('addUser', e)
+            })
 
     }
     /**

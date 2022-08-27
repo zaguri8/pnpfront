@@ -22,7 +22,7 @@ const storage = getStorage(app)
 
 export interface IFirebaseContext {
   user: User | undefined | null;
-  appUser: PNPUser | null;
+  appUser: PNPUser | null | undefined;
   error: Error | null;
   
   setUser: (user: User | null | undefined) => void;
@@ -33,7 +33,7 @@ export const FirebaseContextProvider = (props: object) => {
 
 
   const [user, setUser] = useState<User | null | undefined>()
-  const [appUser, setAppUser] = useState<PNPUser | null>(null)
+  const [appUser, setAppUser] = useState<PNPUser | null | undefined>(undefined)
   const [error, setError] = useState<Error | null>(null)
   const { cancelLoad, doLoad } = useLoading()
   useEffect(() => {
@@ -51,7 +51,6 @@ export const FirebaseContextProvider = (props: object) => {
         setUser(null)
         cancelLoad()
       }
-
       return () => { unsub as Unsubscribe && (unsub as Unsubscribe)() }
     }, setError)
     return () => unsubscribe()

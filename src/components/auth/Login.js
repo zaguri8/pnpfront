@@ -15,6 +15,7 @@ import { submitButton, textFieldStyle } from "../../settings/styles"
 import { useLoading } from "../../context/Loading"
 import { useEffect, useState } from "react"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
+import { PageHolder } from "../utilityComponents/Holders"
 export default function Login() {
 
     const nav = useNavigate()
@@ -49,19 +50,13 @@ export default function Login() {
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
 
     useEffect(() => {
+        console.log(location.state)
+
         hideHeader()
         return () => showHeader()
     }, [])
 
-    return (<div style={{
-        width: '100%',
-        marginBottom: '120px',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        alignItems: 'center'
-    }}>
+    return (<PageHolder>
         <div style={{
             width: '50%',
             maxWidth: '500px',
@@ -147,5 +142,5 @@ export default function Login() {
                 <Link style={{ fontSize: '12px', textDecoration: 'underline', color: SECONDARY_WHITE }} to={'/forgotPass'}>{FORGOT_PASSWORD(lang)}</Link>
             </div>
         </div>
-    </div >)
+    </PageHolder>)
 }

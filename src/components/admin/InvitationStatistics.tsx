@@ -1,6 +1,5 @@
 import React, { CSSProperties, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
-import { useLoading } from "../../context/Loading";
+import { useLocation, useParams } from "react-router";
 import { BLACK_ELEGANT, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_PINK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { PNPPrivateEvent, PNPPublicRide, PNPRideConfirmation } from "../../store/external/types";
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,18 +9,18 @@ import AddUpdateEventInvitation from "./AddUpdateEventInvitation";
 import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, List, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material";
 import SectionTitle from "../other/SectionTitle";
 import AddUpdatePrivateEventRide from "./AddUpdatePrivateEventRide";
-import { useFirebase } from "../../context/Firebase";
 import { Unsubscribe } from "firebase/database";
 import './InvitationStatistics.css'
 import { v4 } from "uuid";
 import $ from 'jquery'
 
-import { useLanguage } from "../../context/Language";
 import { makeStyles } from "@mui/styles";
 import { textFieldStyle } from "../../settings/styles";
 import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
 import { confirmationsPartition, default_no_arrival, getTotalAmountOfConfirmations, getPassengersAndGuests, getInvitationRowGuests } from "./invitationsHelper";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
+import { Hooks } from "../generics/types";
+import { CommonHooks, withHookGroup } from "../generics/withHooks";
 
 export const buttonStyle = {
     textDecoration: 'none',
@@ -36,45 +35,36 @@ export const buttonStyle = {
 }
 export const checkBoxStyle = { padding: '4px', background: RED_ROYAL, margin: '8px', color: SECONDARY_WHITE }
 
-export default function InvitationStatistics() {
+function InvitationStatistics(props: Hooks) {
     const location = useLocation()
     const { eventId } = useParams()
     const [accordionHash, setAccordionHash] = useState<{ [id: string]: boolean }>({})
-    const { openDialog, openDialogWithTitle, closeDialog } = useLoading()
-    const { firebase, user, appUser } = useFirebase()
     const [confirmations, setConfirmations] = useState<{ [dir: string]: PNPRideConfirmation[] } | undefined>()
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
-    const nav = useNavigate()
-    const [oldPrivateEvent, setOldPrivateEvent] = useState<PNPPrivateEvent | undefined>(location.state as PNPPrivateEvent ? location.state as PNPPrivateEvent : undefined)
     const [privateEvent, setPrivateEvent] = useState<PNPPrivateEvent | undefined>(location.state as PNPPrivateEvent ? location.state as PNPPrivateEvent : undefined)
     const [hasChanges, setHasChanges] = useState<{ [id: string]: boolean }>({})
-    const { lang } = useLanguage()
-    const { doLoad, cancelLoad } = useLoading()
     const useStyles = makeStyles(() => textFieldStyle())
     const classes = useStyles()
 
-    const { hideHeader, showHeader } = useHeaderBackgroundExtension()
-
-
     useEffect(() => {
-        hideHeader()
-        return () => showHeader()
+        props.headerExt.hideHeader()
+        return () => props.headerExt.showHeader()
     }, [])
     const updateEvent = () => {
         if (privateEvent)
-            firebase.realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
+            props.firebase.firebase.realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
     }
 
     const deleteEvent = () => {
         if (privateEvent) {
-            closeDialog()
-            doLoad()
-            firebase.realTime.removePrivateEvent(privateEvent.eventId)
+            props.loading.closeDialog()
+            props.loading.doLoad()
+            props.firebase.firebase.realTime.removePrivateEvent(privateEvent.eventId)
                 .then(() => {
-                    cancelLoad()
+                    props.loading.cancelLoad()
                     alert('אירוע נמחק בהצלחה !')
                 }).catch(() => {
-                    cancelLoad()
+                    props.loading.cancelLoad()
                     alert('אירעתה שגיאה בעת מחיקת האירוע, אנא פנה למתכנת האתר')
                 })
         }
@@ -83,7 +73,7 @@ export default function InvitationStatistics() {
     const openDeleteDialog = () => {
         const divStyle = { padding: '8px' } as CSSProperties
 
-        openDialog({
+        props.loading.openDialog({
             content: <Stack style={divStyle} spacing={1}>
                 <span className="spanStyle">
                     {`האם את/ה בטוח/ה שברצונך למחוק את ההזמנה לאירוע ${privateEvent?.eventTitle} ?`}
@@ -107,7 +97,7 @@ export default function InvitationStatistics() {
         let field = $('#email_admin_update_field')
         let val = field.val()
         if (!(val as string)) {
-            openDialog({
+            props.loading.openDialog({
                 content: <div
                     style={{ padding: '8px' }}>
                     <label
@@ -120,28 +110,28 @@ export default function InvitationStatistics() {
         }
 
         val = val as string
-        doLoad()
-        firebase.realTime.getUserIdByEmail(val, (userId: string) => {
+        props.loading.doLoad()
+        props.firebase.firebase.realTime.getUserIdByEmail(val, (userId: string) => {
 
-            firebase.realTime.makeUserResponsible(
+            props.firebase.firebase.realTime.makeUserResponsible(
                 userId,
                 privateEvent
             ).then(() => {
-                cancelLoad()
+                props.loading.cancelLoad()
                 dialog(
                     "גישות דף הניהול שונו בהצלחה, ונתונות כעת בידי " + val
                 )
             }).catch(() => {
-                cancelLoad()
+                props.loading.cancelLoad()
             })
         }, () => {
-            cancelLoad()
+            props.loading.cancelLoad()
             //error
             dialog('לא נמצא משתמש עם האימייל ' + val)
         })
     }
     function dialog(text: string) {
-        openDialog({
+        props.loading.openDialog({
             content: <div
                 style={{ padding: '8px' }}>
                 <label
@@ -158,8 +148,8 @@ export default function InvitationStatistics() {
         let confirmationPointer = confirmation
         async function update(pointer: PNPRideConfirmation) {
             if (!confirmations) return;
-            doLoad()
-            const updated = await firebase.realTime.updateConfirmation(
+            props.loading.doLoad()
+            const updated = await props.firebase.firebase.realTime.updateConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName,
                 pointer
@@ -178,13 +168,13 @@ export default function InvitationStatistics() {
             })
             setConfirmations(output)
             dialog("אישור עודכן בהצלחה")
-            cancelLoad()
+            props.loading.cancelLoad()
         }
 
         async function deleteConfirmation() {
             if (!confirmations) return;
-            doLoad()
-            const deleted = await firebase.realTime.deleteConfirmation(
+            props.loading.doLoad()
+            const deleted = await props.firebase.firebase.realTime.deleteConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName)
             if (!deleted || typeof (deleted) === 'function') {
@@ -201,16 +191,16 @@ export default function InvitationStatistics() {
             })
             setConfirmations(output)
             dialog("אישור נמחק בהצלחה")
-            cancelLoad()
+            props.loading.cancelLoad()
         }
 
-        openDialog({
+        props.loading.openDialog({
             content: <Stack
                 style={{ padding: '16px' }}
                 alignItems={'center'}
                 justifyContent={'center'}
                 spacing={1}>
-                <label style={{ color: SECONDARY_WHITE }}>{lang === 'heb' ? 'כיוון נסיעה' : 'Ride direction'}</label>
+                <label style={{ color: SECONDARY_WHITE }}>{props.language.lang === 'heb' ? 'כיוון נסיעה' : 'Ride direction'}</label>
                 <select
 
                     onChange={(e) => {
@@ -218,13 +208,13 @@ export default function InvitationStatistics() {
                             confirmationPointer.directionType = e.target.value as string
                     }}>
                     <option value={'1'}>
-                        {lang == 'heb' ? 'הלוך' : 'first way only'}
+                        {props.language.lang == 'heb' ? 'הלוך' : 'first way only'}
                     </option>
                     <option value={'2'} >
-                        {lang == 'heb' ? 'חזור' : 'back way only'}
+                        {props.language.lang == 'heb' ? 'חזור' : 'back way only'}
                     </option>
                     <option value={'3'}>
-                        {lang == 'heb' ? 'הלוך-חזור' : 'both ways'}
+                        {props.language.lang == 'heb' ? 'הלוך-חזור' : 'both ways'}
                     </option>
                 </select>
                 <br />
@@ -252,7 +242,7 @@ export default function InvitationStatistics() {
         let unsub2: Unsubscribe | undefined
         let unsub3: Unsubscribe | undefined
         if (privateEvent) {
-            unsub = firebase.realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
+            unsub = props.firebase.firebase.realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
                 if (confs) {
                     setConfirmations(confirmationsPartition(confs))
                     let hashAccordion: { [id: string]: boolean } = {}
@@ -261,24 +251,24 @@ export default function InvitationStatistics() {
                     setAccordionHash(hashAccordion)
                 }
             })
-            unsub2 = firebase.realTime.getPrivateEventRidesById(privateEvent.eventId, setRides)
+            unsub2 = props.firebase.firebase.realTime.getPrivateEventRidesById(privateEvent.eventId, setRides)
         } else if (eventId) {
-            unsub = firebase.realTime.getPrivateEventById(eventId, (e) => {
+            unsub = props.firebase.firebase.realTime.getPrivateEventById(eventId, (e) => {
 
-                if ((!appUser || !appUser.admin) && e.eventProducerId !== user?.uid) {
+                if ((!props.firebase.firebase.appUser || !props.firebase.firebase.appUser.admin) && e.eventProducerId !== props.firebase.firebase.user?.uid) {
                     setTimeout(() => {
-                        if ((!appUser || !appUser.admin) && e.eventProducerId !== user?.uid) {
-                            openDialog({
+                        if ((!props.firebase.firebase.appUser || !props.firebase.firebase.appUser.admin) && e.eventProducerId !== props.firebase.firebase.user?.uid) {
+                            props.loading.openDialog({
                                 content: <span style={{ color: SECONDARY_WHITE, padding: '8px' }}>
                                     {'אין לך הרשאות לעמוד זה'}
                                 </span>
                             })
-                            nav('/')
+                            props.nav('/')
                         }
                     }, 250)
                     return
                 }
-                unsub2 = firebase.realTime.getAllRideConfirmationByEventId(eventId, (confs) => {
+                unsub2 = props.firebase.firebase.realTime.getAllRideConfirmationByEventId(eventId, (confs) => {
                     if (confs) {
                         setConfirmations(confirmationsPartition(confs))
                         let hashAccordion: { [id: string]: boolean } = {}
@@ -287,7 +277,7 @@ export default function InvitationStatistics() {
                         setAccordionHash(hashAccordion)
                     }
                 })
-                unsub3 = firebase.realTime.getPrivateEventRidesById(eventId, setRides)
+                unsub3 = props.firebase.firebase.realTime.getPrivateEventRidesById(eventId, setRides)
                 setPrivateEvent(e)
 
             })
@@ -311,7 +301,7 @@ export default function InvitationStatistics() {
         </React.Fragment> : null
 
     }
-    const PrivateRides = (props: { rides: PNPPublicRide[], event: PNPPrivateEvent }) => {
+    const PrivateRides = (properties: { rides: PNPPublicRide[], event: PNPPrivateEvent }) => {
 
         return (<List style={{ width: '280px', marginLeft: 'auto', marginRight: 'auto' }}>
             <h1 style={{ color: SECONDARY_WHITE }}>{'פעולות אדמין'}</h1>
@@ -323,7 +313,7 @@ export default function InvitationStatistics() {
 
                         onClick={() => {
 
-                            privateEvent && openDialog({
+                            privateEvent && props.loading.openDialog({
                                 content: <div style={{ padding: '16px' }}>
                                     <h3 style={{
                                         fontWeight: '12px',
@@ -343,7 +333,7 @@ export default function InvitationStatistics() {
 
 
                 {function renderRidesTable() {
-                    if (props.rides.length > 0)
+                    if (properties.rides.length > 0)
                         return (<table dir={'rtl'} style={{ width: '100%' }}  >
 
                             {function tableHead() {
@@ -361,7 +351,7 @@ export default function InvitationStatistics() {
 
                             {function tableBody() {
                                 return <tbody >
-                                    {props.rides.map((ride, index) =>
+                                    {properties.rides.map((ride, index) =>
                                         <tr key={v4()} style={{ background: PRIMARY_BLACK }}>
                                             <th style={{ width: '50%', padding: '8px' }}>
                                                 <div style={{ fontSize: '12px', fontWeight: 'bold', color: SECONDARY_WHITE }}>{'נקודת יציאה'}</div>
@@ -377,13 +367,13 @@ export default function InvitationStatistics() {
                                                 {function editRideButton() {
                                                     return <Button
                                                         onClick={() => {
-                                                            openDialogWithTitle(<div style={{ background: 'none' }}><h3 style={
+                                                            props.loading.openDialogWithTitle(<div style={{ background: 'none' }}><h3 style={
                                                                 {
                                                                     fontWeight: '12px',
                                                                     color: PRIMARY_BLACK,
                                                                     textAlign: 'center'
                                                                 }
-                                                            }>{`עריכת הסעה לאירוע: ${props.event.eventTitle}`}</h3>
+                                                            }>{`עריכת הסעה לאירוע: ${properties.event.eventTitle}`}</h3>
                                                                 <h4 style={
                                                                     {
                                                                         fontWeight: '12px',
@@ -391,7 +381,7 @@ export default function InvitationStatistics() {
                                                                         textAlign: 'center'
                                                                     }
                                                                 }>{`נקודת יציאה : ${ride.rideStartingPoint}`}</h4></div>)
-                                                            openDialog({ content: <AddUpdatePrivateEventRide event={props.event} ride={ride} />, title: `עריכת הסעה לאירוע` })
+                                                            props.loading.openDialog({ content: <AddUpdatePrivateEventRide event={properties.event} ride={ride} />, title: `עריכת הסעה לאירוע` })
                                                         }}
                                                         style={{ color: SECONDARY_WHITE, border: '.1px solid black', background: DARK_BLACK }}>
                                                         {`ערוך`}
@@ -401,13 +391,13 @@ export default function InvitationStatistics() {
                                                 {function deleteRideButton() {
                                                     return (<Button key={v4()}
                                                         onClick={() => {
-                                                            openDialogWithTitle(<div><h3 style={
+                                                            props.loading.openDialogWithTitle(<div><h3 style={
                                                                 {
                                                                     fontWeight: '12px',
                                                                     textAlign: 'center',
                                                                     padding: '8px',
                                                                 }
-                                                            }>{`מחיקת הסעה לאירוע ${props.event.eventTitle}`}</h3>
+                                                            }>{`מחיקת הסעה לאירוע ${properties.event.eventTitle}`}</h3>
                                                                 <h4 style={
                                                                     {
                                                                         fontWeight: '12px',
@@ -415,9 +405,9 @@ export default function InvitationStatistics() {
                                                                         padding: '8px',
                                                                     }
                                                                 }>{`נקודת יציאה ${ride.rideStartingPoint}`}</h4></div>)
-                                                            openDialog({
+                                                            props.loading.openDialog({
                                                                 content: <div style={{ padding: '4px' }}><button
-                                                                    onClick={() => { firebase.realTime.removePrivateRide(props.event.eventId, ride.rideId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
+                                                                    onClick={() => { props.firebase.firebase.realTime.removePrivateRide(properties.event.eventId, ride.rideId).then(() => { props.loading.closeDialog() }).catch(() => { props.loading.closeDialog() }) }}
                                                                     style={{
                                                                         padding: '4px',
                                                                         margin: '16px',
@@ -454,7 +444,7 @@ export default function InvitationStatistics() {
             if (privateEvent)
                 return <React.Fragment>
                     <SectionTitle style={{ fontWeight: 'bold', fontSize: '24px', marginTop: '32px', paddingBottom: '4px', fontFamily: 'fantasy' }} title={privateEvent.eventTitle} />
-                    <span style={{ marginTop: '-16px', fontFamily: 'Open Sans Hebrew', color: SECONDARY_WHITE, fontWeight: '200', fontSize: '20px' }}>{lang === 'heb' ? 'עמוד ניהול נסיעות' : 'Ride Supervision Page'}</span>
+                    <span style={{ marginTop: '-16px', fontFamily: 'Open Sans Hebrew', color: SECONDARY_WHITE, fontWeight: '200', fontSize: '20px' }}>{props.language.lang === 'heb' ? 'עמוד ניהול נסיעות' : 'Ride Supervision Page'}</span>
                 </React.Fragment>
             else return null
         }()}
@@ -464,17 +454,17 @@ export default function InvitationStatistics() {
 
                     <Stack spacing={2}>
 
-                        <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{lang === 'heb' ? 'קישור לדף הזמנה : ' : 'Link to invitation Page: '}</span>
-                            <a style={{ ...spanStyle, ...{ fontWeight: 'bold' } }} href={`https://www.pick-n-pull.co.il/#/invitation/${privateEvent.eventId}`}>{lang === 'heb' ? 'לחצ/י כאן' : 'Click here'}</a></div>
+                        <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{props.language.lang === 'heb' ? 'קישור לדף הזמנה : ' : 'Link to invitation Page: '}</span>
+                            <a style={{ ...spanStyle, ...{ fontWeight: 'bold' } }} href={`https://www.pick-n-pull.co.il/#/invitation/${privateEvent.eventId}`}>{props.language.lang === 'heb' ? 'לחצ/י כאן' : 'Click here'}</a></div>
 
-                        {appUser && appUser.admin && <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{lang === 'heb' ? 'קישור לדף ניהול : ' : 'Link to Managing Page: '}</span>
-                            <a style={{ ...spanStyle, ...{ fontWeight: 'bold' } }} href={`https://www.pick-n-pull.co.il/#/producerpanel/invitation/${privateEvent.eventId}`}>{lang === 'heb' ? 'לחצ/י כאן' : 'Click here'}</a></div>}
+                        {props.firebase.firebase.appUser && props.firebase.firebase.appUser.admin && <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{props.language.lang === 'heb' ? 'קישור לדף ניהול : ' : 'Link to Managing Page: '}</span>
+                            <a style={{ ...spanStyle, ...{ fontWeight: 'bold' } }} href={`https://www.pick-n-pull.co.il/#/producerpanel/invitation/${privateEvent.eventId}`}>{props.language.lang === 'heb' ? 'לחצ/י כאן' : 'Click here'}</a></div>}
                         <Button
                             onClick={() => {
-                                openDialog({ content: <AddUpdateEventInvitation event={privateEvent} /> })
+                                props.loading.openDialog({ content: <AddUpdateEventInvitation event={privateEvent} /> })
                             }}
                             style={{ ...buttonStyle, ...{ textTransform: 'none', background: 'linear-gradient(#282c34,black)', fontWeight: 'bold' } }}>
-                            {lang === 'heb' ? 'עריכת אירוע' : 'Edit Event'}
+                            {props.language.lang === 'heb' ? 'עריכת אירוע' : 'Edit Event'}
                             <EditIcon style={{ marginLeft: '4px', width: '20px', height: '20px' }} />
                         </Button>
 
@@ -518,12 +508,12 @@ export default function InvitationStatistics() {
 
                                                                 {entry[0] !== default_no_arrival &&
                                                                     <React.Fragment>
-                                                                        <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים הלוך: ' + passengers.to) : ('To event direction approvals: ' + passengers.to)}</p>
-                                                                        <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים חזור: ' + passengers.back) : ('Back from event direction approvals: ' + passengers.back)}</p>
-                                                                        <p style={paragraphStyle}>{lang === 'heb' ? ('אישורים הלוך-חזור: ' + passengers.twoWay) : ('Both directions approvals: ' + passengers.twoWay)}</p>
+                                                                        <p style={paragraphStyle}>{props.language.lang === 'heb' ? ('אישורים הלוך: ' + passengers.to) : ('To event direction approvals: ' + passengers.to)}</p>
+                                                                        <p style={paragraphStyle}>{props.language.lang === 'heb' ? ('אישורים חזור: ' + passengers.back) : ('Back from event direction approvals: ' + passengers.back)}</p>
+                                                                        <p style={paragraphStyle}>{props.language.lang === 'heb' ? ('אישורים הלוך-חזור: ' + passengers.twoWay) : ('Both directions approvals: ' + passengers.twoWay)}</p>
                                                                     </React.Fragment>}
 
-                                                                <p style={{ padding: '0px', margin: '0px', fontWeight: 'bold' }}>{lang === 'heb' ? ((entry[0] === default_no_arrival ? ('סה"כ : ' + (Math.max(passengers.total, guests)) + " אישורים") : ('סה"כ אישורי הגעה: ' + passengers.total))) : ('Total ride approvals: ' + passengers.total)}</p>
+                                                                <p style={{ padding: '0px', margin: '0px', fontWeight: 'bold' }}>{props.language.lang === 'heb' ? ((entry[0] === default_no_arrival ? ('סה"כ : ' + (Math.max(passengers.total, guests)) + " אישורים") : ('סה"כ אישורי הגעה: ' + passengers.total))) : ('Total ride approvals: ' + passengers.total)}</p>
 
                                                                 <KeyboardDoubleArrowDownIcon
                                                                     style={keyStyle}
@@ -748,3 +738,4 @@ export default function InvitationStatistics() {
 
     </PageHolder>
 }
+export default withHookGroup(InvitationStatistics, CommonHooks)

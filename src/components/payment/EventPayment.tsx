@@ -19,7 +19,7 @@ export default function EventPayment() {
     useEffect(() => {
         let returnedInfo = (location.state as any)
         let stt = (returnedInfo && returnedInfo.paymentInfo) ? returnedInfo.paymentInfo : (location.state as { ride: PNPPublicRide, event: PNPEvent })
-        if (stt && !paymentInfo) {
+        if (stt && !paymentInfo && stt.event) {
             setHeaderBackground(`url('${stt.event.eventMobileImageURL ?? stt.event.eventImageURL}')`)
             setPaymentInfo(stt)
         }

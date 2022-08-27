@@ -184,8 +184,7 @@ class PriceStatistics extends React.Component<Hooks, AlegPriceEval | { error: an
                     }}
                 />
                 {(() => {
-                    const outputEval = this.state as AlegPriceEval;
-
+                    const outputEval = this.state as AlegPriceEval
                     if (outputEval) {
                         return <Stack direction={'row'}
                             alignSelf={'center'}

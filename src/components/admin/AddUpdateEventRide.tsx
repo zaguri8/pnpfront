@@ -7,51 +7,17 @@ import React, { useState } from "react"
 
 import { Stack, TextField, Button, MenuItem, Checkbox, Select } from "@mui/material"
 import { makeStyles } from "@mui/styles"
-import { submitButton } from "../../settings/styles"
+import { submitButton, textFieldStyle } from "../../settings/styles"
 import { SECONDARY_WHITE, PRIMARY_BLACK, PRIMARY_PINK } from "../../settings/colors"
 import { SAME_SPOT } from "../../settings/strings"
 import { getDefaultPublicRide } from "../../store/external/helpers"
+import { Hooks } from "../generics/types"
+import { CommonHooks, withHookGroup } from "../generics/withHooks"
 
-const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) => {
-
-
-
-    // context
-    const { cancelLoad, doLoad, closeDialog } = useLoading()
-    const { lang } = useLanguage()
-    const { firebase } = useFirebase()
-
-    const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : getDefaultPublicRide(props.event, lang))
-
-    const useStyles = makeStyles(() => (
-        {
-            root: {
-                "& .MuiOutlinedInput-root": {
-                    background: SECONDARY_WHITE,
-                    borderRadius: '32px',
-                    padding: '0px',
-                    border: '.1px solid white',
-                    color: PRIMARY_BLACK,
-                    WebkitAppearance: 'none'
-                    , ...{
-                        '& input[type=number]': {
-                            '-moz-appearance': 'textfield'
-                        },
-                        '& input[type=number]::-webkit-outer-spin-button': {
-                            '-webkit-appearance': 'none',
-                            margin: 0
-                        },
-                        '& input[type=number]::-webkit-inner-spin-button': {
-                            '-webkit-appearance': 'none',
-                            margin: 0
-                        }
-                    }
-                }
-            }
-
-        }
-    ))
-
+type AddUpdateRideProps = { ride?: PNPPublicRide, event: PNPEvent }
+const AddUpdateEventRide = (props: AddUpdateRideProps & Hooks) => {
+    const [ride, setRide] = useState<PNPPublicRide>(props.ride ? props.ride : getDefaultPublicRide(props.event, props.language.lang))
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE, { background: PRIMARY_BLACK }))
     const classes = useStyles()
     const changeRideStartingPoint = (newStartPoint: string) => {
         setRide({
@@ -120,29 +86,29 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
 
     const createNewRide = () => {
         if (isValidPublicRide(ride)) {
-            doLoad()
+            props.loading.doLoad()
 
             if (props.ride) {
-                firebase.realTime.updatePublicRide(props.event.eventId, ride.rideId, ride)
+                props.firebase.firebase.realTime.updatePublicRide(props.event.eventId, ride.rideId, ride)
                     .then(() => {
-                        cancelLoad()
-                        closeDialog()
+                        props.loading.cancelLoad()
+                        props.loading.closeDialog()
                         alert(`ערכת נסיעה בהצלחה : \n נסיעה מ ${ride.rideStartingPoint} ל ${ride.rideDestination} \n בשעה : ${ride.rideTime}`)
                     }).catch((e) => {
-                        cancelLoad()
-                        closeDialog()
+                        props.loading.cancelLoad()
+                        props.loading.closeDialog()
                         alert('אירעתה שגיאה בעריכת ההסעה, אנא יידע את המתכנת')
                     })
             } else {
 
-                firebase.realTime.addPublicRide(ride.eventId, ride)
+                props.firebase.firebase.realTime.addPublicRide(ride.eventId, ride)
                     .then(() => {
-                        cancelLoad()
-                        closeDialog()
+                        props.loading.cancelLoad()
+                        props.loading.closeDialog()
                         alert(`הוספת נסיעה נוספת בהצלחה : \n נסיעה מ ${ride.rideStartingPoint} ל ${ride.rideDestination} \n בשעה : ${ride.rideTime}`)
                     }).catch(() => {
-                        cancelLoad()
-                        closeDialog()
+                        props.loading.cancelLoad()
+                        props.loading.closeDialog()
                         alert('אירעתה שגיאה בהוספת ההסעה, אנא יידע את המתכנת')
                     })
             }
@@ -331,4 +297,4 @@ const AddUpdateEventRide = (props: { ride?: PNPPublicRide, event: PNPEvent }) =>
 }
 
 
-export default AddUpdateEventRide
+export default withHookGroup<AddUpdateRideProps>(AddUpdateEventRide, CommonHooks)

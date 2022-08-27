@@ -2,12 +2,10 @@ import './SayNoMoreItem.css'
 import $ from 'jquery'
 import { useLanguage } from "../../context/Language"
 import { NO_MORE_ITEM_1, NO_MORE_ITEM_2, NO_MORE_ITEM_3, NO_MORE_ITEM_4, NO_MORE_ITEM_5 } from "../../settings/strings"
-import SayNoMoreItem, { SayNoMoreItemProps } from "./SayNoMoreItem"
-import { CSSProperties, useEffect, useState } from 'react'
+import { SayNoMoreItemProps } from "./SayNoMoreItem"
+import { useEffect, useState } from 'react'
 let t_done = false
 export default function SayNoMoreContainer() {
-
-
 
     const { lang } = useLanguage()
     const sayNoMoreItems: SayNoMoreItemProps[] = [
@@ -17,11 +15,6 @@ export default function SayNoMoreContainer() {
         { icon: 'no', content: NO_MORE_ITEM_4(lang) },
         { icon: 'no', content: NO_MORE_ITEM_5(lang) }
     ]
-
-    function makeItem(props: SayNoMoreItemProps) {
-        return <SayNoMoreItem key={props.content} icon={props.icon} content={props.content} />
-    }
-
     const [pos, setPos] = useState(sayNoMoreItems.length - 1);
     let pPos = 0;
     useEffect(() => {

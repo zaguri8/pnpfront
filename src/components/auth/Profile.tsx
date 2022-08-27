@@ -1,18 +1,15 @@
 
-import { useFirebase } from '../../context/Firebase'
-import { DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from '../../settings/colors'
+import { SECONDARY_WHITE } from '../../settings/colors'
 import { innerShadow } from '../../settings/styles'
 import EditIcon from '@mui/icons-material/Edit';
-import prof from '../../assets/images/check.png'
 import { useLanguage } from '../../context/Language'
 import './Profile.css'
 import { HELLO, SIDE } from '../../settings/strings'
-import { Accordion, AccordionDetails, AccordionSummary, Button, MenuItem, Stack } from '@mui/material'
-import { ChangeEvent, useEffect, useState } from 'react'
-import { CSSProperties } from '@mui/styles'
+import { MenuItem, Stack } from '@mui/material'
+import { useState } from 'react'
 import { v4 } from 'uuid'
-
-
+import { Hooks } from '../generics/types';
+import { withHookGroup } from '../generics/withHooks';
 
 enum ProfileSubPage {
     coupons, edit, settings, history
@@ -54,18 +51,14 @@ function ProfileActionToolbar(props: IProfileActionToolbar) {
 }
 
 
-export default function Profile() {
-
-    const { lang } = useLanguage()
-    const { appUser } = useFirebase()
-
+function Profile(props: Hooks) {
     const [showingProfilePage, setShowingProfilePage] = useState<ProfileSubPage>(ProfileSubPage.settings)
 
 
     const profileMenuItems: IProfileButton[] = [
-        { title: lang === 'heb' ? 'קופונים' : 'Coupons', action: () => { setShowingProfilePage(ProfileSubPage.coupons) } },
-        { title: lang === 'heb' ? 'הגדרות' : 'Settings', action: () => { setShowingProfilePage(ProfileSubPage.settings) } },
-        { title: lang === 'heb' ? 'הפעילות שלי' : 'My Activity', action: () => { setShowingProfilePage(ProfileSubPage.history) } },
+        { title: props.language.lang === 'heb' ? 'קופונים' : 'Coupons', action: () => { setShowingProfilePage(ProfileSubPage.coupons) } },
+        { title: props.language.lang === 'heb' ? 'הגדרות' : 'Settings', action: () => { setShowingProfilePage(ProfileSubPage.settings) } },
+        { title: props.language.lang === 'heb' ? 'הפעילות שלי' : 'My Activity', action: () => { setShowingProfilePage(ProfileSubPage.history) } },
     ]
 
 
@@ -83,7 +76,7 @@ export default function Profile() {
     }
 
 
-    return (appUser ? <div id='container_profile'>
+    return (props.firebase.firebase.appUser ? <div id='container_profile'>
 
 
         <div
@@ -111,9 +104,9 @@ export default function Profile() {
 
                     </div>
                     <Stack direction={'row'}
-                        alignItems={'center'} style ={{cursor:'pointer'}}>
-                            <EditIcon style={{color:SECONDARY_WHITE, padding: '4px', marginLeft: 'auto', marginRight: 'auto' }} />
-                        <span style ={{color:SECONDARY_WHITE}}>{lang === 'heb' ? 'שנה תמונה' : 'Edit image'}</span>
+                        alignItems={'center'} style={{ cursor: 'pointer' }}>
+                        <EditIcon style={{ color: SECONDARY_WHITE, padding: '4px', marginLeft: 'auto', marginRight: 'auto' }} />
+                        <span style={{ color: SECONDARY_WHITE }}>{props.language.lang === 'heb' ? 'שנה תמונה' : 'Edit image'}</span>
                     </Stack>
                 </div>
                 <div>
@@ -127,14 +120,14 @@ export default function Profile() {
                                 color: SECONDARY_WHITE
                             }
                         }
-                    >{',' + HELLO(lang)}</h5>
+                    >{',' + HELLO(props.language.lang)}</h5>
                     <h3 style={
                         {
                             margin: '0px',
                             padding: '0px',
                             color: SECONDARY_WHITE
                         }
-                    }>{appUser.name}</h3>
+                    }>{props.firebase.firebase.appUser.name}</h3>
                 </div>
 
             </div>
@@ -151,3 +144,4 @@ export default function Profile() {
 
     </div> : null)
 }
+export default withHookGroup(Profile, ['firebase', 'language'])

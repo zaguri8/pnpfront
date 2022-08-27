@@ -49,7 +49,7 @@ const MyPayments = () => {
 
     useEffect(() => {
         let unsub = null, unsub2 = null;
-        if (user && appUser) {
+        if (appUser) {
             doLoad()
             unsub = firebase.realTime.getAllTransactions(appUser.customerId, (trans) => {
                 unsub2 = firebase.realTime.addListenertoRidesForDates(trans, (transformed) => {
@@ -72,7 +72,7 @@ const MyPayments = () => {
             })
         }
         return () => { unsub && unsub(); unsub2 && unsub2(); }
-    }, [])
+    }, [appUser])
 
 
     const TransactionRow = ({ transaction, index }) => {
@@ -113,7 +113,7 @@ const MyPayments = () => {
                     dir={SIDE(lang)}
                     style={{
                         padding: '8px',
-                        fontWeight:'bold',
+                        fontWeight: 'bold',
                         color: PRIMARY_PINK
                     }}>{lang === 'heb' ? 'האם ברצונך להתנתק מחשבון זה ?' : 'Would you like to log out of this account : '}</span>
                 <span
@@ -123,7 +123,7 @@ const MyPayments = () => {
 
                         color: PRIMARY_PINK
                     }}>{appUser.email}</span>
-                <Button style={logOutStyle('50%', { alignSelf: 'center',background:PRIMARY_PINK })} onClick={() => {
+                <Button style={logOutStyle('50%', { alignSelf: 'center', background: PRIMARY_PINK })} onClick={() => {
                     closeDialog()
                     alert('התנתקת בהצלחה.')
                     signOut()

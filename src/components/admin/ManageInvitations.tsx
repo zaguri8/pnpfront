@@ -14,22 +14,14 @@ import { useFirebase } from "../../context/Firebase"
 import { CSSProperties, useEffect, useState } from "react"
 import Spacer from "../utilityComponents/Spacer"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
-const ManageInvitations = () => {
-
-
-    const { openDialog, doLoad, cancelLoad } = useLoading()
-    const { firebase } = useFirebase()
-
+import { Hooks } from "../generics/types"
+import { CommonHooks, withHookGroup } from "../generics/withHooks"
+const ManageInvitations = (props: Hooks) => {
     const [privateEvents, setPrivateEvents] = useState<{ [type: string]: PNPPrivateEvent[] }>()
-    const nav = useNavigate()
-    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
-
-
     useEffect(() => {
-        hideHeader()
-        return () => showHeader()
+        props.headerExt.hideHeader()
+        return () => props.headerExt.showHeader()
     },[])
-
     const rowStyle = {
         flexDirection: 'row',
         display: 'flex',
@@ -44,7 +36,7 @@ const ManageInvitations = () => {
         alignSel:'center',
     } as CSSProperties
     useEffect(() => {
-        const unsub = firebase.realTime.addListenerToPrivateEvents(setPrivateEvents, true)
+        const unsub = props.firebase.firebase.realTime.addListenerToPrivateEvents(setPrivateEvents, true)
         return () => { unsub() }
     }, [])
     return <PageHolder style={{ background: PRIMARY_BLACK }}>
@@ -74,7 +66,7 @@ const ManageInvitations = () => {
                         </div></th>
                         <th style={{ width: '50%' }}><Button
                             style={{ backgroundImage: BLACK_ELEGANT, minWidth: '110px' }}
-                            onClick={() => { nav('/adminpanel/invitations/specificinvitation', { state: event }) }}
+                            onClick={() => { props.nav('/adminpanel/invitations/specificinvitation', { state: event }) }}
                             sx={{
                                 ... {
                                     width: 'fit-content',
@@ -120,7 +112,7 @@ const ManageInvitations = () => {
                                     onClick={() => {
 
 
-                                        openDialog({
+                                        props.loading.openDialog({
                                             content: <InnerPageHolder style={{ padding: '8px', margin: '8px', background: SECONDARY_BLACK }}>
                                                 <Stack spacing={2} style={{ padding: '8px', color: SECONDARY_WHITE, width: '100%' }}>
 
@@ -170,15 +162,15 @@ const ManageInvitations = () => {
                                 <Button
                                     style={{ fontSize: '14px', width: '100px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
                                     onClick={() => {
-                                        doLoad()
-                                        firebase.realTime.approvePrivateEvent(event.eventId)
+                                        props.loading.doLoad()
+                                        props.firebase.firebase.realTime.approvePrivateEvent(event.eventId)
                                             .then(() => {
                                                 alert('האירוע אושר בהצלחה')
-                                                nav('/adminpanel')
-                                                cancelLoad()
+                                                props.nav('/adminpanel')
+                                                props.loading.cancelLoad()
                                             }).catch(() => {
                                                 alert('קרתה שגיאה בעת אישור האירוע, אנא פנא אל מתכנת האתר')
-                                                cancelLoad()
+                                                props.loading.cancelLoad()
                                             })
                                     }}
                                 >
@@ -193,4 +185,4 @@ const ManageInvitations = () => {
         </InnerPageHolder>
     </PageHolder>
 }
-export default ManageInvitations
+export default withHookGroup(ManageInvitations,CommonHooks)

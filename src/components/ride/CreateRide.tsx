@@ -1,38 +1,28 @@
-import React, { ChangeEvent, CSSProperties, useCallback, useEffect, useRef, useState } from "react"
-import { PNPExplicitPrivateRide, PNPPrivateRide } from "../../store/external/types"
+import React, { CSSProperties, useEffect, useState } from "react"
+import { PNPExplicitPrivateRide } from "../../store/external/types"
 import { useFirebase } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
-import { isValidPrivateRide } from '../../store/validators'
 import $ from 'jquery'
-import axios from "axios"
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
-import { Checkbox } from "@mui/material"
-import { useLocation, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import AddIcon from '@mui/icons-material/Add';
 import bus from '../../assets/images/appmenu/pink/bus.svg'
-import { ACCEPT_TERMS_REQUEST, COMMENTS, CONTINUE_TO_CREATE, CREATE_RIDE, CREATE_RIDE_2, DESTINATION_POINT, FILL_ALL_FIELDS, FULL_NAME, LEAVE_HOUR, PASSENGERS, PHONE_NUMBER, RETURN_HOUR, RETURN_HOUR_2, RETURN_POINT, RIDE_DATE, SIDE, STARTING_POINT, STARTING_POINT_SINGLE, TERMS_OF_USE } from "../../settings/strings"
-import { useLanguage } from "../../context/Language"
-import { FormControl, TextField, Stack, Button } from "@mui/material"
-import { HtmlTooltip } from "../utilityComponents/HtmlTooltip"
+import { COMMENTS, CREATE_RIDE_2, FULL_NAME, LEAVE_HOUR, PASSENGERS, PHONE_NUMBER, RETURN_HOUR_2, RETURN_POINT, RIDE_DATE, SIDE, STARTING_POINT_SINGLE } from "../../settings/strings"
+import { TextField, Stack, Button } from "@mui/material"
 import { submitButton, textFieldStyle } from "../../settings/styles"
-import { ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, SECONDARY_WHITE } from "../../settings/colors"
+import { PRIMARY_BLACK, PRIMARY_PINK, SECONDARY_WHITE } from "../../settings/colors"
 import { makeStyles } from "@mui/styles"
 import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityComponents/functions"
-import Spacer from "../utilityComponents/Spacer"
 import { getCurrentDate } from "../../utilities"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import Places from "../utilityComponents/Places"
+import ServerRequest from "../../ApiManager/ApiManager"
+import { Hooks } from "../generics/types"
+import { CommonHooks, withHookGroup } from "../generics/withHooks"
 
 
-
-export default function CreateRide() {
-
-
-    const { lang } = useLanguage()
-    const { firebase, appUser } = useFirebase()
-    const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
-    const [termsOfUser, setTermsOfUse] = useState<boolean>(false)
+function CreateRide(props: Hooks) {
 
     const [ride, setRide] = useState<PNPExplicitPrivateRide>({
         rideId: '',
@@ -48,7 +38,7 @@ export default function CreateRide() {
         date: dateStringFromDate(getCurrentDate()),
         comments: 'null'
     })
-    
+
     const [mandatory, setMandatory] = useState<{ [id: number]: string }>({
         1: '',
         3: '',
@@ -56,10 +46,6 @@ export default function CreateRide() {
         5: '',
         6: '',
     })
-
-    const handleTermsOfUseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTermsOfUse(e.target.checked)
-    }
 
     const updateRideName = (name: string) => {
         setRide({ ...ride, ...{ customerName: name } })
@@ -103,9 +89,8 @@ export default function CreateRide() {
         return () => showHeader()
     }, [])
     const nav = useNavigate()
-    const useStyles = makeStyles(() => textFieldStyle(PRIMARY_BLACK, { background: 'white', direction: SIDE(lang), width: '130px', maxHeight: '30px', alignSelf: 'center', fontSize: '12px', borderRadius: '10px' }));
+    const useStyles = makeStyles(() => textFieldStyle(PRIMARY_BLACK, { background: 'white', direction: SIDE(props.language.lang), width: '130px', maxHeight: '30px', alignSelf: 'center', fontSize: '12px', borderRadius: '10px' }));
     const classes = useStyles()
-    const transformNull = (s: string) => s === 'null' ? '' : s
     const labelStyle = { padding: '0px', margin: '0px', fontSize: '14px', color: SECONDARY_WHITE }
     function createRide() {
         function isAllFieldsValid() {
@@ -122,8 +107,8 @@ export default function CreateRide() {
         }
         const valid = isAllFieldsValid()
 
-        if (!valid || ride.extraStopPoints.length < 1) {
-            alert(lang === 'heb' ? "יש למלא את כל השדות ולבחור לפחות נקודת עצירה אחת" : 'Please fill all the fields and pick at least 1 stop point')
+        if (!valid) {
+            alert(props.language.lang === 'heb' ? "יש למלא את כל השדות" : 'Please fill all the fields and pick at least 1 stop point')
             return
         }
         const send = {
@@ -136,16 +121,15 @@ export default function CreateRide() {
 
         if (ride.backTime === 'null' || ride.backTime.length < 1)
             ride.backTime = 'ללא'
-
-        doLoad()
-        axios.post('https://nadavsolutions.com/gserver/sendSMS/', send).catch(e => { })
-        firebase.realTime.addPrivateRideExplicit(ride)
+        props.loading.doLoad()
+        ServerRequest('sendSMS', send, res => { }, err => { })
+        props.firebase.firebase.realTime.addPrivateRideExplicit(ride)
             .then(() => {
-                cancelLoad()
+                props.loading.cancelLoad()
                 nav('/')
                 alert('בקשה לנסיעה חדשה נשלחה בהצלחה, הצוות שלנו ייצור עמך קשר בהקדם')
             }).catch(() => {
-                cancelLoad()
+                props.loading.cancelLoad()
                 alert('אירעתה שגיאה בשליחת הבקשה להסעה, אנא נסא שוב מאוחר יותר')
             })
     }
@@ -172,25 +156,25 @@ export default function CreateRide() {
 
     const openAddStopDialog = (back: boolean) => {
         let selectedRide = ""
-        openDialog({
+        props.loading.openDialog({
             content: <Stack>
-                <Places value={''} handleAddressSelect={(selected: any) => selectedRide = selected} types={['address']} className='ride_request_places' id={'ride_request_places'} fixed={false} placeHolder={lang === 'heb' ? 'בחר נקודת יציאה' : 'Choose starting point'} style={{ ...{ padding: '0px', margin: '0px', width: '100%', color: SECONDARY_WHITE, background: 'none' }, ...{ cursor: 'pointer' } }} />
+                <Places value={''} handleAddressSelect={(selected: any) => selectedRide = selected} types={['address']} className='ride_request_places' id={'ride_request_places'} fixed={false} placeHolder={props.language.lang === 'heb' ? 'בחר נקודת יציאה' : 'Choose starting point'} style={{ ...{ padding: '0px', margin: '0px', width: '100%', color: PRIMARY_BLACK, background: 'none' }, ...{ cursor: 'pointer' } }} />
                 <Button
                     onClick={() => {
                         if (!back) updateRideDestinations(selectedRide)
                         else updateRideBackDestinations(selectedRide)
-                        closeDialog()
+                        props.loading.closeDialog()
                     }}
                     style={{ ...submitButton(4), ...{ textTransform: 'none', maxHeight: '30px', background: PRIMARY_PINK } }}>
-                    {lang === 'heb' ? 'בחר' : 'Select'}
+                    {props.language.lang === 'heb' ? 'בחר' : 'Select'}
                 </Button>
             </Stack>
         })
     }
 
-    const AddStopPointBtn = (props: { back: boolean }) => {
+    const AddStopPointBtn = (properties: { back: boolean }) => {
         return <Button
-            onClick={() => openAddStopDialog(props.back)}
+            onClick={() => openAddStopDialog(properties.back)}
             style={{
                 ...submitButton(4),
                 background: 'transparent',
@@ -201,7 +185,7 @@ export default function CreateRide() {
                 width: '100%',
                 borderRadius: '24px',
             }}>
-            {lang === 'heb' ? 'הוסף נקודת עצירה' : 'Add Stop point'}
+            {props.language.lang === 'heb' ? 'הוסף נקודת עצירה' : 'Add Stop point'}
             <AddIcon style={{ transform: 'translateX(20px)' }} />
         </Button>
     }
@@ -209,12 +193,12 @@ export default function CreateRide() {
 
     return <PageHolder>
         <img src={bus} style={iconStyle} />
-        <label style={labelHeaderStyle}>{CREATE_RIDE_2(lang)}</label>
+        <label style={labelHeaderStyle}>{CREATE_RIDE_2(props.language.lang)}</label>
         <InnerPageHolder style={{ background: 'none', border: '.8px solid gray' }}>
             {!confirmation ? <Stack spacing={2} style={{ width: '300px' }} alignItems={'center'} justifyContent={'center'}>
 
-                <Stack spacing={0.5} key={FULL_NAME(lang)}>
-                    <label style={labelStyle}>{FULL_NAME(lang)}</label>
+                <Stack spacing={0.5} key={FULL_NAME(props.language.lang)}>
+                    <label style={labelStyle}>{FULL_NAME(props.language.lang)}</label>
                     <TextField
                         type={'text'}
                         id={`arm_2${1}`}
@@ -225,13 +209,13 @@ export default function CreateRide() {
 
                         }}
                         value={ride.customerName === 'null' ? '' : ride.customerName}
-                        placeholder={FULL_NAME(lang)}
+                        placeholder={FULL_NAME(props.language.lang)}
                         classes={classes} />
                 </Stack>
 
 
-                <Stack spacing={0.5} key={PHONE_NUMBER(lang)}>
-                    <label style={labelStyle}>{PHONE_NUMBER(lang)}</label>
+                <Stack spacing={0.5} key={PHONE_NUMBER(props.language.lang)}>
+                    <label style={labelStyle}>{PHONE_NUMBER(props.language.lang)}</label>
                     <TextField
                         type={'number'}
                         id={`arm_2${2}`}
@@ -241,15 +225,15 @@ export default function CreateRide() {
                             setMandatory({ ...mandatory, ...{ 2: e.target.value } })
                             $(`#arm_2${2}`).css('border', 'none')
                         }}
-                        placeholder={PHONE_NUMBER(lang)}
+                        placeholder={PHONE_NUMBER(props.language.lang)}
                         classes={classes} />
                 </Stack>
 
                 <Stack direction={'row'} spacing={1}>
 
 
-                    <Stack spacing={0.5} key={PASSENGERS(lang)}>
-                        <label style={labelStyle}>{PASSENGERS(lang)}</label>
+                    <Stack spacing={0.5} key={PASSENGERS(props.language.lang)}>
+                        <label style={labelStyle}>{PASSENGERS(props.language.lang)}</label>
                         <TextField
                             type={'number'}
                             id={`arm_2${3}`}
@@ -260,14 +244,14 @@ export default function CreateRide() {
 
                             }}
                             value={ride.passengers === 'null' ? '' : ride.passengers}
-                            placeholder={PASSENGERS(lang)}
+                            placeholder={PASSENGERS(props.language.lang)}
                             classes={classes} />
                     </Stack>
 
 
 
-                    <Stack spacing={0.5} key={RIDE_DATE(lang)}>
-                        <label style={labelStyle}>{RIDE_DATE(lang)}</label>
+                    <Stack spacing={0.5} key={RIDE_DATE(props.language.lang)}>
+                        <label style={labelStyle}>{RIDE_DATE(props.language.lang)}</label>
                         <TextField
                             type={'date'}
                             id={`arm_2${4}`}
@@ -278,7 +262,7 @@ export default function CreateRide() {
                                 $(`#arm_2${4}`).css('border', 'none')
 
                             }}
-                            placeholder={RIDE_DATE(lang)}
+                            placeholder={RIDE_DATE(props.language.lang)}
                             classes={classes} />
                     </Stack>
                 </Stack>
@@ -286,8 +270,8 @@ export default function CreateRide() {
                     <Stack direction={'row'} spacing={1}>
 
 
-                        <Stack spacing={0.5} key={LEAVE_HOUR(lang)}>
-                            <label style={labelStyle}>{LEAVE_HOUR(lang)}</label>
+                        <Stack spacing={0.5} key={LEAVE_HOUR(props.language.lang)}>
+                            <label style={labelStyle}>{LEAVE_HOUR(props.language.lang)}</label>
                             <TextField
                                 type={'time'}
                                 id={`arm_2${5}`}
@@ -298,15 +282,15 @@ export default function CreateRide() {
                                     $(`#arm_2${5}`).css('border', 'none')
 
                                 }}
-                                placeholder={LEAVE_HOUR(lang)}
+                                placeholder={LEAVE_HOUR(props.language.lang)}
                                 classes={classes} />
                         </Stack>
 
 
 
 
-                        <Stack spacing={0.5} key={STARTING_POINT_SINGLE(lang)}>
-                            <label style={labelStyle}>{STARTING_POINT_SINGLE(lang)}</label>
+                        <Stack spacing={0.5} key={STARTING_POINT_SINGLE(props.language.lang)}>
+                            <label style={labelStyle}>{STARTING_POINT_SINGLE(props.language.lang)}</label>
                             <TextField
                                 type={'text'}
                                 onChange={(e) => {
@@ -317,7 +301,7 @@ export default function CreateRide() {
                                 }}
                                 id={`arm_2${6}`}
                                 value={ride.rideStartingPoint === 'null' ? '' : ride.rideStartingPoint}
-                                placeholder={STARTING_POINT_SINGLE(lang)}
+                                placeholder={STARTING_POINT_SINGLE(props.language.lang)}
                                 classes={classes} />
                         </Stack>
                     </Stack>
@@ -325,7 +309,7 @@ export default function CreateRide() {
                 </Stack>
 
                 {ride && ride.extraStopPoints && ride.extraStopPoints.length > 0 &&
-                    <Stack spacing={0.5} maxWidth={'300px'} alignItems={'flex-start'} justifyContent={'flex-start'} style={{ direction: SIDE(lang) }}>
+                    <Stack spacing={0.5} maxWidth={'300px'} alignItems={'flex-start'} justifyContent={'flex-start'} style={{ direction: SIDE(props.language.lang) }}>
                         {ride.extraStopPoints.map((startPoint: any, index) => {
                             return <Stack key={startPoint + index} direction={'row'} spacing={2} maxWidth={'300px'} alignItems={'flex-start'}>
                                 <HighlightOffIcon onClick={() => {
@@ -333,35 +317,35 @@ export default function CreateRide() {
                                     copy.extraStopPoints.splice(index, 1)
                                     setRide(copy)
                                 }} style={{ width: '20px', height: '20px', cursor: 'pointer', color: '#bd3333', transform: 'translateX(10px)' }} />
-                                <label style={labelStyle}>{lang === 'heb' ? `תחנה ${index + 1}: ` + startPoint : `Stop point ${index + 1}: ` + startPoint}</label>
+                                <label style={labelStyle}>{props.language.lang === 'heb' ? `תחנה ${index + 1}: ` + startPoint : `Stop point ${index + 1}: ` + startPoint}</label>
                             </Stack>
                         })}</Stack>}
                 <Stack>
                     <Stack direction={'row'} spacing={1}>
 
 
-                        <Stack spacing={0.5} key={RETURN_HOUR_2(lang)}>
-                            <label style={labelStyle}>{RETURN_HOUR_2(lang)}</label>
+                        <Stack spacing={0.5} key={RETURN_HOUR_2(props.language.lang)}>
+                            <label style={labelStyle}>{RETURN_HOUR_2(props.language.lang)}</label>
                             <TextField
                                 type={'time'}
                                 value={ride.backTime}
                                 onChange={(e) => {
                                     updateBackTime(e.target.value)
                                 }}
-                                placeholder={RETURN_HOUR_2(lang)}
+                                placeholder={RETURN_HOUR_2(props.language.lang)}
                                 classes={classes} />
                         </Stack>
 
 
-                        <Stack spacing={0.5} key={RETURN_POINT(lang)}>
-                            <label style={labelStyle}>{RETURN_POINT(lang)}</label>
+                        <Stack spacing={0.5} key={RETURN_POINT(props.language.lang)}>
+                            <label style={labelStyle}>{RETURN_POINT(props.language.lang)}</label>
                             <TextField
                                 type={'text'}
                                 value={ride.backPoint === 'null' ? '' : ride.backPoint}
                                 onChange={(e) => {
                                     updateRideBackpoint(e.target.value)
                                 }}
-                                placeholder={RETURN_POINT(lang)}
+                                placeholder={RETURN_POINT(props.language.lang)}
                                 classes={classes} />
                         </Stack>
                     </Stack>
@@ -369,7 +353,7 @@ export default function CreateRide() {
                 </Stack>
 
                 {ride && ride.extraStopPointsBack && ride.extraStopPointsBack.length > 0 &&
-                    <Stack spacing={0.5} maxWidth={'300px'} alignItems={'flex-start'} justifyContent={'flex-start'} style={{ direction: SIDE(lang) }}>
+                    <Stack spacing={0.5} maxWidth={'300px'} alignItems={'flex-start'} justifyContent={'flex-start'} style={{ direction: SIDE(props.language.lang) }}>
                         {ride.extraStopPointsBack.map((startPoint: any, index) => {
                             return <Stack key={startPoint + index + 8000} direction={'row'} spacing={2} maxWidth={'300px'} alignItems={'flex-start'}>
                                 <HighlightOffIcon onClick={() => {
@@ -377,26 +361,28 @@ export default function CreateRide() {
                                     copy.extraStopPointsBack.splice(index, 1)
                                     setRide(copy)
                                 }} style={{ width: '20px', height: '20px', cursor: 'pointer', color: '#bd3333', transform: 'translateX(10px)' }} />
-                                <label style={labelStyle}>{lang === 'heb' ? `תחנה ${index + 1}: ` + startPoint : `Stop point ${index + 1}: ` + startPoint}</label>
+                                <label style={labelStyle}>{props.language.lang === 'heb' ? `תחנה ${index + 1}: ` + startPoint : `Stop point ${index + 1}: ` + startPoint}</label>
                             </Stack>
                         })}</Stack>}
-                <Stack spacing={0.5} key={COMMENTS(lang)}>
-                    <label style={labelStyle}>{COMMENTS(lang)}</label>
+                <Stack spacing={0.5} key={COMMENTS(props.language.lang)}>
+                    <label style={labelStyle}>{COMMENTS(props.language.lang)}</label>
                     <TextField
                         type={'text'}
                         value={ride.comments === 'null' ? '' : ride.comments}
                         onChange={(e) => {
                             updateRideComments(e.target.value)
                         }}
-                        placeholder={COMMENTS(lang)}
+                        placeholder={COMMENTS(props.language.lang)}
                         classes={classes} />
                 </Stack>
                 <Button
                     onClick={createRide}
                     style={{ ...submitButton(4), maxHeight: '30px', textTransform: 'none' }}>
-                    {lang === 'heb' ? 'שליחה' : 'Send'}
+                    {props.language.lang === 'heb' ? 'שליחה' : 'Send'}
                 </Button>
             </Stack> : null}
         </InnerPageHolder>
     </PageHolder >
 }
+
+export default withHookGroup(CreateRide, CommonHooks)

@@ -125,7 +125,10 @@ function BScanner() {
 
     useEffect(() => {
         hideHeader()
-        return () => showHeader()
+        return () => {
+            showHeader()
+            closePopover()
+        }
     }, [])
 
     const startProducerScanningSession = () => {

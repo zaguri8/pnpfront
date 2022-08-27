@@ -51,7 +51,7 @@ export default function Scanner() {
                     padding: '3px',
                     color: SECONDARY_WHITE,
                     fontWeight: '600'
-                }}>{scannerLanguage === 'עברית' ? `נסיעה מאושרת, סריקה ${confirmation.ridesLeft === 2 ? 1 : 2}` : 'رحلة مصرٌحة'}</label>
+                }}>{scannerLanguage === 'עברית' ? `נסיעה מאושרת, סריקה ${confirmation.ridesLeft == 2 ? 1 : 2}` : 'رحلة مصرٌحة'}</label>
             </Stack>
             <Stack direction={'row'}>
                 <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{valid()}</label><b>{confirmation.amount}</b>
@@ -60,7 +60,7 @@ export default function Scanner() {
             <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{"שם אירוע: "}</label><b>{confirmation.destination}</b>
             <label style={{ padding: '0px', margin: '0px', fontSize: '14px' }}>{"נקודת יציאה: "}</label><b>{confirmation.startPoint}</b>
 
-        </Stack>, 'success', 0)
+        </Stack>, 'success', 10000)
     }
 
     const decline = () => {
@@ -68,7 +68,7 @@ export default function Scanner() {
         showPopover(<Stack style={{ padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <label style={{ padding: '8px', color: SECONDARY_WHITE, fontWeight: '600' }}>{scannerLanguage === 'עברית' ? 'נסיעה לא מאושרת' : 'رحلة غير مصرٌحة'}</label>
             <ErrorOutlineIcon style={{ alignItems: 'center', borderRadius: '32px', background: 'white', width: '64px', height: '64px', color: '#bd3333' }} />
-        </Stack>, 'error', 0)
+        </Stack>, 'error', 10000)
     }
 
     const updateScanResult = (res) => {
@@ -84,7 +84,7 @@ export default function Scanner() {
                     showPopover(<Stack spacing={1} style={{ maxWidth: '300px', padding: '18px' }}>
                         <label style={{ color: 'white' }}>{'ברקוד זה נסרק כבר, ולא נשארו בו נסיעות'}</label>
                         <label style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>{'סריקה אחרונה ב: ' + (confirmation.lastScanDate ? getDateTimeString(confirmation.lastScanDate) : getDateTimeString(getCurrentDate()))}</label>
-                    </Stack>, 'normal', 0)
+                    </Stack>, 'normal', 10000)
                     return
                 }
                 firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
@@ -92,7 +92,7 @@ export default function Scanner() {
                         let temp = barCodes
                         temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1
                         approve(confirmation)
-                        setBarcodes(temp)
+                        setBarcodes([...temp])
                     })
                     .catch(decline)
             } else {

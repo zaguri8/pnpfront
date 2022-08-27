@@ -1,41 +1,24 @@
-import { Stack, TextField } from "@mui/material"
-import { makeStyles } from "@mui/styles"
-import { CSSProperties, useEffect, useState } from "react"
-import { useFirebase } from "../../context/Firebase"
-import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
-import { useLoading } from "../../context/Loading"
-import { BLACK_ELEGANT, PRIMARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
-import { textFieldStyle } from "../../settings/styles"
+import { useEffect, useState } from "react"
+import { BLACK_ELEGANT, SECONDARY_WHITE } from "../../settings/colors"
 import { PNPUser } from "../../store/external/types"
+import { Hooks } from "../generics/types"
+import { CommonHooks, withHookGroup } from "../generics/withHooks"
 import SectionTitle from "../other/SectionTitle"
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
-import Spacer from "../utilityComponents/Spacer"
-import { buttonStyle } from "./InvitationStatistics"
 const today = new Date()
 import './UserStatistics.css'
-export default function UserStatistics() {
-
-
-    const { doLoad, cancelLoad } = useLoading()
-    const { firebase } = useFirebase()
-
+function UserStatistics(props: Hooks) {
     const [users, setUsers] = useState<PNPUser[] | undefined>()
     const [usersCopy, setUsersCopy] = useState<PNPUser[] | undefined>()
-
-
-    const {hideHeader,showHeader} = useHeaderBackgroundExtension()
-
+    useEffect(() => {
+        props.headerExt.hideHeader()
+        return () => props.headerExt.showHeader()
+    }, [])
 
     useEffect(() => {
-        hideHeader()
-        return () => showHeader()
-    },[])
 
-    const [numOfShowing, setNumOfShowing] = useState(10)
-    useEffect(() => {
-
-        doLoad()
-        const unsub = firebase.realTime.addListenerToUsers((users) => {
+        props.loading.doLoad()
+        const unsub = props.firebase.firebase.realTime.addListenerToUsers((users) => {
             users.forEach(u => {
                 const dist = Number(today.getFullYear()) - Number(u.birthDate.split('/')[2])
                 if (dist <= 1 || dist > 100 || !dist) {
@@ -47,9 +30,9 @@ export default function UserStatistics() {
             users.sort((user1, user2) => user1.birthDate === 'אין' ? 1 : user2.birthDate === 'אין' ? -1 : (Number(user1.birthDate) - Number(user2.birthDate)))
             setUsers(users)
             setUsersCopy(users)
-            cancelLoad()
+            props.loading.cancelLoad()
         }, (e) => {
-            cancelLoad()
+            props.loading.cancelLoad()
         })
         return () => unsub()
     }, [])
@@ -105,7 +88,7 @@ export default function UserStatistics() {
     }
 
 
- 
+
 
 
     return <PageHolder style={{ padding: '0px', scroll: 'hidden', background: BLACK_ELEGANT }}>
@@ -139,6 +122,8 @@ export default function UserStatistics() {
                 <option value='0'>הכל</option>
             </select>
 
-         
+
         </InnerPageHolder></PageHolder>
 }
+
+export default withHookGroup(UserStatistics, CommonHooks)

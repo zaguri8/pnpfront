@@ -6,7 +6,7 @@ import { BLACK_ELEGANT } from '../../../settings/colors'
 import axios from 'axios'
 import { useLoading } from '../../../context/Loading'
 import { useParams } from 'react-router'
-import serverRequest from '../../../ApiManager/ApiManager'
+import ServerRequest from '../../../ApiManager/ApiManager'
 export default function PrivatePaymentForm() {
 
     const { customerEmail } = useParams()
@@ -14,7 +14,7 @@ export default function PrivatePaymentForm() {
     const { doLoad, cancelLoad } = useLoading()
     useEffect(() => {
         doLoad()
-        serverRequest('privatePaymentLink', { customerEmail: customerEmail },
+        ServerRequest('privatePaymentLink', { customerEmail: customerEmail },
             (data: any) => {
                 if (data.err) {
                     cancelLoad()

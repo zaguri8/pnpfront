@@ -8,6 +8,7 @@ import { boxShadow, submitButton } from "../../settings/styles"
 import { withHook, withHookGroup } from "../generics/withHooks"
 import { bImportantStyle } from "../payment/PaymentSuccess"
 import { PageHolder } from "../utilityComponents/Holders"
+export const PRIMARY_GRADIENT = `linear-gradient(45deg,${PRIMARY_PINK},${PRIMARY_ORANGE})`
 
 function Barcode({ headerExt, loading, nav, backgroundExt, language }) {
 
@@ -20,7 +21,7 @@ function Barcode({ headerExt, loading, nav, backgroundExt, language }) {
     const generalSize = {
         width: '200px',
         height: '200px',
-        margin: '8px',...boxShadow()
+        margin: '8px', ...boxShadow()
     }
 
 
@@ -29,8 +30,9 @@ function Barcode({ headerExt, loading, nav, backgroundExt, language }) {
         backgroundExt.changeBackgroundColor('black')
         headerExt.setHeaderBackground(`black`)
     }, [])
+
     return <PageHolder style={{ background: `linear-gradient(45deg,${PRIMARY_PINK},${PRIMARY_ORANGE})` }}>
-        <label style={{ color: SECONDARY_WHITE, fontWeight: 'bold',marginTop:'32px' }}>{location.state.more_info.productName}</label>
+        <label style={{ color: SECONDARY_WHITE, fontWeight: 'bold', marginTop: '32px' }}>{location.state.more_info.productName}</label>
         {location.state && <Stack
             alignItems={'center'}
             style={articluateSpace}>

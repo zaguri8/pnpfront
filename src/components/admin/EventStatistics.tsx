@@ -1,5 +1,5 @@
 import { Accordion, TextField, MenuItem, Checkbox, Select, AccordionDetails, AccordionSummary, Button, List, Stack, alertTitleClasses } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 
 import { useFirebase } from "../../context/Firebase";
 import { Unsubscribe } from "firebase/database";
@@ -9,45 +9,106 @@ import { whatsappIcon } from '../../assets/images.js'
 import { useLanguage } from "../../context/Language";
 import $ from 'jquery'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import { SAME_SPOT, SIDE } from "../../settings/strings";
+import { SIDE } from "../../settings/strings";
 import { PNPEvent, PNPPublicRide, PNPRideRequest, PNPTransactionConfirmation, PNPUser } from "../../store/external/types";
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 
 import '../../settings/mainstyles.css'
-import axios from "axios";
 import { useLoading } from "../../context/Loading";
 import { v4 } from "uuid";
-import { isValidPublicRide } from "../../store/validators";
-import { elegantShadow, submitButton, textFieldStyle } from "../../settings/styles";
+import { elegantShadow, submitButton } from "../../settings/styles";
 import { useLocation, useNavigate } from "react-router";
 import SectionTitle from "../other/SectionTitle";
-import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, ORANGE_GRADIENT_PRIMARY, ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, RED_ROYAL, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
+import { ORANGE_RED_GRADIENT_BUTTON, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors";
 import Spacer from "../utilityComponents/Spacer";
-import { makeStyles } from "@mui/styles";
 import AddUpdateEventRide from "./AddUpdateEventRide";
 import AddUpdateEvent from "./AddUpdateEvent";
-import { base64 } from "@firebase/util";
 import EventLinkRedirect from "./EventLinkRedirect";
 import ScannerPermissions from "./ScannerPermissions";
 import { useBackgroundExtension, useHeaderBackgroundExtension } from "../../context/HeaderContext";
+import { StyleBuilder } from "../../settings/styles.builder";
+import PNPList from "../generics/PNPList";
+import { PRIMARY_GRADIENT } from "../other/Barcode";
+import { getDateTimeString } from "../../utilities";
 
 export type PNPRideExtraPassenger = {
     fullName: string,
     phoneNumber: string
 }
 
-export type PNPEventRidePurchaseData = { [rideStartingPoint: string]: { amount: number, users: { uid: string, extraPeople: PNPRideExtraPassenger[] }[] } }
+export type PNPEventRidePurchaseData = { [rideStartingPoint: string]: { amount: number, users: { uid: string, customerName: string, customerPhone: string, customerEmail: string, customerId: string, date: string, extraPeople: PNPRideExtraPassenger[] }[] } }
 
 export type RideStatistics = {
     amount: string
     uid: string
+    date: string
     extraPeople: PNPRideExtraPassenger[]
+    customerName: string
+    customerId: string
+    customerPhone: string
+    customerEmail: string
     rideStartPoint: string
 }
 
 enum AdminScreens {
     ridesOverview, rideTransactions, rideRequests
 }
+const ButtonStyle = { ...submitButton(4), ...{ padding: '2px', fontSize: '14px', maxWidth: '120px' } }
+
+const ListStyle = new StyleBuilder()
+    .textColor(SECONDARY_WHITE)
+    .overflowX('scroll')
+    .maxHeight('400px')
+    .build()
+const HeaderStyle = new StyleBuilder()
+    .whiteText()
+    .bold()
+    .textAlignStart()
+    .rtl()
+    .build()
+const SubHeaderStyle = new StyleBuilder()
+    .whiteText()
+    .padding(8)
+    .margin(0)
+    .textAlignStart()
+    .fontSize(14)
+    .rtl()
+    .build()
+
+const SubListStyle = new StyleBuilder()
+    .maxHeight(150)
+    .flexColumn()
+    .border(1, PRIMARY_WHITE)
+    .padding(8)
+    .borderRadius(8)
+    .fullWidth()
+    .background(PRIMARY_GRADIENT)
+    .build()
+
+const ParagraphStyle = new StyleBuilder()
+    .whiteText()
+    .fontSize(12)
+    .padding(2)
+    .rtl()
+    .textAlignStart()
+    .margin(0)
+    .build()
+
+
+const SmallTextStyle = new StyleBuilder()
+    .whiteText()
+    .fontSize(10)
+    .padding(2)
+    .rtl()
+    .textAlignStart()
+    .margin(0)
+    .build()
+
+const CityStyle = new StyleBuilder()
+    .fontWeight(100)
+    .textColor(SECONDARY_WHITE)
+    .build()
+
 
 export default function EventStatistics() {
     const location = useLocation()
@@ -137,30 +198,7 @@ export default function EventStatistics() {
         color: PRIMARY_PINK
     }
 
-
-
-
     const Rides = (props: { rides: PNPPublicRide[], event: PNPEvent }) => {
-        const approveAllTransactions = (ride: PNPPublicRide) => {
-            const send = {
-                rideId: ride.rideId,
-                credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" }
-            }
-            closeDialog()
-            setTimeout(() => {
-                doLoad()
-                axios.post('https://nadavsolutions.com/gserver/approveRideTransactions', send)
-                    .then(async res => {
-                        ride.extras.rideTransactionsConfirmed = true
-                        await firebase.realTime.updatePublicRide(props.event.eventId, ride.rideId, ride)
-                        cancelLoad()
-                        alert(res.data.result)
-                    }).catch(e => {
-                        cancelLoad()
-                        alert('אירעתה שגיאה בעת אישור העסקאות, אנא פנה למתכנת')
-                    })
-            }, 50)
-        }
         return (<List>
             <h1 style={{ color: SECONDARY_WHITE }}>{'ניהול נסיעות'}</h1>
             {props.rides.length > 0 ? <table dir={'rtl'} style={{ width: '100%' }}  >
@@ -212,6 +250,13 @@ export default function EventStatistics() {
                                     {`ערוך`}
                                 </Button>}
 
+
+                                <Button style={{ ...submitButton(2), fontSize: '12px', padding: '2px', minWidth: 'max-content' }} onClick={() => {
+                                    nav('/adminpanel/sms', { state: { ride: ride } })
+                                }}>
+                                    שלח סמס לכל הרוכשים
+                                </Button>
+
                                 {<Button key={v4()}
                                     onClick={() => {
                                         openDialogWithTitle(<div><h3 style={
@@ -245,33 +290,6 @@ export default function EventStatistics() {
                                     {`מחק`}
                                 </Button>}
 
-                                {/* {<Button key={v4()}
-                                    onClick={() => {
-                                        openDialogWithTitle(<div>
-                                            <h4 style={
-                                                {
-                                                    fontWeight: '12px',
-                                                    textAlign: 'center',
-                                                    padding: '8px',
-                                                }
-                                            }>{`אישור עסקאות להסעה ל ${props.event.eventName} מנקודת יציאה :  ${ride.rideStartingPoint}`}</h4></div>)
-                                        openDialog({
-                                            content: <div style={{ padding: '4px' }}><button
-                                                onClick={() => approveAllTransactions(ride)}
-                                                disabled={ride.extras.rideTransactionsConfirmed}
-                                                style={{
-                                                    padding: '4px',
-                                                    margin: '16px',
-                                                    minWidth: '100px',
-                                                    fontSize: '18px',
-                                                    background: 'linear-gradient(#44A08D,#093637)',
-                                                    color: SECONDARY_WHITE
-                                                }}>{ride.extras.rideTransactionsConfirmed ? "עסקאות אושרו" : 'אשר עסקאות'}</button></div>, title: `אישור עסקאות להסעה לאירוע`
-                                        })
-                                    }}
-                                    style={{ color: SECONDARY_WHITE, margin: '4px', border: '1px solid black', background: 'linear-gradient(#44A08D,#093637)' }}>
-                                    {`אשר עסקאות`}
-                                </Button>} */}
                             </th>
                         </tr>)}
                 </tbody>
@@ -317,10 +335,11 @@ export default function EventStatistics() {
                 }
             }
             let newArray = Object.values(hHash)
+
             newArray.forEach(stat => {
                 if (stat) {
                     if (!hash[stat.rideStartPoint]) {
-                        hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ uid: stat.uid, extraPeople: stat.extraPeople }] }
+                        hash[stat.rideStartPoint] = { amount: Number(stat.amount), users: [{ ...stat }] }
                     } else {
                         hash[stat.rideStartPoint].amount += Number(stat.amount)
                         let exists = hash[stat.rideStartPoint].users.findIndex(uid => uid.uid === stat.uid)
@@ -329,7 +348,7 @@ export default function EventStatistics() {
                                 hash[stat.rideStartPoint].users[exists].extraPeople.push(...stat.extraPeople)
                             }
                         } else
-                            hash[stat.rideStartPoint].users.push({ uid: stat.uid, extraPeople: stat.extraPeople })
+                            hash[stat.rideStartPoint].users.push({ ...stat })
                     }
                     t += Number(stat.amount)
                 }
@@ -339,7 +358,7 @@ export default function EventStatistics() {
         }, [])
 
 
-        type CustomerCardContainerProps = { data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }[], ride: string }
+        type CustomerCardContainerProps = { data: { customerName: string, customerPhone: string, customerId: string, date: string, customerEmail: string, extraPeople: PNPRideExtraPassenger[] }[], ride: string }
         function CustomerCardContainer(props: CustomerCardContainerProps) {
             const [historyProp, setHistoryProp] = useState(props)
             const searchStyle = {
@@ -360,8 +379,8 @@ export default function EventStatistics() {
                     })
                 else {
 
-                    let transPred = (content: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => {
-                        return content.user.name.includes(query) || (content.extraPeople && content.extraPeople.find(p => p.fullName.includes(query)))
+                    let transPred = (content: { customerName: string, customerId: string, customerPhone: string, customerEmail: string, extraPeople: PNPRideExtraPassenger[] }) => {
+                        return content.customerName.includes(query) || (content.extraPeople && content.extraPeople.find(p => p.fullName.includes(query)))
                     }
                     let filter = props.data.filter(transaction => transPred(transaction))
 
@@ -382,7 +401,7 @@ export default function EventStatistics() {
             }, [])
 
 
-            type CustomerCardProps = { customerData: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }, ride: string }
+            type CustomerCardProps = { customerData: { customerName: string, customerPhone: string, date: string, customerId: string, customerEmail: string, extraPeople: PNPRideExtraPassenger[] }, ride: string }
             const CustomerCard = (props: CustomerCardProps) => {
                 const labelTitleStyle = {
                     fontSize: '16px',
@@ -398,6 +417,13 @@ export default function EventStatistics() {
                     color: PRIMARY_BLACK,
                     fontSize: '14px'
                 }
+                const actionBtnStyle = {
+                    background: 'whitesmoke',
+                    fontWeight: 'bold',
+                    color: PRIMARY_PINK,
+                    textTransform: 'none',
+                    fontFamily: 'Open Sans Hebrew'
+                } as CSSProperties
                 return <div style={{
                     width: '90%',
                     justifyContent: 'center',
@@ -411,15 +437,18 @@ export default function EventStatistics() {
                         margin: '4px',
                         flexDirection: 'row',
                         alignItems: 'center',
+                        position: 'relative',
                         justifyContent: 'center',
                         borderBottom: `1px solid ${'white'}`
                     }} >
 
-                        <Stack >
+                        <Stack style={{ width: '100%' }}>
+                            <div style={{ ...SmallTextStyle, color: PRIMARY_BLACK, position: 'absolute', textAlign: 'end', fontWeight: 'bold', right: '-20px', top: -0 }}>{props.customerData.date}</div>
+
                             <div style={labelTitleStyle}>{'שם הקונה'}</div>
-                            <div style={labelSmallStyle}>{props.customerData.user.name}</div>
+                            <div style={labelSmallStyle}>{props.customerData.customerName}</div>
                             <div style={labelTitleStyle}>{'מספר טלפון הקונה'}</div>
-                            <div style={labelSmallStyle}>{props.customerData.user.phone}</div>
+                            <div style={labelSmallStyle}>{props.customerData.customerPhone}</div>
                         </Stack>
                         {props.customerData.extraPeople && props.customerData.extraPeople.length > 0 && <div>
                             <label style={{ ...labelTitleStyle, ...{ textDecoration: 'underline' } }}>{'נוסעים נוספים: '}</label>
@@ -431,11 +460,11 @@ export default function EventStatistics() {
                         </div>}
 
 
-                        <Stack style={{ justifySelf: 'flex-start' }}>
+                        <Stack style={{ justifySelf: 'flex-start' }} spacing={0.5}>
                             <Button
                                 onClick={() => {
                                     doLoad()
-                                    firebase.realTime.removeTransaction(props.customerData.user.customerId, props.ride)
+                                    firebase.realTime.removeTransaction(props.customerData.customerId, props.ride)
                                         .then(removed => {
                                             if (removed) {
                                                 alert('ברקוד ועסקה נמחקו בהצלחה')
@@ -449,14 +478,15 @@ export default function EventStatistics() {
                                             cancelLoad()
                                         })
                                 }}
-                                style={{
-                                    background: 'whitesmoke',
-                                    fontWeight: 'bold',
-                                    color: PRIMARY_PINK,
-                                    textTransform: 'none',
-                                    fontFamily: 'Open Sans Hebrew'
-                                }}>
+                                style={actionBtnStyle}>
                                 בטל
+                            </Button>
+
+                            <Button style={actionBtnStyle} onClick={() => {
+                                closeDialog()
+                                nav('/adminpanel/sms', { state: { client: props.customerData } })
+                            }}>
+                                שלח סמס
                             </Button>
                         </Stack>
 
@@ -471,71 +501,70 @@ export default function EventStatistics() {
                 overflowY: 'scroll',
                 padding: '8px',
                 maxHeight: '400px'
-            }}>{historyProp.data.map((data: { user: PNPUser, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} ride={props.ride} />)}
+            }}>{historyProp.data.map((data: { customerName: string, customerPhone: string, customerId: string, date: string, customerEmail: string, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} ride={props.ride} />)}
             </div>);
         }
 
 
-        const fetchUsersWithIds = async (ride: string, rideUsers: { uid: string, extraPeople: PNPRideExtraPassenger[] }[]) => {
-            doLoad()
-            let users = rideUsers.map(u => ({ ...u, uid: u.uid.split('_nm')[0] }))
-            firebase.realTime.getAllUsersByIds(false, users)
-                .then((data) => {
+        type Transaction = { uid: string, date: string, customerName: string, customerId: string, extraPeople: PNPRideExtraPassenger[] }
 
-                    if (data && data.length > 0) {
-                        cancelLoad()
-                        openDialogWithTitle(<h3 style={
-                            {
-                                fontWeight: '14px',
-                                textAlign: 'center',
-                                padding: '8px',
-                            }
-                        }>{ride}</h3>)
-                        openDialog({
-                            content: <CustomerCardContainer data={data} ride={ride} />,
-                            title: ride
-                        })
-                    } else {
-                        cancelLoad()
-                    }
-                }).catch(() => { cancelLoad(); openDialog({ content: <h2>{'אירעה שגיאה בהבאת המשתמשים'}</h2> }) })
+        const TransactionRow = (props: { transaction: Transaction }) => {
+            const fixedDate = () => {
+                const splitted = props.transaction.date.split(' ')
+                const date = splitted[0]
+                const time = splitted[1]
+                const date_c = date.split('-')
+                const time_c = time.split(':')
+                let temp = date_c[0]
+                date_c[0] = date_c[2]
+                date_c[2] = temp
+                time_c.pop()
+                return date_c.join('-') + " " + time_c.join(':')
+            }
+            return <Stack key={v4()}>
+                <Stack direction={'row'} width={'100%'} justifyContent={'space-between'}>
+                    <p style={{ ...SmallTextStyle, direction: 'ltr',fontSize:'11px' }}>{fixedDate()}</p>
+                    <p style={{ ...ParagraphStyle }}>{`${props.transaction.customerName} `}</p>
+                </Stack>
+            </Stack>
         }
 
+        const toTransactionRow = (transaction: Transaction) => <TransactionRow key={v4()} transaction={transaction} />
+        const showAll = async (cityName: string, users: any) => {
+            openDialog({
+                content: <CustomerCardContainer data={objectsFromStatistics!![cityName].users
+                } ride={cityName} />
+            })
+        }
 
-        return <div>  <h1 style={{ color: SECONDARY_WHITE }}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
-            {objectsFromStatistics ? <div > {<h4 style={{ fontWeight: '100', color: SECONDARY_WHITE }}>{`סה"כ נוסעים`} : <b>{total}</b></h4>}<div dir={'rtl'} style={{ color: SECONDARY_WHITE, overflowY: 'scroll', maxHeight: '400px' }}>
-                {objectsFromStatistics && <div style={{ display: 'grid', minWidth: '320px', height: 'fit-content', gridTemplateColumns: '1fr 1fr' }}>
-                    {Object.entries(objectsFromStatistics)
-                        .map((each, index: number) => <div
-                            key={each[0] + index}
-                            style={{
-                                padding: '4px',
-                                margin: '4px',
-                                maxWidth: '200px',
-                                fontSize: '16px',
-                                fontWeight: 'bold'
-                            }}>
-                            {each[0]} {/*   City Title */}
-                            <div style={{
-                                fontWeight: '500',
-                                padding: '4px'
-                            }}>
-                                {each[1].amount}{/*  City Transactions amount */}
-                            </div>
-                            <button onClick={() => fetchUsersWithIds(each[0], each[1].users)}
-                                style={{
-                                    margin: '4px',
-                                    fontSize: '14px',
-                                    padding: '4px',
-                                    border: '1px solid white',
-                                    background: 'black',
-                                    fontWeight: 'bold',
-                                    color: PRIMARY_ORANGE
-                                }}>
-                                {'הצג משתמשים'}
-                            </button>
-                            <hr /></div>)} </div>}
-            </div>
+        return <div> <h1 style={HeaderStyle}>{'סטטיסטיקה ונתוני הזמנות'} </h1>
+            {objectsFromStatistics ? <div > {
+                <h4 style={CityStyle}>{`סה"כ נוסעים`} : <b>{total}</b>
+                </h4>}
+                {<PNPList<Array<any>>
+                    items={Object.entries(objectsFromStatistics)}
+                    renderRow={([cityName, { amount, users }]) => {
+                        const list = users.slice(0, 5).map(toTransactionRow)
+                        return <Stack key={v4()}>
+                            <label style={HeaderStyle}>{cityName}</label>
+                            <p style={SubHeaderStyle}>{`${amount} נוסעים`}</p>
+                            {<Stack style={SubListStyle}>
+                                <label style={{ ...SmallTextStyle, fontWeight: 'bold', fontSize: '12px', color: PRIMARY_WHITE }}>{'רכישות אחרונות'}</label>
+                                <Stack style={{ overflowY: 'scroll', maxHeight: '150px' }}>
+
+                                    {list}
+                                </Stack>
+                            </Stack>}
+                            <Button
+                                onClick={async () => await showAll(cityName, users)}
+                                style={ButtonStyle}>
+                                {'הצג הכל'}
+                            </Button>
+                        </Stack>
+                    }} />}
+                <div dir={'rtl'}
+                    style={ListStyle}>
+                </div>
             </div> : <h4 style={{ color: 'gray' }}>{'אין הזמנות לאירוע זה'}</h4>}
         </div>
 
@@ -916,17 +945,6 @@ export default function EventStatistics() {
                 }()}
             </Stack>
 
-            {function renderStatisticsPanel() {
-                if (statistics && event)
-                    return (<ShowingPanelScreen
-                        statistics={statistics}
-                        requests={requests ?? []}
-                        rides={rides ?? []}
-                        event={event}
-                        showingComponent={showingComponent} />)
-                else return null
-
-            }()}
 
 
             {function csvExportButton() {
@@ -968,6 +986,18 @@ export default function EventStatistics() {
 
                 <label style={{ color: 'white' }}>שלח סמס בעת רכישת כרטיסים</label>
             </Stack>}
+            {function renderStatisticsPanel() {
+                if (statistics && event)
+                    return (<ShowingPanelScreen
+                        statistics={statistics}
+                        requests={requests ?? []}
+                        rides={rides ?? []}
+                        event={event}
+                        showingComponent={showingComponent} />)
+                else return null
+
+            }()}
+
         </InnerPageHolder>
     </PageHolder> : <div>{'לא קיים לאירוע זה דף ניהול'}</div>)
 

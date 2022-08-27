@@ -1,47 +1,38 @@
-import { AccordionDetails, AccordionSummary, Stack, ListItemIcon, List, MenuItem, Accordion, Button } from "@mui/material"
-import React, { CSSProperties, useEffect, useLayoutEffect, useState } from "react"
+import { Stack, List, MenuItem, Button } from "@mui/material"
+import React, { CSSProperties, useEffect, useState } from "react"
 import { useParams } from "react-router"
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import $ from 'jquery'
 import './EventPage.css'
-import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import sold_out from '../../assets/images/sold_out.png'
 import { PageHolder } from "../utilityComponents/Holders";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { useFirebase } from "../../context/Firebase"
-import { ADDRESS, STARTING_POINT, SHOW_RIDE_SELECT, HIDE_EXTRA_DETAILS, ATTENTION, SHOW_EXTRA_DETAILS, START_DATE, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, SIDE, NO_RIDES, ORDER, PICK_START_POINT_REQUEST, CONTINUE_TO_SECURE_PAYMENT, EVENT_DETAILS } from "../../settings/strings"
+import { ATTENTION, CANT_SEE_YOUR_CITY, NO_DELAYS, BOTH_DIRECTIONS, SIDE, ORDER, PICK_START_POINT_REQUEST, EVENT_DETAILS } from "../../settings/strings"
 import { PNPEvent } from "../../store/external/types"
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import { useLanguage } from "../../context/Language";
-import { useLoading } from "../../context/Loading";
+
 import { submitButton } from '../../settings/styles'
-import { DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, PRIMARY_WHITE, SECONDARY_WHITE, DARKER_BLACK_SELECTED, RED_ROYAL, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors";
+import { PRIMARY_BLACK, PRIMARY_WHITE, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors";
 import { HtmlTooltip } from "../utilityComponents/HtmlTooltip";
-import { useNavigate, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 import { PNPPublicRide } from "../../store/external/types";
 import RideRequestForm from "../ride/RideRequestForm";
 import { Unsubscribe } from "firebase/database";
 import HTMLFromText from "../utilityComponents/HtmlFromText";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { getValidImageUrl } from "../../utilities";
-export default function EventPage() {
+import { Hooks } from "../generics/types";
+import { CommonHooks, withHookGroup } from "../generics/withHooks";
+function EventPage(props: Hooks) {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
-    const [expanded, setExpanded] = useState<boolean>(false)
-    const [expandedRides, setExpandedRides] = useState<boolean>(true)
     const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
-    const { isLoading, doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
-    const { lang } = useLanguage()
     const location = useLocation()
     const [eventRides, setEventRides] = useState<PNPPublicRide[]>([])
-    const { firebase, appUser, user } = useFirebase()
     const { id } = useParams()
-
-    const nav = useNavigate()
-
     const openRequestPaymentDialog = (ride?: PNPPublicRide) => {
         if (event) {
-            nav('/event/payment', { state: { ride: ride ?? selectedEventRide, event: event } })
+            props.nav('/event/payment', { state: { ride: ride ?? selectedEventRide, event: event } })
         }
     }
 
@@ -50,7 +41,7 @@ export default function EventPage() {
 
 
     useEffect(() => {
-        doLoad()
+        props.loading.doLoad()
         const resize = (e?: PNPEvent) => {
             let c: any = e;
             if (!c) {
@@ -82,15 +73,15 @@ export default function EventPage() {
         let u2: Unsubscribe | null = null
         let removeResize: any;
         if (id) {
-            u1 = firebase.realTime.getPublicEventById(id, (event) => {
+            u1 = props.firebase.firebase.realTime.getPublicEventById(id, (event) => {
                 setEvent(event as PNPEvent)
-                cancelLoad()
+                props.loading.cancelLoad()
                 removeResize = () => resize(event as PNPEvent)
                 window.addEventListener('resize', removeResize);
                 resize(event as PNPEvent)
             })
 
-            u2 = firebase.realTime.getPublicRidesByEventId(id, (rides) => {
+            u2 = props.firebase.firebase.realTime.getPublicRidesByEventId(id, (rides) => {
                 setEventRides(rides as PNPPublicRide[])
             })
         }
@@ -127,7 +118,7 @@ export default function EventPage() {
         const left = ridesLeft(ride)
         const showLeft = ride.extras.rideStatus === 'running-out'
         const soldOut = left === 0
-        const labelText = soldOut ? (lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (showLeft ? left + (lang === 'heb' ? (' כרטיסים' + (left <= 10 ? ' אחרונים' : ' זמינים')) : ' Tickets Available') : (lang === 'heb' ? 'כרטיסים זמינים' : 'Tickets Available'))
+        const labelText = soldOut ? (props.language.lang === 'heb' ? 'כרטיסים אזלו' : 'Sold out') : (showLeft ? left + (props.language.lang === 'heb' ? (' כרטיסים' + (left <= 10 ? ' אחרונים' : ' זמינים')) : ' Tickets Available') : (props.language.lang === 'heb' ? 'כרטיסים זמינים' : 'Tickets Available'))
         return (<div className={'sold_out_item_label'}
             style={{
                 direction: 'rtl',
@@ -194,7 +185,7 @@ export default function EventPage() {
     }
 
     const noRidesStyle = {
-        direction: SIDE(lang),
+        direction: SIDE(props.language.lang),
         background: 'none',
         textAlign: 'center',
         fontSize: '12px',
@@ -205,8 +196,8 @@ export default function EventPage() {
     } as CSSProperties
 
     const noRidesStyle2 = {
-        paddingLeft: lang === 'heb' ? '4px' : '0px',
-        paddingRight: lang === 'heb' ? '0px' : '4px',
+        paddingLeft: props.language.lang === 'heb' ? '4px' : '0px',
+        paddingRight: props.language.lang === 'heb' ? '0px' : '4px',
         textDecoration: 'underline',
         textUnderlinePosition: 'under',
         cursor: 'pointer'
@@ -253,30 +244,30 @@ export default function EventPage() {
                             <div className='eventRideListContainer_ePage'>
                                 <div style={{ margin: '0px', padding: '0px' }}>
                                     <hr className="light_hline" />
-                                    <div dir={SIDE(lang)} className="attention_container">
+                                    <div dir={SIDE(props.language.lang)} className="attention_container">
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: '2px' }}>
                                             <span className='attention_ePage'>
-                                                {ATTENTION(lang)}</span>
+                                                {ATTENTION(props.language.lang)}</span>
                                             <span >
-                                                {event.eventAttention?.eventAttention1 === 'unset' ? BOTH_DIRECTIONS(lang) : event.eventAttention?.eventAttention1}
+                                                {event.eventAttention?.eventAttention1 === 'unset' ? BOTH_DIRECTIONS(props.language.lang) : event.eventAttention?.eventAttention1}
                                             </span>
                                         </div>
                                         {eventRides.find(e => e.extras.isRidePassengersLimited) &&
-                                            <span dir={SIDE(lang)}>
+                                            <span dir={SIDE(props.language.lang)}>
                                                 {'מספר המקומות מוגבל ל-50 הרוכשים הראשונים בכל הסעה'}
                                             </span>}
                                     </div>
-                                    {!isLoading && eventRides.length > 0 ?
+                                    {!props.loading.isLoading && eventRides.length > 0 ?
                                         <Stack
                                             style={{ width: '100%', rowGap: '8px' }}>
                                             <RidesList />
                                         </Stack> : event.eventCanAddRides &&
-                                        <div style={noRidesStyle}>{lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'}
-                                            <b onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
-                                                style={noRidesStyle2}> {lang === 'heb' ? `כאן` : 'Here'}
+                                        <div style={noRidesStyle}>{props.language.lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'}
+                                            <b onClick={() => props.firebase.firebase.user ? props.loading.openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : props.nav('/login', { state: { cachedLocation: location.pathname } })}
+                                                style={noRidesStyle2}> {props.language.lang === 'heb' ? `כאן` : 'Here'}
                                             </b >
-                                            {lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
-                                    <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(lang) : (lang === 'heb' ? 'המשך להזמנת כרטיסים' : 'Continue to order page')} arrow>
+                                            {props.language.lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
+                                    <HtmlTooltip sx={{ fontFamily: 'Open Sans Hebrew', fontSize: '18px' }} title={selectedEventRide === null ? PICK_START_POINT_REQUEST(props.language.lang) : (props.language.lang === 'heb' ? 'המשך להזמנת כרטיסים' : 'Continue to order page')} arrow>
                                         <span>
                                             <Button onClick={() => openRequestPaymentDialog()}
                                                 id="request_event_order"
@@ -287,14 +278,14 @@ export default function EventPage() {
                                                         fontWeight: 'bold',
                                                         textTransform: 'none'
                                                     }
-                                                }}> {ORDER(lang)}</Button>
+                                                }}> {ORDER(props.language.lang)}</Button>
                                         </span>
 
                                     </HtmlTooltip>
 
                                 </div>
                                 <span style={{ fontSize: '10px' }}>
-                                    {NO_DELAYS(lang)}
+                                    {NO_DELAYS(props.language.lang)}
                                 </span>
                             </div>
                         </div>
@@ -315,7 +306,7 @@ export default function EventPage() {
                                 padding: '8px',
                                 flexDirection: 'column'
                             }}> <AddCircleOutlineIcon
-                                    onClick={() => user ? openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : nav('/login', { state: { cachedLocation: location.pathname } })}
+                                    onClick={() => props.firebase.firebase.user ? props.loading.openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : props.nav('/login', { state: { cachedLocation: location.pathname } })}
                                     style={{
                                         cursor: 'pointer',
                                         width: '50px',
@@ -326,12 +317,12 @@ export default function EventPage() {
                                         alignSelf: 'center'
                                     }} />
                                 <span className='cantSeeCity_ePage'>
-                                    {CANT_SEE_YOUR_CITY(lang)}
+                                    {CANT_SEE_YOUR_CITY(props.language.lang)}
                                 </span>
                             </div>
                             <hr className="light_hline" />
                             <div className='eventDetailsContainer_ePage'>
-                                <label>{EVENT_DETAILS(lang)}</label>
+                                <label>{EVENT_DETAILS(props.language.lang)}</label>
                                 <div>
                                     <HTMLFromText
                                         style={{ direction: 'rtl', color: PRIMARY_WHITE, padding: '16px' }}
@@ -347,3 +338,4 @@ export default function EventPage() {
         </React.Fragment>
     ) : null)
 }
+export default withHookGroup(EventPage, CommonHooks)

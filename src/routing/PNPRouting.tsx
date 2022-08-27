@@ -1,14 +1,17 @@
 import React from "react"
-import {  Routes } from "react-router"
+import { Routes } from "react-router"
 import AdminEventPanel from "../components/admin/AdminEventPanel"
 import AdminPanel from "../components/admin/AdminPanel"
 import Edit from "../components/admin/Edit/Edit"
 import EventStatistics from "../components/admin/EventStatistics"
 import InvitationStatistics from "../components/admin/InvitationStatistics"
 import ManageInvitations from "../components/admin/ManageInvitations"
+import GeneratePaymentForm from "../components/admin/PaymentForm/GeneratePaymentForm"
 import PrivatePaymentConfirmation from "../components/admin/PaymentForm/PrivatePaymentConfirmation"
 import PrivatePaymentForm from "../components/admin/PaymentForm/PrivatePaymentForm"
 import PriceStatistics from "../components/admin/PriceStatistics/PriceStatistics"
+import PrivateRideRequests from "../components/admin/PrivateRideRequests/PrivateRideRequests"
+import SMS from "../components/admin/SMS/SMS"
 import UserStatistics from "../components/admin/UserStatistics"
 import ForgotPass from "../components/auth/ForgotPass"
 import Login from "../components/auth/Login"
@@ -18,15 +21,14 @@ import Profile from "../components/auth/Profile"
 import Register from "../components/auth/Register"
 import CreateEvent from "../components/event/CreateEvent"
 import EventPage from "../components/event/EventPage"
-import EventPageTest from "../components/event/EventPageTest"
 import PrivateEventConstruction from "../components/event/PrivateEventConstruction"
 import Home from "../components/home/Home"
 import InvitationPage from "../components/invitation/InvitationPage"
 import LinkRedirect from "../components/linkRedirect/LinkRedirect"
+import Barcode from "../components/other/Barcode"
 import TermsOfService from "../components/other/TermsOfService"
 import Test from "../components/other/Test"
 import EventPayment from "../components/payment/EventPayment"
-import EventPaymentTest from "../components/payment/EventPaymentTest"
 import MyPayments from "../components/payment/MyPayments"
 import PaymentSuccess from "../components/payment/PaymentSuccess"
 import CreateRide from "../components/ride/CreateRide"
@@ -66,13 +68,16 @@ const PNPRouting = React.memo((props: any) => {
             pnpRoute('/payment/success', <PaymentSuccess />, 'auth', props.lang),
             pnpRoute('/payment/privatePayment', <PrivatePaymentConfirmation />, 'auth', props.lang),
             pnpRoute('/producerpanel/invitation/:eventId', <InvitationStatistics />, 'auth', props.lang),
+            pnpRoute('/barcode', <Barcode />, 'auth', props.lang),
+
             /* Producer Routing */
             pnpRoute('/scan', <BScanner />, 'producer', props.lang),
             pnpRoute('/scanResult', <BScanResult />, 'producer', props.lang),
             /* Admin Routing */
-            pnpRoute('/event/test/:id', <EventPageTest />, 'admin', props.lang),
-            pnpRoute('/event/test/payment', <EventPaymentTest />, 'admin', props.lang),
             pnpRoute('/test2', <PriceStatistics />, 'admin', props.lang),
+            pnpRoute('/generatePaymentLink', <GeneratePaymentForm />, 'admin', props.lang),
+            pnpRoute('/adminpanel/sms', <SMS />, 'admin', props.lang),
+            pnpRoute('/adminpanel/rideRequests', <PrivateRideRequests />, 'admin', props.lang),
             pnpRoute('/adminpanel', <AdminPanel />, 'admin', props.lang),
             pnpRoute('/adminpanel/editweb', <Edit />, 'admin', props.lang),
             pnpRoute('/adminpanel/invitations', <ManageInvitations />, 'admin', props.lang),

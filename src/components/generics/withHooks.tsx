@@ -1,3 +1,4 @@
+import React, { useEffect } from "react"
 import { useNavigate } from "react-router"
 import { useCookies } from "../../context/CookieContext"
 import { useFirebase } from "../../context/Firebase"
@@ -8,6 +9,7 @@ import { useLoading } from "../../context/Loading"
 import { Hook, Hooks } from "./types"
 
 type NamedHook = "firebase" | "language" | "loading" | "nav" | "backgroundExt" | "headerExt" | "cookies" | "dimExt" | "google"
+export const CommonHooks = ['firebase', 'loading', 'nav', 'language','headerExt','backgroundExt'] as NamedHook[]
 export const getNamedHookGroup = (group: Array<NamedHook>) => {
     let map = {} as { [id: string]: any }
     group.forEach(hook => map[hook] = getNamedHook(hook))

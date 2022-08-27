@@ -62,7 +62,7 @@ export function RegistrationForm({
                 background: SECONDARY_WHITE,
                 borderRadius: '16px',
                 alignSelf: 'center',
-                fontSize:'11px',
+                fontSize: '11px',
                 width: '100%',
                 maxWidth: '245px',
                 border: '.1px solid white',
@@ -158,7 +158,9 @@ export function RegistrationForm({
             alert(validationErrors.join('\n'))
             return
         }
+
         doLoad()
+
         createUserWithEmailAndPassword(firebase.auth, user.email, user.password)
             .then(() => {
                 finishRegister = true;
@@ -174,7 +176,9 @@ export function RegistrationForm({
                     producer: false
                 }).then(result => {
                     cancelLoad()
-                    registrationSuccessAction(firebase.auth.currentUser)
+                    setTimeout(() => {
+                        registrationSuccessAction(firebase.auth.currentUser)
+                    }, 1500)
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
                     firebase.realTime.createError('Register error', err)
@@ -205,14 +209,14 @@ export function RegistrationForm({
             minWidth: '300px',
             flexDirection: 'column',
             alignItems: 'center',
-            alignSelf:'center'
+            alignSelf: 'center'
         }, ...style
     }}>
 
-        <Stack spacing={3}  alignSelf={'center'}>
+        <Stack spacing={3} alignSelf={'center'}>
             <Stack direction={'row'} spacing={4}>
-            <FormControl>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{PHONE_NUMBER(lang)}</label>
+                <FormControl>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE, fontSize: '14px' }}>{PHONE_NUMBER(lang)}</label>
                     <TextField
                         type="tel"
                         placeholder={PHONE_NUMBER(lang)}
@@ -224,7 +228,7 @@ export function RegistrationForm({
 
                 </FormControl>
                 <FormControl>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{FULL_NAME(lang)}</label>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE, fontSize: '14px' }}>{FULL_NAME(lang)}</label>
                     <TextField sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }}
                         classes={{ root: classes.root }}
                         placeholder={FULL_NAME(lang)}
@@ -232,13 +236,13 @@ export function RegistrationForm({
                         id="first_name_input" aria-describedby="first_name_helper_text" />
 
                 </FormControl>
-             
+
             </Stack>
             <Stack direction={'row'} spacing={4}>
 
 
                 <FormControl>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{PASSWORD(lang)}</label>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE, fontSize: '14px' }}>{PASSWORD(lang)}</label>
                     <TextField
                         autoComplete="new-password"
                         type="password"
@@ -249,7 +253,7 @@ export function RegistrationForm({
                         sx={{ direction: SIDE(lang), color: SECONDARY_WHITE }} id="password_input" aria-describedby="password_helper_text" />
                 </FormControl>
                 <FormControl>
-                    <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{EMAIL(lang)}</label>
+                    <label style={{ padding: '4px', color: SECONDARY_WHITE, fontSize: '14px' }}>{EMAIL(lang)}</label>
                     <TextField
                         autoComplete="username"
                         type='email'
@@ -262,7 +266,7 @@ export function RegistrationForm({
                 </FormControl>
             </Stack>
             {registerSettings && registerSettings.requireBirthDate && <FormControl>
-                <label style={{ padding: '4px', color: SECONDARY_WHITE,fontSize:'14px' }}>{BIRTH_DATE(lang)}</label>
+                <label style={{ padding: '4px', color: SECONDARY_WHITE, fontSize: '14px' }}>{BIRTH_DATE(lang)}</label>
                 <TextField
                     type="date"
                     placeholder={BIRTH_DATE(lang)}

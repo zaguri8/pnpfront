@@ -2,25 +2,23 @@ import { Stack, TextField } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Unsubscribe } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { useFirebase } from "../../context/Firebase";
-import { useLoading } from "../../context/Loading";
 import { SECONDARY_WHITE } from "../../settings/colors";
 import { textFieldStyle } from "../../settings/styles";
 import { PNPEvent } from "../../store/external/types";
+import { Hooks } from "../generics/types";
+import {  withHookGroup } from "../generics/withHooks";
 import { buttonStyle } from "./InvitationStatistics";
 import './UserStatistics.css'
-export default function ScannerPermissions(props: { event: PNPEvent }) {
+
+type ScannerPermissionsProps = { event: PNPEvent }
+function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
     const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE))
-
-    const { firebase } = useFirebase()
-    const { cancelLoad, doLoad } = useLoading()
-
     const [scanners, setScanners] = useState<string[] | undefined>()
 
     useEffect(() => {
         let sub: Unsubscribe | undefined;
         if (props.event && !scanners) {
-            sub = firebase.realTime.getAllScanners(props.event.eventId, setScanners)
+            sub = props.firebase.firebase.realTime.getAllScanners(props.event.eventId, setScanners)
         }
         return () => sub && sub()
     }, [props.event])
@@ -28,12 +26,12 @@ export default function ScannerPermissions(props: { event: PNPEvent }) {
     function giveUserPermissions() {
         const email = $('#user_barcode_give_permissions_input').val() as string
         if (!email) { alert('יש להכניס אימייל'); return; }
-        doLoad()
-        firebase.realTime.giveScannerPermissionsByEmail(email, props.event.eventId).then(() => {
-            cancelLoad()
+        props.loading.doLoad()
+        props.firebase.firebase.realTime.giveScannerPermissionsByEmail(email, props.event.eventId).then(() => {
+            props.loading.cancelLoad()
             alert(`המשתמש ${email} קיבל גישות סורק`)
         }).catch(() => {
-            cancelLoad()
+            props.loading.cancelLoad()
             alert('אירעתה שגיאה בעת מתן גישות')
         })
     }
@@ -41,11 +39,11 @@ export default function ScannerPermissions(props: { event: PNPEvent }) {
 
     function takeUserPermissions() {
         const email = $('#user_barcode_take_permissions_input').val() as string
-        firebase.realTime.takeScannerPermissionsByEmail(email).then(() => {
-            cancelLoad()
+        props.firebase.firebase.realTime.takeScannerPermissionsByEmail(email).then(() => {
+            props.loading.cancelLoad()
             alert(`המשתמש ${email} איבד גישות סורק`)
         }).catch(() => {
-            cancelLoad()
+            props.loading.cancelLoad()
             alert('אירעתה שגיאה בעת לקיחת גישות')
         })
     }
@@ -84,3 +82,4 @@ export default function ScannerPermissions(props: { event: PNPEvent }) {
     </div>
 
 }
+export default withHookGroup<ScannerPermissionsProps>(ScannerPermissions, ['loading','firebase'])
