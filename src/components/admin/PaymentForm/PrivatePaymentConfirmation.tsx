@@ -1,9 +1,10 @@
 import { Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom"
-import { useFirebase } from "../../../context/Firebase";
+import { useUser } from "../../../context/Firebase";
 import { useLoading } from "../../../context/Loading";
 import { SECONDARY_WHITE } from "../../../settings/colors";
+import { StoreSingleton } from "../../../store/external";
 import { PCustomerData, PPaymentPageData, PProductData } from "../../../store/external/types";
 import { InnerPageHolder, PageHolder } from "../../utilityComponents/Holders";
 // A custom hook that builds on useLocation to parse
@@ -19,12 +20,11 @@ export default function PrivatePaymentConfirmation() {
     const query = useQuery()
     const nav = useNavigate()
     const [paymentData, setPaymentData] = useState<{ customer: PCustomerData, product: PProductData } | undefined>()
-    const { firebase } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
     useEffect(() => {
         if (query.get('customerEmail') && query.get('customerEmail') !== null) {
             doLoad()
-            firebase.realTime
+            StoreSingleton.getTools().realTime
                 .getPendingPrivateTransaction(query.get('customerEmail')!)
                 .then((data) => {
                     setPaymentData(data)

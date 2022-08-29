@@ -12,7 +12,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { DARKER_BLACK_SELECTED, PRIMARY_BLACK, PRIMARY_WHITE } from "../../settings/colors"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
 import { useLocation, useNavigate } from "react-router"
 export type ToolbarProps = {
@@ -20,7 +20,7 @@ export type ToolbarProps = {
 }
 export function ToolBar(props: ToolbarProps) {
 
-    const { user, appUser } = useFirebase()
+    const { user, appUser } = useUser()
     const nav = useNavigate()
     const location = useLocation()
     return <div id='toolbar'>

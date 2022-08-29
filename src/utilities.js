@@ -5,6 +5,17 @@ export const getCurrentDate = () => {
     date.setMonth(date.getMonth() + 1)
     return date
 }
+export const datesComparator = (a, b) => {
+    let bComps = b.date.split(' ')
+    let bCompDate = bComps[0].split('-')
+    let bCompTime = bComps[1].split(':')
+    let aComps = a.date.split(' ')
+    let aCompDate = aComps[0].split('-')
+    let aCompTime = aComps[1].split(':')
+    return new Date(bCompDate[0], bCompDate[1], bCompDate[2],
+        bCompTime[0], bCompTime[1], bCompTime[2]).getTime() - new Date(aCompDate[0], aCompDate[1], aCompDate[2],
+            aCompTime[0], aCompTime[1], aCompTime[2]).getTime()
+}
 export const getDateString = (dateMili) => {
     const date = new Date(dateMili)
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`

@@ -1,6 +1,6 @@
 
 import axios from "axios"
-import ServerRequest from "../../ApiManager/ApiManager"
+import ServerRequest from "../../network/serverRequest"
 import { PNPUser } from "../external/types"
 const paymentsAPIRoutes = {
     charge: 'https://www.nadavsolutions.com/gserver/transaction',

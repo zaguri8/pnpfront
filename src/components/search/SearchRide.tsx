@@ -6,16 +6,15 @@ import { useEffect, useState } from 'react'
 import { PNPPublicRide } from '../../store/external/types'
 import { useLoading } from '../../context/Loading'
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import { useFirebase } from '../../context/Firebase'
 import { useLocation, useNavigate } from 'react-router'
 
 import React from 'react'
-import { v4 } from 'uuid'
-import { DESTINATION_POINT, SIDE, STARTING_POINT_SINGLE } from '../../settings/strings'
+import {  SIDE } from '../../settings/strings'
 import { useLanguage } from '../../context/Language'
 import SectionTitle from '../other/SectionTitle'
 import Spacer from '../utilityComponents/Spacer'
 import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
+import { StoreSingleton } from '../../store/external'
 export default function SearchRide() {
 
 
@@ -27,9 +26,8 @@ export default function SearchRide() {
 
     const nav = useNavigate()
     const { doLoad, cancelLoad } = useLoading()
-    const { firebase, appUser } = useFirebase()
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
-    
+
     useEffect(() => {
         hideHeader()
         return () => showHeader()
@@ -38,7 +36,7 @@ export default function SearchRide() {
 
     useEffect(() => {
         doLoad()
-        firebase.realTime.addListersForRideSearch(rides => {
+        StoreSingleton.getTools().realTime.addListersForRideSearch(rides => {
             setRides(rides)
             cancelLoad()
         }, () => { cancelLoad() })

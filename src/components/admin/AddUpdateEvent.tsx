@@ -17,6 +17,7 @@ import { makeStyles } from "@mui/styles";
 import { getDefaultPublicEvent } from "../../store/external/helpers";
 import { Hooks } from "../generics/types";
 import { CommonHooks, withHookGroup } from "../generics/withHooks";
+import { StoreSingleton } from "../../store/external";
 
 
 const upperStackStyle = { width: '80%', alignSelf: 'center' }
@@ -28,7 +29,7 @@ const AddUpdateEvent = (props: AddUpdateEventProps & Hooks) => {
     const [imageBufferDesktop, setImageBufferDesktop] = useState<ArrayBuffer | null>(null)
     const [imageMobile, setImageMobile] = useState<string>('')
     const [imageDesktop, setImageDesktop] = useState<string>('')
-    const [pnpEvent, setPnpEvent] = useState<PNPEvent>((props.event ?? getDefaultPublicEvent(props.firebase.firebase.user)))
+    const [pnpEvent, setPnpEvent] = useState<PNPEvent>((props.event ?? getDefaultPublicEvent(props.user.user)))
     const [startDate, setStartDate] = useState<string>(props.event ? props.event.eventHours.startHour : '00:00')
     const [endDate, setEndDate] = useState<string>(props.event ? props.event.eventHours.endHour : '00:00')
 
@@ -42,7 +43,7 @@ const AddUpdateEvent = (props: AddUpdateEventProps & Hooks) => {
         if ((props.event && props.event.eventImageURL) || (imageBufferDesktop || imageBufferMobile)
             && isValidEvent(pnpEvent)) {
             props.loading.doLoad()
-            props.firebase.firebase.realTime.updateEvent(pnpEvent.eventId,
+            StoreSingleton.getTools().realTime.updateEvent(pnpEvent.eventId,
                 pnpEvent, imageBufferMobile, imageBufferDesktop, oldEventType)
                 .then(() => {
                     // update succeed

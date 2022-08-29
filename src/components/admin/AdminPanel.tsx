@@ -2,7 +2,8 @@ import { Button, Stack } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { v4 } from "uuid"
 import { PNPPage } from "../../cookies/types"
-import { BLACK_ELEGANT,PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { BLACK_ELEGANT, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors"
+import { StoreSingleton } from "../../store/external"
 import { getEventTypeFromString } from "../../store/external/converters"
 import { PNPEvent, UserEnterStatistics } from "../../store/external/types"
 import { getCurrentDate } from "../../utilities"
@@ -25,8 +26,9 @@ function AdminPanel(props: Hooks) {
     }, [])
     useEffect(() => {
         props.loading.doLoad()
-        const unsubStats = props.firebase.firebase.realTime.addListenerToUserStatistics(setUserStatistics)
-        const unsub = props.firebase.firebase.realTime.addListenerToPublicEvents((publicEv) => {
+        let tools = StoreSingleton.getTools()
+        const unsubStats = tools.realTime.addListenerToUserStatistics(setUserStatistics)
+        const unsub = tools.realTime.addListenerToPublicEvents((publicEv) => {
 
             const newHash: { [type: string]: { waiting: PNPEvent[], events: PNPEvent[] } } = {}
 

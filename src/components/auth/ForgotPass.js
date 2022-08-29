@@ -2,13 +2,14 @@ import { Button, TextField } from "@mui/material";
 import { makeStyles } from '@mui/styles'
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { useFirebase } from "../../context/Firebase";
+import { useUser } from "../../context/Firebase";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { useLanguage } from "../../context/Language";
 import { useLoading } from "../../context/Loading";
 import { BLACK_ROYAL, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { SIDE } from "../../settings/strings";
 import { submitButton, textFieldStyle } from "../../settings/styles";
+import { StoreSingleton } from "../../store/external";
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders";
 
 
@@ -20,7 +21,6 @@ export default function ForgotPass() {
     const classes = useStyles()
     const { lang } = useLanguage()
 
-    const { firebase } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
     const {hideHeader,showHeader} = useHeaderBackgroundExtension()
     useEffect(() => {
@@ -47,7 +47,7 @@ export default function ForgotPass() {
                         return
                     }
                     doLoad()
-                    sendPasswordResetEmail(firebase.auth, email)
+                    sendPasswordResetEmail(StoreSingleton.getTools().auth, email)
                         .then(res => {
                             cancelLoad()
                             alert('מייל לאיפוס סיסמא נשלח !')

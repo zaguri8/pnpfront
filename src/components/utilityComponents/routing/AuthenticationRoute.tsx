@@ -1,19 +1,18 @@
-import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router";
-import { IFirebaseContext } from "../../../context/Firebase";
-import { PNPRouteProps } from "../../../routing/PNPRoute";
-import { PNPUser } from "../../../store/external/types";
+import { IUserContext } from "../../../context/Firebase";
+import { LazyLoad, PNPRouteProps } from "../../../routing/PNPRoute";
 import { withHookGroup } from "../../generics/withHooks";
 
-function AuthenticationRoute(props: PNPRouteProps & { firebase: IFirebaseContext }) {
+function AuthenticationRoute(props: PNPRouteProps & { user: IUserContext }) {
     const location = useLocation()
-    if (props.firebase.appUser === undefined)
+    if (props.user.appUser === undefined)
         return null;
-    if (!props.firebase.appUser)
+    if (!props.user.appUser)
         return <Navigate to='/login' state={location.state ? { ...(location.state as any), ...{ cachedLocation: location.pathname } } : { cachedLocation: location.pathname }} />
-    return <React.Fragment>
+    return <LazyLoad>
         {props.element}
-    </React.Fragment>
+    </LazyLoad>
+
 }
 
-export default withHookGroup<PNPRouteProps>(AuthenticationRoute, ['firebase'])
+export default withHookGroup<PNPRouteProps>(AuthenticationRoute, ['user'])

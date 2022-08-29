@@ -4,6 +4,7 @@ import { Unsubscribe } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { SECONDARY_WHITE } from "../../settings/colors";
 import { textFieldStyle } from "../../settings/styles";
+import { StoreSingleton } from "../../store/external";
 import { PNPEvent } from "../../store/external/types";
 import { Hooks } from "../generics/types";
 import {  withHookGroup } from "../generics/withHooks";
@@ -18,7 +19,7 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
     useEffect(() => {
         let sub: Unsubscribe | undefined;
         if (props.event && !scanners) {
-            sub = props.firebase.firebase.realTime.getAllScanners(props.event.eventId, setScanners)
+            sub = StoreSingleton.getTools().realTime.getAllScanners(props.event.eventId, setScanners)
         }
         return () => sub && sub()
     }, [props.event])
@@ -27,7 +28,7 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
         const email = $('#user_barcode_give_permissions_input').val() as string
         if (!email) { alert('יש להכניס אימייל'); return; }
         props.loading.doLoad()
-        props.firebase.firebase.realTime.giveScannerPermissionsByEmail(email, props.event.eventId).then(() => {
+        StoreSingleton.getTools().realTime.giveScannerPermissionsByEmail(email, props.event.eventId).then(() => {
             props.loading.cancelLoad()
             alert(`המשתמש ${email} קיבל גישות סורק`)
         }).catch(() => {
@@ -39,7 +40,7 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
 
     function takeUserPermissions() {
         const email = $('#user_barcode_take_permissions_input').val() as string
-        props.firebase.firebase.realTime.takeScannerPermissionsByEmail(email).then(() => {
+        StoreSingleton.getTools().realTime.takeScannerPermissionsByEmail(email).then(() => {
             props.loading.cancelLoad()
             alert(`המשתמש ${email} איבד גישות סורק`)
         }).catch(() => {
@@ -82,4 +83,4 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
     </div>
 
 }
-export default withHookGroup<ScannerPermissionsProps>(ScannerPermissions, ['loading','firebase'])
+export default withHookGroup<ScannerPermissionsProps>(ScannerPermissions, ['loading','user'])

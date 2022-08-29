@@ -6,7 +6,7 @@ import $ from 'jquery'
 import { RegistrationForm } from '../auth/Register';
 import { List, Button, MenuItem, Stack, TextField, Typography, Checkbox } from '@mui/material';
 
-import { useFirebase } from '../../context/Firebase';
+import { useUser } from '../../context/Firebase';
 import { PNPPrivateEvent, PNPRideConfirmation, PNPRideDirectionNumber, PNPUser } from '../../store/external/types';
 import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation, isValidSingleRideConfirmation } from '../../store/validators';
 
@@ -28,6 +28,7 @@ import { getDefaultConfirmation } from '../../store/external/helpers';
 import { User } from 'firebase/auth';
 import { Hooks } from '../generics/types';
 import { CommonHooks, withHookGroup } from '../generics/withHooks';
+import { StoreSingleton } from '../../store/external';
 function InvitationCard(props: Hooks) {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
     const [newConfirmation, setNewConfirmation] = useState<PNPRideConfirmation>()
@@ -53,7 +54,7 @@ function InvitationCard(props: Hooks) {
         if (BETA) return
         props.loading.doLoad()
         let secondUnsub: Unsubscribe | null | object = null
-        const unsubscribe = props.firebase.firebase.realTime.getPrivateEventById(id!, (event) => {
+        const unsubscribe = StoreSingleton.getTools().realTime.getPrivateEventById(id!, (event) => {
 
             if (isValidPrivateEvent(event as PNPPrivateEvent)) {
                 setEvent(event as PNPPrivateEvent)
@@ -63,7 +64,7 @@ function InvitationCard(props: Hooks) {
                         setConfirmation(conf)
                         props.loading.cancelLoad()
                     } else {
-                        secondUnsub = props.firebase.firebase.realTime.getPrivateEventRidesById(id!, (rides) => {
+                        secondUnsub = StoreSingleton.getTools().realTime.getPrivateEventRidesById(id!, (rides) => {
                             if (rides as PNPPublicRide[]) {
                                 setRides(rides as PNPPublicRide[])
                             }
@@ -104,9 +105,9 @@ function InvitationCard(props: Hooks) {
 
         let actualConfirmation = event.registrationRequired ? {
             ...newConfirmation,
-            userName: u?.name ?? props.firebase.firebase.appUser!.name,
-            userId: userId ?? props.firebase.firebase.user!.uid,
-            phoneNumber: u?.phone ?? props.firebase.firebase.appUser!.phone
+            userName: u?.name ?? props.user.appUser!.name,
+            userId: userId ?? props.user.user!.uid,
+            phoneNumber: u?.phone ?? props.user.appUser!.phone
         } as PNPRideConfirmation : newConfirmation
 
         if (actualConfirmation && event.eventWithPassengers && event.eventWithGuests && actualConfirmation.rideArrival) {
@@ -150,7 +151,7 @@ function InvitationCard(props: Hooks) {
         if (!actualConfirmation?.rideArrival || (rides && rides.length < 1 && event.eventWithPassengers) || (isValidPublicRide(selectedEventRide!.ride!))) {
             await props.cookies.saveInvitationConfirmation(actualConfirmation!)
                 .then(() => {
-                    props.firebase.firebase.realTime.addRideConfirmation(actualConfirmation!)
+                    StoreSingleton.getTools().realTime.addRideConfirmation(actualConfirmation!)
                     setConfirmation(actualConfirmation!)
                     props.loading.cancelLoad()
                     alert(`תודה ${actualConfirmation?.userName}, קיבלנו את אישורך `)
@@ -429,7 +430,7 @@ function InvitationCard(props: Hooks) {
                     </Stack>
 
 
-                    {event.registrationRequired && !props.firebase.firebase.appUser
+                    {event.registrationRequired && !props.user.appUser
                         ? <RegistrationForm
                             externalRegistration
                             registerButtonText={CONFIRM_EVENT_ARRIVAL(props.language.lang)}
@@ -440,7 +441,7 @@ function InvitationCard(props: Hooks) {
                             }} registrationSuccessAction={(user: User) => {
                                 props.loading.doLoad()
                                 let unsub: Unsubscribe | undefined;
-                                unsub = props.firebase.firebase.realTime.getUserById(user.uid, ((u: PNPUser) => {
+                                unsub = StoreSingleton.getTools().realTime.getUserById(user.uid, ((u: PNPUser) => {
                                     if (u && u.name) {
                                         props.loading.cancelLoad()
                                         sendInvitation(user.uid, u)

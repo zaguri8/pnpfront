@@ -26,6 +26,7 @@ import MapComponent from '../other/MapComponent'
 import { useGoogleState } from '../../context/GoogleMaps'
 import { Hooks } from '../generics/types'
 import { CommonHooks, withHookGroup } from '../generics/withHooks'
+import { StoreSingleton } from '../../store/external'
 function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
@@ -58,11 +59,11 @@ function PaymentSuccess(props: Hooks) {
         let unsub: Unsubscribe | null = null;
         if (query.has('customer_uid') && query.has('transaction_uid')) {
             props.loading.doLoad()
-            unsub = props.firebase.firebase.realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
+            unsub = StoreSingleton.getTools().realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
                 setTransaction(trans)
                 props.loading.cancelLoad()
             }, (e: Error) => {
-                props.firebase.firebase.realTime.addError({
+                StoreSingleton.getTools().realTime.addError({
                     type: 'getTransaction',
                     error: '',
                     date: new Date().toISOString(),
@@ -105,7 +106,7 @@ function PaymentSuccess(props: Hooks) {
                 props.loading.doLoad()
                 const eventId = transaction.more_info.eventId
                 const rideId = transaction.more_info.rideId
-                await props.firebase.firebase.realTime.getPublicRideById(eventId, rideId)
+                await StoreSingleton.getTools().realTime.getPublicRideById(eventId, rideId)
                     .then(dbRide => {
                         props.loading.cancelLoad()
                         if (isValidPublicRide(dbRide)) {

@@ -4,11 +4,11 @@
 
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useFirebase } from "../../context/Firebase";
+import { useUser } from "../../context/Firebase";
 import { useLoading } from "../../context/Loading";
+import { StoreSingleton } from "../../store/external";
 export default function LinkRedirect() {
     const { id } = useParams();
-    const { firebase } = useFirebase()
     const nav = useNavigate()
     const { doLoad, cancelLoad } = useLoading()
     const pageNotFound = () => {
@@ -19,7 +19,7 @@ export default function LinkRedirect() {
     useEffect(() => {
         if (id) {
             doLoad();
-            firebase.realTime.getLinkRedirect(id, (link, err) => {
+            StoreSingleton.getTools().realTime.getLinkRedirect(id, (link, err) => {
                 if (err || !link) return pageNotFound();
                 cancelLoad();
                 window.open(link, '_self')

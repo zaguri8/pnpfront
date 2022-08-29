@@ -1,7 +1,7 @@
 import { Auth, User } from "firebase/auth"
 import { NavigateFunction } from "react-router"
 import { ICookieContext } from "../../context/CookieContext"
-import { IFirebaseContext } from "../../context/Firebase"
+import { IUserContext } from "../../context/Firebase"
 import { IGoogleContext } from "../../context/GoogleMaps"
 import { IBackgroundExtension, IDimExtension, IHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { ILanguageContext } from "../../context/Language"
@@ -10,7 +10,7 @@ import { Realtime } from "../../store/external"
 import { PNPRideConfirmation, PNPUser } from "../../store/external/types"
 
 
-export type Hook = IFirebaseContext | ILanguageContext | {
+export type Hook = IUserContext | ILanguageContext | {
     isLoading: boolean | undefined;
     doLoad: () => void;
     doLoadSpecial: (img: any) => void;
@@ -29,7 +29,7 @@ export type Hook = IFirebaseContext | ILanguageContext | {
     closeDialog: () => void;
 } | IBackgroundExtension | NavigateFunction | IHeaderBackgroundExtension | IDimExtension | IGoogleContext | ICookieContext
 export type Hooks = {
-    firebase: { firebase: { realTime: Realtime, auth: Auth, appUser: PNPUser | undefined | null, user: User | undefined | null } },
+    user: { appUser: PNPUser | undefined | null, user: User | undefined | null },
     loading: {
         isLoading: boolean | undefined;
         doLoad: () => void;

@@ -1,9 +1,10 @@
 import { Checkbox, Stack, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { useFirebase } from '../../../context/Firebase'
+import { useUser } from '../../../context/Firebase'
 import { useLoading } from '../../../context/Loading'
 import { BLACK_ELEGANT, DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE } from '../../../settings/colors'
 import { StyleBuilder } from '../../../settings/styles.builder'
+import { StoreSingleton } from '../../../store/external'
 import { RegisterFormExtras } from '../../../store/external/types'
 import SectionTitle from '../../other/SectionTitle'
 import { InnerPageHolder, PageHolder } from '../../utilityComponents/Holders'
@@ -13,13 +14,12 @@ const labelStyle = new StyleBuilder()
     .whiteText()
     .build()
 export default function Edit() {
-    const { firebase } = useFirebase()
     const { doLoad, cancelLoad } = useLoading()
     const [registerSettings, setRegisterSettings] = useState<RegisterFormExtras | undefined>()
     const [hasChanges, setHasChanges] = useState<{ [id: string]: boolean }>({})
     useEffect(() => {
         doLoad()
-        const unsub = firebase.realTime.addListenerToRegistrationPage((settings) => {
+        const unsub = StoreSingleton.getTools().realTime.addListenerToRegistrationPage((settings) => {
             cancelLoad()
 
             setRegisterSettings(settings)
@@ -38,7 +38,7 @@ export default function Edit() {
     const executeRegistrationUpdate = () => {
         if (registerSettings) {
             doLoad()
-            firebase.realTime.updateWebsiteRegistrationPage(registerSettings)
+            StoreSingleton.getTools().realTime.updateWebsiteRegistrationPage(registerSettings)
                 .then(() => {
                     alert('ערכת בהצלחה את דף ההרשמה')
                     cancelLoad()

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import $ from 'jquery'
 import { useLoading } from './context/Loading';
 import AppMenu from './components/other/AppMenu';
-import { useFirebase } from './context/Firebase';
+import { useUser } from './context/Firebase';
 import { useLanguage } from './context/Language';
 import LoadingIndicator from './components/utilityComponents/LoadingIndicator';
 import Scanner from './components/scanner/Scanner';
@@ -54,7 +54,7 @@ function App() {
       $('.dim').off()
     }
   }
-  const { isLoadingAuth } = useFirebase()
+  const { isLoadingAuth } = useUser()
   const [resizingScript, setResizingScript] = useState(false)
   useEffect(() => {
     const d = document.createElement('div')

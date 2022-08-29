@@ -1,43 +1,44 @@
 import React from "react"
 import { Routes } from "react-router"
-import AdminEventPanel from "../components/admin/AdminEventPanel"
-import AdminPanel from "../components/admin/AdminPanel"
-import Edit from "../components/admin/Edit/Edit"
-import EventStatistics from "../components/admin/EventStatistics"
-import InvitationStatistics from "../components/admin/InvitationStatistics"
-import ManageInvitations from "../components/admin/ManageInvitations"
-import GeneratePaymentForm from "../components/admin/PaymentForm/GeneratePaymentForm"
-import PrivatePaymentConfirmation from "../components/admin/PaymentForm/PrivatePaymentConfirmation"
-import PrivatePaymentForm from "../components/admin/PaymentForm/PrivatePaymentForm"
-import PriceStatistics from "../components/admin/PriceStatistics/PriceStatistics"
-import PrivateRideRequests from "../components/admin/PrivateRideRequests/PrivateRideRequests"
-import SMS from "../components/admin/SMS/SMS"
-import UserStatistics from "../components/admin/UserStatistics"
-import ForgotPass from "../components/auth/ForgotPass"
-import Login from "../components/auth/Login"
-import MyAccount from "../components/auth/MyAccount"
-import MyCoins from "../components/auth/MyCoins"
-import Profile from "../components/auth/Profile"
-import Register from "../components/auth/Register"
-import CreateEvent from "../components/event/CreateEvent"
-import EventPage from "../components/event/EventPage"
-import PrivateEventConstruction from "../components/event/PrivateEventConstruction"
-import Home from "../components/home/Home"
-import InvitationPage from "../components/invitation/InvitationPage"
-import LinkRedirect from "../components/linkRedirect/LinkRedirect"
-import Barcode from "../components/other/Barcode"
-import TermsOfService from "../components/other/TermsOfService"
-import Test from "../components/other/Test"
-import EventPayment from "../components/payment/EventPayment"
-import MyPayments from "../components/payment/MyPayments"
-import PaymentSuccess from "../components/payment/PaymentSuccess"
-import CreateRide from "../components/ride/CreateRide"
-import BScanner from "../components/scanner/BScanner"
-import BScanResult from "../components/scanner/BScanResult"
-import SearchRide from "../components/search/SearchRide"
-import NotFound from "../components/utilityComponents/NotFound"
 import pnpRoute from "./PNPRoute"
+const AdminEventPanel = React.lazy(() => import("../components/admin/AdminEventPanel"))
+const AdminPanel = React.lazy(() => import("../components/admin/AdminPanel"))
+const Edit = React.lazy(() => import("../components/admin/Edit/Edit"))
+const EventStatistics = React.lazy(() => import("../components/admin/EventStatistics"))
+const InvitationStatistics = React.lazy(() => import("../components/admin/InvitationStatistics"))
+const ManageInvitations = React.lazy(() => import("../components/admin/ManageInvitations"))
+const GeneratePaymentForm = React.lazy(() => import("../components/admin/PaymentForm/GeneratePaymentForm"))
+const PrivatePaymentConfirmation = React.lazy(() => import("../components/admin/PaymentForm/PrivatePaymentConfirmation"))
+const PrivatePaymentForm = React.lazy(() => import("../components/admin/PaymentForm/PrivatePaymentForm"))
+const PriceStatistics = React.lazy(() => import("../components/admin/PriceStatistics/PriceStatistics"))
+const SMS = React.lazy(() => import("../components/admin/SMS/SMS"))
+const PrivateRideRequests = React.lazy(() => import("../components/admin/PrivateRideRequests/PrivateRideRequests"))
+const UserStatistics = React.lazy(() => import("../components/admin/UserStatistics"))
+const ForgotPass = React.lazy(() => import("../components/auth/ForgotPass"))
+const Login = React.lazy(() => import("../components/auth/Login"))
+const MyAccount = React.lazy(() => import("../components/auth/MyAccount"))
+const MyCoins = React.lazy(() => import("../components/auth/MyCoins"))
+const Profile = React.lazy(() => import("../components/auth/Profile"))
+const Register = React.lazy(() => import("../components/auth/Register"))
+const CreateEvent = React.lazy(() => import("../components/event/CreateEvent"))
+const EventPage = React.lazy(() => import("../components/event/EventPage"))
+const PrivateEventConstruction = React.lazy(() => import("../components/event/PrivateEventConstruction"))
+const Home = React.lazy(() => import("../components/home/Home"))
+const InvitationPage = React.lazy(() => import("../components/invitation/InvitationPage"))
+const LinkRedirect = React.lazy(() => import("../components/linkRedirect/LinkRedirect"))
+const Barcode = React.lazy(() => import("../components/other/Barcode"))
+const TermsOfService = React.lazy(() => import("../components/other/TermsOfService"))
+const Test = React.lazy(() => import("../components/other/Test"))
+const EventPayment = React.lazy(() => import("../components/payment/EventPayment"))
+const MyPayments = React.lazy(() => import("../components/payment/MyPayments"))
+const PaymentSuccess = React.lazy(() => import("../components/payment/PaymentSuccess"))
+const CreateRide = React.lazy(() => import("../components/ride/CreateRide"))
+const BScanner = React.lazy(() => import("../components/scanner/BScanner"))
+const BScanResult = React.lazy(() => import("../components/scanner/BScanResult"))
+const SearchRide = React.lazy(() => import("../components/search/SearchRide"))
+const NotFound = React.lazy(() => import("../components/utilityComponents/NotFound"))
 const PNPRouting = React.memo((props: any) => {
+
     return <Routes>
         {[
             /* Register Routing */
@@ -54,7 +55,6 @@ const PNPRouting = React.memo((props: any) => {
             pnpRoute('/*', <NotFound lang={props.lang} />, 'normal', props.lang),
             pnpRoute('/login', <Login />, 'normal', props.lang),
             /* Authenticated Users Routing */
-            pnpRoute("/myaccount", <MyAccount />, 'auth', props.lang),
             pnpRoute("/myaccount", <MyAccount />, 'auth', props.lang),
             pnpRoute('/myaccount/coins', <MyCoins />, 'auth', props.lang),
             pnpRoute('/myaccount/profile', <Profile />, 'auth', props.lang),

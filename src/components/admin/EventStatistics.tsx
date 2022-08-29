@@ -1,7 +1,7 @@
 import { Accordion, TextField, MenuItem, Checkbox, Select, AccordionDetails, AccordionSummary, Button, List, Stack, alertTitleClasses } from "@mui/material";
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 
-import { useFirebase } from "../../context/Firebase";
+import { useUser } from "../../context/Firebase";
 import { Unsubscribe } from "firebase/database";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
@@ -29,7 +29,8 @@ import { useBackgroundExtension, useHeaderBackgroundExtension } from "../../cont
 import { StyleBuilder } from "../../settings/styles.builder";
 import PNPList from "../generics/PNPList";
 import { PRIMARY_GRADIENT } from "../other/Barcode";
-import { getDateTimeString } from "../../utilities";
+import { datesComparator, getDateTimeString } from "../../utilities";
+import { StoreSingleton } from "../../store/external";
 
 export type PNPRideExtraPassenger = {
     fullName: string,
@@ -119,7 +120,6 @@ export default function EventStatistics() {
     const [barCodes, setBarCodes] = useState<PNPTransactionConfirmation[] | undefined>()
     const [statistics, setStatistics] = useState<RideStatistics[] | null>(null)
     const [rides, setRides] = useState<PNPPublicRide[] | null>(null)
-    const { firebase } = useFirebase()
     const { lang } = useLanguage()
     const { openDialog, openDialogWithBottom, closeDialog, doLoad, cancelLoad, openDialogWithTitle } = useLoading()
     const [requests, setRequests] = useState<PNPRideRequest[] | null>(null)
@@ -130,7 +130,7 @@ export default function EventStatistics() {
         let unsub: Unsubscribe | null = null
         if (event) {
             doLoad()
-            unsub3 = firebase.realTime.getAllTransactionsForEvent(event.eventId, (stats) => {
+            unsub3 = StoreSingleton.getTools().realTime.getAllTransactionsForEvent(event.eventId, (stats) => {
                 setStatistics(stats)
                 cancelLoad()
             }, (e) => {
@@ -138,9 +138,9 @@ export default function EventStatistics() {
             })
 
 
-            unsub = event ? firebase.realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
+            unsub = event ? StoreSingleton.getTools().realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
 
-            unsub2 = event ? firebase.realTime.getPublicRidesByEventId(event.eventId, (e) => {
+            unsub2 = event ? StoreSingleton.getTools().realTime.getPublicRidesByEventId(event.eventId, (e) => {
                 setRides(e)
             }) : null
         }
@@ -156,7 +156,7 @@ export default function EventStatistics() {
     useEffect(() => {
         let sub: Unsubscribe | undefined;
         if (!barCodes && event) {
-            sub = firebase.realTime.getAllTransactionConfirmations(event.eventId, setBarCodes, err => { })
+            sub = StoreSingleton.getTools().realTime.getAllTransactionConfirmations(event.eventId, setBarCodes, err => { })
         }
         return () => sub && sub()
     }, [event])
@@ -165,7 +165,7 @@ export default function EventStatistics() {
     const deleteEvent = () => {
         if (event) {
             doLoad()
-            firebase.realTime.removeEvent(event)
+            StoreSingleton.getTools().realTime.removeEvent(event)
                 .then(() => {
                     alert('אירוע נמחק בהצלחה')
                     nav('/adminpanel')
@@ -275,7 +275,7 @@ export default function EventStatistics() {
                                             }>{`נקודת יציאה ${ride.rideStartingPoint}`}</h4></div>)
                                         openDialog({
                                             content: <div style={{ padding: '4px' }}><button
-                                                onClick={() => { firebase.realTime.removePublicRide(props.event.eventId, ride.rideId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
+                                                onClick={() => { StoreSingleton.getTools().realTime.removePublicRide(props.event.eventId, ride.rideId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
                                                 style={{
                                                     padding: '4px',
                                                     margin: '16px',
@@ -464,7 +464,7 @@ export default function EventStatistics() {
                             <Button
                                 onClick={() => {
                                     doLoad()
-                                    firebase.realTime.removeTransaction(props.customerData.customerId, props.ride)
+                                    StoreSingleton.getTools().realTime.removeTransaction(props.customerData.customerId, props.ride)
                                         .then(removed => {
                                             if (removed) {
                                                 alert('ברקוד ועסקה נמחקו בהצלחה')
@@ -501,7 +501,7 @@ export default function EventStatistics() {
                 overflowY: 'scroll',
                 padding: '8px',
                 maxHeight: '400px'
-            }}>{historyProp.data.map((data: { customerName: string, customerPhone: string, customerId: string, date: string, customerEmail: string, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} ride={props.ride} />)}
+            }}>{historyProp.data.sort(datesComparator).map((data: { customerName: string, customerPhone: string, customerId: string, date: string, customerEmail: string, extraPeople: PNPRideExtraPassenger[] }) => <CustomerCard key={v4()} customerData={data} ride={props.ride} />)}
             </div>);
         }
 
@@ -523,7 +523,7 @@ export default function EventStatistics() {
             }
             return <Stack key={v4()}>
                 <Stack direction={'row'} width={'100%'} justifyContent={'space-between'}>
-                    <p style={{ ...SmallTextStyle, direction: 'ltr',fontSize:'11px' }}>{fixedDate()}</p>
+                    <p style={{ ...SmallTextStyle, direction: 'ltr', fontSize: '11px' }}>{fixedDate()}</p>
                     <p style={{ ...ParagraphStyle }}>{`${props.transaction.customerName} `}</p>
                 </Stack>
             </Stack>
@@ -544,7 +544,7 @@ export default function EventStatistics() {
                 {<PNPList<Array<any>>
                     items={Object.entries(objectsFromStatistics)}
                     renderRow={([cityName, { amount, users }]) => {
-                        const list = users.slice(0, 5).map(toTransactionRow)
+                        const list = users.slice(0, 5).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(toTransactionRow)
                         return <Stack key={v4()}>
                             <label style={HeaderStyle}>{cityName}</label>
                             <p style={SubHeaderStyle}>{`${amount} נוסעים`}</p>
@@ -694,7 +694,7 @@ export default function EventStatistics() {
                     </AccordionDetails>
                 </Accordion>{!expand[h(props.request)] && <RemoveCircleIcon sx={{ flexGrow: '0', color: '#bd3333', cursor: 'pointer' }} onClick={() => {
                     openDialog({
-                        content: <div style={{ padding: '10px', color: SECONDARY_WHITE }}> {`האם תרצה להסיר ביקוש זה (אישור, אי רלוונטיות)`} <br /><br />{`ביקוש מעת`} <b>{`${props.request.fullName}`}</b><br /><button
+                        content: <div style={{ padding: '10px', color: PRIMARY_BLACK }}> {`האם תרצה להסיר ביקוש זה (אישור, אי רלוונטיות)`} <br /><br />{`ביקוש מעת`} <b>{`${props.request.fullName}`}</b><br /><button
                             onClick={() => {
                                 delete expand[props.request.eventId]
                                 if (requests)
@@ -708,7 +708,7 @@ export default function EventStatistics() {
                                             break
                                         }
                                     }
-                                firebase.realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() })
+                                StoreSingleton.getTools().realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() })
                             }}
                             style={{
                                 padding: '4px',
@@ -759,7 +759,7 @@ export default function EventStatistics() {
         if (objectsFromStatistics && event) {
             const all = Object.keys(objectsFromStatistics).map((city) => {
                 return {
-                    fetchUsers: async () => await firebase.realTime.getAllUsersByIds(true, objectsFromStatistics[city].users),
+                    fetchUsers: async () => await StoreSingleton.getTools().realTime.getAllUsersByIds(true, objectsFromStatistics[city].users),
                     cityName: city
                 }
             })
@@ -807,7 +807,7 @@ export default function EventStatistics() {
             let newEvent = { ...event, eventShowsInGallery: !event.eventShowsInGallery }
             doLoad()
             setEvent(newEvent)
-            firebase.realTime.updateEvent(event.eventId, newEvent, null, null).then(result => {
+            StoreSingleton.getTools().realTime.updateEvent(event.eventId, newEvent, null, null).then(result => {
                 cancelLoad()
                 alert(toShow ? 'אירוע נוסף לגלריה בהצלחה' : 'אירוע הוסר מהגלריה בהצלחה')
             }).catch(problem => {
@@ -820,7 +820,7 @@ export default function EventStatistics() {
     useEffect(() => {
         let unsub: Unsubscribe | undefined;
         if (event) {
-            unsub = firebase.realTime.getLinkRedirectForEventId(event.eventId, (link, err) => {
+            unsub = StoreSingleton.getTools().realTime.getLinkRedirectForEventId(event.eventId, (link, err) => {
                 if (err) {
                     return;
                 }
@@ -966,7 +966,7 @@ export default function EventStatistics() {
 
             <Spacer offset={1} />
             {(function eventRedirectLink() {
-                return event && <EventLinkRedirect firebase={firebase} event={event} linkRedirect={linkRedirect} />
+                return event && <EventLinkRedirect event={event} linkRedirect={linkRedirect} />
             })()}
 
             {event && <ScannerPermissions event={event} />}
@@ -975,7 +975,7 @@ export default function EventStatistics() {
                 <Checkbox checked={event.eventSendsSMS}
                     onChange={(e) => {
                         setEvent({ ...event, eventSendsSMS: e.target.checked })
-                        firebase.realTime.updateEvent(event.eventId, { ...event, eventSendsSMS: e.target.checked })
+                        StoreSingleton.getTools().realTime.updateEvent(event.eventId, { ...event, eventSendsSMS: e.target.checked })
                             .then(() => {
                                 alert(e.target.checked ? 'סמסים יישלחו כעת עבור הזמנות לאירוע זה' : 'סמסים לא יישלחו עבור הזמנות לאירוע זה')
                             }).catch(err => {

@@ -13,7 +13,7 @@ import $ from 'jquery'
 import { BLACK_ELEGANT, BLACK_ROYAL, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, RED_ROYAL, SECONDARY_WHITE } from "../../settings/colors"
 
 import { useEffect, useState } from "react"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 
 import { useNavigate } from 'react-router'
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
@@ -56,7 +56,7 @@ function MyAccountItem({ title, icon, navTo, underCons }) {
 
 export default function MyAccount() {
     const { lang } = useLanguage()
-    const { signOut, appUser } = useFirebase()
+    const { signOut, appUser } = useUser()
     const { openDialog, closeDialog } = useLoading()
 
     useEffect(() => {

@@ -4,7 +4,7 @@ import './index.css';
 import 'firebase/firestore'
 import App from './App';
 import { HashRouter } from 'react-router-dom';
-import { FirebaseContextProvider } from './context/Firebase';
+import { UserContextProvider } from './context/Firebase';
 import { LoadingContextProvider } from './context/Loading';
 import { GoogleMapsContextProvider } from './context/GoogleMaps';
 import { LanguageContextProvider } from './context/Language';
@@ -19,13 +19,13 @@ ReactDOM.render(
       <LanguageContextProvider>
         <GoogleMapsContextProvider>
           <LoadingContextProvider>
-            <FirebaseContextProvider>
+            <UserContextProvider>
               <ScanningContextProvider>
                 <CookieContextProvider>
                   <App />
                 </CookieContextProvider>
               </ScanningContextProvider>
-            </FirebaseContextProvider>
+            </UserContextProvider>
           </LoadingContextProvider>
         </GoogleMapsContextProvider>
       </LanguageContextProvider>

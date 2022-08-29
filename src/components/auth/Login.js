@@ -4,7 +4,7 @@ import { makeStyles } from "@mui/styles"
 import SectionTitle from "../other/SectionTitle"
 import Button from "../other/Button"
 import { Stack } from "@mui/material"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Link } from "react-router-dom"
@@ -16,18 +16,19 @@ import { useLoading } from "../../context/Loading"
 import { useEffect, useState } from "react"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { PageHolder } from "../utilityComponents/Holders"
+import { StoreSingleton } from "../../store/external"
 export default function Login() {
 
     const nav = useNavigate()
     const location = useLocation()
-    const { firebase } = useFirebase()
+    const { appUser } = useUser()
     const useStyles = makeStyles(() => textFieldStyle('black', { background: SECONDARY_WHITE, width: '100%' }))
     const { doLoad, cancelLoad } = useLoading()
     const [user, setUser] = useState({ u: '', p: '' })
     function login(e) {
         e.preventDefault()
         doLoad()
-        signInWithEmailAndPassword(firebase.auth, user.u, user.p)
+        signInWithEmailAndPassword(StoreSingleton.getTools().auth, user.u, user.p)
             .then(() => {
                 if (location.state && location.state.cachedLocation) {
                     doLoad()
@@ -50,8 +51,6 @@ export default function Login() {
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
 
     useEffect(() => {
-        console.log(location.state)
-
         hideHeader()
         return () => showHeader()
     }, [])

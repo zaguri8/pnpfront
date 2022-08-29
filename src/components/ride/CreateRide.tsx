@@ -1,6 +1,6 @@
 import React, { CSSProperties, useEffect, useState } from "react"
 import { PNPExplicitPrivateRide } from "../../store/external/types"
-import { useFirebase } from '../../context/Firebase'
+import { useUser } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
 import $ from 'jquery'
 import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
@@ -17,9 +17,10 @@ import { dateStringFromDate, reverseDate, unReverseDate } from "../utilityCompon
 import { getCurrentDate } from "../../utilities"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import Places from "../utilityComponents/Places"
-import ServerRequest from "../../ApiManager/ApiManager"
+import ServerRequest from "../../network/serverRequest"
 import { Hooks } from "../generics/types"
 import { CommonHooks, withHookGroup } from "../generics/withHooks"
+import { StoreSingleton } from "../../store/external"
 
 
 function CreateRide(props: Hooks) {
@@ -100,7 +101,6 @@ function CreateRide(props: Hooks) {
                     let el = ($("#arm_2" + entry[0]).children() as any).prevObject
                     el.css({ 'border': '2px solid red', 'borderRadius': '11px', height: '0px', padding: '14px', width: '130px' })
                     allFieldValids = false
-                    console.log(entry[1])
                 }
             })
             return allFieldValids
@@ -123,7 +123,7 @@ function CreateRide(props: Hooks) {
             ride.backTime = 'ללא'
         props.loading.doLoad()
         ServerRequest('sendSMS', send, res => { }, err => { })
-        props.firebase.firebase.realTime.addPrivateRideExplicit(ride)
+        StoreSingleton.getTools().realTime.addPrivateRideExplicit(ride)
             .then(() => {
                 props.loading.cancelLoad()
                 nav('/')

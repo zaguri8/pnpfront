@@ -2,7 +2,7 @@ import { MenuItem, Select, Stack } from "@mui/material"
 import { Suspense, useState } from "react"
 import { QrReader } from "react-qr-reader"
 import { useNavigate } from "react-router"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useScanner } from "../../context/ScannerContext"
 import { useLoading } from '../../context/Loading'
 import { PRIMARY_PINK, SECONDARY_WHITE } from "../../settings/colors"
@@ -11,8 +11,9 @@ import { BARCODE_MESSAGE, CLOSE_SCANNER } from "../../settings/strings"
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { getCurrentDate, getDateString, getDateTimeString } from "../../utilities"
+import { StoreSingleton } from "../../store/external"
 export default function Scanner() {
-    const { appUser, firebase } = useFirebase()
+    const { appUser } = useUser()
     const nav = useNavigate()
     const { isScanning, closeScanner, faceMode, scannerLanguage, setScannerLanguage, barCodes, setBarcodes } = useScanner()
     const { openDialog, doLoad, cancelLoad, showPopover } = useLoading()
@@ -87,7 +88,7 @@ export default function Scanner() {
                     </Stack>, 'normal', 10000)
                     return
                 }
-                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
+                StoreSingleton.getTools().realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
                     .then(() => {
                         let temp = barCodes
                         temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1

@@ -1,6 +1,6 @@
 import { Stack, TextField, Button } from '@mui/material'
 import React, { CSSProperties, HTMLInputTypeAttribute, useEffect, useState } from 'react'
-import { useFirebase } from '../../context/Firebase'
+import { useUser } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
 import { getDefaultPrivateEvent } from '../../store/external/helpers'
 import { PNPPrivateEvent } from '../../store/external/types'
@@ -17,6 +17,7 @@ import Spacer from '../utilityComponents/Spacer'
 import { reverseDate, unReverseDate } from '../utilityComponents/functions'
 import SectionTitle from '../other/SectionTitle'
 import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
+import { StoreSingleton } from '../../store/external'
 
 type FormFieldProps = {
     title: string,
@@ -29,7 +30,7 @@ type FormFieldProps = {
 }
 
 const FormField = React.memo((props: FormFieldProps) => {
-    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE, { background: PRIMARY_BLACK,border:`1px solid ${PRIMARY_PINK}` }))
+    const useStyles = makeStyles(() => textFieldStyle(SECONDARY_WHITE, { background: PRIMARY_BLACK, border: `1px solid ${PRIMARY_PINK}` }))
     const classes = useStyles()
     const { lang } = useLanguage()
     return <Stack alignItems={'center'} justifyContent={'center'} spacing={1}>
@@ -58,10 +59,9 @@ const FormField = React.memo((props: FormFieldProps) => {
 export default function PrivateEventConstruction() {
     // state && context
     const [privateEvent, setPrivateEvent] = useState<PNPPrivateEvent>(getDefaultPrivateEvent())
-    const { firebase, appUser } = useFirebase()
     const { doLoad, openDialog, cancelLoad } = useLoading()
     const { lang } = useLanguage()
-
+    const { appUser } = useUser()
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
     const [imageBuffer, setImageBuffer] = useState<ArrayBuffer | undefined>()
     const [image, setImage] = useState<string>('')
@@ -98,7 +98,7 @@ export default function PrivateEventConstruction() {
     const addPrivateEventAction = () => {
         if (isValidPrivateEvent(privateEvent)) {
             doLoad()
-            firebase.realTime.addPrivateEvent(privateEvent, imageBuffer)
+            StoreSingleton.getTools().realTime.addPrivateEvent(privateEvent, imageBuffer)
                 .then((response) => {
                     if (response && response as { id: string }) {
                         const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר אישור האירוע תקבל/י קישור הניתן לשיתוף לדף הזמנה  .` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. Once the event is approved, you will receive a shareable link for the invitation.`
@@ -129,7 +129,7 @@ export default function PrivateEventConstruction() {
     return <PageHolder style={{ maxWidth: '600px', border: 'none', marginLeft: 'auto', marginRight: 'auto' }}>
 
         <SectionTitle title={CREATE_INVITATION_TITLE(lang)} style={{}} />
-        <InnerPageHolder style={{border: '1px solid gray' , background: 'black' }}>
+        <InnerPageHolder style={{ border: '1px solid gray', background: 'black' }}>
             < Stack style={{ maxWidth: '300px' }} spacing={1}>
 
                 <input onChange={(event) => {
@@ -157,12 +157,12 @@ export default function PrivateEventConstruction() {
                     color: PRIMARY_ORANGE,
                     padding: '8px',
                     borderRadius: '8px',
-                    fontWeight:'bold',
+                    fontWeight: 'bold',
                     cursor: 'pointer',
                     alignSelf: 'center',
                     marginTop: '16px',
                     width: 'fit-content',
-                    backgroundColor:'transparent'
+                    backgroundColor: 'transparent'
                 }} onChange={(e) => alert(e)} htmlFor='files_create_event'>{PICK_IMAGE(lang, true)}</label>
 
                 <FormField
@@ -183,7 +183,7 @@ export default function PrivateEventConstruction() {
 
                     style={{
                         width: '100%',
-                        borderRadius:'32px',
+                        borderRadius: '32px',
                         marginBottom: '2px',
                         color: SECONDARY_WHITE,
                         background: PRIMARY_BLACK
@@ -224,7 +224,7 @@ export default function PrivateEventConstruction() {
                 <Spacer offset={1} />
                 <Button
                     onClick={addPrivateEventAction}
-                    style={{ ...submitButton(false), ...{ marginTop: '0px', width: '80%',paddingTop:'8px',paddingBottom:'8px', textTransform: 'none' } }}>{CREATE_INVITATION(lang)}</Button>
+                    style={{ ...submitButton(false), ...{ marginTop: '0px', width: '80%', paddingTop: '8px', paddingBottom: '8px', textTransform: 'none' } }}>{CREATE_INVITATION(lang)}</Button>
             </Stack >
         </InnerPageHolder>
     </PageHolder>

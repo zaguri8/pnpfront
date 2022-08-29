@@ -5,13 +5,14 @@ import { Unsubscribe } from 'firebase/database'
 import { PNPPage } from '../../cookies/types'
 import { Hooks } from "../generics/types";
 import { withHook } from "../generics/withHooks";
+import { StoreSingleton } from "../../store/external";
 type PNPChartProps = { page: PNPPage, date: string }
 function PNPChart(props: PNPChartProps & Hooks) {
     const [chartData, setChartData] = useState<any[]>()
     useEffect(() => {
         let unsub: Unsubscribe | null = null
         if (props.page) {
-            unsub = props.firebase.firebase.realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
+            unsub = StoreSingleton.getTools().realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
                 setChartData([
                     ["נכנסו ונרשמו", "נכנסו וייצאו"],
                     ["נכנסו ונרשמו", d.leaveWithAttendance],
@@ -34,4 +35,4 @@ function PNPChart(props: PNPChartProps & Hooks) {
     >
     </Chart> : null
 }
-export default withHook<PNPChartProps>(PNPChart, 'firebase')
+export default withHook<PNPChartProps>(PNPChart, 'user')

@@ -19,7 +19,7 @@ import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState } from "react-draft-wysiwyg";
 import { event_placeholder } from "../../assets/images";
-import { useFirebase } from "../../context/Firebase";
+import { useUser } from "../../context/Firebase";
 import { useLoading } from "../../context/Loading";
 import { submitButton, textFieldStyle } from "../../settings/styles";
 import { isValidEvent } from "../../store/validators";
@@ -33,12 +33,13 @@ import { getEventType, getEventTypeFromString } from "../../store/external/conve
 import { getCurrentDate } from "../../utilities";
 import { getDefaultPublicEvent } from "../../store/external/helpers";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
+import { StoreSingleton } from "../../store/external";
 
 export default function CreateEvent() {
     const { lang } = useLanguage()
     const [editorState, setEditorState] = useState<EditorState | undefined>()
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
-    const { user, firebase, appUser } = useFirebase()
+    const { user, appUser } = useUser()
     const nav = useNavigate()
 
     const [termsOfUser, setTermsOfUse] = useState<boolean>(false)
@@ -142,7 +143,7 @@ export default function CreateEvent() {
         const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר האישור האירוע יופיע בדף הבית תחת אותה קטגוריה.` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. One the event is approvedm, will appear on the home page under the same category.`
         if (imageBuffer) {
             doLoad()
-            firebase.realTime.createEvent(pnpEvent,
+            StoreSingleton.getTools().realTime.createEvent(pnpEvent,
                 imageBuffer)
                 .then(() => {
                     cancelLoad()

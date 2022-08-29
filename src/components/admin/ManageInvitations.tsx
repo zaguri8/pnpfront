@@ -10,12 +10,13 @@ import { useLocation } from 'react-router-dom'
 import { PNPPrivateEvent } from '../../store/external/types'
 import { PageHolder, InnerPageHolder } from '../utilityComponents/Holders'
 import { useLoading } from "../../context/Loading"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { CSSProperties, useEffect, useState } from "react"
 import Spacer from "../utilityComponents/Spacer"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { Hooks } from "../generics/types"
 import { CommonHooks, withHookGroup } from "../generics/withHooks"
+import { StoreSingleton } from "../../store/external"
 const ManageInvitations = (props: Hooks) => {
     const [privateEvents, setPrivateEvents] = useState<{ [type: string]: PNPPrivateEvent[] }>()
     useEffect(() => {
@@ -36,7 +37,7 @@ const ManageInvitations = (props: Hooks) => {
         alignSel:'center',
     } as CSSProperties
     useEffect(() => {
-        const unsub = props.firebase.firebase.realTime.addListenerToPrivateEvents(setPrivateEvents, true)
+        const unsub = StoreSingleton.getTools().realTime.addListenerToPrivateEvents(setPrivateEvents, true)
         return () => { unsub() }
     }, [])
     return <PageHolder style={{ background: PRIMARY_BLACK }}>
@@ -163,7 +164,7 @@ const ManageInvitations = (props: Hooks) => {
                                     style={{ fontSize: '14px', width: '100px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
                                     onClick={() => {
                                         props.loading.doLoad()
-                                        props.firebase.firebase.realTime.approvePrivateEvent(event.eventId)
+                                        StoreSingleton.getTools().realTime.approvePrivateEvent(event.eventId)
                                             .then(() => {
                                                 alert('האירוע אושר בהצלחה')
                                                 props.nav('/adminpanel')

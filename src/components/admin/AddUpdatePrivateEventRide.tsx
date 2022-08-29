@@ -1,7 +1,7 @@
 import { PNPPublicRide, PNPEvent, PNPPrivateEvent } from "../../store/external/types"
 import { isValidPublicRide } from "../../store/validators"
 import { useLoading } from "../../context/Loading"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useLanguage } from "../../context/Language"
 import { useState } from "react"
 import React from 'react'
@@ -13,6 +13,7 @@ import { SAME_SPOT } from "../../settings/strings"
 import { getDefaultPublicRide, getDefaultPublicRide2 } from "../../store/external/helpers"
 import { Hooks } from "../generics/types"
 import { CommonHooks, withHookGroup } from "../generics/withHooks"
+import { StoreSingleton } from "../../store/external"
 
 type AddUpdatePrivateRide = { ride?: PNPPublicRide, event: PNPPrivateEvent }
 const AddUpdatePrivateEventRide = (props: AddUpdatePrivateRide & Hooks) => {
@@ -99,7 +100,7 @@ const AddUpdatePrivateEventRide = (props: AddUpdatePrivateRide & Hooks) => {
             props.loading.doLoad()
 
             if (props.ride) {
-                props.firebase.firebase.realTime.updatePublicRide(props.event.eventId, ride.rideId, ride, true)
+                StoreSingleton.getTools().realTime.updatePublicRide(props.event.eventId, ride.rideId, ride, true)
                     .then(() => {
                         props.loading.cancelLoad()
                         props.loading.closeDialog()
@@ -111,7 +112,7 @@ const AddUpdatePrivateEventRide = (props: AddUpdatePrivateRide & Hooks) => {
                     })
             } else {
 
-                props.firebase.firebase.realTime.addPublicRide(ride.eventId, ride, true)
+                StoreSingleton.getTools().realTime.addPublicRide(ride.eventId, ride, true)
                     .then(() => {
                         props.loading.cancelLoad()
                         props.loading.closeDialog()

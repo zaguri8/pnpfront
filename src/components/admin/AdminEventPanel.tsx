@@ -9,11 +9,12 @@ import SectionTitle from "../other/SectionTitle"
 import { useLocation } from 'react-router-dom'
 import { PageHolder, InnerPageHolder } from '../utilityComponents/Holders'
 import { useLoading } from "../../context/Loading"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { CSSProperties, useEffect } from "react"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { Hooks } from "../generics/types"
 import { CommonHooks, withHookGroup } from "../generics/withHooks"
+import { StoreSingleton } from "../../store/external"
 const AdminEventPanel = (props: Hooks) => {
     const location = useLocation()
     const tableTitleStyle: CSSProperties = { fontSize: '20px', color: SECONDARY_WHITE }
@@ -175,7 +176,7 @@ const AdminEventPanel = (props: Hooks) => {
                                                     style={{ width: '100px', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
                                                     onClick={() => {
                                                         props.loading.doLoad()
-                                                        props.firebase.firebase.realTime.approveEvent(event.eventId)
+                                                        StoreSingleton.getTools().realTime.approveEvent(event.eventId)
                                                             .then(() => {
                                                                 alert('אירוע אושר בהצלחה')
                                                                 props.nav('/adminpanel')

@@ -41,15 +41,16 @@ export function populatePassengersDictionaryWithConfirmation(confirmation: PNPRi
 export function getTotalAmountOfConfirmations(event: PNPPrivateEvent, map: { [dir: string]: PNPRideConfirmation[] } | undefined) {
     if (!map) return 0 // there are no confirmations
     let output = 0
-    let hash: any = {}
+    let amountMapping = new Map<string, boolean>()
     for (let entry of Object.entries(map)) {
         INNER: for (let conf of entry[1]) {
-            if (hash[conf.userName + conf.phoneNumber]) continue INNER;
+            let key = conf.userId;
+            if (amountMapping.has(key)) continue INNER;
             if (event.eventWithGuests)
                 output += getGuests(conf)
             else
                 output += getPassengers(conf)
-            hash[conf.userName + conf.phoneNumber] = true
+            amountMapping.set(key, true)
         }
     }
     return output

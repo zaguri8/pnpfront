@@ -1,16 +1,15 @@
 import { get, ref } from 'firebase/database'
 import { useState } from 'react'
-import { useFirebase } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
+import { StoreSingleton } from '../../store/external'
 const BarcodePanel = () => {
-    const { freeDbRef } = useFirebase()
     const [barcode, setBarCode] = useState()
     const [transaction, setTransaction] = useState()
     const { doLoad, cancelLoad } = useLoading()
 
     const handleBarcodeCheck = async () => {
         doLoad()
-        barcode && await get(ref(freeDbRef, `transactions/ridePurchases`))
+        barcode && await get(ref(StoreSingleton.getTools().db, `transactions/ridePurchases`))
             .then(data => {
                 const failures = data.child('error')
                 const success = data.child('success')

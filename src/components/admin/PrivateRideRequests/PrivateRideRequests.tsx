@@ -1,5 +1,6 @@
 import { CSSProperties, useEffect, useState } from "react";
 import { PRIMARY_PINK, SECONDARY_WHITE } from "../../../settings/colors";
+import { StoreSingleton } from "../../../store/external";
 import { PNPExplicitPrivateRide, PNPPrivateRide } from "../../../store/external/types";
 import { Hooks } from "../../generics/types";
 import { withHookGroup } from "../../generics/withHooks";
@@ -17,7 +18,7 @@ function PrivateRideRequests(props: Hooks) {
     }, [])
 
     useEffect(() => {
-        let unsub = props.firebase.firebase.realTime.getAllPrivateRideExplicit(setRequests, (err) => {
+        let unsub = StoreSingleton.getTools().realTime.getAllPrivateRideExplicit(setRequests, (err) => {
             alert(err)
         })
         return () => unsub()
@@ -80,4 +81,4 @@ function PrivateRideRequests(props: Hooks) {
     </PageHolder>
 }
 
-export default withHookGroup(PrivateRideRequests, ['firebase', 'loading', 'nav', 'headerExt'])
+export default withHookGroup(PrivateRideRequests, ['user', 'loading', 'nav', 'headerExt'])

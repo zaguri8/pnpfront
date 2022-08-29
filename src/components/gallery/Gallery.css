@@ -16,6 +16,8 @@
 
   border: .1px solid var(--SECONDARY_BLACK);
   width: 180px;
+  max-height: 180px;
+  object-fit: cover;
   min-height: 180px;
   border-radius: 16px;
   background: white;

@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react'
 import { HtmlTooltip } from '../utilityComponents/HtmlTooltip'
 import { ACCEPT_TERMS_REQUEST, CONTINUE_TO_SECURE_PAYMENT, FULL_NAME, PHONE_NUMBER, RIDE_INFO, SAME_SPOT, TERMS_OF_USE, TOS, TOTAL_TO_PAY_2 } from '../../settings/strings'
 import { submitButton, textFieldStyle } from '../../settings/styles'
-import { useFirebase } from '../../context/Firebase'
+import { useUser } from '../../context/Firebase'
 import AddIcon from '@mui/icons-material/Add';
 import { useLoading } from '../../context/Loading'
 import { credit_cards } from '../../assets/images'
@@ -28,7 +28,8 @@ import { InnerPageHolder } from '../utilityComponents/Holders'
 import { minWidth } from '@mui/system'
 import Spacer from '../utilityComponents/Spacer'
 import { useDimExtension } from '../../context/HeaderContext';
-import ServerRequest from '../../ApiManager/ApiManager';
+import ServerRequest from '../../network/serverRequest';
+import { StoreSingleton } from '../../store/external';
 const paragraphStyle = {
     fontSize: '11px',
     color: PRIMARY_BLACK,
@@ -58,7 +59,7 @@ export function PaymentForm({ product, paymentInfo }) {
     const { closeDialog } = useLoading()
     const nav = useNavigate()
     const [ticketAmount, setTicketAmount] = useState(1)
-    const { firebase, appUser, user } = useFirebase()
+    const { appUser, user } = useUser()
     const { doLoad, cancelLoad } = useLoading()
     const [paymentLink, setPaymentLink] = useState()
     const location = useLocation()
@@ -70,7 +71,7 @@ export function PaymentForm({ product, paymentInfo }) {
     })
 
     const requestPayment = () => {
-        if (!firebase.auth.currentUser || !appUser) {
+        if (!StoreSingleton.getTools().auth.currentUser || !appUser) {
             nav('/login', { state: { cachedLocation: location.pathname, paymentInfo: paymentInfo } })
             closeDialog()
             return
@@ -96,7 +97,7 @@ export function PaymentForm({ product, paymentInfo }) {
         if (!appUser.customerId || appUser.customerId.length < 1) {
             alert('יש לרענן את הדף לונסות שוב, משתמשים רשומים דרך גוגל, אנא צרו משתמש חדש')
             const email = user.email.split('@')[0]
-            firebase.realTime.addUser({
+            StoreSingleton.getTools().realTime.addUser({
                 name: email ? email : 'Annonymous user',
                 email: user.email,
                 customerId: '',

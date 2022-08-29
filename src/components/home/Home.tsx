@@ -1,7 +1,7 @@
 import SayNoMoreContainer from "../saynomore/SayNoMoreContainer"
 import Gallery from "../gallery/Gallery"
 import './Home.css'
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useEffect } from "react"
 import React from 'react'
 import { useState } from "react"
@@ -18,6 +18,7 @@ import logo from '../../assets/images/header.jpeg'
 import { useHeaderBackgroundExtension, useHeaderContext } from "../../context/HeaderContext"
 import { Hooks } from "../generics/types"
 import { withHookGroup } from "../generics/withHooks"
+import { StoreSingleton } from "../../store/external"
 export function Home(props:Hooks) {
     const [pnpEvents, setPnpEvents] = useState<{ [type: string]: PNPEvent[] } | undefined>()
     const { isCacheValid, cacheDone } = useCookies()
@@ -25,7 +26,7 @@ export function Home(props:Hooks) {
     useEffect(() => {
         props.headerExt.setHeaderBackground(`url('${logo}')`)
         setIsShowingAbout(true);
-        const unsubEvents = props.firebase.firebase.realTime.addListenerToPublicEvents((events) => {
+        const unsubEvents = StoreSingleton.getTools().realTime.addListenerToPublicEvents((events) => {
             const ev = Object.values(events)
             let filtered: PNPEvent[] = []
             for (let events of ev)
@@ -36,7 +37,7 @@ export function Home(props:Hooks) {
         if (validToCache instanceof Promise) {
             (validToCache as Promise<boolean>).then((valid) => {
                 if (valid) {
-                    props.firebase.firebase.realTime.addUserStatistic(PNPPage.home)
+                    StoreSingleton.getTools().realTime.addUserStatistic(PNPPage.home)
                     cacheDone(PNPPage.home)
                 }
             })
@@ -99,4 +100,4 @@ export function Home(props:Hooks) {
         <SayNoMoreContainer />
     </div>
 }
-export default withHookGroup(Home,['headerExt','firebase'])
+export default withHookGroup(Home,['headerExt','user'])

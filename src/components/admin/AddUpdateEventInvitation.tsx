@@ -17,6 +17,7 @@ import { makeStyles } from "@mui/styles";
 import { getDefaultPrivateEvent } from "../../store/external/helpers";
 import { Hooks } from "../generics/types";
 import { CommonHooks, withHookGroup } from "../generics/withHooks";
+import { StoreSingleton } from "../../store/external";
 
 type AddUpdateInvitationProps = { event?: PNPPrivateEvent }
 const AddUpdateEventInvitation = (props: AddUpdateInvitationProps & Hooks) => {
@@ -35,7 +36,7 @@ const AddUpdateEventInvitation = (props: AddUpdateInvitationProps & Hooks) => {
         if ((props.event && props.event.eventImageURL) || imageBuffer
             && isValidPrivateEvent(pnpEvent)) {
             props.loading.doLoad()
-            props.firebase.firebase.realTime.updatePrivateEvent(pnpEvent.eventId,
+            StoreSingleton.getTools().realTime.updatePrivateEvent(pnpEvent.eventId,
                 pnpEvent, imageBuffer)
                 .then(() => {
                     // update succeed

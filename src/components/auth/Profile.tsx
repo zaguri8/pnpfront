@@ -76,7 +76,7 @@ function Profile(props: Hooks) {
     }
 
 
-    return (props.firebase.firebase.appUser ? <div id='container_profile'>
+    return (props.user.appUser ? <div id='container_profile'>
 
 
         <div
@@ -127,7 +127,7 @@ function Profile(props: Hooks) {
                             padding: '0px',
                             color: SECONDARY_WHITE
                         }
-                    }>{props.firebase.firebase.appUser.name}</h3>
+                    }>{props.user.appUser.name}</h3>
                 </div>
 
             </div>
@@ -144,4 +144,4 @@ function Profile(props: Hooks) {
 
     </div> : null)
 }
-export default withHookGroup(Profile, ['firebase', 'language'])
+export default withHookGroup(Profile, ['user', 'language'])

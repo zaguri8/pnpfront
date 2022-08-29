@@ -11,7 +11,7 @@ import { InnerPageHolder, PageHolder } from "../utilityComponents/Holders"
 import $ from 'jquery'
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useNavigate } from "react-router"
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { TextField } from "@mui/material"
@@ -27,6 +27,7 @@ import { useCookies } from "../../context/CookieContext"
 import { PNPPage } from "../../cookies/types"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext"
+import { StoreSingleton } from "../../store/external"
 
 let finishRegister = false
 
@@ -36,13 +37,13 @@ export function RegistrationForm({
     externalRegistration = false,
     registerButtonText,
     style = {} }) {
-    const { firebase } = useFirebase()
+    const { firebase } = useUser()
     const { doLoad, cancelLoad } = useLoading()
     const [registerSettings, setRegisterSettings] = useState()
 
     useEffect(() => {
         doLoad()
-        const unsub = firebase.realTime.addListenerToRegistrationPage((settings) => {
+        const unsub = StoreSingleton.getTools().realTime.addListenerToRegistrationPage((settings) => {
             cancelLoad()
             setRegisterSettings(settings)
         }, (e) => {
@@ -164,7 +165,7 @@ export function RegistrationForm({
         createUserWithEmailAndPassword(firebase.auth, user.email, user.password)
             .then(() => {
                 finishRegister = true;
-                firebase.realTime.addUser({
+                StoreSingleton.getTools().realTime.addUser({
                     name: user.fullName,
                     email: user.email,
                     customerId: '',
@@ -181,7 +182,7 @@ export function RegistrationForm({
                     }, 1500)
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
-                    firebase.realTime.createError('Register error', err)
+                    StoreSingleton.getTools().realTime.createError('Register error', err)
                     cancelLoad()
                 })
             }).catch(err => {
@@ -305,7 +306,6 @@ export default function Register() {
     const nav = useNavigate()
     const { lang } = useLanguage()
     const location = useLocation()
-    const { firebase } = useFirebase()
     const { isCacheValid, cacheDone } = useCookies()
     const { openDialog } = useLoading()
     const { hideHeader, showHeader } = useHeaderBackgroundExtension()
@@ -319,7 +319,7 @@ export default function Register() {
                 isCacheValid(PNPPage.register)
                     .then(valid => {
                         if (valid) {
-                            firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
+                            StoreSingleton.getTools().realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
                             cacheDone(PNPPage.register)
                         }
                     })
@@ -339,7 +339,7 @@ export default function Register() {
                     isCacheValid(PNPPage.register)
                         .then(valid => {
                             if (valid) {
-                                firebase.realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
+                                StoreSingleton.getTools().realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
                                 cacheDone(PNPPage.register)
                             }
                         })

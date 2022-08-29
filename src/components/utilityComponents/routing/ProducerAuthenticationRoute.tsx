@@ -1,18 +1,16 @@
-import React from "react";
-import { IFirebaseContext } from "../../../context/Firebase";
-import { PNPRouteProps } from "../../../routing/PNPRoute";
-import { PNPUser } from "../../../store/external/types"
+import { IUserContext } from "../../../context/Firebase";
+import { LazyLoad, PNPRouteProps } from "../../../routing/PNPRoute";
 import { withHookGroup } from "../../generics/withHooks";
 import NoPermissions from "../NoPermissions";
 
-function ProducerAuthenticatedRoute(props: PNPRouteProps & { firebase: IFirebaseContext }) {
-    if (props.firebase.appUser === undefined)
+function ProducerAuthenticatedRoute(props: PNPRouteProps & { user: IUserContext }) {
+    if (props.user.appUser === undefined)
         return null;
-    if (!props.firebase.appUser || (!props.firebase.appUser.producer && !props.firebase.appUser.admin))
+    if (!props.user.appUser || (!props.user.appUser.producer && !props.user.appUser.admin))
         return <NoPermissions lang={props.language} />
-    return <React.Fragment>
+    return <LazyLoad>
         {props.element}
-    </React.Fragment>
+    </LazyLoad>
 }
 
-export default withHookGroup<PNPRouteProps>(ProducerAuthenticatedRoute, ['firebase'])
+export default withHookGroup<PNPRouteProps>(ProducerAuthenticatedRoute, ['user'])

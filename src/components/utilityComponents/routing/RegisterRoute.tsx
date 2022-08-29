@@ -1,18 +1,15 @@
-import React, { useEffect } from "react";
-import { Navigate, useLocation } from "react-router";
-import { IFirebaseContext } from "../../../context/Firebase";
-import { PNPRouteProps } from "../../../routing/PNPRoute";
-import { PNPUser } from "../../../store/external/types";
+import { Navigate } from "react-router";
+import { IUserContext } from "../../../context/Firebase";
+import { LazyLoad, PNPRouteProps } from "../../../routing/PNPRoute";
 import { withHookGroup } from "../../generics/withHooks";
 
-function RegisterRoute(props: PNPRouteProps & { firebase: IFirebaseContext }) {
-    if (props.firebase.appUser === undefined)
-        return null;
-    if (!props.firebase.appUser)
-        return <React.Fragment>
+function RegisterRoute(props: PNPRouteProps & { user: IUserContext }) {
+
+    if (!props.user.appUser)
+        return <LazyLoad>
             {props.element}
-        </React.Fragment>
+        </LazyLoad>
     return <Navigate to={'/'} />
 }
 
-export default withHookGroup<PNPRouteProps>(RegisterRoute, ['firebase'])
+export default withHookGroup<PNPRouteProps>(RegisterRoute, ['user'])

@@ -6,7 +6,7 @@ import { BLACK_ELEGANT } from '../../../settings/colors'
 import axios from 'axios'
 import { useLoading } from '../../../context/Loading'
 import { useParams } from 'react-router'
-import ServerRequest from '../../../ApiManager/ApiManager'
+import ServerRequest from '../../../network/serverRequest'
 export default function PrivatePaymentForm() {
 
     const { customerEmail } = useParams()

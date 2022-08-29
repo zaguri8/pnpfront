@@ -1,5 +1,5 @@
 import { CSSProperties, useEffect } from "react";
-import { IFirebaseContext } from "../../../context/Firebase";
+import { IUserContext } from "../../../context/Firebase";
 import { IBackgroundExtension, IHeaderBackgroundExtension } from "../../../context/HeaderContext";
 import { ILoadingContext, useLoading } from "../../../context/Loading";
 import { Hooks } from "../../generics/types";
@@ -13,7 +13,7 @@ import { blue, blueGrey, green, lightBlue, pink, red } from "@mui/material/color
 import { boxShadow } from "../../../settings/styles";
 import Spacer from "../../utilityComponents/Spacer";
 import { PNPPublicRide, PNPUser } from "../../../store/external/types";
-import ServerRequest from "../../../ApiManager/ApiManager";
+import ServerRequest from "../../../network/serverRequest";
 import { Navigate, useLocation, useParams } from "react-router";
 function SMS(props: Partial<Hooks>) {
 
@@ -154,4 +154,4 @@ function SMS(props: Partial<Hooks>) {
 }
 
 
-export default withHookGroup(SMS, ['firebase', 'loading', 'nav', 'headerExt', 'backgroundExt'])
+export default withHookGroup(SMS, ['user', 'loading', 'nav', 'headerExt', 'backgroundExt'])

@@ -23,6 +23,7 @@ export default function EventPayment() {
             setHeaderBackground(`url('${stt.event.eventMobileImageURL ?? stt.event.eventImageURL}')`)
             setPaymentInfo(stt)
         }
+        return () => setHeaderBackground('none')
     }, [location.state])
     useEffect(() => {
         window.scrollTo({
@@ -53,7 +54,6 @@ export default function EventPayment() {
         zIndex:'1000',
         fontFamily: 'Open Sans Hebrew',
     }}>
-   
         {(paymentInfo && paymentInfo.ride && paymentInfo.event) ? <PaymentForm
             paymentInfo={paymentInfo}
             product={{

@@ -21,6 +21,7 @@ import { confirmationsPartition, default_no_arrival, getTotalAmountOfConfirmatio
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { Hooks } from "../generics/types";
 import { CommonHooks, withHookGroup } from "../generics/withHooks";
+import { StoreSingleton } from "../../store/external";
 
 export const buttonStyle = {
     textDecoration: 'none',
@@ -52,14 +53,14 @@ function InvitationStatistics(props: Hooks) {
     }, [])
     const updateEvent = () => {
         if (privateEvent)
-            props.firebase.firebase.realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
+            StoreSingleton.getTools().realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
     }
 
     const deleteEvent = () => {
         if (privateEvent) {
             props.loading.closeDialog()
             props.loading.doLoad()
-            props.firebase.firebase.realTime.removePrivateEvent(privateEvent.eventId)
+            StoreSingleton.getTools().realTime.removePrivateEvent(privateEvent.eventId)
                 .then(() => {
                     props.loading.cancelLoad()
                     alert('אירוע נמחק בהצלחה !')
@@ -111,9 +112,9 @@ function InvitationStatistics(props: Hooks) {
 
         val = val as string
         props.loading.doLoad()
-        props.firebase.firebase.realTime.getUserIdByEmail(val, (userId: string) => {
+        StoreSingleton.getTools().realTime.getUserIdByEmail(val, (userId: string) => {
 
-            props.firebase.firebase.realTime.makeUserResponsible(
+            StoreSingleton.getTools().realTime.makeUserResponsible(
                 userId,
                 privateEvent
             ).then(() => {
@@ -149,7 +150,7 @@ function InvitationStatistics(props: Hooks) {
         async function update(pointer: PNPRideConfirmation) {
             if (!confirmations) return;
             props.loading.doLoad()
-            const updated = await props.firebase.firebase.realTime.updateConfirmation(
+            const updated = await StoreSingleton.getTools().realTime.updateConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName,
                 pointer
@@ -174,7 +175,7 @@ function InvitationStatistics(props: Hooks) {
         async function deleteConfirmation() {
             if (!confirmations) return;
             props.loading.doLoad()
-            const deleted = await props.firebase.firebase.realTime.deleteConfirmation(
+            const deleted = await StoreSingleton.getTools().realTime.deleteConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName)
             if (!deleted || typeof (deleted) === 'function') {
@@ -242,7 +243,7 @@ function InvitationStatistics(props: Hooks) {
         let unsub2: Unsubscribe | undefined
         let unsub3: Unsubscribe | undefined
         if (privateEvent) {
-            unsub = props.firebase.firebase.realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
+            unsub = StoreSingleton.getTools().realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
                 if (confs) {
                     setConfirmations(confirmationsPartition(confs))
                     let hashAccordion: { [id: string]: boolean } = {}
@@ -251,13 +252,13 @@ function InvitationStatistics(props: Hooks) {
                     setAccordionHash(hashAccordion)
                 }
             })
-            unsub2 = props.firebase.firebase.realTime.getPrivateEventRidesById(privateEvent.eventId, setRides)
+            unsub2 = StoreSingleton.getTools().realTime.getPrivateEventRidesById(privateEvent.eventId, setRides)
         } else if (eventId) {
-            unsub = props.firebase.firebase.realTime.getPrivateEventById(eventId, (e) => {
+            unsub = StoreSingleton.getTools().realTime.getPrivateEventById(eventId, (e) => {
 
-                if ((!props.firebase.firebase.appUser || !props.firebase.firebase.appUser.admin) && e.eventProducerId !== props.firebase.firebase.user?.uid) {
+                if ((!props.user.appUser || !props.user.appUser.admin) && e.eventProducerId !== props.user.user?.uid) {
                     setTimeout(() => {
-                        if ((!props.firebase.firebase.appUser || !props.firebase.firebase.appUser.admin) && e.eventProducerId !== props.firebase.firebase.user?.uid) {
+                        if ((!props.user.appUser || !props.user.appUser.admin) && e.eventProducerId !== props.user.user?.uid) {
                             props.loading.openDialog({
                                 content: <span style={{ color: SECONDARY_WHITE, padding: '8px' }}>
                                     {'אין לך הרשאות לעמוד זה'}
@@ -268,7 +269,7 @@ function InvitationStatistics(props: Hooks) {
                     }, 250)
                     return
                 }
-                unsub2 = props.firebase.firebase.realTime.getAllRideConfirmationByEventId(eventId, (confs) => {
+                unsub2 = StoreSingleton.getTools().realTime.getAllRideConfirmationByEventId(eventId, (confs) => {
                     if (confs) {
                         setConfirmations(confirmationsPartition(confs))
                         let hashAccordion: { [id: string]: boolean } = {}
@@ -277,7 +278,7 @@ function InvitationStatistics(props: Hooks) {
                         setAccordionHash(hashAccordion)
                     }
                 })
-                unsub3 = props.firebase.firebase.realTime.getPrivateEventRidesById(eventId, setRides)
+                unsub3 = StoreSingleton.getTools().realTime.getPrivateEventRidesById(eventId, setRides)
                 setPrivateEvent(e)
 
             })
@@ -407,7 +408,7 @@ function InvitationStatistics(props: Hooks) {
                                                                 }>{`נקודת יציאה ${ride.rideStartingPoint}`}</h4></div>)
                                                             props.loading.openDialog({
                                                                 content: <div style={{ padding: '4px' }}><button
-                                                                    onClick={() => { props.firebase.firebase.realTime.removePrivateRide(properties.event.eventId, ride.rideId).then(() => { props.loading.closeDialog() }).catch(() => { props.loading.closeDialog() }) }}
+                                                                    onClick={() => { StoreSingleton.getTools().realTime.removePrivateRide(properties.event.eventId, ride.rideId).then(() => { props.loading.closeDialog() }).catch(() => { props.loading.closeDialog() }) }}
                                                                     style={{
                                                                         padding: '4px',
                                                                         margin: '16px',
@@ -457,7 +458,7 @@ function InvitationStatistics(props: Hooks) {
                         <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{props.language.lang === 'heb' ? 'קישור לדף הזמנה : ' : 'Link to invitation Page: '}</span>
                             <a style={{ ...spanStyle, ...{ fontWeight: 'bold' } }} href={`https://www.pick-n-pull.co.il/#/invitation/${privateEvent.eventId}`}>{props.language.lang === 'heb' ? 'לחצ/י כאן' : 'Click here'}</a></div>
 
-                        {props.firebase.firebase.appUser && props.firebase.firebase.appUser.admin && <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{props.language.lang === 'heb' ? 'קישור לדף ניהול : ' : 'Link to Managing Page: '}</span>
+                        {props.user.appUser && props.user.appUser.admin && <div style={{ border: '.5px solid white', background: 'black', padding: '8px', borderRadius: '8px' }}><span style={{ ...spanStyle }} >{props.language.lang === 'heb' ? 'קישור לדף ניהול : ' : 'Link to Managing Page: '}</span>
                             <a style={{ ...spanStyle, ...{ fontWeight: 'bold' } }} href={`https://www.pick-n-pull.co.il/#/producerpanel/invitation/${privateEvent.eventId}`}>{props.language.lang === 'heb' ? 'לחצ/י כאן' : 'Click here'}</a></div>}
                         <Button
                             onClick={() => {

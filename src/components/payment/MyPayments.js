@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useFirebase } from '../../context/Firebase'
+import { useUser } from '../../context/Firebase'
 import { useLoading } from '../../context/Loading'
 import { v4 } from 'uuid'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router'
 import './MyPayments.css'
 import SectionTitle from '../other/SectionTitle';
 import { useHeaderBackgroundExtension } from '../../context/HeaderContext'
+import { StoreSingleton } from '../../store/external';
 
 const logOutStyle = (width, any = {}) => ({
     color: 'white',
@@ -33,7 +34,7 @@ const logOutStyle = (width, any = {}) => ({
     fontFamily: 'Open Sans Hebrew', ...any
 })
 const MyPayments = () => {
-    const { firebase, user, appUser, signOut } = useFirebase()
+    const { firebase, user, appUser, signOut } = useUser()
     const { doLoad, cancelLoad, openDialog, closeDialog } = useLoading()
     const nav = useNavigate()
     const { lang } = useLanguage()
@@ -51,8 +52,8 @@ const MyPayments = () => {
         let unsub = null, unsub2 = null;
         if (appUser) {
             doLoad()
-            unsub = firebase.realTime.getAllTransactions(appUser.customerId, (trans) => {
-                unsub2 = firebase.realTime.addListenertoRidesForDates(trans, (transformed) => {
+            unsub = StoreSingleton.getTools().realTime.getAllTransactions(appUser.customerId, (trans) => {
+                unsub2 = StoreSingleton.getTools().realTime.addListenertoRidesForDates(trans, (transformed) => {
                     setTransactions(transformed)
                     cancelLoad()
                 }, (err) => {
@@ -61,7 +62,7 @@ const MyPayments = () => {
                         nav('/');
                 })
             }, (e) => {
-                firebase.realTime.addError({
+                StoreSingleton.getTools().realTime.addError({
                     type: 'getAllTransactions',
                     error: '',
                     date: new Date().toISOString(),

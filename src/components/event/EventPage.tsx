@@ -24,6 +24,7 @@ import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { getValidImageUrl } from "../../utilities";
 import { Hooks } from "../generics/types";
 import { CommonHooks, withHookGroup } from "../generics/withHooks";
+import { StoreSingleton } from "../../store/external";
 function EventPage(props: Hooks) {
     const [event, setEvent] = useState<PNPEvent | undefined | null>(undefined)
     const [selectedEventRide, setSelectedEventRide] = useState<PNPPublicRide | null>(null)
@@ -73,7 +74,7 @@ function EventPage(props: Hooks) {
         let u2: Unsubscribe | null = null
         let removeResize: any;
         if (id) {
-            u1 = props.firebase.firebase.realTime.getPublicEventById(id, (event) => {
+            u1 = StoreSingleton.getTools().realTime.getPublicEventById(id, (event) => {
                 setEvent(event as PNPEvent)
                 props.loading.cancelLoad()
                 removeResize = () => resize(event as PNPEvent)
@@ -81,7 +82,7 @@ function EventPage(props: Hooks) {
                 resize(event as PNPEvent)
             })
 
-            u2 = props.firebase.firebase.realTime.getPublicRidesByEventId(id, (rides) => {
+            u2 = StoreSingleton.getTools().realTime.getPublicRidesByEventId(id, (rides) => {
                 setEventRides(rides as PNPPublicRide[])
             })
         }
@@ -263,7 +264,7 @@ function EventPage(props: Hooks) {
                                             <RidesList />
                                         </Stack> : event.eventCanAddRides &&
                                         <div style={noRidesStyle}>{props.language.lang === 'heb' ? `לאירוע זה טרם קיימות הסעות, לחץ` : 'This event has no rides, click'}
-                                            <b onClick={() => props.firebase.firebase.user ? props.loading.openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : props.nav('/login', { state: { cachedLocation: location.pathname } })}
+                                            <b onClick={() => props.user.user ? props.loading.openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : props.nav('/login', { state: { cachedLocation: location.pathname } })}
                                                 style={noRidesStyle2}> {props.language.lang === 'heb' ? `כאן` : 'Here'}
                                             </b >
                                             {props.language.lang === 'heb' ? `על מנת ליצור ביקוש להסעה` : ' In order to make a ride request'}</div>}
@@ -306,7 +307,7 @@ function EventPage(props: Hooks) {
                                 padding: '8px',
                                 flexDirection: 'column'
                             }}> <AddCircleOutlineIcon
-                                    onClick={() => props.firebase.firebase.user ? props.loading.openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : props.nav('/login', { state: { cachedLocation: location.pathname } })}
+                                    onClick={() => props.user.user ? props.loading.openDialog({ title: `ביקוש להסעה לאירוע ${event.eventName}`, content: <RideRequestForm event={event} /> }) : props.nav('/login', { state: { cachedLocation: location.pathname } })}
                                     style={{
                                         cursor: 'pointer',
                                         width: '50px',

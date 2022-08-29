@@ -3,6 +3,11 @@ import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideCon
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
+import { initializeApp } from 'firebase/app'
+import firebase from 'firebase/compat/app'
 import { RideStatistics } from '../../components/admin/EventStatistics'
 import { DocumentData } from 'firebase/firestore'
 import { getStorage, getDownloadURL, ref as storageRef, FirebaseStorage, uploadBytes } from "firebase/storage";
@@ -15,9 +20,10 @@ import {
 import { createNewCustomer } from '../payments'
 import { TransactionSuccess } from '../payments/types'
 import { transactionSuccessFromDict } from '../payments/converters'
-import { getCurrentDate } from '../../utilities'
+import { datesComparator, getCurrentDate } from '../../utilities'
 import { dateStringFromDate } from '../../components/utilityComponents/functions'
 import { PNPRideExtraPassenger } from '../../components/admin/EventStatistics'
+import { firebaseConfig, uiConfig } from '../../settings/config'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -38,19 +44,19 @@ function CreateRealTimeDatabase(auth: Auth, db: Database, storage: FirebaseStora
     return new Realtime(auth, db, storage)
 }
 export class Realtime {
-    private siteSettings: DatabaseReference
-    private rides: DatabaseReference
-    private allEvents: DatabaseReference
-    private errs: DatabaseReference
-    private users: DatabaseReference
-    private linkRedirects: DatabaseReference
-    private scanners: DatabaseReference
-    private auth: Auth
-    private storage: FirebaseStorage
-    private statistics: DatabaseReference
-    private privatePaymentPages: DatabaseReference
-    private transactions: DatabaseReference
-    private transactionConfirmations: DatabaseReference
+    public siteSettings: DatabaseReference
+    public rides: DatabaseReference
+    public allEvents: DatabaseReference
+    public errs: DatabaseReference
+    public users: DatabaseReference
+    public linkRedirects: DatabaseReference
+    public scanners: DatabaseReference
+    public auth: Auth
+    public storage: FirebaseStorage
+    public statistics: DatabaseReference
+    public privatePaymentPages: DatabaseReference
+    public transactions: DatabaseReference
+    public transactionConfirmations: DatabaseReference
     constructor(auth: Auth, db: Database, storage: FirebaseStorage) {
         this.siteSettings = ref(db, '/settings')
         this.allEvents = ref(db, '/events')
@@ -66,7 +72,6 @@ export class Realtime {
         this.auth = auth
         this.storage = storage
     }
-
 
     setLinkRedirect(id: string, redirectUrl: string, consume: (link: string | null) => void) {
         set(child(this.linkRedirects, id), redirectUrl).then(success => {
@@ -219,9 +224,7 @@ export class Realtime {
                     }
                 })
             })
-            allTransactions.sort((a, b) => {
-                return new Date(b.date).getTime() - new Date(a.date).getTime()
-            })
+            allTransactions.sort(datesComparator)
             consume(allTransactions)
         }, onError)
     }
@@ -1263,7 +1266,6 @@ export class Realtime {
                 this.auth.currentUser?.delete();
                 this.createError('addUser', e)
             })
-
     }
     /**
  * addUser
@@ -1382,13 +1384,26 @@ export class Realtime {
 export type FirebaseTools = {
     auth: Auth,
     realTime: Realtime,
+    db: Database
     temp: Firestore
 }
-export default function Store(auth: Auth, db: Database, firestore: Firestore): FirebaseTools {
+function Store(auth: Auth, db: Database, firestore: Firestore): FirebaseTools {
     return {
         auth: auth,
         realTime: CreateRealTimeDatabase(auth, db, getStorage(auth.app)),
-        temp: firestore
+        temp: firestore,
+        db: db
+    }
+}
+export class StoreSingleton {
+    public static instance: FirebaseTools | undefined;
+    static getTools(): FirebaseTools {
+        if (!this.instance) {
+            const app = initializeApp(firebaseConfig)
+            const auth = getAuth(app)
+            this.instance = Store(auth, getDatabase(app), getFirestore(app))
+        }
+        return this.instance!!
     }
 }
 

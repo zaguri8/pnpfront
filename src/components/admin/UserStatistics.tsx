@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { BLACK_ELEGANT, SECONDARY_WHITE } from "../../settings/colors"
+import { StoreSingleton } from "../../store/external"
 import { PNPUser } from "../../store/external/types"
 import { Hooks } from "../generics/types"
 import { CommonHooks, withHookGroup } from "../generics/withHooks"
@@ -18,7 +19,7 @@ function UserStatistics(props: Hooks) {
     useEffect(() => {
 
         props.loading.doLoad()
-        const unsub = props.firebase.firebase.realTime.addListenerToUsers((users) => {
+        const unsub = StoreSingleton.getTools().realTime.addListenerToUsers((users) => {
             users.forEach(u => {
                 const dist = Number(today.getFullYear()) - Number(u.birthDate.split('/')[2])
                 if (dist <= 1 || dist > 100 || !dist) {

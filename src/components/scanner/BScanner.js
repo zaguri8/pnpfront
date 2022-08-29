@@ -9,12 +9,13 @@ import { Button, Stack, TextField } from "@mui/material";
 import './BScanner.css'
 import { makeStyles } from "@mui/styles";
 import { textFieldStyle } from "../../settings/styles";
-import { useFirebase } from "../../context/Firebase";
+import { useUser } from "../../context/Firebase";
 import { useHeaderBackgroundExtension } from "../../context/HeaderContext";
 import { useLoading } from "../../context/Loading";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { getCurrentDate, getDateString } from "../../utilities";
+import { StoreSingleton } from "../../store/external";
 function BScanner() {
     const location = useLocation()
     const nav = useNavigate()
@@ -23,7 +24,7 @@ function BScanner() {
         if (!location.state && appUser && appUser.admin)
             openScanner(scannerLanguage)
     }, [])
-    const { user, appUser, firebase } = useFirebase()
+    const { user, appUser } = useUser()
     const inputRef = useRef()
 
     const [inScanningZone, setInScanningZone] = useState()
@@ -92,7 +93,7 @@ function BScanner() {
                     return
                 }
 
-                firebase.realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
+                StoreSingleton.getTools().realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
                     .then(() => {
                         let temp = barCodes
                         temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1
@@ -116,7 +117,7 @@ function BScanner() {
     useEffect(() => {
         let sub = null;
         if (producingEventId !== 0) {
-            sub = firebase.realTime.getPublicEventById(appUser.producingEventId, event => {
+            sub = StoreSingleton.getTools().realTime.getPublicEventById(appUser.producingEventId, event => {
                 setProducingEvent(event)
             })
         }
@@ -133,7 +134,7 @@ function BScanner() {
 
     const startProducerScanningSession = () => {
         doLoad()
-        let unsub = firebase.realTime.getAllTransactionConfirmations(producingEventId, transactions => {
+        let unsub = StoreSingleton.getTools().realTime.getAllTransactionConfirmations(producingEventId, transactions => {
             setBarcodes(transactions)
             setInScanningZone(true)
             setTimeout(cancelLoad, 1000)

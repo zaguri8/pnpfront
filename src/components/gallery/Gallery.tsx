@@ -11,6 +11,7 @@ import './Gallery.css'
 import { Stack } from "@mui/material";
 import { Hooks } from "../generics/types";
 import { withHookGroup } from "../generics/withHooks";
+import { getValidImageUrl } from "../../utilities";
 export type GalleryProps = {
     header: string
     events: PNPEvent[]
@@ -88,30 +89,6 @@ function Gallery(props: GalleryProps & Hooks) {
         props.nav(`/event/${pnpEvent.eventId}`)
     }
 
-
-    useEffect(() => {
-        setTimeout(() => {
-            $('.loadingDivStyle').css('display', 'none')
-        }, 550)
-        props.events.forEach(event => {
-            const imageId = (event as any).imageId
-            $(`#gallery_img_${imageId}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
-        })
-        props.privateEvents.forEach(event => {
-            const imageId = (event as any).imageId
-            $(`#gallery_img_${imageId}`).css('background-image', `url('${event.eventMobileImageURL ?? event.eventImageURL}')`)
-        })
-    }, [])
-
-    const loadingDivStyle = {
-        background: `url('${loadingGif}')`,
-        width: '100%',
-        borderTopLeftRadius: '16px',
-        borderTopRightRadius: '16px',
-        backgroundSize: 'cover',
-        height: '100%'
-    }
-
     const animations = {
         initial: { opacity: 0, transform: 'translateX(200px)' },
         animate: { opacity: 1, transform: 'translateX(0px)' },
@@ -129,16 +106,15 @@ function Gallery(props: GalleryProps & Hooks) {
             <div className='gallery' style={imageContainer} >
 
                 {props.events.map(pnpEvent => {
-                    const imageId = (pnpEvent as any).imageId
                     return (<div key={v4()} style={{ transform: 'scale(0.9)' }}>
                         <GalleryItemTitle event={pnpEvent} />
-                        <div
+                        <img
                             className="gallery_img"
-                            id={`gallery_img_${imageId}`}
+                            loading="lazy"
+                            src={pnpEvent.eventMobileImageURL ?? pnpEvent.eventImageURL}
+                            id={`gallery_img_${(pnpEvent as any).imageId}`}
                             onClick={() => handleOpen(pnpEvent)}>
-                            <div className='loadingDivStyle'
-                                style={loadingDivStyle} />
-                        </div>
+                        </img>
                         <GalleryItemBottom event={pnpEvent} />
                     </div>)
                 })}
@@ -158,13 +134,13 @@ function Gallery(props: GalleryProps & Hooks) {
 
                     return (<div key={v4()} style={{ transform: 'scale(0.9)', marginLeft: '4px', marginRight: '4px' }}>
                         <GalleryItemTitle event={pnpEvent} />
-                        <div
+                        <img
                             className="gallery_img"
+                            loading="lazy"
                             id={`gallery_img_${imageId}`}
+                            src={pnpEvent.eventImageURL}
                             onClick={() => handleOpen(pnpEvent)}>
-                            <div className='loadingDivStyle'
-                                style={loadingDivStyle} />
-                        </div>
+                        </img>
                         <GalleryItemBottom event={pnpEvent} />
                     </div>)
                 })}

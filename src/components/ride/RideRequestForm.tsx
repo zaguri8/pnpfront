@@ -9,6 +9,7 @@ import { submitButton } from "../../settings/styles";
 import { PRIMARY_BLACK, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../settings/colors";
 import { CommonHooks, withHookGroup } from "../generics/withHooks";
 import { Hooks } from "../generics/types";
+import { StoreSingleton } from "../../store/external";
 
 type RideRequestFormProps = { event: PNPEvent | undefined | null }
 function RideRequestForm(props: RideRequestFormProps & Hooks) {
@@ -22,9 +23,9 @@ function RideRequestForm(props: RideRequestFormProps & Hooks) {
     }>({
         names: [],
         startingPoint: '',
-        fullName: props.firebase.firebase.appUser ? props.firebase.firebase.appUser.name : '',
+        fullName: props.user.appUser ? props.user.appUser.name : '',
         passengers: '',
-        phoneNumber: (props.firebase.firebase.appUser && props.firebase.firebase.appUser.phone) ? props.firebase.firebase.appUser.phone : '',
+        phoneNumber: (props.user.appUser && props.user.appUser.phone) ? props.user.appUser.phone : '',
 
     })
 
@@ -93,7 +94,7 @@ function RideRequestForm(props: RideRequestFormProps & Hooks) {
             <TextField
                 className={classes.root}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder={props.firebase.firebase.appUser?.name ?? ''}
+                placeholder={props.user.appUser?.name ?? ''}
                 name="name" sx={{ direction: SIDE(props.language.lang) }} id="fn_input_ride_request" aria-describedby="fn_input_ride_request" />
 
         </FormControl>
@@ -104,7 +105,7 @@ function RideRequestForm(props: RideRequestFormProps & Hooks) {
                 className={classes.root}
 
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder={props.firebase.firebase.appUser?.phone ?? ''} type='number' name='phone' sx={{ direction: SIDE(props.language.lang) }} id="phone_number_input_ride_request" aria-describedby="phone_number_helper_text" />
+                placeholder={props.user.appUser?.phone ?? ''} type='number' name='phone' sx={{ direction: SIDE(props.language.lang) }} id="phone_number_input_ride_request" aria-describedby="phone_number_helper_text" />
 
         </FormControl>
         <FormControl>
@@ -140,11 +141,11 @@ function RideRequestForm(props: RideRequestFormProps & Hooks) {
                             const ride: PNPRideRequest = {
                                 ...request,
                                 eventId: props.event?.eventId ?? '',
-                                requestUserId: props.firebase.firebase.user?.uid ?? '',
+                                requestUserId: props.user.user?.uid ?? '',
                                 eventName: props.event?.eventName ?? ''
                             }
                             props.loading.doLoad()
-                            props.firebase.firebase.realTime.addRideRequest(ride)
+                            StoreSingleton.getTools().realTime.addRideRequest(ride)
                                 .then(r => {
                                     alert(props.language.lang === 'heb' ? `בקשת התקבלה, הצוות שלנו ייצור עמך קשר בהקדם` : 'We got your request, our team will contact you in the next 24 hours')
                                     props.loading.closeDialog()

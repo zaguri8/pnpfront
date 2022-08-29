@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router"
 import React, { useEffect, useState } from 'react'
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { Unsubscribe } from "firebase/database"
 import { PNPTransactionConfirmation } from "../../store/external/types"
 import Spacer from "../utilityComponents/Spacer"
@@ -11,6 +11,7 @@ import { Button, Stack } from "@mui/material"
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { submitButton } from "../../settings/styles"
 import { useScanner } from "../../context/ScannerContext"
+import { StoreSingleton } from "../../store/external"
 function useQuery() {
     const { search } = useLocation()
     return React.useMemo(() => new URLSearchParams(search), [search])
@@ -19,7 +20,6 @@ function useQuery() {
 export default function BScanResult() {
 
     const queries = useQuery()
-    const { firebase } = useFirebase()
     const nav = useNavigate()
     const { doLoad, cancelLoad, openDialog } = useLoading()
     const { scannerLanguage } = useScanner()
@@ -57,7 +57,7 @@ export default function BScanResult() {
     }
     useEffect(() => {
         if (queries.has('confirmationVoucher')) {
-            firebase.realTime
+            StoreSingleton.getTools().realTime
                 .addListenerToTransactionConfirmation(queries.get('confirmationVoucher')!, (c) => {
                     doLoad()
                     if (c === null) {
@@ -67,7 +67,7 @@ export default function BScanResult() {
                     if (c.ridesLeft === 0) {
                         decline()
                     } else {
-                        firebase.realTime.invalidateTransactionConfirmations(c.confirmationVoucher, c.twoWay ? (c.ridesLeft === 2 ? 1 : 0) : 0)
+                        StoreSingleton.getTools().realTime.invalidateTransactionConfirmations(c.confirmationVoucher, c.twoWay ? (c.ridesLeft === 2 ? 1 : 0) : 0)
                             .then(() => { approve(c) })
                             .catch(decline)
                     }

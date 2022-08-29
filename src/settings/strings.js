@@ -4,8 +4,8 @@ export const CREATE_INVITATION = (lang) => lang === 'heb' ? 'צור/י הזמנ�
 export const TOOLBAR_LOGIN = (lang) => lang === 'heb' ? 'התחברות ' : 'Sign in'
 export const TOOLBAR_LANGUAGE = (lang) => lang === 'heb' ? 'שפה ' : 'Language'
 export const TOOLBAR_MENU = (lang) => lang === 'heb' ? 'תפריט' : 'Menu'
-export const CREATE_RIDE = (lang) => lang === 'heb' ? 'צור הסעה' : 'Create a ride'
-export const CREATE_RIDE_2 = (lang) => lang === 'heb' ? 'יצירת הסעה' : 'Create a ride'
+export const CREATE_RIDE = (lang) => lang === 'heb' ? 'הצעת מחיר להסעה' : 'Ride bidding'
+export const CREATE_RIDE_2 = CREATE_RIDE
 
 export const NO_RIDES = (lang) => lang === 'heb' ? 'לאירוע זה טרם קיימות הסעות, לחץ כאן על מנת ליצור ביקוש להסעה' : 'This event currently has no rides, make a request to create a ride'
 export const CANT_SEE_YOUR_CITY = (lang) => lang === 'heb' ? 'לא רואה את העיר שלך ברשימה? לחץ על כפתור הפלוס ופתח ביקוש' : 'Your city is missing? open a request for a ride by clicking the the plus button'

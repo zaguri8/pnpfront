@@ -1,6 +1,4 @@
 import { Stack, Typography } from "@mui/material";
-import { useFirebase } from "../../context/Firebase";
-import { useLanguage } from "../../context/Language";
 import { BLACK_ELEGANT, BLACK_ROYAL, DARKER_BLACK_SELECTED, DARK_BLACK, ORANGE_GRADIENT_PRIMARY, PRIMARY_BLACK, SECONDARY_BLACK, SECONDARY_WHITE } from "../../settings/colors";
 import { MY_COINS, SIDE } from "../../settings/strings";
 import { elegantShadow } from "../../settings/styles";
@@ -117,7 +115,7 @@ function MyCoins(props:Hooks) {
                                         <Typography
                                             style={coinTextStyle}
                                             color='white'>
-                                            {props.firebase.firebase.appUser && props.firebase.firebase.appUser.coins}
+                                            {props.user.appUser && props.user.appUser.coins}
                                         </Typography>
                                     </div>
                                 </div>
@@ -131,4 +129,4 @@ function MyCoins(props:Hooks) {
     </PageHolder>
 }
 
-export default withHookGroup(MyCoins,['language','firebase'])
+export default withHookGroup(MyCoins,['language','user'])

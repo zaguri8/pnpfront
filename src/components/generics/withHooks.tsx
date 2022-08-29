@@ -1,15 +1,14 @@
 import React, { useEffect } from "react"
 import { useNavigate } from "react-router"
 import { useCookies } from "../../context/CookieContext"
-import { useFirebase } from "../../context/Firebase"
+import { useUser } from "../../context/Firebase"
 import { useGoogleState } from "../../context/GoogleMaps"
 import { useBackgroundExtension, useDimExtension, useHeaderBackgroundExtension } from "../../context/HeaderContext"
 import { useLanguage } from "../../context/Language"
 import { useLoading } from "../../context/Loading"
-import { Hook, Hooks } from "./types"
 
-type NamedHook = "firebase" | "language" | "loading" | "nav" | "backgroundExt" | "headerExt" | "cookies" | "dimExt" | "google"
-export const CommonHooks = ['firebase', 'loading', 'nav', 'language','headerExt','backgroundExt'] as NamedHook[]
+type NamedHook = 'user' | "language" | "loading" | "nav" | "backgroundExt" | "headerExt" | "cookies" | "dimExt" | "google"
+export const CommonHooks = ['user', 'loading', 'nav', 'language','headerExt','backgroundExt'] as NamedHook[]
 export const getNamedHookGroup = (group: Array<NamedHook>) => {
     let map = {} as { [id: string]: any }
     group.forEach(hook => map[hook] = getNamedHook(hook))
@@ -18,8 +17,8 @@ export const getNamedHookGroup = (group: Array<NamedHook>) => {
 
 export const getNamedHook = (name: NamedHook) => {
     switch (name) {
-        case "firebase":
-            return useFirebase()
+        case 'user':
+            return useUser()
         case "language":
             return useLanguage()
         case "loading":
@@ -41,7 +40,7 @@ export const getNamedHook = (name: NamedHook) => {
 
 export function withHooks<T>(Component: any) {
     return (props: T) => {
-        const firebase = useFirebase()
+        const user = useUser()
         const loading = useLoading()
         const language = useLanguage()
         const nav = useNavigate()
@@ -50,7 +49,7 @@ export function withHooks<T>(Component: any) {
         const cookies = useCookies()
         const dimExt = useDimExtension()
         const google = useGoogleState()
-        return <Component {...props}  {... { firebase, loading, language, nav, backgroundExt, headerExt, cookies, dimExt, google }} /> as any
+        return <Component {...props}  {... { user, loading, language, nav, backgroundExt, headerExt, cookies, dimExt, google }} /> as any
     }
 }
 
@@ -65,6 +64,6 @@ export function withHook<P>(Component: any, namedHook: NamedHook) {
 export function withHookGroup<P>(Component: any, namedHook: Array<NamedHook>) {
     return (props: P) => {
         const hooks = getNamedHookGroup(namedHook)
-        return <Component {...props} {...hooks} />
+        return  <Component {...props} {...hooks} />
     }
 }
