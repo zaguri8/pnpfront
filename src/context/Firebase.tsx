@@ -28,7 +28,7 @@ export const UserContextProvider = (props: object) => {
   const { cancelLoad, doLoad } = useLoading()
   useEffect(() => {
     doLoad()
-    let tools = StoreSingleton.getTools()
+    let tools = StoreSingleton.get()
     const unsubscribe = tools.auth.onAuthStateChanged((user) => {
       let unsub: Unsubscribe | null = null
       if (user) {
@@ -37,9 +37,14 @@ export const UserContextProvider = (props: object) => {
           setAppUser(au)
           setUser(user)
           cancelLoad()
-        }, () => { cancelLoad() })
+        }, () => {
+          setUser(user)
+          setAppUser(null)
+          cancelLoad()
+        })
       } else {
-        setUser(null)
+        setUser(user)
+        setAppUser(null)
         cancelLoad()
       }
       return () => { unsub as Unsubscribe && (unsub as Unsubscribe)() }
@@ -54,7 +59,7 @@ export const UserContextProvider = (props: object) => {
 
 export const useUser = () => {
   const firebaseContext: IUserContext | null = useContext(UserContext)
-  let tools = StoreSingleton.getTools()
+  let tools = StoreSingleton.get()
   return {
     ...firebaseContext,
     signOut: async () => {

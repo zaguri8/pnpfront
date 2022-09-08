@@ -130,7 +130,7 @@ export default function EventStatistics() {
         let unsub: Unsubscribe | null = null
         if (event) {
             doLoad()
-            unsub3 = StoreSingleton.getTools().realTime.getAllTransactionsForEvent(event.eventId, (stats) => {
+            unsub3 = StoreSingleton.get().realTime.getAllTransactionsForEvent(event.eventId, (stats) => {
                 setStatistics(stats)
                 cancelLoad()
             }, (e) => {
@@ -138,9 +138,9 @@ export default function EventStatistics() {
             })
 
 
-            unsub = event ? StoreSingleton.getTools().realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
+            unsub = event ? StoreSingleton.get().realTime.addListenerToRideRequestsByEventId(event.eventId, setRequests) : null
 
-            unsub2 = event ? StoreSingleton.getTools().realTime.getPublicRidesByEventId(event.eventId, (e) => {
+            unsub2 = event ? StoreSingleton.get().realTime.getPublicRidesByEventId(event.eventId, (e) => {
                 setRides(e)
             }) : null
         }
@@ -156,7 +156,7 @@ export default function EventStatistics() {
     useEffect(() => {
         let sub: Unsubscribe | undefined;
         if (!barCodes && event) {
-            sub = StoreSingleton.getTools().realTime.getAllTransactionConfirmations(event.eventId, setBarCodes, err => { })
+            sub = StoreSingleton.get().realTime.getAllTransactionConfirmations(event.eventId, setBarCodes, err => { })
         }
         return () => sub && sub()
     }, [event])
@@ -165,7 +165,7 @@ export default function EventStatistics() {
     const deleteEvent = () => {
         if (event) {
             doLoad()
-            StoreSingleton.getTools().realTime.removeEvent(event)
+            StoreSingleton.get().realTime.removeEvent(event)
                 .then(() => {
                     alert('אירוע נמחק בהצלחה')
                     nav('/adminpanel')
@@ -275,7 +275,7 @@ export default function EventStatistics() {
                                             }>{`נקודת יציאה ${ride.rideStartingPoint}`}</h4></div>)
                                         openDialog({
                                             content: <div style={{ padding: '4px' }}><button
-                                                onClick={() => { StoreSingleton.getTools().realTime.removePublicRide(props.event.eventId, ride.rideId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
+                                                onClick={() => { StoreSingleton.get().realTime.removePublicRide(props.event.eventId, ride.rideId).then(() => { closeDialog() }).catch(() => { closeDialog() }) }}
                                                 style={{
                                                     padding: '4px',
                                                     margin: '16px',
@@ -464,7 +464,7 @@ export default function EventStatistics() {
                             <Button
                                 onClick={() => {
                                     doLoad()
-                                    StoreSingleton.getTools().realTime.removeTransaction(props.customerData.customerId, props.ride)
+                                    StoreSingleton.get().realTime.removeTransaction(props.customerData.customerId, props.ride)
                                         .then(removed => {
                                             if (removed) {
                                                 alert('ברקוד ועסקה נמחקו בהצלחה')
@@ -708,7 +708,7 @@ export default function EventStatistics() {
                                             break
                                         }
                                     }
-                                StoreSingleton.getTools().realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() })
+                                StoreSingleton.get().realTime.removeRideRequest(props.request.eventId, props.request.requestUserId).then(() => { closeDialog() }).catch(() => { closeDialog() })
                             }}
                             style={{
                                 padding: '4px',
@@ -758,8 +758,8 @@ export default function EventStatistics() {
     const csvData = async () => {
         if (objectsFromStatistics && event) {
             const all = Object.keys(objectsFromStatistics).map((city) => {
-                return {
-                    fetchUsers: async () => await StoreSingleton.getTools().realTime.getAllUsersByIds(true, objectsFromStatistics[city].users),
+                return { 
+                    fetchUsers: async () => await StoreSingleton.get().realTime.getAllUsersByIds(true, objectsFromStatistics[city].users),
                     cityName: city
                 }
             })
@@ -807,7 +807,7 @@ export default function EventStatistics() {
             let newEvent = { ...event, eventShowsInGallery: !event.eventShowsInGallery }
             doLoad()
             setEvent(newEvent)
-            StoreSingleton.getTools().realTime.updateEvent(event.eventId, newEvent, null, null).then(result => {
+            StoreSingleton.get().realTime.updateEvent(event.eventId, newEvent, null, null).then(result => {
                 cancelLoad()
                 alert(toShow ? 'אירוע נוסף לגלריה בהצלחה' : 'אירוע הוסר מהגלריה בהצלחה')
             }).catch(problem => {
@@ -820,7 +820,7 @@ export default function EventStatistics() {
     useEffect(() => {
         let unsub: Unsubscribe | undefined;
         if (event) {
-            unsub = StoreSingleton.getTools().realTime.getLinkRedirectForEventId(event.eventId, (link, err) => {
+            unsub = StoreSingleton.get().realTime.getLinkRedirectForEventId(event.eventId, (link, err) => {
                 if (err) {
                     return;
                 }
@@ -975,7 +975,7 @@ export default function EventStatistics() {
                 <Checkbox checked={event.eventSendsSMS}
                     onChange={(e) => {
                         setEvent({ ...event, eventSendsSMS: e.target.checked })
-                        StoreSingleton.getTools().realTime.updateEvent(event.eventId, { ...event, eventSendsSMS: e.target.checked })
+                        StoreSingleton.get().realTime.updateEvent(event.eventId, { ...event, eventSendsSMS: e.target.checked })
                             .then(() => {
                                 alert(e.target.checked ? 'סמסים יישלחו כעת עבור הזמנות לאירוע זה' : 'סמסים לא יישלחו עבור הזמנות לאירוע זה')
                             }).catch(err => {

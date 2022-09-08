@@ -59,11 +59,11 @@ function PaymentSuccess(props: Hooks) {
         let unsub: Unsubscribe | null = null;
         if (query.has('customer_uid') && query.has('transaction_uid')) {
             props.loading.doLoad()
-            unsub = StoreSingleton.getTools().realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
+            unsub = StoreSingleton.get().realTime.getTransaction(query.get('customer_uid')!, query.get('transaction_uid')!, (trans) => {
                 setTransaction(trans)
                 props.loading.cancelLoad()
             }, (e: Error) => {
-                StoreSingleton.getTools().realTime.addError({
+                StoreSingleton.get().realTime.addError({
                     type: 'getTransaction',
                     error: '',
                     date: new Date().toISOString(),
@@ -106,7 +106,7 @@ function PaymentSuccess(props: Hooks) {
                 props.loading.doLoad()
                 const eventId = transaction.more_info.eventId
                 const rideId = transaction.more_info.rideId
-                await StoreSingleton.getTools().realTime.getPublicRideById(eventId, rideId)
+                await StoreSingleton.get().realTime.getPublicRideById(eventId, rideId)
                     .then(dbRide => {
                         props.loading.cancelLoad()
                         if (isValidPublicRide(dbRide)) {

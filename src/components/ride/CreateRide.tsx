@@ -123,7 +123,7 @@ function CreateRide(props: Hooks) {
             ride.backTime = 'ללא'
         props.loading.doLoad()
         ServerRequest('sendSMS', send, res => { }, err => { })
-        StoreSingleton.getTools().realTime.addPrivateRideExplicit(ride)
+        StoreSingleton.get().realTime.addPrivateRideExplicit(ride)
             .then(() => {
                 props.loading.cancelLoad()
                 nav('/')

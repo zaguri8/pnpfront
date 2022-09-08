@@ -24,7 +24,7 @@ export default function PrivatePaymentConfirmation() {
     useEffect(() => {
         if (query.get('customerEmail') && query.get('customerEmail') !== null) {
             doLoad()
-            StoreSingleton.getTools().realTime
+            StoreSingleton.get().realTime
                 .getPendingPrivateTransaction(query.get('customerEmail')!)
                 .then((data) => {
                     setPaymentData(data)

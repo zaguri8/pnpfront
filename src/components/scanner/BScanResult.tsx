@@ -57,7 +57,7 @@ export default function BScanResult() {
     }
     useEffect(() => {
         if (queries.has('confirmationVoucher')) {
-            StoreSingleton.getTools().realTime
+            StoreSingleton.get().realTime
                 .addListenerToTransactionConfirmation(queries.get('confirmationVoucher')!, (c) => {
                     doLoad()
                     if (c === null) {
@@ -67,7 +67,7 @@ export default function BScanResult() {
                     if (c.ridesLeft === 0) {
                         decline()
                     } else {
-                        StoreSingleton.getTools().realTime.invalidateTransactionConfirmations(c.confirmationVoucher, c.twoWay ? (c.ridesLeft === 2 ? 1 : 0) : 0)
+                        StoreSingleton.get().realTime.invalidateTransactionConfirmations(c.confirmationVoucher, c.twoWay ? (c.ridesLeft === 2 ? 1 : 0) : 0)
                             .then(() => { approve(c) })
                             .catch(decline)
                     }

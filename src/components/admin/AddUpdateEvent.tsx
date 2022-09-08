@@ -43,7 +43,7 @@ const AddUpdateEvent = (props: AddUpdateEventProps & Hooks) => {
         if ((props.event && props.event.eventImageURL) || (imageBufferDesktop || imageBufferMobile)
             && isValidEvent(pnpEvent)) {
             props.loading.doLoad()
-            StoreSingleton.getTools().realTime.updateEvent(pnpEvent.eventId,
+            StoreSingleton.get().realTime.updateEvent(pnpEvent.eventId,
                 pnpEvent, imageBufferMobile, imageBufferDesktop, oldEventType)
                 .then(() => {
                     // update succeed

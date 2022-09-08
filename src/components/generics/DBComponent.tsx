@@ -21,7 +21,7 @@ abstract class DBComponent<T> extends
     }
 
     async componentDidMount() {
-        let rt = StoreSingleton.getTools().realTime
+        let rt = StoreSingleton.get().realTime
         let f = this.props.dft(rt).bind(rt)
         this.setState({
             ...this.state,

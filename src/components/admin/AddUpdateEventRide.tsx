@@ -90,7 +90,7 @@ const AddUpdateEventRide = (props: AddUpdateRideProps & Hooks) => {
             props.loading.doLoad()
 
             if (props.ride) {
-                StoreSingleton.getTools().realTime.updatePublicRide(props.event.eventId, ride.rideId, ride)
+                StoreSingleton.get().realTime.updatePublicRide(props.event.eventId, ride.rideId, ride)
                     .then(() => {
                         props.loading.cancelLoad()
                         props.loading.closeDialog()
@@ -102,7 +102,7 @@ const AddUpdateEventRide = (props: AddUpdateRideProps & Hooks) => {
                     })
             } else {
 
-                StoreSingleton.getTools().realTime.addPublicRide(ride.eventId, ride)
+                StoreSingleton.get().realTime.addPublicRide(ride.eventId, ride)
                     .then(() => {
                         props.loading.cancelLoad()
                         props.loading.closeDialog()

@@ -1397,7 +1397,7 @@ function Store(auth: Auth, db: Database, firestore: Firestore): FirebaseTools {
 }
 export class StoreSingleton {
     public static instance: FirebaseTools | undefined;
-    static getTools(): FirebaseTools {
+    static get(): FirebaseTools {
         if (!this.instance) {
             const app = initializeApp(firebaseConfig)
             const auth = getAuth(app)

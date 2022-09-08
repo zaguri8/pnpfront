@@ -47,7 +47,7 @@ export default function ForgotPass() {
                         return
                     }
                     doLoad()
-                    sendPasswordResetEmail(StoreSingleton.getTools().auth, email)
+                    sendPasswordResetEmail(StoreSingleton.get().auth, email)
                         .then(res => {
                             cancelLoad()
                             alert('מייל לאיפוס סיסמא נשלח !')

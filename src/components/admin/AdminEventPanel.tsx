@@ -176,7 +176,7 @@ const AdminEventPanel = (props: Hooks) => {
                                                     style={{ width: '100px', fontSize: '14px', margin: '4px', padding: '4px', color: 'white', background: '#228B22' }}
                                                     onClick={() => {
                                                         props.loading.doLoad()
-                                                        StoreSingleton.getTools().realTime.approveEvent(event.eventId)
+                                                        StoreSingleton.get().realTime.approveEvent(event.eventId)
                                                             .then(() => {
                                                                 alert('אירוע אושר בהצלחה')
                                                                 props.nav('/adminpanel')

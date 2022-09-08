@@ -12,7 +12,7 @@ export default function EventPayment() {
 
     const [paymentInfo, setPaymentInfo] = useState<{ ride: PNPPublicRide, event: PNPEvent } | undefined>();
 
-
+  
     const { setHeaderBackground } = useHeaderBackgroundExtension()
 
 
@@ -49,6 +49,7 @@ export default function EventPayment() {
     function getIsSoldOut() {
         return paymentInfo && paymentInfo.ride.extras.rideStatus === 'sold-out'
     }
+
     return <PageHolder style={{
         position: 'relative',
         zIndex:'1000',

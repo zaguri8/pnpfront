@@ -25,7 +25,7 @@ function EventLinkRedirect(props: EventLinkRedirectProps & Hooks) {
             return
         }
         props.loading.doLoad()
-        StoreSingleton.getTools().realTime.setLinkRedirect(path,
+        StoreSingleton.get().realTime.setLinkRedirect(path,
             `https://www.pick-n-pull.co.il/#/event/${props.event.eventId}`,
             (link) => {
                 if (link === null) {

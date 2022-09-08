@@ -43,7 +43,7 @@ export function RegistrationForm({
 
     useEffect(() => {
         doLoad()
-        const unsub = StoreSingleton.getTools().realTime.addListenerToRegistrationPage((settings) => {
+        const unsub = StoreSingleton.get().realTime.addListenerToRegistrationPage((settings) => {
             cancelLoad()
             setRegisterSettings(settings)
         }, (e) => {
@@ -165,7 +165,7 @@ export function RegistrationForm({
         createUserWithEmailAndPassword(firebase.auth, user.email, user.password)
             .then(() => {
                 finishRegister = true;
-                StoreSingleton.getTools().realTime.addUser({
+                StoreSingleton.get().realTime.addUser({
                     name: user.fullName,
                     email: user.email,
                     customerId: '',
@@ -182,7 +182,7 @@ export function RegistrationForm({
                     }, 1500)
                 }).catch(err => {
                     alert('הייתה בעיה בהתחברות אנא נסה שוב בעוד מספר רגעים')
-                    StoreSingleton.getTools().realTime.createError('Register error', err)
+                    StoreSingleton.get().realTime.createError('Register error', err)
                     cancelLoad()
                 })
             }).catch(err => {
@@ -319,7 +319,7 @@ export default function Register() {
                 isCacheValid(PNPPage.register)
                     .then(valid => {
                         if (valid) {
-                            StoreSingleton.getTools().realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
+                            StoreSingleton.get().realTime.addBrowsingStat(PNPPage.register, 'leaveNoAttendance')
                             cacheDone(PNPPage.register)
                         }
                     })
@@ -339,7 +339,7 @@ export default function Register() {
                     isCacheValid(PNPPage.register)
                         .then(valid => {
                             if (valid) {
-                                StoreSingleton.getTools().realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
+                                StoreSingleton.get().realTime.addBrowsingStat(PNPPage.register, 'leaveWithAttendance')
                                 cacheDone(PNPPage.register)
                             }
                         })

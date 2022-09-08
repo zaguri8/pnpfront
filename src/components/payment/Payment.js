@@ -71,7 +71,7 @@ export function PaymentForm({ product, paymentInfo }) {
     })
 
     const requestPayment = () => {
-        if (!StoreSingleton.getTools().auth.currentUser || !appUser) {
+        if (!StoreSingleton.get().auth.currentUser || !appUser) {
             nav('/login', { state: { cachedLocation: location.pathname, paymentInfo: paymentInfo } })
             closeDialog()
             return
@@ -97,7 +97,7 @@ export function PaymentForm({ product, paymentInfo }) {
         if (!appUser.customerId || appUser.customerId.length < 1) {
             alert('יש לרענן את הדף לונסות שוב, משתמשים רשומים דרך גוגל, אנא צרו משתמש חדש')
             const email = user.email.split('@')[0]
-            StoreSingleton.getTools().realTime.addUser({
+            StoreSingleton.get().realTime.addUser({
                 name: email ? email : 'Annonymous user',
                 email: user.email,
                 customerId: '',

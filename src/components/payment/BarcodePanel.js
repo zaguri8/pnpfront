@@ -9,7 +9,7 @@ const BarcodePanel = () => {
 
     const handleBarcodeCheck = async () => {
         doLoad()
-        barcode && await get(ref(StoreSingleton.getTools().db, `transactions/ridePurchases`))
+        barcode && await get(ref(StoreSingleton.get().db, `transactions/ridePurchases`))
             .then(data => {
                 const failures = data.child('error')
                 const success = data.child('success')

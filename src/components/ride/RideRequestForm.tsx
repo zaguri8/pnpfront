@@ -145,7 +145,7 @@ function RideRequestForm(props: RideRequestFormProps & Hooks) {
                                 eventName: props.event?.eventName ?? ''
                             }
                             props.loading.doLoad()
-                            StoreSingleton.getTools().realTime.addRideRequest(ride)
+                            StoreSingleton.get().realTime.addRideRequest(ride)
                                 .then(r => {
                                     alert(props.language.lang === 'heb' ? `בקשת התקבלה, הצוות שלנו ייצור עמך קשר בהקדם` : 'We got your request, our team will contact you in the next 24 hours')
                                     props.loading.closeDialog()

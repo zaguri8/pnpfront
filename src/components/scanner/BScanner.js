@@ -93,7 +93,7 @@ function BScanner() {
                     return
                 }
 
-                StoreSingleton.getTools().realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
+                StoreSingleton.get().realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
                     .then(() => {
                         let temp = barCodes
                         temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1
@@ -117,7 +117,7 @@ function BScanner() {
     useEffect(() => {
         let sub = null;
         if (producingEventId !== 0) {
-            sub = StoreSingleton.getTools().realTime.getPublicEventById(appUser.producingEventId, event => {
+            sub = StoreSingleton.get().realTime.getPublicEventById(appUser.producingEventId, event => {
                 setProducingEvent(event)
             })
         }
@@ -134,7 +134,7 @@ function BScanner() {
 
     const startProducerScanningSession = () => {
         doLoad()
-        let unsub = StoreSingleton.getTools().realTime.getAllTransactionConfirmations(producingEventId, transactions => {
+        let unsub = StoreSingleton.get().realTime.getAllTransactionConfirmations(producingEventId, transactions => {
             setBarcodes(transactions)
             setInScanningZone(true)
             setTimeout(cancelLoad, 1000)

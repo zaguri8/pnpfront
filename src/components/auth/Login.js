@@ -28,7 +28,7 @@ export default function Login() {
     function login(e) {
         e.preventDefault()
         doLoad()
-        signInWithEmailAndPassword(StoreSingleton.getTools().auth, user.u, user.p)
+        signInWithEmailAndPassword(StoreSingleton.get().auth, user.u, user.p)
             .then(() => {
                 if (location.state && location.state.cachedLocation) {
                     doLoad()

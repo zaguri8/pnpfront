@@ -18,7 +18,7 @@ function PrivateRideRequests(props: Hooks) {
     }, [])
 
     useEffect(() => {
-        let unsub = StoreSingleton.getTools().realTime.getAllPrivateRideExplicit(setRequests, (err) => {
+        let unsub = StoreSingleton.get().realTime.getAllPrivateRideExplicit(setRequests, (err) => {
             alert(err)
         })
         return () => unsub()

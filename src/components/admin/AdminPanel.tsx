@@ -26,7 +26,7 @@ function AdminPanel(props: Hooks) {
     }, [])
     useEffect(() => {
         props.loading.doLoad()
-        let tools = StoreSingleton.getTools()
+        let tools = StoreSingleton.get()
         const unsubStats = tools.realTime.addListenerToUserStatistics(setUserStatistics)
         const unsub = tools.realTime.addListenerToPublicEvents((publicEv) => {
 

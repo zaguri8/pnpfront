@@ -36,7 +36,7 @@ export default function SearchRide() {
 
     useEffect(() => {
         doLoad()
-        StoreSingleton.getTools().realTime.addListersForRideSearch(rides => {
+        StoreSingleton.get().realTime.addListersForRideSearch(rides => {
             setRides(rides)
             cancelLoad()
         }, () => { cancelLoad() })

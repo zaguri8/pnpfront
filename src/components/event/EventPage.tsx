@@ -74,7 +74,7 @@ function EventPage(props: Hooks) {
         let u2: Unsubscribe | null = null
         let removeResize: any;
         if (id) {
-            u1 = StoreSingleton.getTools().realTime.getPublicEventById(id, (event) => {
+            u1 = StoreSingleton.get().realTime.getPublicEventById(id, (event) => {
                 setEvent(event as PNPEvent)
                 props.loading.cancelLoad()
                 removeResize = () => resize(event as PNPEvent)
@@ -82,7 +82,7 @@ function EventPage(props: Hooks) {
                 resize(event as PNPEvent)
             })
 
-            u2 = StoreSingleton.getTools().realTime.getPublicRidesByEventId(id, (rides) => {
+            u2 = StoreSingleton.get().realTime.getPublicRidesByEventId(id, (rides) => {
                 setEventRides(rides as PNPPublicRide[])
             })
         }

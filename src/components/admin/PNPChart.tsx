@@ -12,7 +12,7 @@ function PNPChart(props: PNPChartProps & Hooks) {
     useEffect(() => {
         let unsub: Unsubscribe | null = null
         if (props.page) {
-            unsub = StoreSingleton.getTools().realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
+            unsub = StoreSingleton.get().realTime.addListenerToBrowsingStat(props.page, hyphenToMinus(props.date), (d) => {
                 setChartData([
                     ["נכנסו ונרשמו", "נכנסו וייצאו"],
                     ["נכנסו ונרשמו", d.leaveWithAttendance],

@@ -88,7 +88,7 @@ export default function Scanner() {
                     </Stack>, 'normal', 10000)
                     return
                 }
-                StoreSingleton.getTools().realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
+                StoreSingleton.get().realTime.invalidateTransactionConfirmations(confirmation.confirmationVoucher, confirmation.twoWay ? (confirmation.ridesLeft === 2 ? 1 : 0) : 0)
                     .then(() => {
                         let temp = barCodes
                         temp[confirmationIdx].ridesLeft = temp[confirmationIdx].ridesLeft - 1

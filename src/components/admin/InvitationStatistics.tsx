@@ -53,14 +53,14 @@ function InvitationStatistics(props: Hooks) {
     }, [])
     const updateEvent = () => {
         if (privateEvent)
-            StoreSingleton.getTools().realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
+            StoreSingleton.get().realTime.updatePrivateEvent(privateEvent?.eventId, privateEvent).then(() => { alert('שינויים נשמרו בהצלחה') })
     }
 
     const deleteEvent = () => {
         if (privateEvent) {
             props.loading.closeDialog()
             props.loading.doLoad()
-            StoreSingleton.getTools().realTime.removePrivateEvent(privateEvent.eventId)
+            StoreSingleton.get().realTime.removePrivateEvent(privateEvent.eventId)
                 .then(() => {
                     props.loading.cancelLoad()
                     alert('אירוע נמחק בהצלחה !')
@@ -112,9 +112,9 @@ function InvitationStatistics(props: Hooks) {
 
         val = val as string
         props.loading.doLoad()
-        StoreSingleton.getTools().realTime.getUserIdByEmail(val, (userId: string) => {
+        StoreSingleton.get().realTime.getUserIdByEmail(val, (userId: string) => {
 
-            StoreSingleton.getTools().realTime.makeUserResponsible(
+            StoreSingleton.get().realTime.makeUserResponsible(
                 userId,
                 privateEvent
             ).then(() => {
@@ -150,7 +150,7 @@ function InvitationStatistics(props: Hooks) {
         async function update(pointer: PNPRideConfirmation) {
             if (!confirmations) return;
             props.loading.doLoad()
-            const updated = await StoreSingleton.getTools().realTime.updateConfirmation(
+            const updated = await StoreSingleton.get().realTime.updateConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName,
                 pointer
@@ -175,7 +175,7 @@ function InvitationStatistics(props: Hooks) {
         async function deleteConfirmation() {
             if (!confirmations) return;
             props.loading.doLoad()
-            const deleted = await StoreSingleton.getTools().realTime.deleteConfirmation(
+            const deleted = await StoreSingleton.get().realTime.deleteConfirmation(
                 privateEvent!.eventId,
                 confirmation.userName)
             if (!deleted || typeof (deleted) === 'function') {
@@ -243,7 +243,7 @@ function InvitationStatistics(props: Hooks) {
         let unsub2: Unsubscribe | undefined
         let unsub3: Unsubscribe | undefined
         if (privateEvent) {
-            unsub = StoreSingleton.getTools().realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
+            unsub = StoreSingleton.get().realTime.getAllRideConfirmationByEventId(privateEvent.eventId, (confs) => {
                 if (confs) {
                     setConfirmations(confirmationsPartition(confs))
                     let hashAccordion: { [id: string]: boolean } = {}
@@ -252,9 +252,9 @@ function InvitationStatistics(props: Hooks) {
                     setAccordionHash(hashAccordion)
                 }
             })
-            unsub2 = StoreSingleton.getTools().realTime.getPrivateEventRidesById(privateEvent.eventId, setRides)
+            unsub2 = StoreSingleton.get().realTime.getPrivateEventRidesById(privateEvent.eventId, setRides)
         } else if (eventId) {
-            unsub = StoreSingleton.getTools().realTime.getPrivateEventById(eventId, (e) => {
+            unsub = StoreSingleton.get().realTime.getPrivateEventById(eventId, (e) => {
 
                 if ((!props.user.appUser || !props.user.appUser.admin) && e.eventProducerId !== props.user.user?.uid) {
                     setTimeout(() => {
@@ -269,7 +269,7 @@ function InvitationStatistics(props: Hooks) {
                     }, 250)
                     return
                 }
-                unsub2 = StoreSingleton.getTools().realTime.getAllRideConfirmationByEventId(eventId, (confs) => {
+                unsub2 = StoreSingleton.get().realTime.getAllRideConfirmationByEventId(eventId, (confs) => {
                     if (confs) {
                         setConfirmations(confirmationsPartition(confs))
                         let hashAccordion: { [id: string]: boolean } = {}
@@ -278,7 +278,7 @@ function InvitationStatistics(props: Hooks) {
                         setAccordionHash(hashAccordion)
                     }
                 })
-                unsub3 = StoreSingleton.getTools().realTime.getPrivateEventRidesById(eventId, setRides)
+                unsub3 = StoreSingleton.get().realTime.getPrivateEventRidesById(eventId, setRides)
                 setPrivateEvent(e)
 
             })
@@ -408,7 +408,7 @@ function InvitationStatistics(props: Hooks) {
                                                                 }>{`נקודת יציאה ${ride.rideStartingPoint}`}</h4></div>)
                                                             props.loading.openDialog({
                                                                 content: <div style={{ padding: '4px' }}><button
-                                                                    onClick={() => { StoreSingleton.getTools().realTime.removePrivateRide(properties.event.eventId, ride.rideId).then(() => { props.loading.closeDialog() }).catch(() => { props.loading.closeDialog() }) }}
+                                                                    onClick={() => { StoreSingleton.get().realTime.removePrivateRide(properties.event.eventId, ride.rideId).then(() => { props.loading.closeDialog() }).catch(() => { props.loading.closeDialog() }) }}
                                                                     style={{
                                                                         padding: '4px',
                                                                         margin: '16px',

@@ -36,7 +36,7 @@ const AddUpdateEventInvitation = (props: AddUpdateInvitationProps & Hooks) => {
         if ((props.event && props.event.eventImageURL) || imageBuffer
             && isValidPrivateEvent(pnpEvent)) {
             props.loading.doLoad()
-            StoreSingleton.getTools().realTime.updatePrivateEvent(pnpEvent.eventId,
+            StoreSingleton.get().realTime.updatePrivateEvent(pnpEvent.eventId,
                 pnpEvent, imageBuffer)
                 .then(() => {
                     // update succeed

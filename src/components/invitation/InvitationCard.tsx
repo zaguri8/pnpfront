@@ -54,7 +54,7 @@ function InvitationCard(props: Hooks) {
         if (BETA) return
         props.loading.doLoad()
         let secondUnsub: Unsubscribe | null | object = null
-        const unsubscribe = StoreSingleton.getTools().realTime.getPrivateEventById(id!, (event) => {
+        const unsubscribe = StoreSingleton.get().realTime.getPrivateEventById(id!, (event) => {
 
             if (isValidPrivateEvent(event as PNPPrivateEvent)) {
                 setEvent(event as PNPPrivateEvent)
@@ -64,7 +64,7 @@ function InvitationCard(props: Hooks) {
                         setConfirmation(conf)
                         props.loading.cancelLoad()
                     } else {
-                        secondUnsub = StoreSingleton.getTools().realTime.getPrivateEventRidesById(id!, (rides) => {
+                        secondUnsub = StoreSingleton.get().realTime.getPrivateEventRidesById(id!, (rides) => {
                             if (rides as PNPPublicRide[]) {
                                 setRides(rides as PNPPublicRide[])
                             }
@@ -151,7 +151,7 @@ function InvitationCard(props: Hooks) {
         if (!actualConfirmation?.rideArrival || (rides && rides.length < 1 && event.eventWithPassengers) || (isValidPublicRide(selectedEventRide!.ride!))) {
             await props.cookies.saveInvitationConfirmation(actualConfirmation!)
                 .then(() => {
-                    StoreSingleton.getTools().realTime.addRideConfirmation(actualConfirmation!)
+                    StoreSingleton.get().realTime.addRideConfirmation(actualConfirmation!)
                     setConfirmation(actualConfirmation!)
                     props.loading.cancelLoad()
                     alert(`תודה ${actualConfirmation?.userName}, קיבלנו את אישורך `)
@@ -441,7 +441,7 @@ function InvitationCard(props: Hooks) {
                             }} registrationSuccessAction={(user: User) => {
                                 props.loading.doLoad()
                                 let unsub: Unsubscribe | undefined;
-                                unsub = StoreSingleton.getTools().realTime.getUserById(user.uid, ((u: PNPUser) => {
+                                unsub = StoreSingleton.get().realTime.getUserById(user.uid, ((u: PNPUser) => {
                                     if (u && u.name) {
                                         props.loading.cancelLoad()
                                         sendInvitation(user.uid, u)

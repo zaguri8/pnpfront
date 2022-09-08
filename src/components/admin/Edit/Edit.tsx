@@ -19,7 +19,7 @@ export default function Edit() {
     const [hasChanges, setHasChanges] = useState<{ [id: string]: boolean }>({})
     useEffect(() => {
         doLoad()
-        const unsub = StoreSingleton.getTools().realTime.addListenerToRegistrationPage((settings) => {
+        const unsub = StoreSingleton.get().realTime.addListenerToRegistrationPage((settings) => {
             cancelLoad()
 
             setRegisterSettings(settings)
@@ -38,7 +38,7 @@ export default function Edit() {
     const executeRegistrationUpdate = () => {
         if (registerSettings) {
             doLoad()
-            StoreSingleton.getTools().realTime.updateWebsiteRegistrationPage(registerSettings)
+            StoreSingleton.get().realTime.updateWebsiteRegistrationPage(registerSettings)
                 .then(() => {
                     alert('ערכת בהצלחה את דף ההרשמה')
                     cancelLoad()

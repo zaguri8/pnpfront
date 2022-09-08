@@ -26,7 +26,7 @@ export function Home(props:Hooks) {
     useEffect(() => {
         props.headerExt.setHeaderBackground(`url('${logo}')`)
         setIsShowingAbout(true);
-        const unsubEvents = StoreSingleton.getTools().realTime.addListenerToPublicEvents((events) => {
+        const unsubEvents = StoreSingleton.get().realTime.addListenerToPublicEvents((events) => {
             const ev = Object.values(events)
             let filtered: PNPEvent[] = []
             for (let events of ev)
@@ -37,7 +37,7 @@ export function Home(props:Hooks) {
         if (validToCache instanceof Promise) {
             (validToCache as Promise<boolean>).then((valid) => {
                 if (valid) {
-                    StoreSingleton.getTools().realTime.addUserStatistic(PNPPage.home)
+                    StoreSingleton.get().realTime.addUserStatistic(PNPPage.home)
                     cacheDone(PNPPage.home)
                 }
             })

@@ -52,8 +52,8 @@ const MyPayments = () => {
         let unsub = null, unsub2 = null;
         if (appUser) {
             doLoad()
-            unsub = StoreSingleton.getTools().realTime.getAllTransactions(appUser.customerId, (trans) => {
-                unsub2 = StoreSingleton.getTools().realTime.addListenertoRidesForDates(trans, (transformed) => {
+            unsub = StoreSingleton.get().realTime.getAllTransactions(appUser.customerId, (trans) => {
+                unsub2 = StoreSingleton.get().realTime.addListenertoRidesForDates(trans, (transformed) => {
                     setTransactions(transformed)
                     cancelLoad()
                 }, (err) => {
@@ -62,7 +62,7 @@ const MyPayments = () => {
                         nav('/');
                 })
             }, (e) => {
-                StoreSingleton.getTools().realTime.addError({
+                StoreSingleton.get().realTime.addError({
                     type: 'getAllTransactions',
                     error: '',
                     date: new Date().toISOString(),

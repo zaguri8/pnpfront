@@ -143,7 +143,7 @@ export default function CreateEvent() {
         const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר האישור האירוע יופיע בדף הבית תחת אותה קטגוריה.` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. One the event is approvedm, will appear on the home page under the same category.`
         if (imageBuffer) {
             doLoad()
-            StoreSingleton.getTools().realTime.createEvent(pnpEvent,
+            StoreSingleton.get().realTime.createEvent(pnpEvent,
                 imageBuffer)
                 .then(() => {
                     cancelLoad()

@@ -1,6 +1,6 @@
 import './App.css';
 import { ToolBar } from './components/toolbar/Toolbar';
-import { useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import $ from 'jquery'
 import { useLoading } from './context/Loading';
 import AppMenu from './components/other/AppMenu';
@@ -13,7 +13,7 @@ import PNPRouting from './routing/PNPRouting';
 import ImageHeader from './components/imageheader/ImageHeader';
 import PNPDialogComponent from './components/dialog/PNPDialogComponent';
 
-
+const dimStyle = { position: 'fixed', display: 'none', width: '100%', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: '500' } as CSSProperties
 function App() {
   const [canToggle, setCanToggle] = useState(true)
   const dialogContext = useLoading()
@@ -97,7 +97,7 @@ function App() {
   return (<div>
     <Scanner />
     <AppMenu menuToggle={toggleMenu} />
-    <div className='global_dim' style={{ position: 'fixed', display: 'none', width: '100%', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: '500' }}></div>
+    <div className='global_dim' style={dimStyle}></div>
     <div className="App">
       {dialogContext.content ? <PNPDialogComponent lang={lang} dialogContext={dialogContext} />
         : null}

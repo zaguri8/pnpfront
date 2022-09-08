@@ -1,8 +1,8 @@
-import { CSSProperties, useEffect } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import { IUserContext } from "../../../context/Firebase";
 import { IBackgroundExtension, IHeaderBackgroundExtension } from "../../../context/HeaderContext";
 import { ILoadingContext, useLoading } from "../../../context/Loading";
-import { Hooks } from "../../generics/types";
+import { Hooks, ServerResponse } from "../../generics/types";
 import { withHookGroup } from "../../generics/withHooks";
 import SimpleForm from "../../simpleForm/SimpleForm";
 import { PageHolder } from "../../utilityComponents/Holders";
@@ -16,8 +16,9 @@ import { PNPPublicRide, PNPUser } from "../../../store/external/types";
 import ServerRequest from "../../../network/serverRequest";
 import { Navigate, useLocation, useParams } from "react-router";
 function SMS(props: Partial<Hooks>) {
-
-    const location = useLocation().state as any
+    type SMSState = { client: any, ride: any } | undefined
+    const location = useLocation()
+    const [sacState, setSacState] = useState<SMSState>(location.state as SMSState)
 
     let inputStyle = {
         padding: '8px',
@@ -80,26 +81,27 @@ function SMS(props: Partial<Hooks>) {
         placeHolder: `הכנס פרמטר ${x}`
     }))) as SimpleFormField[][]
 
-
+    useEffect(() => {
+        if (location && !sacState)
+            setSacState(location.state as SMSState)
+    }, [])
     function sendSMSRequest(state: string) {
         props.loading!.doLoad()
-        if (location && location.ride) {
-            ServerRequest<{ success: string, error: any }>('sendridesms', {
-                ride: location.ride,
+        if (sacState && sacState.ride) {
+            ServerRequest<ServerResponse>('sendridesms', {
+                ride: sacState.ride,
                 text: state
             }, result => {
                 props.loading!.cancelLoad()
-                if (result.success)
-                    alert(result.success)
-                else if (result.error)
-                    alert(result.error)
+                if (result.success) alert(result.success)
+                else if (result.error) alert(result.error)
             }, error => {
                 props.loading!.cancelLoad()
                 alert(error)
             })
-        } else if (location && location.client) {
-            ServerRequest<{ success: string, error: any }>('sendclientsms', {
-                client: location.client,
+        } else if (sacState && sacState.client) {
+            ServerRequest<ServerResponse>('sendclientsms', {
+                client: sacState.client,
                 text: state
             }, result => {
                 props.loading!.cancelLoad()
@@ -122,10 +124,9 @@ function SMS(props: Partial<Hooks>) {
         fontWeight: 'bold'
     }
 
-
-    return <PageHolder style={{ overflow: 'hidden' }}>
-        {location && location.ride ? <label style={labelHeaderStyle} dir={'rtl'}>{`שליחת הודעה לנוסעים מנקודת יציאה:`}<b style={{ display: 'block' }}>{location.ride.rideStartingPoint}</b></label>
-            : location && location.client ? <label style={labelHeaderStyle}>{`שליחת הודעה ללקוח: ${location.client.name}`}</label> : null}
+    return sacState ? <PageHolder style={{ overflow: 'hidden' }}>
+        {sacState && sacState.ride ? <label style={labelHeaderStyle} dir={'rtl'}>{`שליחת הודעה לנוסעים מנקודת יציאה:`}<b style={{ display: 'block' }}>{sacState.ride.rideStartingPoint}</b></label>
+            : location && sacState.client ? <label style={labelHeaderStyle}>{`שליחת הודעה ללקוח: ${sacState.client.customerName}`}</label> : null}
         < SimpleForm layout="grid"
             numCols={2}
             numRows={1}
@@ -148,9 +149,9 @@ function SMS(props: Partial<Hooks>) {
             {'פרמטרים בנויים:'}
         </label>
         <label dir="rtl" style={{ ...secLabelStyle, fontSize: '10px' }}>
-            {location.ride ? '[שם], [אימייל] , [טלפון], [אירוע], [נקודת_יציאה] ,[שעת_יציאה] ,[תאריך_נסיעה]' : '[שם], [אימייל] , [טלפון]'}
+            {sacState.ride ? '[שם], [אימייל] , [טלפון], [אירוע], [נקודת_יציאה] ,[שעת_יציאה] ,[תאריך_נסיעה]' : '[שם], [אימייל] , [טלפון]'}
         </label>
-    </PageHolder>
+    </PageHolder> : <Navigate to='/' />
 }
 
 

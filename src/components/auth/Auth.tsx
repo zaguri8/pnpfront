@@ -18,7 +18,7 @@ function Auth(props: AuthProps & Hooks) {
         ...style
     }}>{props.title}</p>
         <StyledFirebaseAuth uiConfig={uiConfig("#" + props.redirect ? props.redirect : location.pathname)}
-            firebaseAuth={StoreSingleton.getTools().auth} /></div>)
+            firebaseAuth={StoreSingleton.get().auth} /></div>)
 }
 
 export default withHook<AuthProps>(Auth, 'user')

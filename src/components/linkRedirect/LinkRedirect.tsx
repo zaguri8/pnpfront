@@ -19,7 +19,7 @@ export default function LinkRedirect() {
     useEffect(() => {
         if (id) {
             doLoad();
-            StoreSingleton.getTools().realTime.getLinkRedirect(id, (link, err) => {
+            StoreSingleton.get().realTime.getLinkRedirect(id, (link, err) => {
                 if (err || !link) return pageNotFound();
                 cancelLoad();
                 window.open(link, '_self')

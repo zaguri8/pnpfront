@@ -98,7 +98,7 @@ export default function PrivateEventConstruction() {
     const addPrivateEventAction = () => {
         if (isValidPrivateEvent(privateEvent)) {
             doLoad()
-            StoreSingleton.getTools().realTime.addPrivateEvent(privateEvent, imageBuffer)
+            StoreSingleton.get().realTime.addPrivateEvent(privateEvent, imageBuffer)
                 .then((response) => {
                     if (response && response as { id: string }) {
                         const dialogTitle = lang === 'heb' ? `תודה ${appUser?.name ?? ''}, הבקשה ליצירת האירוע התקבלה. האירוע יאושר על ידי ההנהלה תוך זמן קצר. לאחר אישור האירוע תקבל/י קישור הניתן לשיתוף לדף הזמנה  .` : `Thanks ${appUser?.name ?? ''}, Event creation request accepted.and will be Approved by management shortly. Once the event is approved, you will receive a shareable link for the invitation.`

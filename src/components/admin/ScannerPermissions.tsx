@@ -19,7 +19,7 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
     useEffect(() => {
         let sub: Unsubscribe | undefined;
         if (props.event && !scanners) {
-            sub = StoreSingleton.getTools().realTime.getAllScanners(props.event.eventId, setScanners)
+            sub = StoreSingleton.get().realTime.getAllScanners(props.event.eventId, setScanners)
         }
         return () => sub && sub()
     }, [props.event])
@@ -28,7 +28,7 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
         const email = $('#user_barcode_give_permissions_input').val() as string
         if (!email) { alert('יש להכניס אימייל'); return; }
         props.loading.doLoad()
-        StoreSingleton.getTools().realTime.giveScannerPermissionsByEmail(email, props.event.eventId).then(() => {
+        StoreSingleton.get().realTime.giveScannerPermissionsByEmail(email, props.event.eventId).then(() => {
             props.loading.cancelLoad()
             alert(`המשתמש ${email} קיבל גישות סורק`)
         }).catch(() => {
@@ -40,7 +40,7 @@ function ScannerPermissions(props: ScannerPermissionsProps & Hooks) {
 
     function takeUserPermissions() {
         const email = $('#user_barcode_take_permissions_input').val() as string
-        StoreSingleton.getTools().realTime.takeScannerPermissionsByEmail(email).then(() => {
+        StoreSingleton.get().realTime.takeScannerPermissionsByEmail(email).then(() => {
             props.loading.cancelLoad()
             alert(`המשתמש ${email} איבד גישות סורק`)
         }).catch(() => {

@@ -28,6 +28,11 @@ export type Hook = IUserContext | ILanguageContext | {
     popoverContent: any,
     closeDialog: () => void;
 } | IBackgroundExtension | NavigateFunction | IHeaderBackgroundExtension | IDimExtension | IGoogleContext | ICookieContext
+
+export type ServerResponse = Partial<{
+    success: string
+    error: string
+}>
 export type Hooks = {
     user: { appUser: PNPUser | undefined | null, user: User | undefined | null },
     loading: {
