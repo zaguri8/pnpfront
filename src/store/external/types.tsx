@@ -46,6 +46,33 @@ export type PNPPublicRide = {
     extras: PNPRideExtras
 }
 
+export type PNPWorkersRide = {
+    companyId: string,
+    id: string,
+    backTime:string,
+    startPoint: string,
+    destination: string,
+    rideTime:string,
+    date: string,
+    extras:PNPWorkersRideExtras
+}
+
+
+
+export type PNPCompany = {
+    id: string,
+    logo:string,
+    name: string
+}
+
+export type PNPWorkersRideExtras = {
+    rideStatus?: 'on-going' | 'sold-out' | 'running-out'
+    rideDirection: '2' | '1' // 1 - from event, 2 - to event
+    rideMaxPassengers?: string
+    twoWay: boolean
+    twoWayOnly: boolean
+}
+
 export type PNPRideExtras = {
     isRidePassengersLimited?: boolean
     rideTransactionsConfirmed: boolean
@@ -77,7 +104,7 @@ export type PNPPrivateRide = {
 export type PNPExplicitPrivateRide = {
     customerPhone: string
     customerName: string
-    rideId:string
+    rideId: string
     rideStartingPoint: string
     extraStopPoints: string[]
     extraStopPointsBack: string[]
@@ -185,6 +212,15 @@ export type PNPRideConfirmation = {
     directionType: string
 }
 
+export type PNPCompanyRideConfirmation = {
+    userId: string
+    userName: string
+    phoneNumber: string
+    rideId: string
+    companyId: string
+    companyName:string
+    date: string
+}
 
 export enum PNPRideDirectionNumber {
     to_event = 1,

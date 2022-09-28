@@ -14,6 +14,7 @@ function useQuery() {
 
     return React.useMemo(() => new URLSearchParams(search), [search]);
 }
+const PageHolderStylePrivatePayment = { background: 'none', border: 'none' }
 
 export default function PrivatePaymentConfirmation() {
 
@@ -34,7 +35,7 @@ export default function PrivatePaymentConfirmation() {
         }
     }, [query])
     return <PageHolder>
-        {(paymentData && paymentData.customer !== undefined && paymentData.customer !== null) && < InnerPageHolder style={{ background: 'none', border: 'none' }}>
+        {(paymentData && paymentData.customer !== undefined && paymentData.customer !== null) && <InnerPageHolder style={PageHolderStylePrivatePayment}>
             <h1 dir='rtl' style={{ color: SECONDARY_WHITE }}>{'תודה, ' + paymentData.customer.customer_name}</h1>
             <Stack spacing={1.2}>
                 <h4 dir='rtl' style={{ color: SECONDARY_WHITE }}>{'אישור עסקה עם Pick n Pull'}</h4>

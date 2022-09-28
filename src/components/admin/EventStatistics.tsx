@@ -788,6 +788,7 @@ export default function EventStatistics() {
                                 let row = rowArray.join(",");
                                 csvContent += row + "\r\n";
                             });
+
                             var downloadLink = document.createElement("a");
                             var encodedUri = encodeURI(csvContent);
                             downloadLink.href = encodedUri;

@@ -1,5 +1,6 @@
 import React from "react"
 import { Routes } from "react-router"
+import InvitationPageWorkers from "../components/invitation/InvitationPageWorkers"
 import pnpRoute from "./PNPRoute"
 const AdminEventPanel = React.lazy(() => import("../components/admin/AdminEventPanel"))
 const AdminPanel = React.lazy(() => import("../components/admin/AdminPanel"))
@@ -11,6 +12,7 @@ const GeneratePaymentForm = React.lazy(() => import("../components/admin/Payment
 const PrivatePaymentConfirmation = React.lazy(() => import("../components/admin/PaymentForm/PrivatePaymentConfirmation"))
 const PrivatePaymentForm = React.lazy(() => import("../components/admin/PaymentForm/PrivatePaymentForm"))
 const PriceStatistics = React.lazy(() => import("../components/admin/PriceStatistics/PriceStatistics"))
+const PriceStatistics2 = React.lazy(() => import("../components/admin/PriceStatistics/PriceStatistics2"))
 const SMS = React.lazy(() => import("../components/admin/SMS/SMS"))
 const PrivateRideRequests = React.lazy(() => import("../components/admin/PrivateRideRequests/PrivateRideRequests"))
 const UserStatistics = React.lazy(() => import("../components/admin/UserStatistics"))
@@ -51,6 +53,7 @@ const PNPRouting = React.memo((props: any) => {
             pnpRoute('termsOfService', <TermsOfService />, 'normal', props.lang),
             pnpRoute('/payment/privatePaymentPage/:customerEmail', <PrivatePaymentForm />, 'normal', props.lang),
             pnpRoute('/invitation/:id', <InvitationPage />, 'normal', props.lang),
+            pnpRoute('/invitationWorkers/:id', <InvitationPageWorkers />, 'normal', props.lang),
             pnpRoute('/forgotPass', <ForgotPass />, 'normal', props.lang),
             pnpRoute('/*', <NotFound lang={props.lang} />, 'normal', props.lang),
             pnpRoute('/login', <Login />, 'normal', props.lang),
@@ -75,6 +78,7 @@ const PNPRouting = React.memo((props: any) => {
             pnpRoute('/scanResult', <BScanResult />, 'producer', props.lang),
             /* Admin Routing */
             pnpRoute('/test2', <PriceStatistics />, 'admin', props.lang),
+            pnpRoute('/priceStats', <PriceStatistics2 />, 'admin', props.lang),
             pnpRoute('/generatePaymentLink', <GeneratePaymentForm />, 'admin', props.lang),
             pnpRoute('/adminpanel/sms', <SMS />, 'admin', props.lang),
             pnpRoute('/adminpanel/rideRequests', <PrivateRideRequests />, 'admin', props.lang),

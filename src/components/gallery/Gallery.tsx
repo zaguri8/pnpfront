@@ -17,11 +17,22 @@ export type GalleryProps = {
     events: PNPEvent[]
     privateEvents: PNPEvent[]
 }
-const paragraphStyle = {
+export const paragraphStyle = {
     fontSize: '12px',
     margin: '0px'
 } as CSSProperties
-
+export const todayIconStyle = {
+    width: '12px',
+    height: '12px',
+    color: 'orange',
+    paddingLeft: '4px'
+} as CSSProperties
+export const locationPinIconStyle = {
+    paddingLeft: '2px',
+    width: '12.5px',
+    color: 'orange',
+    height: '12.5px'
+} as CSSProperties
 type GalleryItemProps = { event: PNPEvent }
 function GalleryItemTitle(props: GalleryItemProps) {
     return <div style={{
@@ -39,18 +50,7 @@ function GalleryItemTitle(props: GalleryItemProps) {
 }
 function GalleryItemBottom(props: GalleryItemProps) {
 
-    const todayIconStyle = {
-        width: '12px',
-        height: '12px',
-        color: 'orange',
-        paddingLeft: '4px'
-    } as CSSProperties
-    const locationPinIconStyle = {
-        paddingLeft: '2px',
-        width: '12.5px',
-        color: 'orange',
-        height: '12.5px'
-    } as CSSProperties
+   
 
     return <div >
         <Stack display={'flex'} alignItems={'flex-start'} className="gallery_item_decoration">

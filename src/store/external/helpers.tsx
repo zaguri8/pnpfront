@@ -1,8 +1,8 @@
 import { User } from "firebase/auth";
 import { dateStringFromDate } from "../../components/utilityComponents/functions";
 import { SAME_SPOT } from "../../settings/strings";
-import { getCurrentDate } from "../../utilities";
-import { PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./types";
+import { getCurrentDate, getDateString } from "../../utilities";
+import { PNPCompany, PNPCompanyRideConfirmation, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./types";
 
 
 export function getDefaultPublicEvent(user?: User | null): PNPEvent {
@@ -43,6 +43,17 @@ export function getDefaultConfirmation(event: PNPPrivateEvent): PNPRideConfirmat
     }
 }
 
+export function getDefaultConfirmationCompanyRide(company: PNPCompany): PNPCompanyRideConfirmation {
+    return {
+        userId: 'guest',
+        companyId: company.id,
+        companyName: company.name,
+        userName: 'null',
+        phoneNumber: 'null',
+        date: getDateString(new Date().getTime()),
+        rideId: 'null',
+    }
+}
 export function getDefaultPrivateEvent(): PNPPrivateEvent {
     return {
         eventTitle: 'null',
@@ -74,7 +85,7 @@ export function getDefaultPublicRide(event?: PNPEvent | null, lang?: string): PN
         extras: {
             isRidePassengersLimited: true,
             rideStatus: 'on-going',
-            rideTransactionsConfirmed:false,
+            rideTransactionsConfirmed: false,
             rideMaxPassengers: '54',
             twoWayOnly: false,
             twoWay: true,
@@ -100,7 +111,7 @@ export function getDefaultPublicRide2(event?: PNPPrivateEvent | null, lang?: str
             isRidePassengersLimited: true,
             rideStatus: 'on-going',
             rideMaxPassengers: '54',
-            rideTransactionsConfirmed:false,
+            rideTransactionsConfirmed: false,
             twoWayOnly: false,
             twoWay: true,
             rideDirection: '2',

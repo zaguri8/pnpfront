@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { PNPPage, PNPPageStats } from "../cookies/types";
 import { asyncLocalStorage } from '../cookies/index'
-import { PNPRideConfirmation } from '../store/external/types';
+import { PNPCompanyRideConfirmation, PNPRideConfirmation } from '../store/external/types';
 
 export interface ICookieContext {
     setCookies: (cookies: PNPPageStats[]) => void
@@ -132,6 +132,26 @@ export const useCookies = () => {
             return await asyncLocalStorage.getItem<PNPRideConfirmation[]>('pnpEIC').then(data => {
                 if (data) {
                     return data.find(conf => conf.eventId === eventId)
+                } else return undefined
+            })
+        },
+
+        saveInvitationConfirmationWorkers: async (invConfirmation: PNPCompanyRideConfirmation) => {
+            await asyncLocalStorage.getItem<PNPCompanyRideConfirmation[]>('pnpEICWorkers').then(data => {
+                if (data) {
+                    data.push(invConfirmation)
+                    asyncLocalStorage.setItem('pnpEICWorkers', data)
+                    return true;
+                } else {
+                    asyncLocalStorage.setItem('pnpEICWorkers', [invConfirmation])
+                    return true;
+                }
+            })
+        },
+        getInvitationConfirmationWorkers: async (cId: string) => {
+            return await asyncLocalStorage.getItem<PNPCompanyRideConfirmation[]>('pnpEICWorkers').then(data => {
+                if (data) {
+                    return data.find(conf => conf.companyId === cId)
                 } else return undefined
             })
         }

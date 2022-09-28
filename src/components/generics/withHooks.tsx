@@ -1,4 +1,3 @@
-import React, { useEffect } from "react"
 import { useNavigate } from "react-router"
 import { useCookies } from "../../context/CookieContext"
 import { useUser } from "../../context/Firebase"

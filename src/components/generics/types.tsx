@@ -7,7 +7,7 @@ import { IBackgroundExtension, IDimExtension, IHeaderBackgroundExtension } from 
 import { ILanguageContext } from "../../context/Language"
 import { PNPPage } from "../../cookies/types"
 import { Realtime } from "../../store/external"
-import { PNPRideConfirmation, PNPUser } from "../../store/external/types"
+import { PNPCompanyRideConfirmation, PNPRideConfirmation, PNPUser } from "../../store/external/types"
 
 
 export type Hook = IUserContext | ILanguageContext | {
@@ -65,5 +65,7 @@ export type Hooks = {
         cacheDone: (page: PNPPage) => void,
         saveInvitationConfirmation: (invConfirmation: PNPRideConfirmation) => Promise<boolean>
         getInvitationConfirmation: (eventId: string) => Promise<PNPRideConfirmation | undefined>
+        saveInvitationConfirmationWorkers: (invConfirmation: PNPCompanyRideConfirmation) => Promise<boolean>
+        getInvitationConfirmationWorkers: (eventId: string) => Promise<PNPCompanyRideConfirmation | undefined>
     }
 }

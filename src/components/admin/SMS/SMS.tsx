@@ -1,20 +1,13 @@
 import { CSSProperties, useEffect, useState } from "react";
-import { IUserContext } from "../../../context/Firebase";
-import { IBackgroundExtension, IHeaderBackgroundExtension } from "../../../context/HeaderContext";
-import { ILoadingContext, useLoading } from "../../../context/Loading";
 import { Hooks, ServerResponse } from "../../generics/types";
 import { withHookGroup } from "../../generics/withHooks";
 import SimpleForm from "../../simpleForm/SimpleForm";
 import { PageHolder } from "../../utilityComponents/Holders";
 import { SimpleFormField } from '../../simpleForm/simpleform.types'
-import { PRIMARY_GRADIENT } from "../../other/Barcode";
-import { PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from "../../../settings/colors";
-import { blue, blueGrey, green, lightBlue, pink, red } from "@mui/material/colors";
-import { boxShadow } from "../../../settings/styles";
+import {  SECONDARY_WHITE } from "../../../settings/colors";
 import Spacer from "../../utilityComponents/Spacer";
-import { PNPPublicRide, PNPUser } from "../../../store/external/types";
 import ServerRequest from "../../../network/serverRequest";
-import { Navigate, useLocation, useParams } from "react-router";
+import { Navigate, useLocation } from "react-router";
 function SMS(props: Partial<Hooks>) {
     type SMSState = { client: any, ride: any } | undefined
     const location = useLocation()

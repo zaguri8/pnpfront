@@ -1,5 +1,5 @@
 import { Auth, User } from 'firebase/auth'
-import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople, PNPTransactionConfirmationExtended, PNPExplicitPrivateRide } from './types'
+import { PNPEvent, PNPUser, PNPPublicRide, PNPPrivateEvent, PNPError, PNPRideConfirmation, PNPPrivateRide, PNPRideRequest, PNPTransactionConfirmation, UserDateSpecificStatistics, UserEnterStatistics, RegisterFormExtras, PPaymentPageData, PCustomerData, PProductData, UserIdAndExtraPeople, UserAndExtraPeople, PNPTransactionConfirmationExtended, PNPExplicitPrivateRide, PNPCompany, PNPWorkersRide, PNPCompanyRideConfirmation } from './types'
 import { privateEventFromDict, userFromDict, eventFromDict, publicRideFromDict, rideConfirmationFromDict, rideRequestFromDict, getEventType, transactionConfirmationFromDict, toDictionary, pPaymentPageDataFromDict, pPaymentTransactionDataFromDict } from './converters'
 import { SnapshotOptions } from 'firebase/firestore'
 import { PNPPage } from '../../cookies/types'
@@ -21,7 +21,7 @@ import { createNewCustomer } from '../payments'
 import { TransactionSuccess } from '../payments/types'
 import { transactionSuccessFromDict } from '../payments/converters'
 import { datesComparator, getCurrentDate } from '../../utilities'
-import { dateStringFromDate } from '../../components/utilityComponents/functions'
+import { dateStringFromDate, hyphenToMinus } from '../../components/utilityComponents/functions'
 import { PNPRideExtraPassenger } from '../../components/admin/EventStatistics'
 import { firebaseConfig, uiConfig } from '../../settings/config'
 
@@ -47,6 +47,7 @@ export class Realtime {
     public siteSettings: DatabaseReference
     public rides: DatabaseReference
     public allEvents: DatabaseReference
+    public allCompanies: DatabaseReference
     public errs: DatabaseReference
     public users: DatabaseReference
     public linkRedirects: DatabaseReference
@@ -61,6 +62,7 @@ export class Realtime {
         this.siteSettings = ref(db, '/settings')
         this.allEvents = ref(db, '/events')
         this.scanners = ref(db, '/scanners')
+        this.allCompanies = ref(db, '/companies')
         this.rides = ref(db, "/rides")
         this.privatePaymentPages = ref(db, '/paymentPages/private')
         this.statistics = ref(db, '/statistics')
@@ -526,6 +528,31 @@ export class Realtime {
     async addRideConfirmation(confirmation: PNPRideConfirmation): Promise<object | void> {
         let newPath = push(child(child(this.rides, 'confirmations'), confirmation.eventId))
         return await set(newPath, confirmation)
+    }
+
+    /**
+ * addRideConfirmationWorkers
+ * @param confirmation confirmation to be added for current user
+ * @returns new reference callback
+ */
+    async addRideConfirmationWorkers(uid: string, confirmation: PNPCompanyRideConfirmation): Promise<any | boolean> {
+
+        return set(child(child(child(child(child(this.rides, 'confirmationsWorkers'), confirmation.companyId), hyphenToMinus(confirmation.date)), confirmation.rideId), uid), confirmation)
+    }
+
+
+    addListenerToWorkerConfirmations(uid: string, companyId: string, consume: (rides: PNPCompanyRideConfirmation[]) => void) {
+        return onValue(child(child(this.rides, 'confirmationsWorkers'), companyId), (val) => {
+            const allConfirmations: PNPCompanyRideConfirmation[] = []
+            val.forEach(date => {
+                date.forEach(ride => {
+                    if(ride.hasChild(uid)) {
+                         allConfirmations.push(ride.child(uid).val())
+                    }
+                })
+            })
+            consume(allConfirmations)
+        })
     }
     /**
        * addPublicRide
@@ -1289,6 +1316,18 @@ export class Realtime {
         })
     }
 
+
+    /**
+        * 
+        * @param id private event to be fetched by id
+        * @returns private event if found
+        */
+    getPrivateCompanyById = (id: string, consume: ((event: PNPCompany) => void)) => {
+        return onValue(child(this.allCompanies, id), (val) => {
+            consume(val.val() as PNPCompany)
+        })
+    }
+
     /**
      * getPrivateEventRidesById
      * @param id eventId to fetch rides for
@@ -1302,6 +1341,34 @@ export class Realtime {
                 ret.push(publicRideFromDict(ride))
             })
             consume(ret)
+        })
+    }
+
+
+    /**
+     * getPrivateEventRidesById
+     * @param id eventId to fetch rides for
+     * @returns all rides for given event
+     */
+    getCompanyRidesById = (id: string, consume: (consume: PNPWorkersRide[]) => void) => {
+        return onValue(child(child(this.rides, 'workers'), id), (snap) => {
+            const ret: PNPWorkersRide[] = []
+            snap.forEach(ride => {
+                ret.push(ride.val() as PNPWorkersRide)
+            })
+            consume(ret)
+        })
+    }
+
+
+    /**
+ * getPrivateEventRidesById
+ * @param id eventId to fetch rides for
+ * @returns all rides for given event
+ */
+    getCompanyRideById = (companyId: string, rideId: string, consume: (consume: PNPWorkersRide) => void) => {
+        return onValue(child(child(child(this.rides, 'workers'), companyId), rideId), (snap) => {
+            consume(snap.val() as PNPWorkersRide)
         })
     }
     /**

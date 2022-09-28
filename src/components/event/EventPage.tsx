@@ -204,11 +204,6 @@ function EventPage(props: Hooks) {
         cursor: 'pointer'
     } as CSSProperties
 
-
-
-
-
-
     return (event === null) ? <h1>There was an error loading requested page</h1> : (event !== undefined ? (
         <React.Fragment>
             <PageHolder

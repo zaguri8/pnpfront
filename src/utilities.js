@@ -5,6 +5,20 @@ export const getCurrentDate = () => {
     date.setMonth(date.getMonth() + 1)
     return date
 }
+export function millisToMinutesAndSeconds(duration) {
+    const a = duration.includes('mins');
+    const b = duration.includes('hours');
+    const c = a && b;
+    if (c) {
+        const x = duration.split(' ')
+        const hours = Number(x[0]);
+        const minutes = Number(x[2]);
+
+        return { hours, minutes }
+
+    } else return { minutes: Number(duration.split(" ")[0]), hours: 0 }
+}
+
 export const datesComparator = (a, b) => {
     let bComps = b.date.split(' ')
     let bCompDate = bComps[0].split('-')
@@ -20,7 +34,17 @@ export const getDateString = (dateMili) => {
     const date = new Date(dateMili)
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
 }
-
+export function getDaysInCurrentMonth() {
+    const date = new Date();
+    return getDaysInMonth(date);
+}
+export function getDaysInMonth(date) {
+    return new Date(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        0
+    ).getDate();
+}
 export const getDateTimeString = (dateMili) => {
     const date = new Date(dateMili)
     let hour = date.getHours()

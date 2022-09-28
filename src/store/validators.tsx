@@ -1,5 +1,5 @@
 
-import { PassengersDictionary, PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./external/types";
+import { PassengersDictionary, PNPCompany, PNPCompanyRideConfirmation, PNPCoupon, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation, PNPWorkersRide } from "./external/types";
 
 export function isValidHttpUrl(string: string): boolean {
   let url;
@@ -55,8 +55,22 @@ export function isValidPrivateEvent(event: PNPPrivateEvent): boolean {
     && (event.eventTitle !== null)
     && (event.eventTitle !== 'null')
 }
+export function isValidWorkersRide(event: PNPWorkersRide): boolean {
+  return event !== undefined
+    && event !== null
+    && (event.date !== null
+      && event.destination !== 'null')
+    && (event.destination !== null
+      && event.startPoint !== null
+      && event.destination !== null)
+}
 
-
+export function isValidCompany(event: PNPCompany): boolean {
+  return event !== undefined
+    && event !== null
+    && (event.name !== null
+      && event.name !== 'null')
+}
 
 export function isValidCoupon(coupon: PNPCoupon) {
   return coupon
@@ -144,6 +158,19 @@ export function isValidSingleRideConfirmation(ride: PNPRideConfirmation | undefi
       && ride.userName !== 'null')
     && (ride.userName !== null
       && ride.passengers !== 'null')
+    && (ride.date !== null
+      && ride.date !== 'null')
+}
+
+export function isValidSingleWorkersRideConfirmation(ride: PNPCompanyRideConfirmation | undefined): boolean {
+  return ride !== undefined
+    && ride !== null
+    && (ride.userId !== null
+      && ride.userId !== 'null')
+    && ride.phoneNumber !== 'null'
+    && (ride.phoneNumber !== null
+      && ride.userName !== 'null')
+    && (ride.userName !== null)
     && (ride.date !== null
       && ride.date !== 'null')
 }

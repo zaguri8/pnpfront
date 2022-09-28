@@ -1,34 +1,43 @@
 import 'firebaseui/dist/firebaseui.css'
-import React, { useEffect, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import 'firebase/compat/auth';
-
+import sold_out from '../../assets/images/sold_out.png'
 import $ from 'jquery'
 import { RegistrationForm } from '../auth/Register';
 import { List, Button, MenuItem, Stack, TextField, Typography, Checkbox } from '@mui/material';
-
-import { useUser } from '../../context/Firebase';
-import { PNPPrivateEvent, PNPRideConfirmation, PNPRideDirectionNumber, PNPUser } from '../../store/external/types';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { PNPPrivateEvent, PNPRideConfirmation, PNPUser } from '../../store/external/types';
 import { isValidPrivateEvent, isValidPublicRide, isValidRideConfirmation, isValidSingleRideConfirmation } from '../../store/validators';
-
+import '../event/EventPage.css'
 import { PNPPublicRide } from '../../store/external/types';
 import { useNavigate, useParams } from 'react-router';
-import { useLoading } from '../../context/Loading';
 import { BETA } from '../../settings/config';
-import { DARK_BLACK, PRIMARY_BLACK, SECONDARY_WHITE } from '../../settings/colors';
+import { DARK_BLACK, PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK, SECONDARY_WHITE } from '../../settings/colors';
 import { InnerPageHolder, PageHolder } from '../utilityComponents/Holders';
-import { CHOOSE_RIDE, CONFIRM_EVENT_ARRIVAL, CONFIRM_RIDE, FULL_NAME, PHONE_NUMBER, SIDE } from '../../settings/strings';
-import { useLanguage } from '../../context/Language';
+import { CHOOSE_RIDE, CONFIRM_EVENT_ARRIVAL, FULL_NAME, PHONE_NUMBER, SIDE } from '../../settings/strings';
 import { HtmlTooltip } from '../utilityComponents/HtmlTooltip';
-import { elegantShadow, submitButton, textFieldStyle } from '../../settings/styles';
+import { submitButton, textFieldStyle } from '../../settings/styles';
 import { Unsubscribe } from 'firebase/database';
 import { makeStyles } from '@mui/styles';
 import Spacer from '../utilityComponents/Spacer';
-import { useCookies } from '../../context/CookieContext';
 import { getDefaultConfirmation } from '../../store/external/helpers';
-import { User } from 'firebase/auth';
 import { Hooks } from '../generics/types';
 import { CommonHooks, withHookGroup } from '../generics/withHooks';
 import { StoreSingleton } from '../../store/external';
+import { User } from 'firebase/auth';
+import { locationPinIconStyle, paragraphStyle, todayIconStyle } from '../gallery/Gallery';
+
+export const rideTitleStyle = {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'space-between',
+}
+// this page was written bad when i just started front-end development, but im too lazy to update it
+
+export const nameforDir = (dir: number) => dir === 1 ? 'הלוך' : dir === 2 ? 'חזור' : 'הסעה דו כיוונית (הלוך חזור)'
+
 function InvitationCard(props: Hooks) {
     const [confirmation, setConfirmation] = useState<PNPRideConfirmation | null>(null)
     const [newConfirmation, setNewConfirmation] = useState<PNPRideConfirmation>()
@@ -88,9 +97,8 @@ function InvitationCard(props: Hooks) {
 
     const typographyStyle = {
         fontFamily: 'Open Sans Hebrew',
-        color: SECONDARY_WHITE,
-        fontWeight: 'bold',
-        fontSize: '20px'
+        color: PRIMARY_PINK,
+        fontSize: '18px'
     }
     const spanStyle = {
         fontFamily: 'Open Sans Hebrew'
@@ -173,133 +181,86 @@ function InvitationCard(props: Hooks) {
     }
 
 
+    const RidesCardStyle = {
+        background: 'white',
+        borderRadius: '12px',
+        padding: '8px',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'flex',
+        marginBlock: '8px',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+    } as CSSProperties
+
     function getMenuItems(ride: PNPPublicRide) {
+        const styleForRide = (dir: number) => ({
+            backgroundColor: (selectedEventRide?.ride === ride && selectedEventRide.direction === dir) ? 'none' : ride.extras.rideStatus === 'sold-out' ? 'orange' : ' white',
+            width: '100%',
+            background: selectedEventRide?.ride === ride && selectedEventRide.direction === dir ? 'rgba(0,0,0,0.8)' : ride.extras.rideStatus === 'sold-out' ? `url(${sold_out})` : 'none',
+            backgroundSize: (ride.extras.rideStatus === 'sold-out' && (selectedEventRide?.ride !== ride)) ? '125px 50px' : '100%',
+            color: (selectedEventRide?.ride === ride && selectedEventRide.direction === dir ? 'white' : 'black'),
+            border: '.1px solid lightgray',
+            borderRadius: '8px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: ride.extras.rideStatus === 'sold-out' && selectedEventRide?.ride !== ride ? '50% center' : 'center center',
+            padding: '8px',
+            display: 'flex',
+        })
+  
+        const RideRow = ({ ride, dir }: { ride: PNPPublicRide, dir: number }) => {
+            return (<MenuItem
+                dir='rtl'
+                onClick={() => {
+                    handleSelectEventRide(ride, dir)
+                }} style={styleForRide(dir)} value={ride.rideId}>
+                <div style={rideTitleStyle}>
+                    <Stack direction={'row'} alignItems={'center'} style={{ columnGap: '8px' }}>
+                        <DirectionsBusIcon style={{ color: PRIMARY_ORANGE }} />
+                        <span className='eventRideRowName_ePage'>{nameforDir(dir)}</span>
+                    </Stack>
+                    <span className={selectedEventRide?.ride === ride && selectedEventRide.direction === dir ? 'eventTimeSelected_ePage' : 'eventTime_ePage'}>{ride.extras.twoWay ? ride.rideTime : ride.extras.rideDirection === '1' ? ride.backTime : ride.rideTime}</span>
+                </div>
+            </MenuItem>)
+        }
+
+
 
         return <Stack alignSelf={'center'} spacing={1} style={{
             maxWidth: '600px',
-            width: '100%'
+            width: '100%',
+            ...RidesCardStyle
         }}>
-            {
 
-                ride.extras.twoWay ? (
-                    <React.Fragment
-                        key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}>
+
+            {ride.extras.twoWay ? (
+                <React.Fragment
+                    key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}>
+                    <Stack>
+
+                        <Typography
+                            style={typographyStyle} >
+                            {ride.rideStartingPoint}
+                        </Typography>
                         <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+
                             {!ride.extras.twoWayOnly && <span
-                                style={{ fontSize: '18px', textAlign: 'center', color: SECONDARY_WHITE }}
+                                style={{ fontSize: '14px', textAlign: 'center', color: PRIMARY_BLACK }}
                             >{props.language.lang === 'heb' ? 'בחר הסעה: הלוך/חזור/הלוך וחזור' : 'Choose directions'}</span>}
-                            <span
-                                style={{ color: SECONDARY_WHITE, fontSize: '12px', marginTop: '48px' }}
-                            >{props.language.lang === 'heb' ? 'שעת יציאה,שעת חזרה' : 'Ride time,Back time'}</span>
                         </Stack>
-                        {!ride.extras.twoWayOnly && <MenuItem
-                            onClick={() => {
-                                handleSelectEventRide(ride, 1)
-                            }} style={{
-                                background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 1) ? DARK_BLACK : 'white',
-                                alignSelf: 'center',
-                                justifyContent: 'space-between',
-                                textAlign: 'center',
-                                width: '100%',
-                                flexDirection: 'row',
-                                color: (selectedEventRide?.ride === ride && selectedEventRide.direction === 1) ? 'white' : 'black',
-                                border: '.1px solid gray',
-                                borderRadius: '4px',
-                                marginTop: '8px',
-                                marginBottom: '8px',
-                                display: 'flex',
-                            }} value={ride.rideId}>
-                            <span style={spanStyle}>{props.language.lang === 'heb' ? 'הסעה הלוך' : 'Ride to event'}</span>
-                            <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime}</span>
-                        </MenuItem>}
-                        {!ride.extras.twoWayOnly && <MenuItem onClick={() => {
-                            handleSelectEventRide(ride, 2)
-                        }} style={{
-                            background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 2) ? DARK_BLACK : 'white',
-                            alignSelf: 'center',
-                            justifyContent: 'space-between',
-                            textAlign: 'center',
-                            width: '100%',
-                            flexDirection: 'row',
-                            color: (selectedEventRide?.ride === ride && selectedEventRide.direction === 2) ? 'white' : 'black',
-                            border: '.1px solid gray',
-                            borderRadius: '4px',
-                            marginTop: '8px',
-                            marginBottom: '8px',
-                            display: 'flex',
-                        }} value={ride.rideId}>
-
-                            <span style={spanStyle}>{props.language.lang === 'heb' ? 'הסעה חזור' : 'Ride Back'}</span>
-                            <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.backTime}</span>
-                        </MenuItem>}
-                        <MenuItem onClick={() => {
-                            handleSelectEventRide(ride, 3)
-                        }} style={{
-                            background: (selectedEventRide?.ride === ride && selectedEventRide.direction === 3) ? DARK_BLACK : 'white',
-                            alignSelf: 'center',
-                            justifyContent: 'space-between',
-                            textAlign: 'center',
-                            width: '100%',
-                            flexDirection: 'row',
-                            color: (selectedEventRide?.ride === ride && selectedEventRide.direction === 3) ? 'white' : 'black',
-                            border: '.1px solid gray',
-                            borderRadius: '4px',
-                            marginTop: '8px',
-                            marginBottom: '8px',
-                            display: 'flex',
-                        }} value={ride.rideId}>
-                            <span style={spanStyle}>{props.language.lang === 'heb' ? 'הסעה דו כיוונית (הלוך וחזור) ' : 'Two directions ride'}</span>
-                            <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime + ", " + ride.backTime}</span>
-                        </MenuItem>
-                    </React.Fragment>) : Number(ride.extras.rideDirection) === 1 ? (
-                        <React.Fragment>
-                            <MenuItem
-                                key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}
-
-                                onClick={() => {
-                                    handleSelectEventRide(ride, 2)
-                                }} style={{
-                                    background: selectedEventRide?.ride === ride ? DARK_BLACK : 'white',
-                                    alignSelf: 'center',
-                                    justifyContent: 'space-between',
-                                    textAlign: 'center',
-                                    width: '100%',
-                                    flexDirection: 'row',
-                                    color: selectedEventRide?.ride === ride ? 'white' : 'black',
-                                    border: '.1px solid gray',
-                                    borderRadius: '4px',
-                                    marginTop: '8px',
-                                    marginBottom: '8px',
-                                    display: 'flex',
-                                }} value={ride.rideId}>
-
-                                <span style={spanStyle}>{props.language.lang === 'heb' ? 'הסעה חזור' : 'Ride Back'}</span>
-                                <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.backTime}</span>
-                            </MenuItem>
-                        </React.Fragment>) : (<React.Fragment>
-                            <MenuItem
-                                key={ride.rideId + ride.rideStartingPoint + Math.random() * Number.MAX_VALUE}
-
-                                onClick={() => {
-                                    handleSelectEventRide(ride, 1)
-                                }} style={{
-                                    background: selectedEventRide?.ride === ride ? DARK_BLACK : 'white',
-                                    alignSelf: 'center',
-                                    justifyContent: 'space-between',
-                                    textAlign: 'center',
-                                    width: '100%',
-                                    flexDirection: 'row',
-                                    color: selectedEventRide?.ride === ride ? 'white' : 'black',
-                                    border: '.1px solid gray',
-                                    borderRadius: '4px',
-                                    marginTop: '8px',
-                                    marginBottom: '8px',
-                                    display: 'flex',
-                                }} value={ride.rideId}>
-                                <span style={spanStyle}>{props.language.lang === 'heb' ? 'הסעה הלוך' : 'Ride to event'}</span>
-                                <span style={{ ...spanStyle, ...{ fontSize: '14px' } }}>{ride.rideTime}</span>
-                            </MenuItem>
-                        </React.Fragment>)
+                    </Stack>
+                    {!ride.extras.twoWayOnly && <RideRow dir={1} ride={ride} />}
+                    {!ride.extras.twoWayOnly && <RideRow dir={2} ride={ride} />}
+                    <RideRow dir={3} ride={ride} />
+                </React.Fragment>) : Number(ride.extras.rideDirection) === 1 ? (
+                    <React.Fragment>
+                        {!ride.extras.twoWayOnly && <RideRow dir={2} ride={ride} />}
+                    </React.Fragment>) : (<React.Fragment>
+                        {!ride.extras.twoWayOnly && <RideRow dir={1} ride={ride} />}
+                    </React.Fragment>)
             }
         </Stack >
     }
@@ -345,12 +306,13 @@ function InvitationCard(props: Hooks) {
             {event && event.eventImageURL ? <img alt='No image for this event'
                 style={{ width: '100%', minWidth: '300px', height: '50%' }}
                 src={event!.eventImageURL} /> : null}
-
-            <span style={{ ...spanStyle, fontWeight: 'bold', paddingTop: '8px', color: SECONDARY_WHITE, fontSize: '20px' }}>{event.eventTitle}</span>
-
-            <span style={{ ...spanStyle, padding: '2px', color: SECONDARY_WHITE, fontSize: '16px' }}>{event.eventLocation}</span>
-            <span style={{ ...spanStyle, fontWeight: '100', padding: '2px', color: SECONDARY_WHITE, fontSize: '14px' }}>{event.eventDate}</span>
-
+            <Stack spacing={1}>
+                <span style={{ ...spanStyle, fontWeight: 'bold', paddingTop: '8px', color: PRIMARY_PINK, fontSize: '20px' }}>{event.eventTitle}</span>
+                <Stack direction={'row'} columnGap={2}>
+                    <p style={{ ...paragraphStyle, color: SECONDARY_WHITE, fontSize: '16px' }}><LocationOnIcon className="img_pin_location" style={locationPinIconStyle} />{event.eventLocation}</p>
+                    <p style={{ ...paragraphStyle, color: SECONDARY_WHITE, fontSize: '16px' }}><CalendarTodayIcon style={todayIconStyle} />{event.eventDate} </p>
+                </Stack>
+            </Stack>
             <div style={{ width: '100%', background: PRIMARY_BLACK }}>
                 <List style={{ width: '85%', background: PRIMARY_BLACK, minWidth: 'fit-content', marginLeft: 'auto', marginRight: 'auto', padding: '16px' }}>
                     {/* Arriving to rides Check box */}
@@ -374,21 +336,19 @@ function InvitationCard(props: Hooks) {
 
                     </Stack>}
                     {(rides && rides.length > 0 && newConfirmation?.rideArrival) ? <List style={{ width: '100%' }} dir={SIDE(props.language.lang)}>
-
+                        {props.user.appUser && <Typography
+                            style={{ ...{ fontSize: '24px', color: SECONDARY_WHITE, fontFamily: 'Open Sans Hebrew' } }} >
+                            {props.language.lang === 'heb' ? `שלום, ${props.user.appUser.name}` : `Hello, ${props.user.appUser.name}`}
+                        </Typography>}
                         <Typography
-                            style={{ ...typographyStyle, ...{ fontSize: '24px' } }} >
-                            {props.language.lang === 'heb' ? 'נקודת אסיפה/הורדה' : 'Start Point/Destination'}
+                            style={{ ...{ fontSize: '24px', color: SECONDARY_WHITE, fontFamily: 'Open Sans Hebrew' } }} >
+                            {props.language.lang === 'heb' ? 'בחר/י נקודת אסיפה/הורדה' : 'Start Point/Destination'}
                         </Typography>
                         <br />
                         {rides!.map(ride => {
-                            return <Stack key={ride.rideId + ride.eventId}>
-
-                                <Typography
-                                    style={typographyStyle} >
-                                    {ride.rideStartingPoint}
-                                </Typography>
+                            return <React.Fragment key={ride.rideId + ride.eventId}>
                                 {getMenuItems(ride)}
-                            </Stack>
+                            </React.Fragment>
 
                         })}
                         <Spacer offset={1} />
