@@ -1,65 +1,78 @@
-import { Unsubscribe } from "firebase/auth";
+import { Unsubscribe, User } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { ILoadingContext } from "../../context/Loading";
 import { StoreSingleton } from "../../store/external";
-import { PNPCompany, PNPCompanyRideConfirmation, PNPRideConfirmation, PNPWorkersRide } from "../../store/external/types";
+import { PNPCompany, PNPCompanyRideConfirmation, PNPUser, PNPWorkersRide } from "../../store/external/types";
 import { isValidCompany } from "../../store/validators";
-import { getDaysInCurrentMonth, getDaysInMonth } from "../../utilities";
+import { getDateString, getDaysInMonth } from "../../utilities";
 import { Hooks } from "../generics/types";
-import { getAllWeekDaysLeft, getAllWeekDaysLeftFromDate, getDateRange, getMonths, isEqualDates, trueDateForSelectedRide, userHasConfirmationForDate } from "./invitationsWorkerHelper";
-
-type DayMapping = { [day: string]: PNPWorkersRide }
-type WeekMapping = { [week: string]: DayMapping }
-export type SelectedRide = { day: number, week: number, ride: PNPWorkersRide } | null
+import {
+    getAllWeekDaysLeft,
+    getAllWeekDays,
+    isEqualDates,
+    WEEK_LONG,
+    DAYS_AMT,
+    isEqualRides,
+    getAllWeekDaysLeftAtDate
+} from "./invitationsWorkerHelper";
+const systemTime = new Date()
+export type SelectedRide = { date: string, ride: PNPWorkersRide } | null
 
 export type IRidesCalendar = {
     userConfirmations: PNPCompanyRideConfirmation[],
     rides: PNPWorkersRide[],
     today: Date,
-    selectedRide: SelectedRide,
-    confirmationForWeek: PNPCompanyRideConfirmation | undefined,
+    selectedRides: SelectedRide[],
+    selectedRidesRemove: SelectedRide[],
     company: PNPCompany | null | undefined,
-    selectedWeek: number,
     weekDays: number[],
-    saveConfirmation: () => void,
+    viewingRide: PNPWorkersRide | undefined,
+    setViewingRide: (ride: PNPWorkersRide | undefined) => void,
+    isAllSelected: () => boolean,
+    isToRemove: (ride: SelectedRide) => boolean,
+    saveConfirmation: (user?: User, appUser?: PNPUser) => void,
+    selectAll: (ride: PNPWorkersRide) => void,
+    removeConfirmation: (user?: User, appUser?: PNPUser) => void,
+    selectedExistingConfirmation: (ride: SelectedRide) => boolean,
     selectRide: (ride: SelectedRide) => void,
     weekForwards: () => void,
     weekBackwards: () => void
 } | undefined
 
 
-export default function CompanyRidesCalendar(hooks: Hooks, companyId?: string): IRidesCalendar {
+export default function useCompanyRidesCalendar(hooks: Hooks, companyId?: string): IRidesCalendar {
     if (!companyId) return
     const [userConfirmations, setConfirmations] = useState<PNPCompanyRideConfirmation[]>([])
-    const [confirmationForWeek, setConfirmationForWeek] = useState<PNPCompanyRideConfirmation>()
-    const [selectedRide, setSelectedEventRide] = useState<SelectedRide>(null)
+    const [selectedRides, setSelectedEventRides] = useState<SelectedRide[]>([])
+    const [viewingRide, setViewingRide] = useState<PNPWorkersRide>()
+    const [selectedRidesRemove, setSelectedEventRidesRemove] = useState<SelectedRide[]>([])
     const [rides, setRides] = useState<PNPWorkersRide[]>([])
     const [weekDays, setWeekDays] = useState<number[]>(getAllWeekDaysLeft());
     const [company, setCompany] = useState<PNPCompany | null>()
-    const [selectedWeek, setSelectedWeek] = useState(1)
     const [today, setToday] = useState(new Date())
-    if (!companyId) return;
 
-
-    const checkUserConfirmations = () => {
-        const hasConfirmationForWeek = userHasConfirmationForDate(userConfirmations, getDateRange(today))
-        setConfirmationForWeek(hasConfirmationForWeek)
+    const selectedExistingConfirmation = (ride: SelectedRide) => {
+        return userConfirmations.find(x => {
+            return x.date === ride?.date && ride?.ride.id === x.rideId
+        }) != undefined
     }
+    const isToRemove = (ride: SelectedRide) => {
+        for (let x of selectedRidesRemove) {
+            if (isEqualRides(ride, x))
+                return true;
+        }
+        return false;
+    }
+    const isAllSelected = () => {
+        return selectedRides.length === 6 || selectedRidesRemove.length === 6 || (selectedRidesRemove.length + selectedRides.length) === 6
+    }
+
     useEffect(() => {
         let unsubscribe: Unsubscribe[] = []
-        if (hooks.user.user) {
-            unsubscribe.push(StoreSingleton.get().realTime.addListenerToWorkerConfirmations(hooks.user.user.uid, companyId, (confs) => {
-                setConfirmations(confs)
-
-            }))
-        }
-        return () => {
-            unsubscribe.forEach(unsub => unsub());
-        }
+        if (hooks.user.user)
+            unsubscribe.push(StoreSingleton.get().realTime.addListenerToWorkerConfirmations(hooks.user.user.uid, companyId, setConfirmations))
+        return () => unsubscribe.forEach(unsub => unsub());
     }, [hooks.user.user])
-    useEffect(() => {
-        checkUserConfirmations()
-    }, [userConfirmations])
+
     useEffect(() => {
         //  props.loading.doLoad()
         let unsubscribe: Unsubscribe[] = []
@@ -84,60 +97,126 @@ export default function CompanyRidesCalendar(hooks: Hooks, companyId?: string): 
 
 
     return {
-        userConfirmations, rides,
-        company, selectedWeek, selectedRide, weekDays, today, confirmationForWeek,
-        selectRide(r: SelectedRide) {
-            setSelectedEventRide(r)
+        userConfirmations, rides, selectedExistingConfirmation, selectedRidesRemove,
+        company, selectedRides, weekDays, today, isToRemove, isAllSelected, viewingRide,
+        setViewingRide: (ride: PNPWorkersRide | undefined) => {
+            setViewingRide(ride)
+            setSelectedEventRides([])
+            setSelectedEventRidesRemove([])
         },
-        async saveConfirmation() {
+        selectRide(r: SelectedRide) {
+
+            let iAdd = selectedRides.findIndex(x => isEqualRides(x, r))
+            if (iAdd > -1) {
+                selectedRides.splice(iAdd, 1)
+                return setSelectedEventRides([...selectedRides])
+            }
+            let iRem = selectedRidesRemove.findIndex(x => isEqualRides(x, r))
+            if (iRem > -1) {
+                selectedRidesRemove.splice(iRem, 1)
+                return setSelectedEventRidesRemove([...selectedRidesRemove])
+            }
+
+            if (selectedExistingConfirmation(r))
+                return setSelectedEventRidesRemove([...selectedRidesRemove, r])
+            setSelectedEventRides([...selectedRides, r])
+        },
+        selectAll(ride: PNPWorkersRide) {
+            if (isAllSelected()) {
+                setSelectedEventRides([])
+                setSelectedEventRidesRemove([])
+                return
+            }
+
+            let d = new Date(today)
+            d.setDate(d.getDate() - 1)
+            let toAdd = [], toRemove = []
+            for (let i = 0; i < DAYS_AMT - 1; i++) {
+                d.setDate(d.getDate() + 1);
+                const constructedRide = ({ date: getDateString(d, true), ride })
+                if (selectedExistingConfirmation(constructedRide)) {
+                    toRemove.push(constructedRide)
+                } else
+                    toAdd.push(constructedRide)
+            }
+
+            setSelectedEventRides(toAdd)
+            setSelectedEventRidesRemove(toRemove)
+        },
+        async removeConfirmation(user?: User, appUser?: PNPUser) {
+            let relevantUser = user ?? hooks.user.user
+            let relevantAppUser = appUser ?? hooks.user.appUser
             if (!company) {
                 return;
             }
-            if (!selectedRide) {
+            if (selectedRidesRemove.length === 0) {
+                return alert('יש לבחור הסעה כדי לבטל את אישור הגעה')
+            }
+            if (!relevantUser || !relevantAppUser) {
+                return alert('עלייך להירשם על מנת לאשר/לבטל אישור הגעה להסעה')
+            }
+            hooks.loading.doLoad()
+            for (let r of selectedRidesRemove) {
+                if (!r) continue
+                await StoreSingleton.get().realTime.removeRideConfirmationWorkers(relevantUser.uid, {
+                    userId: relevantUser.uid,
+                    userName: relevantAppUser.name,
+                    phoneNumber: relevantAppUser.phone,
+                    companyId,
+                    startPoint: r.ride.startPoint,
+                    rideId: r.ride.id,
+                    companyName: company.name,
+                    date: r.date
+                })
+            }
+            setSelectedEventRidesRemove([])
+            hooks.loading.cancelLoad()
+        },
+        async saveConfirmation(user?: User, appUser?: PNPUser) {
+            let relevantUser = user ?? hooks.user.user
+            let relevantAppUser = appUser ?? hooks.user.appUser
+            if (!company) {
+                return;
+            }
+            if (selectedRides.length === 0) {
                 return alert('יש לבחור הסעה כדי לאשר הגעה')
             }
-            if (!hooks.user.appUser || !hooks.user.user) {
+            if (!relevantUser || !relevantAppUser) {
                 return alert('עלייך להירשם על מנת לאשר הגעה להסעה')
             }
             hooks.loading.doLoad()
-            const res = await StoreSingleton.get().realTime.addRideConfirmationWorkers(hooks.user.user.uid, {
-                userId: hooks.user.user.uid,
-                userName: hooks.user.appUser.name,
-                phoneNumber: hooks.user.appUser.phone,
-                companyId,
-                rideId: selectedRide.ride.id,
-                companyName: company.name,
-                date: trueDateForSelectedRide(today, selectedRide)
-            })
+            for (let r of selectedRides) {
+                if (!r) continue
+                const res = await StoreSingleton.get().realTime.addRideConfirmationWorkers(relevantUser.uid, {
+                    userId: relevantUser.uid,
+                    userName: relevantAppUser.name,
+                    phoneNumber: relevantAppUser.phone,
+                    companyId,
+                    startPoint: r.ride.startPoint,
+                    rideId: r.ride.id,
+                    companyName: company.name,
+                    date: r.date
+                })
+            }
+            setSelectedEventRides([])
             hooks.loading.cancelLoad()
         },
         weekForwards() {
             hooks.loading.doLoad()
-            const newDays = today.getDate() + 7
-            if (newDays > getDaysInMonth(today)) {
+            const newDays = today.getDate() + (isEqualDates(today, systemTime) ? (DAYS_AMT) - getAllWeekDaysLeft().length + 1 : DAYS_AMT)
+            if (newDays > getDaysInMonth(today) + 1) {
                 today.setDate(newDays - getDaysInMonth(today))
                 today.setMonth(today.getMonth() + 1)
-                if (today.getMonth() > 12) {
-                    today.setFullYear(today.getFullYear() + 1)
-                    today.setMonth(0);
-                    today.setDate(0);
-                }
-            } else {
-                today.setDate(newDays);
-            }
-            setSelectedWeek((week) => week + 1)
-            setWeekDays(isEqualDates(today, new Date()) ? getAllWeekDaysLeft() : getAllWeekDaysLeftFromDate(today))
-            checkUserConfirmations()
-            setSelectedEventRide(null)
-            setTimeout(() => {
-                hooks.loading.cancelLoad()
-            }, 300)
+            } else today.setDate(newDays);
+            setWeekDays(getAllWeekDays())
+            setSelectedEventRides([])
+            setTimeout(() => { hooks.loading.cancelLoad() }, 300)
         },
         weekBackwards() {
-            if (today.getTime() - (7) * 12 * 60 * 60 * 1000 < new Date().getTime())
+            if (today.getTime() - WEEK_LONG < systemTime.getTime())
                 return
             hooks.loading.doLoad()
-            const newDays = today.getDate() - 7
+            const newDays = today.getDate() - DAYS_AMT
             if (newDays <= 0) {
                 today.setMonth(today.getMonth() - 1)
                 today.setDate(getDaysInMonth(today) + newDays)
@@ -145,16 +224,10 @@ export default function CompanyRidesCalendar(hooks: Hooks, companyId?: string): 
                     today.setFullYear(today.getFullYear() - 1)
                     today.setMonth(0);
                 }
-            } else {
-                today.setDate(newDays);
-            }
-            setSelectedWeek((week) => Math.max(1, week - 1))
-            setWeekDays(isEqualDates(today, new Date()) ? getAllWeekDaysLeft() : getAllWeekDaysLeftFromDate(today))
-            checkUserConfirmations()
-            setSelectedEventRide(null)
-            setTimeout(() => {
-                hooks.loading.cancelLoad()
-            }, 300)
+            } else today.setDate(newDays);
+            setWeekDays(isEqualDates(today, systemTime) ? getAllWeekDaysLeft() : getAllWeekDays())
+            setSelectedEventRides([])
+            setTimeout(() => { hooks.loading.cancelLoad() }, 300)
         }
     }
 }

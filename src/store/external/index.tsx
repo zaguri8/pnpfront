@@ -24,6 +24,7 @@ import { datesComparator, getCurrentDate } from '../../utilities'
 import { dateStringFromDate, hyphenToMinus } from '../../components/utilityComponents/functions'
 import { PNPRideExtraPassenger } from '../../components/admin/EventStatistics'
 import { firebaseConfig, uiConfig } from '../../settings/config'
+import { CompanyConfirmationsMapping } from './types_2'
 
 export type ExternalStoreActions = {
     /*  events */
@@ -536,19 +537,50 @@ export class Realtime {
  * @returns new reference callback
  */
     async addRideConfirmationWorkers(uid: string, confirmation: PNPCompanyRideConfirmation): Promise<any | boolean> {
-
         return set(child(child(child(child(child(this.rides, 'confirmationsWorkers'), confirmation.companyId), hyphenToMinus(confirmation.date)), confirmation.rideId), uid), confirmation)
     }
 
+    /**
+* removeRideConfirmationWorkers
+* @param confirmation confirmation to be added for current user
+* @returns new reference callback
+*/
+    async removeRideConfirmationWorkers(uid: string, confirmation: PNPCompanyRideConfirmation): Promise<any | boolean> {
+        return remove(child(child(child(child(child(this.rides, 'confirmationsWorkers'), confirmation.companyId), hyphenToMinus(confirmation.date)), confirmation.rideId), uid))
+    }
 
     addListenerToWorkerConfirmations(uid: string, companyId: string, consume: (rides: PNPCompanyRideConfirmation[]) => void) {
         return onValue(child(child(this.rides, 'confirmationsWorkers'), companyId), (val) => {
             const allConfirmations: PNPCompanyRideConfirmation[] = []
             val.forEach(date => {
                 date.forEach(ride => {
-                    if(ride.hasChild(uid)) {
-                         allConfirmations.push(ride.child(uid).val())
+                    if (ride.hasChild(uid)) {
+                        allConfirmations.push(ride.child(uid).val())
                     }
+                })
+            })
+            consume(allConfirmations)
+        })
+    }
+
+    addListenerToCompanyConfirmations(companyId: string, consume: (confirmationMapping: CompanyConfirmationsMapping) => void) {
+        return onValue(child(child(this.rides, 'confirmationsWorkers'), companyId), (val) => {
+            let allConfirmations: any = {};
+            val.forEach(dateSnap => {
+                const date = dateSnap.key!
+                let confirmations: PNPCompanyRideConfirmation[] = []
+                dateSnap.forEach(ride => {
+                    let rideVal: any;
+
+                    ride.forEach(confirmation => {
+                        if (!rideVal)
+                            rideVal = confirmation.child('startPoint').val()
+                        confirmations.push(confirmation.val())
+                    })
+                    if (!allConfirmations[rideVal])
+                        allConfirmations[rideVal] = [{ date, confirmations }]
+                    else
+                        allConfirmations[rideVal].push({ date, confirmations })
                 })
             })
             consume(allConfirmations)
@@ -579,6 +611,16 @@ export class Realtime {
         return await set(newRef, ride).catch((e) => { this.createError('addPublicRide', e) })
     }
 
+    addWorkersRide = async (eventId: string, ride: PNPWorkersRide): Promise<object | void> => {
+        ride.companyId = eventId
+        const newRef = push(child(child(this.rides, 'workers'), eventId))
+        ride.id = newRef.key!
+        return await set(newRef, ride).catch((e) => { this.createError('addWorkersRide', e) })
+    }
+
+    removeWorkersRide = async (companyId: string, rideId: string): Promise<object | void> => {
+        return await remove(child(child(child(this.rides, 'workers'), companyId), rideId))
+    }
     removePublicRide = async (eventId: string, rideId: string): Promise<object | void> => {
         return await remove(child(child(child(child(this.rides, 'public'), 'ridesForEvents'), eventId), rideId))
     }
@@ -1024,6 +1066,23 @@ export class Realtime {
         }
         return await update(child(child(child(child(this.rides, privateEvent ? 'private' : 'public'),
             'ridesForEvents'), eventId), rideId), ride)
+    }
+
+    updateWorkersRide = async (companyId: string, rideId: string, ride: any) => {
+
+        if (ride.extras.isRidePassengersLimited) {
+            let newStatus: 'on-going' | 'sold-out' | 'running-out';
+            let ticketsLeft = Number(ride.extras.rideMaxPassengers) - Number(ride.passengers)
+            if (ticketsLeft <= 0) {
+                newStatus = 'sold-out'
+            } else if (ticketsLeft <= 15) {
+                newStatus = 'running-out'
+            } else {
+                newStatus = 'on-going'
+            }
+            ride.extras.rideStatus = newStatus;
+        }
+        return await update(child(child(child(this.rides, 'workers'), companyId), rideId), ride)
     }
     /**
       * updateCurrentUser

@@ -1,6 +1,6 @@
 import { Button, Dialog, List, ListItem, Stack } from "@mui/material";
 import React from "react";
-import { PRIMARY_BLACK, PRIMARY_ORANGE } from "../../settings/colors";
+import { PRIMARY_BLACK, PRIMARY_ORANGE, PRIMARY_PINK } from "../../settings/colors";
 import { CLOSE, SIDE } from "../../settings/strings";
 
 export default function PNPDialogComponent(props: { lang: string, dialogContext: any }) {
@@ -45,7 +45,7 @@ export default function PNPDialogComponent(props: { lang: string, dialogContext:
                     props.dialogContext.closeDialog();
                 }} style={{
                     width: '100%',
-                    color: PRIMARY_ORANGE,
+                    color: PRIMARY_PINK,
                     border: '1px solid lightgray',
                     fontWeight: 'bold',
                     background: 'white',

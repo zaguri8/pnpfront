@@ -49,19 +49,19 @@ export type PNPPublicRide = {
 export type PNPWorkersRide = {
     companyId: string,
     id: string,
-    backTime:string,
+    backTime: string,
     startPoint: string,
     destination: string,
-    rideTime:string,
+    rideTime: string,
     date: string,
-    extras:PNPWorkersRideExtras
+    extras: PNPWorkersRideExtras
 }
 
 
 
 export type PNPCompany = {
     id: string,
-    logo:string,
+    logo: string,
     name: string
 }
 
@@ -217,8 +217,9 @@ export type PNPCompanyRideConfirmation = {
     userName: string
     phoneNumber: string
     rideId: string
+    startPoint: string
     companyId: string
-    companyName:string
+    companyName: string
     date: string
 }
 

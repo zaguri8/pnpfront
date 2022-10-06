@@ -6,8 +6,8 @@ export const getCurrentDate = () => {
     return date
 }
 export function millisToMinutesAndSeconds(duration) {
-    const a = duration.includes('mins');
-    const b = duration.includes('hours');
+    const a = duration.includes('min');
+    const b = duration.includes('hour');
     const c = a && b;
     if (c) {
         const x = duration.split(' ')
@@ -30,9 +30,18 @@ export const datesComparator = (a, b) => {
         bCompTime[0], bCompTime[1], bCompTime[2]).getTime() - new Date(aCompDate[0], aCompDate[1], aCompDate[2],
             aCompTime[0], aCompTime[1], aCompTime[2]).getTime()
 }
-export const getDateString = (dateMili) => {
+export const getDateString = (dateMili, inc1 = false) => {
     const date = new Date(dateMili)
-    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+    const day = ("0" + date.getDate()).slice(-2)
+    const month = ("0" + (date.getMonth() + (inc1 ? 1 : 0))).slice(-2)
+    return `${day}/${month}/${date.getFullYear()}`
+}
+export const getDateStringShort = (dateMili, inc1 = false) => {
+    const date = new Date(dateMili)
+    const day = ("0" + date.getDate()).slice(-2)
+    const month = ("0" + (date.getMonth() + (inc1 ? 1 : 0))).slice(-2)
+    const year = (date.getFullYear() + "").slice(-2)
+    return `${day}/${month}/${year}`
 }
 export function getDaysInCurrentMonth() {
     const date = new Date();

@@ -54,20 +54,20 @@ export type RideStatistics = {
 enum AdminScreens {
     ridesOverview, rideTransactions, rideRequests
 }
-const ButtonStyle = { ...submitButton(4), ...{ padding: '2px', fontSize: '14px', maxWidth: '120px' } }
+export const ButtonStyle = { ...submitButton(4), ...{ padding: '2px', fontSize: '14px', maxWidth: '120px' } }
 
 const ListStyle = new StyleBuilder()
     .textColor(SECONDARY_WHITE)
     .overflowX('scroll')
     .maxHeight('400px')
     .build()
-const HeaderStyle = new StyleBuilder()
+export const HeaderStyle = new StyleBuilder()
     .whiteText()
     .bold()
     .textAlignStart()
     .rtl()
     .build()
-const SubHeaderStyle = new StyleBuilder()
+export const SubHeaderStyle = new StyleBuilder()
     .whiteText()
     .padding(8)
     .margin(0)
@@ -76,7 +76,7 @@ const SubHeaderStyle = new StyleBuilder()
     .rtl()
     .build()
 
-const SubListStyle = new StyleBuilder()
+export const SubListStyle = new StyleBuilder()
     .maxHeight(150)
     .flexColumn()
     .border(1, PRIMARY_WHITE)
@@ -86,7 +86,7 @@ const SubListStyle = new StyleBuilder()
     .background(PRIMARY_GRADIENT)
     .build()
 
-const ParagraphStyle = new StyleBuilder()
+export const ParagraphStyle = new StyleBuilder()
     .whiteText()
     .fontSize(12)
     .padding(2)
@@ -96,7 +96,7 @@ const ParagraphStyle = new StyleBuilder()
     .build()
 
 
-const SmallTextStyle = new StyleBuilder()
+export const SmallTextStyle = new StyleBuilder()
     .whiteText()
     .fontSize(10)
     .padding(2)

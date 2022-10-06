@@ -32,7 +32,6 @@ async function ridePriceEval(
                         travelMode: google.maps.TravelMode.DRIVING
                     });
                 const { distance, duration } = response.rows[0].elements[0]
-
                 const { hours, minutes } = millisToMinutesAndSeconds(duration.text)
                 if (response === null) { console.log("could not load.."); return null; }
                 let km = Number(distance.text.replace(' ק"מ', '').replace(' km', '').replace('km ', ''))
@@ -94,7 +93,7 @@ class Statistics {
         const end_h = compute(checkoutHour, true);
         let totalHours = Math.abs(end_h - start_h);
         totalHours += (end_min - start_min) / 60.0;
-        if (this.estimatedRideTime.hours < 1 && this.estimatedRideTime.minutes < 10) {
+        if (this.estimatedRideTime.hours < 1 && this.estimatedRideTime.minutes < 30) {
             alert('ניתן לחשב זמן נסיעה כאשר זמן הנסיעה המשוער קטן או שווה זמן נסיעה עירוני ')
             this.result = -1;
             return -1;

@@ -2,7 +2,7 @@ import { User } from "firebase/auth";
 import { dateStringFromDate } from "../../components/utilityComponents/functions";
 import { SAME_SPOT } from "../../settings/strings";
 import { getCurrentDate, getDateString } from "../../utilities";
-import { PNPCompany, PNPCompanyRideConfirmation, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation } from "./types";
+import { PNPCompany, PNPCompanyRideConfirmation, PNPEvent, PNPPrivateEvent, PNPPrivateRide, PNPPublicRide, PNPRideConfirmation, PNPWorkersRide } from "./types";
 
 
 export function getDefaultPublicEvent(user?: User | null): PNPEvent {
@@ -48,6 +48,7 @@ export function getDefaultConfirmationCompanyRide(company: PNPCompany): PNPCompa
         userId: 'guest',
         companyId: company.id,
         companyName: company.name,
+        startPoint: 'null',
         userName: 'null',
         phoneNumber: 'null',
         date: getDateString(new Date().getTime()),
@@ -92,6 +93,26 @@ export function getDefaultPublicRide(event?: PNPEvent | null, lang?: string): PN
             rideDirection: '2',
             exactBackPoint: SAME_SPOT(lang),
             exactStartPoint: ''
+        }
+    }
+}
+
+
+export function getDefaultWorkersRide(company?: PNPCompany | null, lang?: string): PNPWorkersRide {
+    return {
+        id: "null",
+        companyId: company?.id ?? "null",
+        destination: company?.name ?? "null",
+        startPoint: "null",
+        rideTime: "00:00",
+        backTime: "04:00",
+        date: '',
+        extras: {
+            rideStatus: 'on-going',
+            rideMaxPassengers: '54',
+            twoWayOnly: false,
+            twoWay: true,
+            rideDirection: '2',
         }
     }
 }

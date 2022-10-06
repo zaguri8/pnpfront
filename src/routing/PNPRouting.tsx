@@ -1,5 +1,6 @@
 import React from "react"
 import { Routes } from "react-router"
+import InvitationWorkersManager from "../components/admin/InvitationWorkersManager/InvitationWorkersManager"
 import InvitationPageWorkers from "../components/invitation/InvitationPageWorkers"
 import pnpRoute from "./PNPRoute"
 const AdminEventPanel = React.lazy(() => import("../components/admin/AdminEventPanel"))
@@ -53,7 +54,7 @@ const PNPRouting = React.memo((props: any) => {
             pnpRoute('termsOfService', <TermsOfService />, 'normal', props.lang),
             pnpRoute('/payment/privatePaymentPage/:customerEmail', <PrivatePaymentForm />, 'normal', props.lang),
             pnpRoute('/invitation/:id', <InvitationPage />, 'normal', props.lang),
-            pnpRoute('/invitationWorkers/:id', <InvitationPageWorkers />, 'normal', props.lang),
+            pnpRoute('/invitationWorkers/:id', <InvitationPageWorkers />, 'auth', props.lang),
             pnpRoute('/forgotPass', <ForgotPass />, 'normal', props.lang),
             pnpRoute('/*', <NotFound lang={props.lang} />, 'normal', props.lang),
             pnpRoute('/login', <Login />, 'normal', props.lang),
@@ -84,6 +85,7 @@ const PNPRouting = React.memo((props: any) => {
             pnpRoute('/adminpanel/rideRequests', <PrivateRideRequests />, 'admin', props.lang),
             pnpRoute('/adminpanel', <AdminPanel />, 'admin', props.lang),
             pnpRoute('/adminpanel/editweb', <Edit />, 'admin', props.lang),
+            pnpRoute('/adminpanel/invitationWorkers/:id', <InvitationWorkersManager />, 'auth', props.lang),
             pnpRoute('/adminpanel/invitations', <ManageInvitations />, 'admin', props.lang),
             pnpRoute('/adminpanel/invitations/specificinvitation', <InvitationStatistics />, 'admin', props.lang),
             pnpRoute('/adminpanel/specificevent', <AdminEventPanel />, 'admin', props.lang),

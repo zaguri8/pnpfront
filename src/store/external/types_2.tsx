@@ -1,3 +1,4 @@
+import { PNPCompanyRideConfirmation, PNPWorkersRide } from "./types";
 
 
 
@@ -12,3 +13,10 @@ export type qPNPRideParams = qPNPAbstractRideParams & {
 }
 
 
+
+export type CompanyDateConfirmations = {date: string,
+     confirmations: (PNPCompanyRideConfirmation & {dateObject:Date})[] }
+
+export type CompanyConfirmationsMapping = {
+    [ride: string]: CompanyDateConfirmations[]
+}

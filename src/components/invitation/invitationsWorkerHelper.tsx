@@ -4,17 +4,28 @@ import { IRidesCalendar, SelectedRide } from "./CompanyRidesCalendar";
 import { PNPCompanyRideConfirmation } from "../../store/external/types";
 
 
+const systemTime = new Date();
 export const getAllWeekDaysLeft = () => {
-    const todaysDate = new Date();
+    const todaysDate = systemTime;
     let days = []
-    for (let i = todaysDate.getDay() + 1; i < 7; i++) {
+    for (let i = todaysDate.getDay() + 1; i < DAYS_AMT; i++) {
         days.push(i);
     }
     return days;
 }
-export const getAllWeekDaysLeftFromDate = (date: Date) => {
+
+export const getAllWeekDaysLeftAtDate = (date: Date) => {
     let days = []
-    for (let i = 1; i < 7; i++) {
+    for (let i = date.getDay() + 1; i < DAYS_AMT; i++) {
+        days.push(i);
+    }
+    return days;
+}
+
+
+export const getAllWeekDays = () => {
+    let days = []
+    for (let i = 1; i < DAYS_AMT; i++) {
         days.push(i);
     }
     return days;
@@ -27,7 +38,7 @@ export function getMonths() {
 }
 
 export function determineOffset(today: Date) {
-    return isEqualDates(today, new Date()) ? 0 : getAllWeekDaysLeft().length
+    return isEqualDates(today, systemTime) ? 0 : getAllWeekDaysLeft().length
 }
 export const userHasConfirmationForDate = (confirmations: PNPCompanyRideConfirmation[],
     dateRange: { d1: string, d2: string }) => {
@@ -35,54 +46,38 @@ export const userHasConfirmationForDate = (confirmations: PNPCompanyRideConfirma
     let month = Number(dateRange.d1.split('/')[1]);
     let day_start = Number(dateRange.d1.split('/')[0]);
     let day_end = Number(dateRange.d2.split('/')[0]);
-
     for (let conf of confirmations) {
         const conf_d_com = conf.date.split('/')
         const day = Number(conf_d_com[0])
         const conf_month = Number(conf_d_com[1])
         if (conf_month === month) {
-            if (day >= day_start && day <= day_end) {
+            if (day >= day_start && day <= day_end || day_end < 5) {
                 return conf
+            } else {
+
             }
         }
     }
 }
-export const getDateRange = (today: Date) => {
-    if (today) {
-        const offset = (isEqualDates(today, new Date()) ? getAllWeekDaysLeft().length : getAllWeekDaysLeftFromDate(today).length) - 1
-        let x1 = trueDateForSelectedRide(today, {
-            day: today.getDate()
-        })
-        let x2 = trueDateForSelectedRide(today, {
-            day: today.getDate() + offset
-        })
-        return { d1: x1, d2: x2 }
-    }
-    return { d1: "0", d2: "0" }
-}
-export const trueDateForSelectedRide = (today: Date, selected: any) => {
-    const c = isEqualDates(today, new Date()) ? 0 : getAllWeekDaysLeft().length
-    const daysInMonth = getDaysInMonth(today)
-    let realM = (Math.max(1, (today.getMonth() + 1) % 13))
-    let realD = (selected.day - c)
-    if (realD < getAllWeekDaysLeft().length - 2) {
-        realM -= 1;
-        realD = Math.min(daysInMonth, daysInMonth + realD);
-    } else if (realD > daysInMonth) {
-        realM += 1;
-        realD = Math.max(1, Math.abs(daysInMonth - realD));
-    }
-    return ("0" + realD).slice(-2) + "/" + ("0" + realM).slice(-2) + "/" + today.getFullYear();
-}
+
+export const MONTHS_AMT = 12
+export const DAYS_AMT = 7
+export const SECONDS_FOR_MIN = 60
+export const MILIS_FOR_SEC = 1000
+export const WEEK_LONG = (DAYS_AMT) * MONTHS_AMT * Math.pow(SECONDS_FOR_MIN, 2) * MILIS_FOR_SEC
 export const isEqualDates = (d1: Date, d2: Date) => {
-    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth()
+    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 }
-export const isEqualRides = (c: IRidesCalendar, selected: SelectedRide) => {
-    return c?.selectedRide?.day == selected?.day && c?.selectedRide?.ride === selected?.ride && c?.selectedRide?.week === c?.selectedWeek
-}
-
+export const isEqualRides = (r1: SelectedRide, r2: SelectedRide) => r1?.date === r2?.date && r1?.ride === r2?.ride
 export const nameforDir = (dir: number) => dir === 1 ? 'הלוך' : dir === 2 ? 'חזור' : 'הסעה דו כיוונית (הלוך חזור)'
-
+export const showingWeek = (d: Date) => {
+    const newD1 = new Date(d)
+    const start = getDateString(newD1, true)
+    const newD = new Date(d)
+    newD.setDate(newD.getDate() + DAYS_AMT - 2)
+    const end = getDateString(newD, true)
+    return end + " - " + start
+}
 export const getDateWithDayString = (day: number) => {
     const today = new Date();
     const date = getDateString(today.getTime());
@@ -90,7 +85,7 @@ export const getDateWithDayString = (day: number) => {
     c[0] = Number(c[0]) + day + "";
     if (Number(c[0]) > getDaysInCurrentMonth())
         c[1] = Number(c[1]) + 1 + "";
-    if (Number(c[1]) > 12)
+    if (Number(c[1]) > MONTHS_AMT)
         c[2] = Number(c[2]) + 1 + "";
     else if (Number(c[0]) <= today.getDay() && Number(c[1]) === today.getMonth() && Number(c[2]) === today.getFullYear())
         return date;
@@ -101,8 +96,8 @@ export const getDateWithDayString = (day: number) => {
 export const getDayName = (day: number) => {
 
     switch (day) {
-
         case 1:
+        case 0:
             return "ראשון";
         case 2:
             return "שני";
@@ -118,3 +113,55 @@ export const getDayName = (day: number) => {
             return "שבת";
     }
 }
+export const getDayLetter = (day: number) => {
+
+    switch (day) {
+        case 1:
+        case 0:
+            return "א'";
+        case 2:
+            return "ב'";
+        case 3:
+            return "ג'";
+        case 4:
+            return "ד'";
+        case 5:
+            return "ה'";
+        case 6:
+            return "ו'";
+        case 7:
+            return "ז'";
+    }
+}
+
+export const getMonthName = (m: number) => {
+
+    switch (m) {
+        case 1:
+        case 0:
+            return 'ינואר'
+        case 2:
+            return "פברואר"
+        case 3:
+            return "מרץ"
+        case 4:
+            return "אפריל"
+        case 5:
+            return "מאי"
+        case 6:
+            return "יוני"
+        case 7:
+            return "יולי"
+        case 8:
+            return "אוגוסט"
+        case 9:
+            return "ספטמבר"
+        case 10:
+            return "אוקטובר"
+        case 11:
+            return "נובמבר"  
+        case 12:
+            return "דצמבר"     
+    }
+}
+
