@@ -14,6 +14,7 @@ import { getDateString } from "../../utilities"
 import { CollapsingList } from "../generics/PNPList"
 import { useIWContextConsumer } from "./InvitationCardWorkers"
 import styled from "@emotion/styled"
+const systemTime = new Date()
 // JSX
 const SpanStyle = { fontFamily: 'Open Sans Hebrew' } as CSSProperties
 export const SubmitConfirmationStyle = (lang: string) => ({
@@ -38,7 +39,7 @@ export const CalendarListStyle = { width: '85%', background: PRIMARY_BLACK, minW
 export const CalendarWelcomeStyle = {
     ...{
         marginInline: 'auto',
-        fontSize: '18px',
+        fontSize: '16px',
         maxWidth: '400px',
         color: SECONDARY_WHITE, fontFamily: 'Open Sans Hebrew'
     }
@@ -131,6 +132,8 @@ export function WeekDaysRideList({ props, ride }: { props: any, ride: PNPWorkers
                         date={(() => {
                             const d = new Date(calendar.today)
                             d.setDate(d.getDate() + index! - (isEqualDates(d, new Date()) ? 0 : 1))
+                            if (systemTime.getDay() === 6)
+                                d.setDate(d.getDate() + 1)
                             return getDateString(d, true)
                         })()} weekDay={day} ride={ride} />} />
             </React.Fragment>

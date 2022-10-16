@@ -4,15 +4,15 @@ import { useLocation, useParams } from 'react-router'
 import { v4 } from 'uuid'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { PRIMARY_PINK, PRIMARY_WHITE } from '../../../settings/colors'
+import { PRIMARY_PINK, PRIMARY_WHITE, SECONDARY_WHITE } from '../../../settings/colors'
 import { submitButton } from '../../../settings/styles'
 import { StoreSingleton } from '../../../store/external'
-import { PNPCompany, PNPCompanyRideConfirmation } from '../../../store/external/types'
+import { PNPCompany, PNPCompanyRideConfirmation, PNPWorkersRide } from '../../../store/external/types'
 import { CompanyConfirmationsMapping, CompanyDateConfirmations } from '../../../store/external/types_2'
 import { getDateString, getDateStringShort } from '../../../utilities'
 import PNPList from '../../generics/PNPList'
 import { Hooks } from '../../generics/types'
-import { withHookGroup } from '../../generics/withHooks'
+import { withHook, withHookGroup, withHooks } from '../../generics/withHooks'
 import { getDayLetter, getDayName, getMonthName } from '../../invitation/invitationsWorkerHelper'
 import { CalendarControlsStyle, CalendarShowingWeekStyle, ControlStyle } from '../../invitation/InvitationUIProver'
 import SectionTitle from '../../other/SectionTitle'
@@ -23,6 +23,8 @@ import AddUpdateCompanyRide from '../AddUpdateCompanyRide'
 import AddUpdateEventRide from '../AddUpdateEventRide'
 import { ButtonStyle, HeaderStyle, ParagraphStyle, SmallTextStyle, SubHeaderStyle, SubListStyle } from '../EventStatistics'
 import './InvitationWorkersManager.css'
+import moment from 'moment';
+import styled from '@emotion/styled';
 
 const ControlStyleButton = {
     ...submitButton(), width: '80%',
@@ -86,69 +88,103 @@ const toDateObject = (confirmationMapping: { date: string }) => {
     const date = new Date(year, month, day)
     return date
 }
-const ConfirmationsComponent = ({ ride,
-    confirmations, showingMonthYear }: ConfirmationRow & {
-        showingMonthYear: [number, number]
-    }) => {
+const ConfirmationsComponent = ({ ride, confirmations }: ConfirmationRow) => {
+    const findCorrectDate = (someDateString: string) => {
+        let date = toDateObject({ date: someDateString })
+        return date.getDay() + 1
+    }
+    const weekForwards = () => {
+        setWeek(w => Math.min(w + 1, organizedByWeeks.length - 1))
+    }
+    const weekBackwards = () => {
+        setWeek(w => Math.max(w - 1, 0))
+    }
 
     const organizedByWeeks = useMemo(() => {
-        let byMonth = {} as WeekMapping
-        for (let confirmation of confirmations) {
-            const year = Number(confirmation.date.split('-')[2])
-            const month = Number(confirmation.date.split('-')[1])
-            if (!byMonth[year])
-                byMonth[year] = {}
-            byMonth[year][month] = byMonth[year][month] ? [...byMonth[year][month], ...confirmation.confirmations] : confirmation.confirmations
-        }
-        return byMonth
-    }, [])
-
-    const getConfirmationsAmount = () => {
-        if (!organizedByWeeks[showingMonthYear[0]]) return 0
-        if (!organizedByWeeks[showingMonthYear[0]][showingMonthYear[1]]) return 0
-        return organizedByWeeks[showingMonthYear[0]][showingMonthYear[1]].length
-    }
-    const confirmationsForShowingMonth = useMemo(() => organizedByWeeks[showingMonthYear[0]] ? organizedByWeeks[showingMonthYear[0]][showingMonthYear[1]] ?? [] : [], [showingMonthYear])
-    const getDay = (c: PNPCompanyRideConfirmation) => Number(c.date.split('/')[0])
-    const confirmationsDevidedToWeeks = useMemo(() => {
-        let array: PNPCompanyRideConfirmation[][] = []
-        confirmationsForShowingMonth.forEach(conf => {
-            const day = getDay(conf)
-            let metReq = true;
-            let i = 0;
-            let j = 0;
-            for (; i < array.length; i++) {
-                for (let el of array[i]) {
-                    if (Math.abs(getDay(el) - day) >= 6) {
-                        metReq = false
-                        j++;
-                        array[j] = [conf]
+        const ret = confirmations.reduce((a, b) => {
+            const d2 = moment(b.date, "DD/MM/YYYY")
+            let added = false
+            for (let ax of a) {
+                if (ax.confs.length > 0) {
+                    const d1 = moment(ax.confs[0].date, "DD/MM/YYYY");
+                    if (d1.isSame(d2, 'week')) {
+                        added = true
+                        ax.confs.push(...b.confirmations)
                         break;
                     }
                 }
             }
-            if (metReq)
-                if (!array[j]) array[j] = [conf]
-                else array[j].push(conf)
-        })
-        return array
-    }, [confirmationsForShowingMonth])
-    return <Stack style={ConfirmationListStackStyle}>
-        <span style={{ ...ConfirmationRideTitleStyle }}>{ride}</span>
+            if (!added) {
+                console.log(b.date)
+                a.push({ date: moment(b.date, 'DD/MM/YYYY'), confs: b.confirmations })
+            }
+            return a;
+        }, [] as {
+            date: moment.Moment,
+            confs: PNPCompanyRideConfirmation[]
+        }[])
 
+        // ret.forEach(x => {
+        //     x.confs.sort((a, b) => {
+        //         let d1 = moment(a.date, "DD/MM/YY")
+        //         let d2 = moment(b.date, 'DD/MM/YY')
+        //         return d1.isBefore(d2) ? -1 : d2.isBefore(d1) ? 1 : 0
+        //     })
+
+        // })
+        ret.forEach((a: any) => {
+            let map = {} as any
+            a.confs.forEach((conf: PNPCompanyRideConfirmation) => {
+                let y = conf.date.split('/')
+                conf.date = y[0] + "/" + y[1] + "/" + y[2].slice(-2);
+                if (map[conf.date]) {
+                    map[conf.date].confs.push(conf)
+                } else {
+                    map[conf.date] = { confs: [conf], weekDay: getDayLetter(findCorrectDate(conf.date)) }
+                }
+            })
+
+            a.dayMap = map
+        })
+        return ret as {
+            date: moment.Moment, confs: PNPCompanyRideConfirmation[],
+            dayMap: { [id: string]: { confs: PNPCompanyRideConfirmation[], weekDay: string }[] }
+        }[]
+    }, [])
+
+    const getDay = (c: PNPCompanyRideConfirmation) => Number(c.date.split('/')[0])
+    const [week, setWeek] = useState(0)
+    const TableLabel = styled.label<{ size: number }>`
+        color:white;
+        padding:0px;
+        font-size:${x => x.size + "px"};
+    `
+    const RideControls = useMemo(() => <React.Fragment>
+        <Stack direction={'row'} justifyContent={'space-between'} style={CalendarControlsStyle}>
+            <ArrowBackIosIcon style={ControlStyle} onClick={weekForwards} />
+            <div style={CalendarShowingWeekStyle}>שבוע {week + 1}</div>
+            <ArrowForwardIosIcon style={ControlStyle} onClick={weekBackwards} />
+        </Stack>
+        <Spacer offset={1} />
+    </React.Fragment>, [ride, week])
+
+    const RideDaysConfirmations = useMemo(() => <Stack spacing={1}>
+        {React.Children.toArray(Object.entries(organizedByWeeks[week].dayMap).map((entry: any) => {
+            return <Stack direction={'row'} style={{ direction: 'rtl', background: 'rgba(255,255,255,0.1)', padding: '4px', borderRadius: '4px' }} justifyContent={'space-around'}>
+                <TableLabel size={20} style={{ fontWeight: 'bold' }}>יום {entry[1].weekDay}</TableLabel>
+                <TableLabel size={20} >{entry[0]}</TableLabel>
+                <TableLabel size={20}>נוסעים: <b style={{ fontSize: '20px' }}>{entry[1].confs.length}</b></TableLabel>
+            </Stack>
+        }))}
+    </Stack>, [organizedByWeeks,week])
+    return <Stack style={ConfirmationListStackStyle}>
+        {RideControls}
+        <span style={{ ...ConfirmationRideTitleStyle }}>{ride}</span>
         <Stack key={v4()} style={ConfirmationStackStyle}>
             <Stack style={{ ...SubListStyle, padding: '16px', maxHeight: '400px', overflowY: 'scroll' }}>
-                <label style={{ ...ConfirmationTitleStyle2, fontSize: '24px' }}>{getConfirmationsAmount()} {'אישורים'}</label>
-                <Stack spacing={1}>
-                    {React.Children.toArray(confirmationsDevidedToWeeks.map((weekDays, index) =>
-                        <Stack>
-                            <label style={{ ...ConfirmationTitleStyle2, textAlign: 'center' }}>{"שבוע " + getDayLetter(index + 1)}</label>
-                            <PNPList<PNPCompanyRideConfirmation>
-                                items={weekDays}
-                                ElementWrapper={Stack}
-                                renderRow={toConfirmationRow} />
-                        </Stack>))}
-                </Stack>
+                <label style={{ ...ConfirmationTitleStyle2, fontSize: '24px' }}>{'סה"כ נוסעים: '} {organizedByWeeks.length > 0 ? organizedByWeeks[week].confs.length : 0}</label>
+                <br />
+                {RideDaysConfirmations}
             </Stack>
         </Stack>
     </Stack>
@@ -157,6 +193,41 @@ const ConfirmationsComponent = ({ ride,
 enum ShowingCompanyManagerPage {
     Confirmations = "confs",
     AddRide = "add"
+}
+
+const RideManageRow = withHookGroup<{ ride: PNPWorkersRide }>(({ ride, loading }: Hooks & { ride: PNPWorkersRide }) => {
+
+    const deleteRide = async () => {
+        loading.doLoad()
+        const res = await StoreSingleton.get()
+            .realTime.removeWorkersRide(ride.companyId, ride.id)
+        loading.cancelLoad()
+        alert('נסיעה נמחקה בהצלחה')
+    }
+    return <Stack>
+        <label style={{ color: SECONDARY_WHITE, fontWeight: 'bold' }}>{ride.startPoint}</label>
+        <Button
+            onClick={deleteRide}
+            style={{
+                background: PRIMARY_PINK,
+                color: SECONDARY_WHITE,
+                marginInline: 'auto',
+                maxWidth: '200px',
+                minWidth: '200px'
+            }}>מחק הסעה</Button>
+    </Stack>
+}, ['loading'])
+const CompanyRidesManagementScreen = ({ cid }: { cid: string }) => {
+    const [rides, setRides] = useState<PNPWorkersRide[]>([])
+
+    useEffect(() => {
+        const unsub = StoreSingleton.get().realTime.getCompanyRidesById(cid, setRides)
+        return () => unsub()
+    })
+
+    return <Stack spacing={2}>
+        {React.Children.toArray(rides.map(ride => <RideManageRow ride={ride} />))}
+    </Stack>
 }
 export default withHookGroup((hooks: Hooks) => {
     const [confirmationMapping, setConfirmationMapping] = useState<CompanyConfirmationsMapping | undefined>()
@@ -176,37 +247,15 @@ export default withHookGroup((hooks: Hooks) => {
         return () => unsub()
     }, [])
 
-    const [showingMonthYear, setShowingMonthYear] = useState<[number, number]>([2022, 10])
-
-    const monthForward = () => {
-        if (showingMonthYear[1] >= 12)
-            setShowingMonthYear([showingMonthYear[0] + 1, 1])
-        else
-            setShowingMonthYear([showingMonthYear[0], showingMonthYear[1] + 1])
-    }
-    const monthBackward = () => {
-        if (showingMonthYear[1] <= 1)
-            setShowingMonthYear([showingMonthYear[0] - 1, 12])
-        else
-            setShowingMonthYear([showingMonthYear[0], showingMonthYear[1] - 1])
-    }
-
 
     const ConfirmationList = useCallback(() => {
         if (!confirmationMapping) return null
         const List = React.Children.toArray(Object.entries(confirmationMapping).map(([k, v]) => <ConfirmationsComponent
-            showingMonthYear={showingMonthYear}
             ride={k} confirmations={v} />))
         return <React.Fragment>
-            <Stack direction={'row'} justifyContent={'space-between'} style={CalendarControlsStyle}>
-                <ArrowBackIosIcon style={ControlStyle} onClick={monthBackward} />
-                <div style={CalendarShowingWeekStyle}>{getMonthName(showingMonthYear[1]) + " " + showingMonthYear[0]}</div>
-                <ArrowForwardIosIcon style={ControlStyle} onClick={monthForward} />
-            </Stack>
-            <Spacer offset={1} />
             {List}
         </React.Fragment>
-    }, [confirmationMapping, showingMonthYear])
+    }, [confirmationMapping])
 
 
     const AddRideAction = useCallback(() => {
@@ -231,11 +280,11 @@ export default withHookGroup((hooks: Hooks) => {
             case ShowingCompanyManagerPage.Confirmations:
                 return <Stack>{<ConfirmationList />}</Stack>
             case ShowingCompanyManagerPage.AddRide:
-                return <div>Hello World</div>
+                return company ? <CompanyRidesManagementScreen cid={company.id} /> : null
             default:
                 return null
         }
-    }, [showingPage, confirmationMapping, showingMonthYear])
+    }, [showingPage, confirmationMapping])
 
     if (!company)
         return <LoadingIndicator />
@@ -248,6 +297,7 @@ export default withHookGroup((hooks: Hooks) => {
             <ShowingPage />
             <Spacer offset={1} />
             <Button onClick={AddRideAction} style={ControlStyleButton}>{'הוסף נקודת יציאה'}</Button>
+            <Button onClick={ToggleScreen} style={ControlStyleButton}>{showingPage === ShowingCompanyManagerPage.AddRide ? 'הצג נוסעים' : 'נהל תחנות'}</Button>
         </Stack>
 
     </PageHolder>

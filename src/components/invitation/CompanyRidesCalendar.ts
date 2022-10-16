@@ -46,10 +46,9 @@ export default function useCompanyRidesCalendar(hooks: Hooks, companyId?: string
     const [viewingRide, setViewingRide] = useState<PNPWorkersRide>()
     const [selectedRidesRemove, setSelectedEventRidesRemove] = useState<SelectedRide[]>([])
     const [rides, setRides] = useState<PNPWorkersRide[]>([])
-    const [weekDays, setWeekDays] = useState<number[]>(getAllWeekDaysLeft());
+    const [weekDays, setWeekDays] = useState<number[]>(systemTime.getDay() === 6 ? getAllWeekDays() : getAllWeekDaysLeft());
     const [company, setCompany] = useState<PNPCompany | null>()
     const [today, setToday] = useState(new Date())
-
     const selectedExistingConfirmation = (ride: SelectedRide) => {
         return userConfirmations.find(x => {
             return x.date === ride?.date && ride?.ride.id === x.rideId
@@ -94,7 +93,12 @@ export default function useCompanyRidesCalendar(hooks: Hooks, companyId?: string
         }
     }, [])
 
-
+    useEffect(() => {
+        if (systemTime.getDay() === 6)
+            today.setDate(today.getDate() + 1)
+        if (systemTime.getDay() === 0)
+            today.setDate(today.getDate() + (isEqualDates(today, systemTime) ? ((DAYS_AMT) - Math.max(getAllWeekDaysLeft().length + 1), 1) : DAYS_AMT))
+    }, [])
 
     return {
         userConfirmations, rides, selectedExistingConfirmation, selectedRidesRemove,
@@ -203,11 +207,14 @@ export default function useCompanyRidesCalendar(hooks: Hooks, companyId?: string
         },
         weekForwards() {
             hooks.loading.doLoad()
-            const newDays = today.getDate() + (isEqualDates(today, systemTime) ? (DAYS_AMT) - getAllWeekDaysLeft().length + 1 : DAYS_AMT)
+            let newDays = today.getDate() + (isEqualDates(today, systemTime) ? ((DAYS_AMT) - Math.max(getAllWeekDaysLeft().length + 1), 1) : DAYS_AMT)
+
             if (newDays > getDaysInMonth(today) + 1) {
                 today.setDate(newDays - getDaysInMonth(today))
                 today.setMonth(today.getMonth() + 1)
-            } else today.setDate(newDays);
+            } else {
+                today.setDate(newDays);
+            }
             setWeekDays(getAllWeekDays())
             setSelectedEventRides([])
             setTimeout(() => { hooks.loading.cancelLoad() }, 300)

@@ -73,7 +73,7 @@ function InvitationCardWorkers(props: Hooks) {
                     <List style={{ width: '100%' }} dir={SIDE(props.language.lang)}>
                         {props.user.appUser && <Typography
                             style={CalendarWelcomeStyle} >
-                            {props.language.lang === 'heb' ? `שלום ${props.user.appUser.name}, בחר את התחנה וסמן את הימים שבהם תגיע להסעה לאחר מכן לחץ אשר הגעה `: `Hello ${props.user.appUser.name}, choose the station and mark the days on which you will arrive for the shuttle, then click confirm arrival`}
+                            {props.language.lang === 'heb' ? `היי ${props.user.appUser.name}, אנא בחר את התחנה הרצויה וסמן את הימים שבהם תגיע להסעה. לאחר מכן לחץ ״אשר הגעה״.`: `Hello ${props.user.appUser.name}, choose the station and mark the days on which you will arrive for the shuttle, then click confirm arrival`}
                         </Typography>}
                         <br />
 

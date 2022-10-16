@@ -72,6 +72,7 @@ export const isEqualRides = (r1: SelectedRide, r2: SelectedRide) => r1?.date ===
 export const nameforDir = (dir: number) => dir === 1 ? 'הלוך' : dir === 2 ? 'חזור' : 'הסעה דו כיוונית (הלוך חזור)'
 export const showingWeek = (d: Date) => {
     const newD1 = new Date(d)
+    newD1.setDate(newD1.getDate() - (systemTime.getDay() === 0 ? 1 : 0))
     const start = getDateString(newD1, true)
     const newD = new Date(d)
     newD.setDate(newD.getDate() + DAYS_AMT - 2)
@@ -159,9 +160,9 @@ export const getMonthName = (m: number) => {
         case 10:
             return "אוקטובר"
         case 11:
-            return "נובמבר"  
+            return "נובמבר"
         case 12:
-            return "דצמבר"     
+            return "דצמבר"
     }
 }
 

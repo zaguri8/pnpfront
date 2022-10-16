@@ -113,7 +113,7 @@ function CreateRide(props: Hooks) {
         }
         const send = {
             request: ride,
-            credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" },
+            credentials: { key: process.env.REACT_APP_NADAVSOLUTIONS_API_KEY },
         }
 
         if (ride.backPoint === 'null' || ride.backPoint.length < 1)

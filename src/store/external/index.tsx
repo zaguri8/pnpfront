@@ -619,6 +619,7 @@ export class Realtime {
     }
 
     removeWorkersRide = async (companyId: string, rideId: string): Promise<object | void> => {
+        await remove(child(child(child(this.rides, 'confirmationsWorkers'), companyId), rideId))
         return await remove(child(child(child(this.rides, 'workers'), companyId), rideId))
     }
     removePublicRide = async (eventId: string, rideId: string): Promise<object | void> => {

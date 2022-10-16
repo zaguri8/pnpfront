@@ -137,7 +137,7 @@ export function PaymentForm({ product, paymentInfo }) {
 
         const send = {
             customer: customer,
-            credentials: { key: "N_O_R_M_M_A_C_D_O_N_A_L_D" },
+            credentials: { key: process.env.REACT_APP_NADAVSOLUTIONS_API_KEY },
             product: payProduct
         }
 
